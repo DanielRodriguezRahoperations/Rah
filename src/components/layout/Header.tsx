@@ -371,7 +371,7 @@ const Header = () => {
               </a>
               <a
                 href="https://yelp.com/biz/rah-operations-scottsdale"
-                className="text-[#1A7C81] hover:text-[#0F6168] transition-colors duration-300"
+                className="text-[#3CBEC7] hover:text-[#1A7C81] transition-colors duration-300"
                 aria-label="Yelp"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -380,7 +380,7 @@ const Header = () => {
               </a>
               <a
                 href="https://www.google.com/maps/place/Rah+Operations+LLC/@33.7335583,-111.9450294,969m/data=!3m2!1e3!4b1!4m6!3m5!1s0x872b790bdab5c151:0xac53f9ac22bb3909!8m2!3d33.7335583!4d-111.9450294!16s%2Fg%2F11mcpjh776?hl=en&entry=ttu&g_ep=EgoyMDI1MDkxMC4wIKXMDSoASAFQAw%3D%3D"
-                className="text-[#0F6168] hover:text-[#1A7C81] transition-colors duration-300"
+                className="text-[#0F6168] hover:text-[#104A53] transition-colors duration-300"
                 aria-label="Google Maps"
                 target="_blank"
                 rel="noopener noreferrer"
