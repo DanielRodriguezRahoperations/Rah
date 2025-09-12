@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Phone, Mail, Facebook, Instagram, Linkedin, BadgeHelp as Yelp, ChevronDown } from 'lucide-react';
+import { Menu, X, Phone, Mail, Facebook, Instagram, Linkedin, BadgeHelp as Yelp, ChevronDown, MapPin } from 'lucide-react';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -79,9 +79,10 @@ const Header = () => {
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
+                {/* Updated social media icons with brand colors */}
                 <a
                   href="https://facebook.com/644350702085787"
-                  className="text-[#1877F2] hover:text-blue-700 transition-all duration-300 transform hover:scale-110 hover:rotate-12 hover:shadow-lg rounded-full p-1"
+                  className="text-[#3CBEC7] hover:text-[#1A7C81] transition-all duration-300 transform hover:scale-110 hover:rotate-12 hover:shadow-lg rounded-full p-1"
                   aria-label="Follow us on Facebook"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -90,7 +91,7 @@ const Header = () => {
                 </a>
                 <a
                   href="https://instagram.com/rahoperations/"
-                  className="text-[#E4405F] hover:text-pink-700 transition-all duration-300 transform hover:scale-110 hover:rotate-12 hover:shadow-lg rounded-full p-1"
+                  className="text-[#1A7C81] hover:text-[#0F6168] transition-all duration-300 transform hover:scale-110 hover:rotate-12 hover:shadow-lg rounded-full p-1"
                   aria-label="Follow us on Instagram"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -99,7 +100,7 @@ const Header = () => {
                 </a>
                 <a
                   href="https://www.linkedin.com/company/rah-operations-llc"
-                  className="text-[#0077B5] hover:text-blue-800 transition-all duration-300 transform hover:scale-110 hover:rotate-12 hover:shadow-lg rounded-full p-1"
+                  className="text-[#0F6168] hover:text-[#104A53] transition-all duration-300 transform hover:scale-110 hover:rotate-12 hover:shadow-lg rounded-full p-1"
                   aria-label="Connect with us on LinkedIn"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -108,12 +109,22 @@ const Header = () => {
                 </a>
                 <a
                   href="https://yelp.com/biz/rah-operations-scottsdale"
-                  className="text-[#D32323] hover:text-red-700 transition-all duration-300 transform hover:scale-110 hover:rotate-12 hover:shadow-lg rounded-full p-1"
+                  className="text-[#97EDED] hover:text-[#3CBEC7] transition-all duration-300 transform hover:scale-110 hover:rotate-12 hover:shadow-lg rounded-full p-1"
                   aria-label="Review us on Yelp"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   <Yelp className="w-5 h-5" />
+                </a>
+                {/* NEW: Google My Business Link */}
+                <a
+                  href="https://www.google.com/maps/place/Rah+Operations+LLC/@33.7335583,-111.9450294,969m/data=!3m2!1e3!4b1!4m6!3m5!1s0x872b790bdab5c151:0xac53f9ac22bb3909!8m2!3d33.7335583!4d-111.9450294!16s%2Fg%2F11mcpjh776?hl=en&entry=ttu&g_ep=EgoyMDI1MDkxMC4wIKXMDSoASAFQAw%3D%3D"
+                  className="text-[#C9F8F6] hover:text-[#97EDED] transition-all duration-300 transform hover:scale-110 hover:rotate-12 hover:shadow-lg rounded-full p-1"
+                  aria-label="Find us on Google Maps"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <MapPin className="w-5 h-5" />
                 </a>
               </div>
               <div className="hidden sm:flex items-center space-x-4 ml-4">
@@ -146,12 +157,16 @@ const Header = () => {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center group">
-              <img
-                src="/Updated%20RAH%20LOGO%20with%20Correct%20Color%20scheme.png"
-                alt="RAH Operations - Arizona Business Solutions"
-                className="h-12 w-auto transition-all duration-300 group-hover:scale-105 transform-gpu"
-                loading="eager"
-              />
+              {/* Updated to use optimized logo with WebP fallback */}
+              <picture>
+                <source srcSet="/logo.webp" type="image/webp" />
+                <img
+                  src="/logo.png"
+                  alt="RAH Operations - Arizona Business Solutions"
+                  className="h-12 w-auto transition-all duration-300 group-hover:scale-105 transform-gpu"
+                  loading="eager"
+                />
+              </picture>
             </Link>
           </div>
 
@@ -166,8 +181,8 @@ const Header = () => {
                         onClick={() => handleDropdownToggle(item.name)}
                         className={`nav-link flex items-center text-xs font-medium transition-all duration-300 whitespace-nowrap px-3 py-2 rounded-md hover:bg-gray-50 group ${
                           isActive(item.href) || activeDropdown === item.name
-                            ? 'text-[#97EDED] bg-gray-50 active'
-                            : 'text-gray-700 hover:text-[#97EDED]'
+                            ? 'text-[#1A7C81] bg-gray-50 active'
+                            : 'text-gray-700 hover:text-[#1A7C81]'
                         }`}
                       >
                         {item.name}
@@ -203,8 +218,8 @@ const Header = () => {
                       to={item.href}
                       className={`nav-link text-xs font-medium transition-all duration-300 whitespace-nowrap px-3 py-2 rounded-md hover:bg-gray-50 ${
                         isActive(item.href)
-                          ? 'text-[#97EDED] bg-gray-50 active'
-                          : 'text-gray-700 hover:text-[#97EDED]'
+                          ? 'text-[#1A7C81] bg-gray-50 active'
+                          : 'text-gray-700 hover:text-[#1A7C81]'
                       }`}
                     >
                       {item.name}
@@ -227,7 +242,7 @@ const Header = () => {
           <div className="lg:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-[#97EDED] hover:bg-gray-50 transition-all duration-300 transform hover:scale-110 relative overflow-hidden"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-[#1A7C81] hover:bg-gray-50 transition-all duration-300 transform hover:scale-110 relative overflow-hidden"
               aria-expanded="false"
               aria-label="Toggle navigation menu"
             >
@@ -260,8 +275,8 @@ const Header = () => {
                       onClick={() => handleDropdownToggle(item.name)}
                       className={`flex items-center justify-between w-full px-3 py-2 text-sm font-medium transition-all duration-300 rounded-md transform hover:translate-x-2 hover:bg-gray-50 ${
                         activeDropdown === item.name
-                          ? 'text-[#97EDED] bg-gray-50'
-                          : 'text-gray-700 hover:text-[#97EDED]'
+                          ? 'text-[#1A7C81] bg-gray-50'
+                          : 'text-gray-700 hover:text-[#1A7C81]'
                       }`}
                       style={{
                         animationDelay: `${index * 50}ms`,
@@ -301,8 +316,8 @@ const Header = () => {
                     to={item.href}
                     className={`block px-3 py-2 text-sm font-medium transition-all duration-300 rounded-md transform hover:translate-x-2 hover:bg-gray-50 ${
                       isActive(item.href)
-                        ? 'text-[#97EDED] bg-gray-50'
-                        : 'text-gray-700 hover:text-[#97EDED]'
+                        ? 'text-[#1A7C81] bg-gray-50'
+                        : 'text-gray-700 hover:text-[#1A7C81]'
                     }`}
                     style={{
                       animationDelay: `${index * 50}ms`,
@@ -324,6 +339,55 @@ const Header = () => {
             >
               Free Consultation
             </Link>
+            
+            {/* Mobile Social Media Links */}
+            <div className="flex justify-center items-center space-x-4 mt-4 pt-4 border-t border-gray-100">
+              <a
+                href="https://facebook.com/644350702085787"
+                className="text-[#3CBEC7] hover:text-[#1A7C81] transition-colors duration-300"
+                aria-label="Facebook"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Facebook className="w-5 h-5" />
+              </a>
+              <a
+                href="https://instagram.com/rahoperations/"
+                className="text-[#1A7C81] hover:text-[#0F6168] transition-colors duration-300"
+                aria-label="Instagram"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Instagram className="w-5 h-5" />
+              </a>
+              <a
+                href="https://www.linkedin.com/company/rah-operations-llc"
+                className="text-[#0F6168] hover:text-[#104A53] transition-colors duration-300"
+                aria-label="LinkedIn"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Linkedin className="w-5 h-5" />
+              </a>
+              <a
+                href="https://yelp.com/biz/rah-operations-scottsdale"
+                className="text-[#97EDED] hover:text-[#3CBEC7] transition-colors duration-300"
+                aria-label="Yelp"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Yelp className="w-5 h-5" />
+              </a>
+              <a
+                href="https://www.google.com/maps/place/Rah+Operations+LLC/@33.7335583,-111.9450294,969m/data=!3m2!1e3!4b1!4m6!3m5!1s0x872b790bdab5c151:0xac53f9ac22bb3909!8m2!3d33.7335583!4d-111.9450294!16s%2Fg%2F11mcpjh776?hl=en&entry=ttu&g_ep=EgoyMDI1MDkxMC4wIKXMDSoASAFQAw%3D%3D"
+                className="text-[#C9F8F6] hover:text-[#97EDED] transition-colors duration-300"
+                aria-label="Google Maps"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <MapPin className="w-5 h-5" />
+              </a>
+            </div>
           </div>
         </div>
       </nav>
