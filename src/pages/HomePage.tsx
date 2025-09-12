@@ -417,11 +417,14 @@ const HomePage = () => {
                     <img
                       src={service.iconImage}
                       alt={service.iconAlt}
-                      className="w-12 h-12 object-contain group-hover:scale-110 transition-transform duration-300 filter brightness-0 invert"
+                      className="w-12 h-12 object-contain group-hover:scale-110 transition-transform duration-300"
                       onError={(e) => {
                         console.error(`Failed to load image: ${service.iconImage}`);
-                        // Keep the container but hide the broken image
-                        e.currentTarget.style.display = 'none';
+                        // Show a fallback text instead of hiding
+                        const fallback = document.createElement('div');
+                        fallback.className = 'text-white text-xs text-center';
+                        fallback.textContent = 'Icon';
+                        e.currentTarget.parentNode?.replaceChild(fallback, e.currentTarget);
                       }}
                     />
                   </div>
