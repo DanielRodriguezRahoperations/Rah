@@ -92,7 +92,9 @@ const HomePage = () => {
       description: 'Custom website design and search engine optimization to help your Arizona business rank higher on Google and dominate local search results.',
       link: '/website-design-and-seo',
       features: ['Mobile-Responsive Design', 'Local Arizona SEO', 'Google My Business', 'Conversion Optimization'],
-      color: 'from-blue-500 to-blue-600'
+      color: 'from-[#3CBEC7] to-[#1A7C81]', // Primary teal gradient
+      bgAccent: 'bg-[#3CBEC7]/10',
+      iconBg: 'bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81]'
     },
     {
       icon: Building2,
@@ -100,7 +102,9 @@ const HomePage = () => {
       description: 'Complete business formation services including LLC setup, EIN registration, and all required documentation to legally establish your Arizona business.',
       link: '/new-business-setup',
       features: ['LLC Formation', 'EIN Registration', 'Operating Agreements', 'Legal Compliance'],
-      color: 'from-green-500 to-green-600'
+      color: 'from-[#1A7C81] to-[#0F6168]', // Darker teal gradient
+      bgAccent: 'bg-[#1A7C81]/10',
+      iconBg: 'bg-gradient-to-r from-[#1A7C81] to-[#0F6168]'
     },
     {
       icon: CreditCard,
@@ -108,7 +112,9 @@ const HomePage = () => {
       description: 'Establish and build business credit, secure funding, and access capital for growth without relying on personal credit guarantees.',
       link: '/business-credit-and-funding',
       features: ['Credit Building', 'Funding Solutions', 'D-U-N-S Setup', 'Trade Lines'],
-      color: 'from-purple-500 to-purple-600'
+      color: 'from-[#97EDED] to-[#3CBEC7]', // Light teal gradient
+      bgAccent: 'bg-[#97EDED]/20',
+      iconBg: 'bg-gradient-to-r from-[#97EDED] to-[#3CBEC7]'
     },
     {
       icon: TrendingUp,
@@ -116,7 +122,9 @@ const HomePage = () => {
       description: 'Professional credit repair services to improve your personal credit score, remove negative items, and build better financial standing.',
       link: '/personal-credit-repair',
       features: ['Credit Analysis', 'Dispute Process', 'Score Improvement', 'Financial Coaching'],
-      color: 'from-red-500 to-red-600'
+      color: 'from-[#0F6168] to-[#104A53]', // Deep teal gradient
+      bgAccent: 'bg-[#0F6168]/10',
+      iconBg: 'bg-gradient-to-r from-[#0F6168] to-[#104A53]'
     },
     {
       icon: BarChart3,
@@ -124,7 +132,9 @@ const HomePage = () => {
       description: 'Comprehensive digital marketing strategies including SEO, social media, and lead generation to grow your Arizona business online.',
       link: '/digital-marketing',
       features: ['SEO Strategy', 'Social Media', 'Lead Generation', 'Analytics'],
-      color: 'from-orange-500 to-orange-600'
+      color: 'from-[#C9F8F6] to-[#97EDED]', // Soft teal gradient
+      bgAccent: 'bg-[#C9F8F6]/30',
+      iconBg: 'bg-gradient-to-r from-[#C9F8F6] to-[#97EDED]'
     },
     {
       icon: Users,
@@ -132,7 +142,9 @@ const HomePage = () => {
       description: 'Professional social media management to build your brand presence, engage customers, and drive business growth across all platforms.',
       link: '/social-media-management',
       features: ['Content Creation', 'Community Management', 'Paid Advertising', 'Brand Building'],
-      color: 'from-pink-500 to-pink-600'
+      color: 'from-[#B5F3F0] to-[#C9F8F6]', // Gentle teal gradient
+      bgAccent: 'bg-[#B5F3F0]/25',
+      iconBg: 'bg-gradient-to-r from-[#B5F3F0] to-[#C9F8F6]'
     },
     {
       icon: FileText,
@@ -140,7 +152,9 @@ const HomePage = () => {
       description: 'Professional notary services for all your business and personal document needs throughout Arizona with mobile service available.',
       link: '/notary-services',
       features: ['Mobile Notary', 'Business Documents', 'Real Estate', 'Legal Papers'],
-      color: 'from-indigo-500 to-indigo-600'
+      color: 'from-[#3CBEC7] via-[#1A7C81] to-[#0F6168]', // Three-color teal gradient
+      bgAccent: 'bg-[#3CBEC7]/15',
+      iconBg: 'bg-gradient-to-r from-[#3CBEC7] via-[#1A7C81] to-[#0F6168]'
     }
   ];
 
@@ -188,28 +202,32 @@ const HomePage = () => {
       number: '500',
       suffix: '+',
       label: 'Arizona Businesses Served',
-      description: 'Helping local businesses grow since 2015'
+      description: 'Helping local businesses grow since 2015',
+      color: 'text-[#3CBEC7]'
     },
     { 
       icon: Zap,
       number: '1',
       suffix: '',
       label: 'Google Rankings Achieved',
-      description: 'Top search results for our clients'
+      description: 'Top search results for our clients',
+      color: 'text-[#1A7C81]'
     },
     { 
       icon: Star,
       number: '98',
       suffix: '%',
       label: 'Client Satisfaction',
-      description: 'Consistently exceeding expectations'
+      description: 'Consistently exceeding expectations',
+      color: 'text-[#97EDED]'
     },
     { 
       icon: TrendingUp,
       number: '10',
       suffix: '+',
       label: 'Years in Arizona',
-      description: 'Deep local market expertise'
+      description: 'Deep local market expertise',
+      color: 'text-[#0F6168]'
     }
   ];
 
@@ -315,7 +333,7 @@ const HomePage = () => {
           <div className="text-center">
             {/* Animated badge */}
             <div className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-[#0F6168] text-sm font-medium mb-6 fade-in-up">
-              <Award className="w-4 h-4 mr-2" />
+              <Award className="w-4 h-4 mr-2 text-[#1A7C81]" />
               #1 Rated Arizona Business Solutions
             </div>
 
@@ -337,11 +355,11 @@ const HomePage = () => {
             </p>
 
             <div className="hero-buttons flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Button size="lg" to="/contact" className="pulse-glow btn-magnetic">
+              <Button size="lg" to="/contact" className="pulse-glow btn-magnetic bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81] hover:from-[#1A7C81] hover:to-[#0F6168]">
                 Get Free SEO Audit
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <Button variant="outline" size="lg" href="tel:+14884724621" className="btn-magnetic">
+              <Button variant="outline" size="lg" href="tel:+14884724621" className="btn-magnetic border-[#1A7C81] text-[#1A7C81] hover:bg-[#1A7C81] hover:text-white">
                 Call (888) 472-4621
               </Button>
             </div>
@@ -349,15 +367,15 @@ const HomePage = () => {
             {/* Trust indicators */}
             <div className="flex flex-wrap justify-center items-center gap-8 text-[#1A7C81] text-sm font-medium fade-in-up">
               <div className="flex items-center">
-                <CheckCircle className="w-5 h-5 mr-2" />
+                <CheckCircle className="w-5 h-5 mr-2 text-[#3CBEC7]" />
                 500+ Arizona Businesses Served
               </div>
               <div className="flex items-center">
-                <Star className="w-5 h-5 mr-2 text-yellow-500" />
+                <Star className="w-5 h-5 mr-2 text-[#3CBEC7] fill-current" />
                 5.0 Star Rating
               </div>
               <div className="flex items-center">
-                <Award className="w-5 h-5 mr-2" />
+                <Award className="w-5 h-5 mr-2 text-[#3CBEC7]" />
                 10+ Years Experience
               </div>
             </div>
@@ -383,11 +401,14 @@ const HomePage = () => {
               return (
                 <div
                   key={index}
-                  className="service-card group"
+                  className="service-card group relative overflow-hidden"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
+                  {/* Subtle background accent */}
+                  <div className={`absolute top-0 right-0 w-24 h-24 ${service.bgAccent} rounded-full transform translate-x-8 -translate-y-8 opacity-0 group-hover:opacity-100 transition-all duration-500`}></div>
+                  
                   <div className="relative z-10">
-                    <div className={`w-16 h-16 bg-gradient-to-r ${service.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg group-hover:shadow-xl`}>
+                    <div className={`w-16 h-16 ${service.iconBg} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg group-hover:shadow-xl`}>
                       <Icon className="w-8 h-8 text-white group-hover:scale-110 transition-transform duration-300" />
                     </div>
 
@@ -413,7 +434,7 @@ const HomePage = () => {
                       <Button
                         variant="outline"
                         to={service.link}
-                        className="group-hover:bg-[#3CBEC7] group-hover:text-white group-hover:border-[#3CBEC7] transition-all duration-300"
+                        className="group-hover:bg-[#3CBEC7] group-hover:text-white group-hover:border-[#3CBEC7] border-[#1A7C81] text-[#1A7C81] transition-all duration-300"
                       >
                         Learn More
                         <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
@@ -440,7 +461,7 @@ const HomePage = () => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16 fade-in-up">
             <h2 className="text-4xl font-bold mb-4">Proven Results for Arizona Businesses</h2>
-            <p className="text-xl text-gray-200">Numbers that demonstrate our commitment to Arizona business success</p>
+            <p className="text-xl text-[#C9F8F6]">Numbers that demonstrate our commitment to Arizona business success</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -449,14 +470,14 @@ const HomePage = () => {
               return (
                 <div key={index} className={`text-center fade-in-up stagger-${index + 1} group`}>
                   <div className="relative">
-                    <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                      <Icon className="w-10 h-10 text-[#97EDED]" />
+                    <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 group-hover:bg-white/20 transition-all duration-300">
+                      <Icon className={`w-10 h-10 ${achievement.color}`} />
                     </div>
                     <div className="animate-number stat-number" data-target={achievement.number} data-suffix={achievement.suffix}>
                       0{achievement.suffix}
                     </div>
-                    <div className="text-xl font-semibold mb-2">{achievement.label}</div>
-                    <p className="text-gray-200 text-sm">{achievement.description}</p>
+                    <div className="text-xl font-semibold mb-2 text-[#C9F8F6]">{achievement.label}</div>
+                    <p className="text-[#B5F3F0] text-sm">{achievement.description}</p>
                   </div>
                 </div>
               );
@@ -486,7 +507,7 @@ const HomePage = () => {
                 <div className="relative z-10">
                   <div className="flex items-center mb-4">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                      <Star key={i} className="w-5 h-5 text-[#3CBEC7] fill-current" />
                     ))}
                   </div>
                   <p className="text-gray-700 mb-6 italic leading-relaxed">"{testimonial.text}"</p>
@@ -501,7 +522,7 @@ const HomePage = () => {
           </div>
 
           <div className="text-center mt-12 fade-in-up">
-            <Button to="/testimonials" className="btn-magnetic">
+            <Button to="/testimonials" className="btn-magnetic bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81] text-white hover:from-[#1A7C81] hover:to-[#0F6168]">
               View All Testimonials
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
