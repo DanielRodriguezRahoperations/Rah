@@ -5,6 +5,7 @@ import { absoluteUrl } from '../utils/url';
 import Button from '../components/ui/Button';
 import ContactForm from '../components/ui/ContactForm';
 import InternalLinks from '../components/ui/InternalLinks';
+import EnhancedTestimonials from '../components/ui/EnhancedTestimonials';
 
 const HomePage = () => {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -162,44 +163,6 @@ const HomePage = () => {
       color: 'from-[#3CBEC7] via-[#1A7C81] to-[#0F6168]',
       bgAccent: 'bg-[#3CBEC7]/15',
       iconBg: 'bg-gradient-to-r from-[#3CBEC7] via-[#1A7C81] to-[#0F6168]'
-    }
-  ];
-
-  const testimonials = [
-    {
-      name: 'Sarah M.',
-      location: 'Phoenix, AZ',
-      text: 'Incredible service and support. RAH Operations transformed our online presence and doubled our leads within 3 months!',
-      rating: 5,
-      company: 'Phoenix Home Services'
-    },
-    {
-      name: 'John D.',
-      location: 'Scottsdale, AZ',
-      text: 'RAH Operations helped us double our monthly leads and positioned us as a market leader in Arizona!',
-      rating: 5,
-      company: 'Scottsdale Real Estate'
-    },
-    {
-      name: 'Lisa T.',
-      location: 'Tempe, AZ',
-      text: 'I was skeptical about digital marketing agencies, but Daniel proved me wrong. He delivered real results in just a few weeks.',
-      rating: 5,
-      company: 'Tempe Consulting Group'
-    },
-    {
-      name: 'Jamal R.',
-      location: 'Chandler, AZ',
-      text: 'Before working with RAH Operations, I had no online presence. Now I\'m ranking on Google, and my phone hasn\'t stopped ringing!',
-      rating: 5,
-      company: 'Chandler Law Firm'
-    },
-    {
-      name: 'Jeremy White',
-      location: 'Phoenix, AZ',
-      text: 'Daniel helped me take my business from an idea to a fully structured LLC with solid business credit in under 30 days.',
-      rating: 5,
-      company: 'Arizona Tech Startup'
     }
   ];
 
@@ -502,49 +465,12 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16 fade-in-up">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              What Arizona Businesses Say
-            </h2>
-            <p className="text-xl text-gray-600">
-              Real stories from Arizona businesses we've helped grow and succeed
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {testimonials.slice(0, 3).map((testimonial, index) => (
-              <div
-                key={index}
-                className={`testimonial-card fade-in-up stagger-${index + 1} group`}
-              >
-                <div className="relative z-10">
-                  <div className="flex items-center mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 text-[#3CBEC7] fill-current" />
-                    ))}
-                  </div>
-                  <p className="text-gray-700 mb-6 italic leading-relaxed">"{testimonial.text}"</p>
-                  <div>
-                    <div className="font-semibold text-gray-900">{testimonial.name}</div>
-                    <div className="text-[#1A7C81] text-sm">{testimonial.location}</div>
-                    <div className="text-gray-500 text-xs mt-1">{testimonial.company}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="text-center mt-12 fade-in-up">
-            <Button to="/testimonials" className="btn-magnetic bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81] text-white hover:from-[#1A7C81] hover:to-[#0F6168]">
-              View All Testimonials
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-          </div>
-        </div>
-      </section>
+      {/* Enhanced Testimonials Section - REPLACES OLD TESTIMONIALS */}
+      <EnhancedTestimonials 
+        showClientLogos={true}
+        showVideoTestimonials={true}
+        autoplay={true}
+      />
 
       {/* Contact Section */}
       <section className="py-20 bg-gradient-to-br from-[#C9F8F6] to-[#B5F3F0] bg-pattern">
