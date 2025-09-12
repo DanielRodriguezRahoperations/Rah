@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Star, Users, TrendingUp, Shield, Building2, CreditCard, BarChart3, Globe, Search, FileText, MessageCircle, CheckCircle, Award, Zap } from 'lucide-react';
+import { ArrowRight, Star, TrendingUp, Shield, CheckCircle, Award, Zap } from 'lucide-react';
 import SEOHead from '../components/ui/SEOHead';
 import { absoluteUrl } from '../utils/url';
 import Button from '../components/ui/Button';
@@ -268,7 +268,7 @@ const HomePage = () => {
       'Glendale',
       'Arizona'
     ],
-    image: 'https://www.rahoperations.com/logo.webp',
+    image: 'https://www.rahoperations.com/Updated%20RAH%20LOGO%20with%20Correct%20Color%20scheme.png',
     priceRange: '$$',
     aggregateRating: {
       '@type': 'AggregateRating',
