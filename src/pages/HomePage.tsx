@@ -268,7 +268,7 @@ const HomePage = () => {
       'Glendale',
       'Arizona'
     ],
-    image: 'https://www.rahoperations.com/Updated%20RAH%20LOGO%20with%20Correct%20Color%20scheme.png',
+    image: 'https://www.rahoperations.com/logo.webp',
     priceRange: '$$',
     aggregateRating: {
       '@type': 'AggregateRating',
