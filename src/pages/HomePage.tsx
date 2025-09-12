@@ -87,72 +87,79 @@ const HomePage = () => {
 
   const services = [
     {
-      icon: Globe,
+      iconImage: '/Websitedesignandseo.png',
+      iconAlt: 'Website Design and SEO Services',
       title: 'Website Design & SEO',
       description: 'Custom website design and search engine optimization to help your Arizona business rank higher on Google and dominate local search results.',
       link: '/website-design-and-seo',
       features: ['Mobile-Responsive Design', 'Local Arizona SEO', 'Google My Business', 'Conversion Optimization'],
-      color: 'from-[#3CBEC7] to-[#1A7C81]', // Primary teal gradient
+      color: 'from-[#3CBEC7] to-[#1A7C81]',
       bgAccent: 'bg-[#3CBEC7]/10',
       iconBg: 'bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81]'
     },
     {
-      icon: Building2,
+      iconImage: '/Newbusinessdevopment.png',
+      iconAlt: 'New Business Setup Services',
       title: 'New Business Setup',
       description: 'Complete business formation services including LLC setup, EIN registration, and all required documentation to legally establish your Arizona business.',
       link: '/new-business-setup',
       features: ['LLC Formation', 'EIN Registration', 'Operating Agreements', 'Legal Compliance'],
-      color: 'from-[#1A7C81] to-[#0F6168]', // Darker teal gradient
+      color: 'from-[#1A7C81] to-[#0F6168]',
       bgAccent: 'bg-[#1A7C81]/10',
       iconBg: 'bg-gradient-to-r from-[#1A7C81] to-[#0F6168]'
     },
     {
-      icon: CreditCard,
+      iconImage: '/businesscreditandfunding.png',
+      iconAlt: 'Business Credit and Funding Services',
       title: 'Business Credit & Funding',
       description: 'Establish and build business credit, secure funding, and access capital for growth without relying on personal credit guarantees.',
       link: '/business-credit-and-funding',
       features: ['Credit Building', 'Funding Solutions', 'D-U-N-S Setup', 'Trade Lines'],
-      color: 'from-[#97EDED] to-[#3CBEC7]', // Light teal gradient
+      color: 'from-[#97EDED] to-[#3CBEC7]',
       bgAccent: 'bg-[#97EDED]/20',
       iconBg: 'bg-gradient-to-r from-[#97EDED] to-[#3CBEC7]'
     },
     {
-      icon: TrendingUp,
+      iconImage: '/Personalcreditrepair.png',
+      iconAlt: 'Personal Credit Repair Services',
       title: 'Personal Credit Repair',
       description: 'Professional credit repair services to improve your personal credit score, remove negative items, and build better financial standing.',
       link: '/personal-credit-repair',
       features: ['Credit Analysis', 'Dispute Process', 'Score Improvement', 'Financial Coaching'],
-      color: 'from-[#0F6168] to-[#104A53]', // Deep teal gradient
+      color: 'from-[#0F6168] to-[#104A53]',
       bgAccent: 'bg-[#0F6168]/10',
       iconBg: 'bg-gradient-to-r from-[#0F6168] to-[#104A53]'
     },
     {
-      icon: BarChart3,
+      iconImage: '/DigitalMarketing.png',
+      iconAlt: 'Digital Marketing Services',
       title: 'Digital Marketing',
       description: 'Comprehensive digital marketing strategies including SEO, social media, and lead generation to grow your Arizona business online.',
       link: '/digital-marketing',
       features: ['SEO Strategy', 'Social Media', 'Lead Generation', 'Analytics'],
-      color: 'from-[#C9F8F6] to-[#97EDED]', // Soft teal gradient
+      color: 'from-[#C9F8F6] to-[#97EDED]',
       bgAccent: 'bg-[#C9F8F6]/30',
       iconBg: 'bg-gradient-to-r from-[#C9F8F6] to-[#97EDED]'
     },
     {
-      icon: Users,
+      iconImage: '/SocialMediaManagement.png',
+      iconAlt: 'Social Media Management Services',
       title: 'Social Media Management',
       description: 'Professional social media management to build your brand presence, engage customers, and drive business growth across all platforms.',
       link: '/social-media-management',
       features: ['Content Creation', 'Community Management', 'Paid Advertising', 'Brand Building'],
-      color: 'from-[#B5F3F0] to-[#C9F8F6]', // Gentle teal gradient
+      color: 'from-[#B5F3F0] to-[#C9F8F6]',
       bgAccent: 'bg-[#B5F3F0]/25',
       iconBg: 'bg-gradient-to-r from-[#B5F3F0] to-[#C9F8F6]'
     },
     {
-      icon: FileText,
+      iconImage: '/Arizonanotaryservices.png',
+      iconAlt: 'Arizona Notary Services',
       title: 'Arizona Notary Services',
       description: 'Professional notary services for all your business and personal document needs throughout Arizona with mobile service available.',
       link: '/notary-services',
       features: ['Mobile Notary', 'Business Documents', 'Real Estate', 'Legal Papers'],
-      color: 'from-[#3CBEC7] via-[#1A7C81] to-[#0F6168]', // Three-color teal gradient
+      color: 'from-[#3CBEC7] via-[#1A7C81] to-[#0F6168]',
       bgAccent: 'bg-[#3CBEC7]/15',
       iconBg: 'bg-gradient-to-r from-[#3CBEC7] via-[#1A7C81] to-[#0F6168]'
     }
@@ -396,55 +403,61 @@ const HomePage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 services-container">
-            {services.map((service, index) => {
-              const Icon = service.icon;
-              return (
-                <div
-                  key={index}
-                  className="service-card group relative overflow-hidden"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  {/* Subtle background accent */}
-                  <div className={`absolute top-0 right-0 w-24 h-24 ${service.bgAccent} rounded-full transform translate-x-8 -translate-y-8 opacity-0 group-hover:opacity-100 transition-all duration-500`}></div>
-                  
-                  <div className="relative z-10">
-                    <div className={`w-16 h-16 ${service.iconBg} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg group-hover:shadow-xl`}>
-                      <Icon className="w-8 h-8 text-white group-hover:scale-110 transition-transform duration-300" />
-                    </div>
+            {services.map((service, index) => (
+              <div
+                key={index}
+                className="service-card group relative overflow-hidden"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                {/* Subtle background accent */}
+                <div className={`absolute top-0 right-0 w-24 h-24 ${service.bgAccent} rounded-full transform translate-x-8 -translate-y-8 opacity-0 group-hover:opacity-100 transition-all duration-500`}></div>
+                
+                <div className="relative z-10">
+                  <div className={`w-16 h-16 ${service.iconBg} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg group-hover:shadow-xl p-2`}>
+                    <img
+                      src={service.iconImage}
+                      alt={service.iconAlt}
+                      className="w-12 h-12 object-contain group-hover:scale-110 transition-transform duration-300 filter brightness-0 invert"
+                      onError={(e) => {
+                        console.error(`Failed to load image: ${service.iconImage}`);
+                        // Keep the container but hide the broken image
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  </div>
 
-                    <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-[#1A7C81] transition-colors duration-300">
-                      {service.title}
-                    </h3>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-[#1A7C81] transition-colors duration-300">
+                    {service.title}
+                  </h3>
 
-                    <p className="text-gray-600 mb-6 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
-                      {service.description}
-                    </p>
+                  <p className="text-gray-600 mb-6 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
+                    {service.description}
+                  </p>
 
-                    {/* Feature list */}
-                    <ul className="space-y-2 mb-6">
-                      {service.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-center text-sm text-gray-600">
-                          <CheckCircle className="w-4 h-4 text-[#3CBEC7] mr-2 flex-shrink-0" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
+                  {/* Feature list */}
+                  <ul className="space-y-2 mb-6">
+                    {service.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-center text-sm text-gray-600">
+                        <CheckCircle className="w-4 h-4 text-[#3CBEC7] mr-2 flex-shrink-0" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
 
-                    <div className="flex items-center justify-between">
-                      <Button
-                        variant="outline"
-                        to={service.link}
-                        className="group-hover:bg-[#3CBEC7] group-hover:text-white group-hover:border-[#3CBEC7] border-[#1A7C81] text-[#1A7C81] transition-all duration-300"
-                      >
-                        Learn More
-                        <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-                      </Button>
-                      <div className="w-2 h-2 bg-[#3CBEC7] rounded-full opacity-0 group-hover:opacity-100 group-hover:scale-150 transition-all duration-500"></div>
-                    </div>
+                  <div className="flex items-center justify-between">
+                    <Button
+                      variant="outline"
+                      to={service.link}
+                      className="group-hover:bg-[#3CBEC7] group-hover:text-white group-hover:border-[#3CBEC7] border-[#1A7C81] text-[#1A7C81] transition-all duration-300"
+                    >
+                      Learn More
+                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                    </Button>
+                    <div className="w-2 h-2 bg-[#3CBEC7] rounded-full opacity-0 group-hover:opacity-100 group-hover:scale-150 transition-all duration-500"></div>
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </div>
       </section>
