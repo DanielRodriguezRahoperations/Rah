@@ -491,23 +491,52 @@ const PortfolioPage = () => {
             {filteredProjects.map((project, index) => (
               <div key={project.id} className={`portfolio-animate fade-in-up stagger-${(index % 3) + 1}`}>
                 <div className="group bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 overflow-hidden">
-                  {/* Project Image */}
+                  {/* Live Website Preview */}
                   <div className="relative h-48 bg-gradient-to-br from-[#C9F8F6] to-[#B5F3F0] overflow-hidden">
-                    <img
-                      src={project.image}
-                      alt={`${project.title} preview`}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      onError={(e) => e.currentTarget.style.display = 'none'}
-                    />
-                    <div className="absolute top-4 right-4">
-                      <a
-                        href={project.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-[#1A7C81] hover:bg-white transition-colors duration-300"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                      </a>
+                    {/* Live Badge */}
+                    <div className="absolute top-2 left-2 z-20 bg-white/95 backdrop-blur-sm px-2 py-1 rounded text-xs font-medium text-[#1A7C81] flex items-center">
+                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1 animate-pulse"></div>
+                      Live
+                    </div>
+                    
+                    {/* Direct Website Link */}
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute inset-0 z-10 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center"
+                    >
+                      <div className="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center">
+                        <ExternalLink className="w-4 h-4 mr-2 text-[#1A7C81]" />
+                        <span className="font-medium text-[#1A7C81] text-sm">View Live Site</span>
+                      </div>
+                    </a>
+
+                    {/* Website Preview */}
+                    <div className="relative w-full h-full">
+                      <iframe
+                        src={project.url}
+                        title={`${project.title} preview`}
+                        className="w-full h-full scale-75 transform origin-top-left pointer-events-none border-2 border-white/20 rounded"
+                        style={{ width: '133.33%', height: '133.33%' }}
+                        loading="lazy"
+                      />
+                      
+                      {/* Fallback gradient when iframe doesn't load */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#C9F8F6] to-[#B5F3F0] opacity-0 flex items-center justify-center">
+                        <div className="text-center text-[#1A7C81]">
+                          <ExternalLink className="w-8 h-8 mx-auto mb-2" />
+                          <div className="text-sm font-medium">Click to Visit</div>
+                          <div className="text-xs opacity-75">{project.url.replace('https://', '').replace('www.', '')}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Corner Link Icon */}
+                    <div className="absolute top-2 right-2 z-20">
+                      <div className="w-6 h-6 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-[#1A7C81] opacity-70 group-hover:opacity-100 transition-opacity duration-300">
+                        <ExternalLink className="w-3 h-3" />
+                      </div>
                     </div>
                   </div>
 
