@@ -79,10 +79,10 @@ const Header = () => {
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
-                {/* Updated social media icons with brand colors */}
+                {/* ALL SOCIAL MEDIA ICONS - SAME DARK TEAL COLOR */}
                 <a
                   href="https://facebook.com/644350702085787"
-                  className="text-[#3CBEC7] hover:text-[#1A7C81] transition-all duration-300 transform hover:scale-110 hover:rotate-12 hover:shadow-lg rounded-full p-1"
+                  className="text-[#0F6168] hover:text-[#104A53] transition-all duration-300 transform hover:scale-110 hover:rotate-12 hover:shadow-lg rounded-full p-1"
                   aria-label="Follow us on Facebook"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -91,7 +91,7 @@ const Header = () => {
                 </a>
                 <a
                   href="https://instagram.com/rahoperations/"
-                  className="text-[#3CBEC7] hover:text-[#1A7C81] transition-all duration-300 transform hover:scale-110 hover:rotate-12 hover:shadow-lg rounded-full p-1"
+                  className="text-[#0F6168] hover:text-[#104A53] transition-all duration-300 transform hover:scale-110 hover:rotate-12 hover:shadow-lg rounded-full p-1"
                   aria-label="Follow us on Instagram"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -100,7 +100,7 @@ const Header = () => {
                 </a>
                 <a
                   href="https://www.linkedin.com/company/rah-operations-llc"
-                  className="text-[#3CBEC7] hover:text-[#1A7C81] transition-all duration-300 transform hover:scale-110 hover:rotate-12 hover:shadow-lg rounded-full p-1"
+                  className="text-[#0F6168] hover:text-[#104A53] transition-all duration-300 transform hover:scale-110 hover:rotate-12 hover:shadow-lg rounded-full p-1"
                   aria-label="Connect with us on LinkedIn"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -109,17 +109,16 @@ const Header = () => {
                 </a>
                 <a
                   href="https://yelp.com/biz/rah-operations-scottsdale"
-                  className="text-[#3CBEC7] hover:text-[#1A7C81] transition-all duration-300 transform hover:scale-110 hover:rotate-12 hover:shadow-lg rounded-full p-1"
+                  className="text-[#0F6168] hover:text-[#104A53] transition-all duration-300 transform hover:scale-110 hover:rotate-12 hover:shadow-lg rounded-full p-1"
                   aria-label="Review us on Yelp"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   <Yelp className="w-5 h-5" />
                 </a>
-                {/* NEW: Google My Business Link */}
                 <a
                   href="https://www.google.com/maps/place/Rah+Operations+LLC/@33.7335583,-111.9450294,969m/data=!3m2!1e3!4b1!4m6!3m5!1s0x872b790bdab5c151:0xac53f9ac22bb3909!8m2!3d33.7335583!4d-111.9450294!16s%2Fg%2F11mcpjh776?hl=en&entry=ttu&g_ep=EgoyMDI1MDkxMC4wIKXMDSoASAFQAw%3D%3D"
-                  className="text-[#3CBEC7]  hover:text-[#1A7C81]transition-all duration-300 transform hover:scale-110 hover:rotate-12 hover:shadow-lg rounded-full p-1"
+                  className="text-[#0F6168] hover:text-[#104A53] transition-all duration-300 transform hover:scale-110 hover:rotate-12 hover:shadow-lg rounded-full p-1"
                   aria-label="Find us on Google Maps"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -340,11 +339,11 @@ const Header = () => {
               Free Consultation
             </Link>
             
-            {/* Mobile Social Media Links */}
+            {/* Mobile Social Media Links - ALL SAME DARK COLOR */}
             <div className="flex justify-center items-center space-x-4 mt-4 pt-4 border-t border-gray-100">
               <a
                 href="https://facebook.com/644350702085787"
-                className="text-[#3CBEC7] hover:text-[#1A7C81] transition-colors duration-300"
+                className="text-[#0F6168] hover:text-[#104A53] transition-colors duration-300"
                 aria-label="Facebook"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -353,7 +352,7 @@ const Header = () => {
               </a>
               <a
                 href="https://instagram.com/rahoperations/"
-                className="text-[#1A7C81] hover:text-[#0F6168] transition-colors duration-300"
+                className="text-[#0F6168] hover:text-[#104A53] transition-colors duration-300"
                 aria-label="Instagram"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -371,7 +370,7 @@ const Header = () => {
               </a>
               <a
                 href="https://yelp.com/biz/rah-operations-scottsdale"
-                className="text-[#3CBEC7] hover:text-[#1A7C81] transition-colors duration-300"
+                className="text-[#0F6168] hover:text-[#104A53] transition-colors duration-300"
                 aria-label="Yelp"
                 target="_blank"
                 rel="noopener noreferrer"
