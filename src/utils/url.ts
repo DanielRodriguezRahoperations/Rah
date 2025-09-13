@@ -1,8 +1,8 @@
-import { SITE_URL } from "../config/site";
+export const absoluteUrl = (path: string): string => {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.rahoperations.com';
+  return `${baseUrl}${path}`;
+};
 
-export function absoluteUrl(pathname: string): string {
-  if (!pathname) return SITE_URL + "/";
-  // Ensure single slash between origin and path
-  const path = pathname.startsWith("/") ? pathname : `/${pathname}`;
-  return `${SITE_URL}${path}`;
-}
+export const getCanonicalUrl = (path: string): string => {
+  return absoluteUrl(path);
+};
