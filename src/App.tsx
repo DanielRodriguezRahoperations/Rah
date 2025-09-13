@@ -49,10 +49,8 @@ const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
   useEffect(() => {
     if (!isLoading) {
-      // Scroll to top on route change
       window.scrollTo({ top: 0, behavior: 'smooth' });
       
-      // Initialize scroll animations
       const timer = setTimeout(() => {
         const elements = document.querySelectorAll('.fade-in-up, .fade-in-left, .fade-in-right, .scale-in');
         elements.forEach((el, index) => {
@@ -85,7 +83,6 @@ const SEOLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <>
-      {/* Global defaults for every page */}
       <SEOHead
         title={DEFAULT_TITLE}
         description={DEFAULT_DESCRIPTION}
@@ -100,18 +97,6 @@ const SEOLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 // Performance monitor component
 const PerformanceMonitor = () => {
   useEffect(() => {
-    // Monitor Core Web Vitals
-    if ('web-vitals' in window) {
-      import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-        getCLS(console.log);
-        getFID(console.log);
-        getFCP(console.log);
-        getLCP(console.log);
-        getTTFB(console.log);
-      });
-    }
-
-    // Preload critical resources
     const preloadLinks = [
       '/Updated%20RAH%20LOGO%20with%20Correct%20Color%20scheme.png',
     ];
@@ -124,7 +109,6 @@ const PerformanceMonitor = () => {
       document.head.appendChild(link);
     });
 
-    // Initialize Google Analytics 4 (if needed)
     if (process.env.NODE_ENV === 'production') {
       // Add GA4 tracking code here
     }
@@ -137,24 +121,17 @@ function App() {
   const [isAppReady, setIsAppReady] = useState(false);
 
   useEffect(() => {
-    // App initialization
     const initializeApp = async () => {
       try {
-        // Preload critical fonts
-        await document.fonts.load('400 16px Inter');
-        await document.fonts.load('600 16px Inter');
-        await document.fonts.load('700 16px Inter');
-        
         setIsAppReady(true);
       } catch (error) {
-        console.warn('Font preloading failed:', error);
+        console.warn('App initialization failed:', error);
         setIsAppReady(true);
       }
     };
 
     initializeApp();
 
-    // Service Worker registration (for future PWA features)
     if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
@@ -167,10 +144,8 @@ function App() {
       });
     }
 
-    // Error boundary for uncaught errors
     const handleError = (event: ErrorEvent) => {
       console.error('Global error:', event.error);
-      // Could send to error tracking service
     };
 
     window.addEventListener('error', handleError);
@@ -199,71 +174,6 @@ function App() {
                 <Route path="/portfolio" element={
                   <PageTransition>
                     <Portfoliopage />
-                  </PageTransition>
-                } />
-                <Route path="/services" element={
-                  <PageTransition>
-                    <ServicesPage />
-                  </PageTransition>
-                } />
-                <Route path="/website-design-and-seo" element={
-                  <PageTransition>
-                    <WebsiteDesignSEOPage />
-                  </PageTransition>
-                } />
-                <Route path="/business-credit-and-funding" element={
-                  <PageTransition>
-                    <BusinessCreditPage />
-                  </PageTransition>
-                } />
-                <Route path="/digital-marketing" element={
-                  <PageTransition>
-                    <DigitalMarketingPage />
-                  </PageTransition>
-                } />
-                <Route path="/new-business-setup" element={
-                  <PageTransition>
-                    <NewBusinessSetupPage />
-                  </PageTransition>
-                } />
-                <Route path="/personal-credit-repair" element={
-                  <PageTransition>
-                    <PersonalCreditPage />
-                  </PageTransition>
-                } />
-                <Route path="/social-media-management" element={
-                  <PageTransition>
-                    <SocialMediaManagementPage />
-                  </PageTransition>
-                } />
-                <Route path="/notary-services" element={
-                  <PageTransition>
-                    <NotaryServicesPage />
-                  </PageTransition>
-                } />
-                <Route path="/about" element={
-                  <PageTransition>
-                    <AboutPage />
-                  </PageTransition>
-                } />
-                <Route path="/blogs" element={
-                  <PageTransition>
-                    <BlogPage />
-                  </PageTransition>
-                } />
-                <Route path="/contact" element={
-                  <PageTransition>
-                    <ContactPage />
-                  </PageTransition>
-                } />
-                <Route path="/testimonials" element={
-                  <PageTransition>
-                    <TestimonialsPage />
-                  </PageTransition>
-                } />
-                <Route path="/privacy-policy" element={
-                  <PageTransition>
-                    <PrivacyPolicyPage />
                   </PageTransition>
                 } />
               </Routes>
