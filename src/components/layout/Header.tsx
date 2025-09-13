@@ -7,7 +7,6 @@ const Header: React.FC = () => {
 
   const navigation = [
     { name: 'Home', href: '/' },
-    { name: 'Portfolio', href: '/portfolio' },
     { name: 'Services', href: '/services' },
     { name: 'About', href: '/about' },
     { name: 'Contact', href: '/contact' },
@@ -17,7 +16,6 @@ const Header: React.FC = () => {
     <header className="bg-white shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
-          {/* Logo */}
           <Link to="/" className="flex items-center">
             <img
               src="/Updated%20RAH%20LOGO%20with%20Correct%20Color%20scheme.png"
@@ -26,7 +24,6 @@ const Header: React.FC = () => {
             />
           </Link>
 
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
             {navigation.map((item) => (
               <Link
@@ -39,7 +36,6 @@ const Header: React.FC = () => {
             ))}
           </nav>
 
-          {/* CTA Button */}
           <div className="hidden md:flex items-center space-x-4">
             
               href="tel:+18884724621"
@@ -50,7 +46,6 @@ const Header: React.FC = () => {
             </a>
           </div>
 
-          {/* Mobile menu button */}
           <button
             className="md:hidden"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -63,7 +58,6 @@ const Header: React.FC = () => {
           </button>
         </div>
 
-        {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t">
             <nav className="flex flex-col space-y-4">
