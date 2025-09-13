@@ -5,6 +5,7 @@ import { absoluteUrl } from '../utils/url';
 import Button from '../components/ui/Button';
 import InternalLinks from '../components/ui/InternalLinks';
 
+// Fixed duplicate URL prop issue - rebuild timestamp: 2025-01-17
 const ServicesPage = () => {
   const services = [
     {
