@@ -134,7 +134,6 @@ const ServicesPage = () => {
         title="Business Services Arizona | RAH Operations"
         description="Comprehensive business services for Arizona companies. Website design, SEO, business credit, and digital marketing solutions. Serving Phoenix, Scottsdale, Tempe."
         url={absoluteUrl("/services")}
-        url={absoluteUrl("/services")}
       />
 
       {/* Hero Section */}
