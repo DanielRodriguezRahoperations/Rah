@@ -11,34 +11,32 @@ interface SEOHeadProps {
 }
 
 const SEOHead: React.FC<SEOHeadProps> = ({
-  title,
-  description,
-  url,
-  imageUrl,
-  keywords,
+  title = "RAH Operations - Arizona Website Design & SEO",
+  description = "Top-rated Arizona website design and SEO company. We help Arizona businesses rank #1 on Google.",
+  url = "https://www.rahoperations.com",
+  imageUrl = "/Updated%20RAH%20LOGO%20with%20Correct%20Color%20scheme.png",
+  keywords = "Arizona website design, Arizona SEO, Phoenix web design",
   structuredData
 }) => {
   return (
     <Helmet>
-      {title && <title>{title}</title>}
-      {description && <meta name="description" content={description} />}
-      {keywords && <meta name="keywords" content={keywords} />}
+      <title>{title}</title>
+      <meta name="description" content={description} />
+      <meta name="keywords" content={keywords} />
+      <link rel="canonical" href={url} />
       
-      {/* Open Graph tags */}
-      {title && <meta property="og:title" content={title} />}
-      {description && <meta property="og:description" content={description} />}
-      {url && <meta property="og:url" content={url} />}
-      {imageUrl && <meta property="og:image" content={imageUrl} />}
+      {/* Open Graph */}
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
+      <meta property="og:url" content={url} />
+      <meta property="og:image" content={imageUrl} />
       <meta property="og:type" content="website" />
       
-      {/* Twitter Card tags */}
+      {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
-      {title && <meta name="twitter:title" content={title} />}
-      {description && <meta name="twitter:description" content={description} />}
-      {imageUrl && <meta name="twitter:image" content={imageUrl} />}
-      
-      {/* Canonical URL */}
-      {url && <link rel="canonical" href={url} />}
+      <meta name="twitter:title" content={title} />
+      <meta name="twitter:description" content={description} />
+      <meta name="twitter:image" content={imageUrl} />
       
       {/* Structured Data */}
       {structuredData && (
