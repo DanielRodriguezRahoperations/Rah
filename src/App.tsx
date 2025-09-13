@@ -176,6 +176,71 @@ function App() {
                     <Portfoliopage />
                   </PageTransition>
                 } />
+                <Route path="/services" element={
+                  <PageTransition>
+                    <ServicesPage />
+                  </PageTransition>
+                } />
+                <Route path="/website-design-and-seo" element={
+                  <PageTransition>
+                    <WebsiteDesignSEOPage />
+                  </PageTransition>
+                } />
+                <Route path="/business-credit-and-funding" element={
+                  <PageTransition>
+                    <BusinessCreditPage />
+                  </PageTransition>
+                } />
+                <Route path="/digital-marketing" element={
+                  <PageTransition>
+                    <DigitalMarketingPage />
+                  </PageTransition>
+                } />
+                <Route path="/new-business-setup" element={
+                  <PageTransition>
+                    <NewBusinessSetupPage />
+                  </PageTransition>
+                } />
+                <Route path="/personal-credit-repair" element={
+                  <PageTransition>
+                    <PersonalCreditPage />
+                  </PageTransition>
+                } />
+                <Route path="/social-media-management" element={
+                  <PageTransition>
+                    <SocialMediaManagementPage />
+                  </PageTransition>
+                } />
+                <Route path="/notary-services" element={
+                  <PageTransition>
+                    <NotaryServicesPage />
+                  </PageTransition>
+                } />
+                <Route path="/about" element={
+                  <PageTransition>
+                    <AboutPage />
+                  </PageTransition>
+                } />
+                <Route path="/blogs" element={
+                  <PageTransition>
+                    <BlogPage />
+                  </PageTransition>
+                } />
+                <Route path="/contact" element={
+                  <PageTransition>
+                    <ContactPage />
+                  </PageTransition>
+                } />
+                <Route path="/testimonials" element={
+                  <PageTransition>
+                    <TestimonialsPage />
+                  </PageTransition>
+                } />
+                <Route path="/privacy-policy" element={
+                  <PageTransition>
+                    <PrivacyPolicyPage />
+                  </PageTransition>
+                } />
               </Routes>
             </main>
             <Footer />
