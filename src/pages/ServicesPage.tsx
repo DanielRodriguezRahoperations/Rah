@@ -1,3 +1,4 @@
+// Build fix - timestamp: Jan 17 2025
 import React from 'react';
 import { Globe, CreditCard, BarChart3, Building2, TrendingUp, Users, FileText, ArrowRight } from 'lucide-react';
 import SEOHead from '../components/ui/SEOHead';
@@ -5,7 +6,6 @@ import { absoluteUrl } from '../utils/url';
 import Button from '../components/ui/Button';
 import InternalLinks from '../components/ui/InternalLinks';
 
-// Fixed duplicate URL prop issue - rebuild timestamp: 2025-01-17
 const ServicesPage = () => {
   const services = [
     {
