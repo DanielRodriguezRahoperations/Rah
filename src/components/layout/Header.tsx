@@ -16,34 +16,30 @@ const Header = () => {
               className="h-12 w-auto"
             />
           </Link>
-
           <nav className="hidden md:flex space-x-8">
-            <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium">Home</Link>
-            <Link to="/services" className="text-gray-700 hover:text-blue-600 font-medium">Services</Link>
-            <Link to="/about" className="text-gray-700 hover:text-blue-600 font-medium">About</Link>
-            <Link to="/contact" className="text-gray-700 hover:text-blue-600 font-medium">Contact</Link>
+            <Link to="/" className="text-gray-700 hover:text-teal-500 font-medium">Home</Link>
+            <Link to="/services" className="text-gray-700 hover:text-teal-500 font-medium">Services</Link>
+            <Link to="/about" className="text-gray-700 hover:text-teal-500 font-medium">About</Link>
+            <Link to="/contact" className="text-gray-700 hover:text-teal-500 font-medium">Contact</Link>
           </nav>
-
           <div className="hidden md:flex items-center">
-            <a href="tel:+18884724621" className="flex items-center text-blue-600 hover:text-blue-800 font-medium">
+            <a href="tel:+18884724621" className="flex items-center text-teal-600 hover:text-teal-800 font-medium">
               <Phone className="w-4 h-4 mr-2" />
               (888) 472-4621
             </a>
           </div>
-
           <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
-
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t">
             <div className="flex flex-col space-y-4">
-              <Link to="/" className="text-gray-700 hover:text-blue-600" onClick={() => setIsMenuOpen(false)}>Home</Link>
-              <Link to="/services" className="text-gray-700 hover:text-blue-600" onClick={() => setIsMenuOpen(false)}>Services</Link>
-              <Link to="/about" className="text-gray-700 hover:text-blue-600" onClick={() => setIsMenuOpen(false)}>About</Link>
-              <Link to="/contact" className="text-gray-700 hover:text-blue-600" onClick={() => setIsMenuOpen(false)}>Contact</Link>
-              <a href="tel:+18884724621" className="flex items-center text-blue-600">
+              <Link to="/" onClick={() => setIsMenuOpen(false)}>Home</Link>
+              <Link to="/services" onClick={() => setIsMenuOpen(false)}>Services</Link>
+              <Link to="/about" onClick={() => setIsMenuOpen(false)}>About</Link>
+              <Link to="/contact" onClick={() => setIsMenuOpen(false)}>Contact</Link>
+              <a href="tel:+18884724621" className="flex items-center">
                 <Phone className="w-4 h-4 mr-2" />
                 (888) 472-4621
               </a>
