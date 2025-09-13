@@ -8,7 +8,6 @@ import Header from './components/layout/Header';
 import Breadcrumbs from './components/ui/Breadcrumbs';
 import Footer from './components/layout/Footer';
 import HomePage from './pages/HomePage';
-import Portfoliopage from './pages/Portfoliopage';
 import ServicesPage from './pages/ServicesPage';
 import WebsiteDesignSEOPage from './pages/WebsiteDesignSEOPage';
 import BusinessCreditPage from './pages/BusinessCreditPage';
@@ -169,11 +168,6 @@ function App() {
                 <Route path="/" element={
                   <PageTransition>
                     <HomePage />
-                  </PageTransition>
-                } />
-                <Route path="/portfolio" element={
-                  <PageTransition>
-                    <Portfoliopage />
                   </PageTransition>
                 } />
                 <Route path="/services" element={
