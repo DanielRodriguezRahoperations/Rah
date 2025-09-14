@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Star, TrendingUp, Shield, CheckCircle, Award, Zap } from 'lucide-react';
 import SEOHead from '../components/ui/SEOHead';
@@ -5,7 +6,7 @@ import { absoluteUrl } from '../utils/url';
 import Button from '../components/ui/Button';
 import ContactForm from '../components/ui/ContactForm';
 import InternalLinks from '../components/ui/InternalLinks';
-import EnhancedTestimonials from '../components/ui/EnhancedTestimonials';
+// Temporarily removed: import EnhancedTestimonials from '../components/ui/EnhancedTestimonials';
 
 const HomePage = () => {
   const heroRef = useRef<HTMLDivElement>(null);
