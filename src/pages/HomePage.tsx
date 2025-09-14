@@ -5,7 +5,6 @@ import { absoluteUrl } from '../utils/url';
 import Button from '../components/ui/Button';
 import ContactForm from '../components/ui/ContactForm';
 import InternalLinks from '../components/ui/InternalLinks';
-// Temporarily removed: import EnhancedTestimonials from '../components/ui/EnhancedTestimonials';
 
 const HomePage = () => {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -465,148 +464,161 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Enhanced Testimonials Section */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-20 left-10 w-32 h-32 bg-[#3CBEC7] rounded-full"></div>
-          <div className="absolute bottom-20 right-10 w-24 h-24 bg-[#1A7C81] rounded-full"></div>
-          <div className="absolute top-1/2 left-1/2 w-16 h-16 bg-[#97EDED] rounded-full"></div>
+      {/* PREMIUM TESTIMONIALS SECTION - Enhanced Design */}
+      <section className="py-20 bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden">
+        {/* Enhanced Background decoration */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81] rounded-full blur-xl"></div>
+          <div className="absolute bottom-20 right-10 w-24 h-24 bg-gradient-to-r from-[#1A7C81] to-[#0F6168] rounded-full blur-xl"></div>
+          <div className="absolute top-1/2 left-1/2 w-16 h-16 bg-gradient-to-r from-[#97EDED] to-[#3CBEC7] rounded-full blur-xl"></div>
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4 relative">
+            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 relative">
               What Our Arizona Clients Say
-              <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81] rounded-full"></span>
+              <span className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-32 h-1.5 bg-gradient-to-r from-[#3CBEC7] via-[#1A7C81] to-[#0F6168] rounded-full"></span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Real results from real Arizona businesses who trust RAH Operations
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Real results from real Arizona businesses who trust RAH Operations with their success
             </p>
           </div>
           
-          {/* Testimonials Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {/* Testimonial 1 */}
-            <div className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 hover:border-[#3CBEC7]/30">
+          {/* Enhanced Testimonials Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+            {/* Premium Testimonial 1 */}
+            <div className="group bg-white p-10 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-3 border-2 border-gray-100 hover:border-[#3CBEC7]/40 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#3CBEC7]/20 to-[#1A7C81]/20 rounded-full transform translate-x-10 -translate-y-10 group-hover:scale-150 transition-transform duration-700"></div>
+              
               <div className="flex items-center mb-6">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  <Star key={i} className="w-6 h-6 text-yellow-400 fill-current drop-shadow-sm" />
                 ))}
               </div>
-              <blockquote className="text-gray-700 mb-6 text-lg italic leading-relaxed">
+              
+              <blockquote className="text-gray-700 mb-8 text-lg italic leading-relaxed font-medium">
                 "RAH Operations transformed our online presence completely. Our website traffic increased by 300% in just 3 months, and we're now ranking #1 for our main keywords!"
               </blockquote>
+              
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81] rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                <div className="w-14 h-14 bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81] rounded-full flex items-center justify-center text-white font-bold text-xl mr-4 shadow-lg">
                   SJ
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-900">Sarah Johnson</div>
-                  <div className="text-sm text-gray-500">CEO, Phoenix Marketing Group</div>
-                  <div className="text-xs text-[#3CBEC7] font-medium">Phoenix, AZ</div>
+                  <div className="font-bold text-gray-900 text-lg">Sarah Johnson</div>
+                  <div className="text-sm text-gray-600 font-medium">CEO, Phoenix Marketing Group</div>
+                  <div className="text-xs text-[#3CBEC7] font-semibold">Phoenix, AZ</div>
                 </div>
               </div>
             </div>
 
-            {/* Testimonial 2 */}
-            <div className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 hover:border-[#3CBEC7]/30">
+            {/* Premium Testimonial 2 */}
+            <div className="group bg-white p-10 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-3 border-2 border-gray-100 hover:border-[#1A7C81]/40 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#1A7C81]/20 to-[#0F6168]/20 rounded-full transform translate-x-10 -translate-y-10 group-hover:scale-150 transition-transform duration-700"></div>
+              
               <div className="flex items-center mb-6">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  <Star key={i} className="w-6 h-6 text-yellow-400 fill-current drop-shadow-sm" />
                 ))}
               </div>
-              <blockquote className="text-gray-700 mb-6 text-lg italic leading-relaxed">
+              
+              <blockquote className="text-gray-700 mb-8 text-lg italic leading-relaxed font-medium">
                 "Best investment we've made for our business. The SEO results speak for themselves - we're getting more qualified leads than ever before. Their team is incredible!"
               </blockquote>
+              
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-[#1A7C81] to-[#0F6168] rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                <div className="w-14 h-14 bg-gradient-to-r from-[#1A7C81] to-[#0F6168] rounded-full flex items-center justify-center text-white font-bold text-xl mr-4 shadow-lg">
                   MR
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-900">Mike Rodriguez</div>
-                  <div className="text-sm text-gray-500">Owner, Scottsdale Auto Repair</div>
-                  <div className="text-xs text-[#3CBEC7] font-medium">Scottsdale, AZ</div>
+                  <div className="font-bold text-gray-900 text-lg">Mike Rodriguez</div>
+                  <div className="text-sm text-gray-600 font-medium">Owner, Scottsdale Auto Repair</div>
+                  <div className="text-xs text-[#3CBEC7] font-semibold">Scottsdale, AZ</div>
                 </div>
               </div>
             </div>
 
-            {/* Testimonial 3 */}
-            <div className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 hover:border-[#3CBEC7]/30">
+            {/* Premium Testimonial 3 */}
+            <div className="group bg-white p-10 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-3 border-2 border-gray-100 hover:border-[#97EDED]/40 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#97EDED]/20 to-[#3CBEC7]/20 rounded-full transform translate-x-10 -translate-y-10 group-hover:scale-150 transition-transform duration-700"></div>
+              
               <div className="flex items-center mb-6">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  <Star key={i} className="w-6 h-6 text-yellow-400 fill-current drop-shadow-sm" />
                 ))}
               </div>
-              <blockquote className="text-gray-700 mb-6 text-lg italic leading-relaxed">
+              
+              <blockquote className="text-gray-700 mb-8 text-lg italic leading-relaxed font-medium">
                 "Professional, reliable, and results-driven. RAH Operations helped us establish our business credit and secure funding. Highly recommend their comprehensive services!"
               </blockquote>
+              
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-[#97EDED] to-[#3CBEC7] rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                <div className="w-14 h-14 bg-gradient-to-r from-[#97EDED] to-[#3CBEC7] rounded-full flex items-center justify-center text-white font-bold text-xl mr-4 shadow-lg">
                   LC
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-900">Lisa Chen</div>
-                  <div className="text-sm text-gray-500">Founder, Tempe Consulting</div>
-                  <div className="text-xs text-[#3CBEC7] font-medium">Tempe, AZ</div>
+                  <div className="font-bold text-gray-900 text-lg">Lisa Chen</div>
+                  <div className="text-sm text-gray-600 font-medium">Founder, Tempe Consulting</div>
+                  <div className="text-xs text-[#3CBEC7] font-semibold">Tempe, AZ</div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Trust Badges */}
-          <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Trusted by Arizona Businesses</h3>
-              <p className="text-gray-600">Join hundreds of successful Arizona companies</p>
+          {/* Enhanced Trust Badges */}
+          <div className="bg-white rounded-3xl p-12 shadow-2xl border-2 border-gray-100 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#3CBEC7]/5 to-[#1A7C81]/5"></div>
+            
+            <div className="relative text-center mb-12">
+              <h3 className="text-3xl font-bold text-gray-900 mb-3">Trusted by Arizona Businesses</h3>
+              <p className="text-lg text-gray-600">Join hundreds of successful Arizona companies who chose RAH Operations</p>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
-              {/* Trust indicators */}
+            <div className="relative grid grid-cols-2 md:grid-cols-4 gap-10 items-center">
               <div className="text-center group">
-                <div className="w-16 h-16 bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81] rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
-                  <Award className="w-8 h-8 text-white" />
+                <div className="w-20 h-20 bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81] rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-125 transition-all duration-500 shadow-xl">
+                  <Award className="w-10 h-10 text-white" />
                 </div>
-                <div className="text-2xl font-bold text-gray-900">500+</div>
-                <div className="text-sm text-gray-600">Happy Clients</div>
+                <div className="text-3xl font-bold text-gray-900 mb-1">500+</div>
+                <div className="text-sm font-semibold text-gray-600">Happy Clients</div>
               </div>
               
               <div className="text-center group">
-                <div className="w-16 h-16 bg-gradient-to-r from-[#1A7C81] to-[#0F6168] rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
-                  <Star className="w-8 h-8 text-white fill-current" />
+                <div className="w-20 h-20 bg-gradient-to-r from-[#1A7C81] to-[#0F6168] rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-125 transition-all duration-500 shadow-xl">
+                  <Star className="w-10 h-10 text-white fill-current" />
                 </div>
-                <div className="text-2xl font-bold text-gray-900">5.0</div>
-                <div className="text-sm text-gray-600">Average Rating</div>
+                <div className="text-3xl font-bold text-gray-900 mb-1">5.0</div>
+                <div className="text-sm font-semibold text-gray-600">Average Rating</div>
               </div>
               
               <div className="text-center group">
-                <div className="w-16 h-16 bg-gradient-to-r from-[#97EDED] to-[#3CBEC7] rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
-                  <TrendingUp className="w-8 h-8 text-white" />
+                <div className="w-20 h-20 bg-gradient-to-r from-[#97EDED] to-[#3CBEC7] rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-125 transition-all duration-500 shadow-xl">
+                  <TrendingUp className="w-10 h-10 text-white" />
                 </div>
-                <div className="text-2xl font-bold text-gray-900">98%</div>
-                <div className="text-sm text-gray-600">Success Rate</div>
+                <div className="text-3xl font-bold text-gray-900 mb-1">98%</div>
+                <div className="text-sm font-semibold text-gray-600">Success Rate</div>
               </div>
               
               <div className="text-center group">
-                <div className="w-16 h-16 bg-gradient-to-r from-[#0F6168] to-[#104A53] rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
-                  <CheckCircle className="w-8 h-8 text-white" />
+                <div className="w-20 h-20 bg-gradient-to-r from-[#0F6168] to-[#104A53] rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-125 transition-all duration-500 shadow-xl">
+                  <CheckCircle className="w-10 h-10 text-white" />
                 </div>
-                <div className="text-2xl font-bold text-gray-900">10+</div>
-                <div className="text-sm text-gray-600">Years in AZ</div>
+                <div className="text-3xl font-bold text-gray-900 mb-1">10+</div>
+                <div className="text-sm font-semibold text-gray-600">Years in AZ</div>
               </div>
             </div>
           </div>
 
-          {/* Call to Action */}
-          <div className="text-center mt-12">
-            <p className="text-lg text-gray-600 mb-6">Ready to join our satisfied clients?</p>
+          {/* Enhanced Call to Action */}
+          <div className="text-center mt-16">
+            <p className="text-xl text-gray-700 mb-8 font-medium">Ready to join our satisfied clients and transform your business?</p>
             <Button 
               size="lg" 
               to="/contact" 
-              className="bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81] hover:from-[#1A7C81] hover:to-[#0F6168] transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="bg-gradient-to-r from-[#3CBEC7] via-[#1A7C81] to-[#0F6168] hover:from-[#1A7C81] hover:via-[#0F6168] hover:to-[#104A53] transform hover:scale-110 transition-all duration-500 shadow-2xl hover:shadow-3xl text-lg px-12 py-4 rounded-2xl font-bold"
             >
-              Get Your Free Consultation
-              <ArrowRight className="ml-2 w-5 h-5" />
+              Get Your Free Consultation Now
+              <ArrowRight className="ml-3 w-6 h-6" />
             </Button>
           </div>
         </div>
