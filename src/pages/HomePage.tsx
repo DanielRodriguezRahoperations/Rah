@@ -465,12 +465,60 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Enhanced Testimonials Section - REPLACES OLD TESTIMONIALS */}
-      <EnhancedTestimonials 
-        showClientLogos={true}
-        showVideoTestimonials={true}
-        autoplay={true}
-      />
+      {/* Testimonials Section - Temporarily replaced with simple testimonials */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              What Our Arizona Clients Say
+            </h2>
+            <p className="text-xl text-gray-600">
+              Real results from real Arizona businesses
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <div className="flex items-center mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                ))}
+              </div>
+              <p className="text-gray-600 mb-6 italic">"RAH Operations transformed our online presence. Our website traffic increased by 300% in just 3 months!"</p>
+              <div>
+                <div className="font-semibold text-gray-900">Sarah Johnson</div>
+                <div className="text-sm text-gray-500">Phoenix Marketing Group</div>
+              </div>
+            </div>
+            
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <div className="flex items-center mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                ))}
+              </div>
+              <p className="text-gray-600 mb-6 italic">"Best investment we've made for our business. The SEO results speak for themselves."</p>
+              <div>
+                <div className="font-semibold text-gray-900">Mike Rodriguez</div>
+                <div className="text-sm text-gray-500">Scottsdale Auto Repair</div>
+              </div>
+            </div>
+            
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <div className="flex items-center mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                ))}
+              </div>
+              <p className="text-gray-600 mb-6 italic">"Professional, reliable, and results-driven. Highly recommend their services."</p>
+              <div>
+                <div className="font-semibold text-gray-900">Lisa Chen</div>
+                <div className="text-sm text-gray-500">Tempe Consulting</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Contact Section */}
       <section className="py-20 bg-gradient-to-br from-[#C9F8F6] to-[#B5F3F0] bg-pattern">
