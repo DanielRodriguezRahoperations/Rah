@@ -24,7 +24,7 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 
 // Loading component
 const PageLoader = () => (
-  <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
+  <div className="fixed inset-0 bg-white z-50 flex items-center justify-center"> 
     <div className="relative">
       <div className="w-16 h-16 border-4 border-[#97EDED] border-t-[#3CBEC7] rounded-full animate-spin"></div>
       <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-[#1A7C81] rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
