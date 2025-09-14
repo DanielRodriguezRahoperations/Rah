@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Star, TrendingUp, Shield, CheckCircle, Award, Zap } from 'lucide-react';
 import SEOHead from '../components/ui/SEOHead';
@@ -466,57 +465,149 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Testimonials Section - Temporarily replaced with simple testimonials */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Enhanced Testimonials Section */}
+      <section className="py-20 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-20 left-10 w-32 h-32 bg-[#3CBEC7] rounded-full"></div>
+          <div className="absolute bottom-20 right-10 w-24 h-24 bg-[#1A7C81] rounded-full"></div>
+          <div className="absolute top-1/2 left-1/2 w-16 h-16 bg-[#97EDED] rounded-full"></div>
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4 relative">
               What Our Arizona Clients Say
+              <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81] rounded-full"></span>
             </h2>
-            <p className="text-xl text-gray-600">
-              Real results from real Arizona businesses
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Real results from real Arizona businesses who trust RAH Operations
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-gray-50 p-6 rounded-lg">
-              <div className="flex items-center mb-4">
+          {/* Testimonials Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {/* Testimonial 1 */}
+            <div className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 hover:border-[#3CBEC7]/30">
+              <div className="flex items-center mb-6">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                 ))}
               </div>
-              <p className="text-gray-600 mb-6 italic">"RAH Operations transformed our online presence. Our website traffic increased by 300% in just 3 months!"</p>
-              <div>
-                <div className="font-semibold text-gray-900">Sarah Johnson</div>
-                <div className="text-sm text-gray-500">Phoenix Marketing Group</div>
+              <blockquote className="text-gray-700 mb-6 text-lg italic leading-relaxed">
+                "RAH Operations transformed our online presence completely. Our website traffic increased by 300% in just 3 months, and we're now ranking #1 for our main keywords!"
+              </blockquote>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81] rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                  SJ
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900">Sarah Johnson</div>
+                  <div className="text-sm text-gray-500">CEO, Phoenix Marketing Group</div>
+                  <div className="text-xs text-[#3CBEC7] font-medium">Phoenix, AZ</div>
+                </div>
               </div>
+            </div>
+
+            {/* Testimonial 2 */}
+            <div className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 hover:border-[#3CBEC7]/30">
+              <div className="flex items-center mb-6">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                ))}
+              </div>
+              <blockquote className="text-gray-700 mb-6 text-lg italic leading-relaxed">
+                "Best investment we've made for our business. The SEO results speak for themselves - we're getting more qualified leads than ever before. Their team is incredible!"
+              </blockquote>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-r from-[#1A7C81] to-[#0F6168] rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                  MR
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900">Mike Rodriguez</div>
+                  <div className="text-sm text-gray-500">Owner, Scottsdale Auto Repair</div>
+                  <div className="text-xs text-[#3CBEC7] font-medium">Scottsdale, AZ</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonial 3 */}
+            <div className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 hover:border-[#3CBEC7]/30">
+              <div className="flex items-center mb-6">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                ))}
+              </div>
+              <blockquote className="text-gray-700 mb-6 text-lg italic leading-relaxed">
+                "Professional, reliable, and results-driven. RAH Operations helped us establish our business credit and secure funding. Highly recommend their comprehensive services!"
+              </blockquote>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-r from-[#97EDED] to-[#3CBEC7] rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                  LC
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900">Lisa Chen</div>
+                  <div className="text-sm text-gray-500">Founder, Tempe Consulting</div>
+                  <div className="text-xs text-[#3CBEC7] font-medium">Tempe, AZ</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Trust Badges */}
+          <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+            <div className="text-center mb-8">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Trusted by Arizona Businesses</h3>
+              <p className="text-gray-600">Join hundreds of successful Arizona companies</p>
             </div>
             
-            <div className="bg-gray-50 p-6 rounded-lg">
-              <div className="flex items-center mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                ))}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
+              {/* Trust indicators */}
+              <div className="text-center group">
+                <div className="w-16 h-16 bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81] rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
+                  <Award className="w-8 h-8 text-white" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900">500+</div>
+                <div className="text-sm text-gray-600">Happy Clients</div>
               </div>
-              <p className="text-gray-600 mb-6 italic">"Best investment we've made for our business. The SEO results speak for themselves."</p>
-              <div>
-                <div className="font-semibold text-gray-900">Mike Rodriguez</div>
-                <div className="text-sm text-gray-500">Scottsdale Auto Repair</div>
+              
+              <div className="text-center group">
+                <div className="w-16 h-16 bg-gradient-to-r from-[#1A7C81] to-[#0F6168] rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
+                  <Star className="w-8 h-8 text-white fill-current" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900">5.0</div>
+                <div className="text-sm text-gray-600">Average Rating</div>
+              </div>
+              
+              <div className="text-center group">
+                <div className="w-16 h-16 bg-gradient-to-r from-[#97EDED] to-[#3CBEC7] rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
+                  <TrendingUp className="w-8 h-8 text-white" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900">98%</div>
+                <div className="text-sm text-gray-600">Success Rate</div>
+              </div>
+              
+              <div className="text-center group">
+                <div className="w-16 h-16 bg-gradient-to-r from-[#0F6168] to-[#104A53] rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
+                  <CheckCircle className="w-8 h-8 text-white" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900">10+</div>
+                <div className="text-sm text-gray-600">Years in AZ</div>
               </div>
             </div>
-            
-            <div className="bg-gray-50 p-6 rounded-lg">
-              <div className="flex items-center mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                ))}
-              </div>
-              <p className="text-gray-600 mb-6 italic">"Professional, reliable, and results-driven. Highly recommend their services."</p>
-              <div>
-                <div className="font-semibold text-gray-900">Lisa Chen</div>
-                <div className="text-sm text-gray-500">Tempe Consulting</div>
-              </div>
-            </div>
+          </div>
+
+          {/* Call to Action */}
+          <div className="text-center mt-12">
+            <p className="text-lg text-gray-600 mb-6">Ready to join our satisfied clients?</p>
+            <Button 
+              size="lg" 
+              to="/contact" 
+              className="bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81] hover:from-[#1A7C81] hover:to-[#0F6168] transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
+              Get Your Free Consultation
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Button>
           </div>
         </div>
       </section>
