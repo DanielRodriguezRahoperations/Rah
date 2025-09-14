@@ -511,7 +511,7 @@ const HomePage = () => {
                 </div>
               </div>
             </div>
-<div className="bg-red-500 text-white p-4 text-center">TEST - If you see this, the code is updating</div>
+
             {/* Premium Testimonial 2 */}
             <div className="group bg-white p-10 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-3 border-2 border-gray-100 hover:border-[#1A7C81]/40 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#1A7C81]/20 to-[#0F6168]/20 rounded-full transform translate-x-10 -translate-y-10 group-hover:scale-150 transition-transform duration-700"></div>
