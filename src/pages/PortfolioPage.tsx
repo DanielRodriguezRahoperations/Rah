@@ -36,6 +36,7 @@ const PortfolioPage: React.FC = () => {
       title: "Empire Builds AZ",
       url: "https://www.empirebuildsaz.com",
       description: "Professional construction and building services company showcasing their portfolio of residential and commercial projects",
+      image: "/portfolio/empire-builds.png",
       technologies: ["React", "Tailwind CSS", "SEO Optimized", "Mobile Responsive"],
       category: "Construction",
       features: ["Project Gallery", "Service Listings", "Contact Forms", "Testimonials"]
@@ -45,6 +46,7 @@ const PortfolioPage: React.FC = () => {
       title: "Pinnacle Bookkeeping AZ",
       url: "https://www.pinnaclebookkeepingaz.com/",
       description: "Full-service bookkeeping and financial management solutions for small to medium businesses in Arizona",
+      image: "/portfolio/pinnacle-bookkeeping.png",
       technologies: ["React", "TypeScript", "Professional Design", "Secure Forms"],
       category: "Finance",
       features: ["Service Calculator", "Client Portal", "Resource Center", "Appointment Booking"]
@@ -54,6 +56,7 @@ const PortfolioPage: React.FC = () => {
       title: "The Scottsdale Injector",
       url: "https://www.thescottsdaleinjector.com/",
       description: "Premium medical aesthetics and cosmetic injection services with a focus on natural-looking results",
+      image: "/portfolio/scottsdale-injector.png",
       technologies: ["React", "HIPAA Compliant", "Before/After Gallery", "Booking System"],
       category: "Healthcare",
       features: ["Treatment Menu", "Virtual Consultation", "Patient Forms", "Educational Blog"]
@@ -63,6 +66,7 @@ const PortfolioPage: React.FC = () => {
       title: "SunVision Solar",
       url: "https://www.sunvision-solar.com/",
       description: "Solar energy solutions provider offering installation, maintenance, and consultation services across Arizona",
+      image: "/portfolio/sunvision-solar.png",
       technologies: ["React", "Interactive Calculators", "3D Visualizations", "Lead Generation"],
       category: "Energy",
       features: ["Solar Calculator", "Project Showcase", "Financing Options", "Energy Reports"]
@@ -72,6 +76,7 @@ const PortfolioPage: React.FC = () => {
       title: "Daniel Rodriguez",
       url: "https://www.danielrodriguez.org/",
       description: "Professional portfolio and personal brand website showcasing expertise and achievements",
+      image: "/portfolio/daniel-rodriguez.png",
       technologies: ["React", "TypeScript", "Analytics", "Performance Optimized"],
       category: "Personal Brand",
       features: ["Portfolio Gallery", "Blog Section", "Resume Download", "Contact Integration"]
@@ -81,6 +86,7 @@ const PortfolioPage: React.FC = () => {
       title: "Daniel Rodriguez Scottsdale",
       url: "https://danielrodriguezscottsdale.carrd.co",
       description: "Streamlined landing page for professional networking and quick contact information",
+      image: "/portfolio/daniel-rodriguez-scottsdale.png",
       technologies: ["Carrd", "Single Page", "Fast Loading", "Mobile First"],
       category: "Landing Page",
       features: ["Social Links", "Contact Info", "Bio Section", "Call-to-Action"]
@@ -90,6 +96,7 @@ const PortfolioPage: React.FC = () => {
       title: "Knox Strats",
       url: "https://www.knoxstrats.com/",
       description: "Strategic consulting firm specializing in business development and growth strategies",
+      image: "/portfolio/knox-strats.png",
       technologies: ["React", "Data Visualization", "Client Dashboard", "Secure"],
       category: "Consulting",
       features: ["Case Studies", "Service Packages", "Client Resources", "Strategy Tools"]
@@ -169,14 +176,36 @@ const PortfolioPage: React.FC = () => {
                   className={`service-card group fade-in-up stagger-${Math.min(index + 1, 6)}`}
                 >
                   {/* Website Preview Area */}
-                  <div className="relative h-48 -mx-8 -mt-8 mb-6 overflow-hidden rounded-t-xl">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#3CBEC7] to-[#1A7C81] opacity-90"></div>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Monitor className="w-16 h-16 text-white opacity-50 group-hover:scale-110 transition-transform duration-300" />
+                  <div className="relative h-48 -mx-8 -mt-8 mb-6 overflow-hidden rounded-t-xl bg-gray-100">
+                    {/* Automatic Screenshot using screenshot.rocks (free service) */}
+                    <img 
+                      src={`https://screenshot.rocks/api/screenshot?url=${encodeURIComponent(item.url)}&width=600&height=400&deviceScaleFactor=1`}
+                      alt={`${item.title} preview`}
+                      className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
+                      loading="lazy"
+                      onError={(e) => {
+                        // Fallback to a simpler service if first fails
+                        const target = e.currentTarget as HTMLImageElement;
+                        if (!target.dataset.fallback) {
+                          target.dataset.fallback = 'true';
+                          target.src = `https://image.thum.io/get/width/600/crop/400/${item.url}`;
+                        } else {
+                          // If both fail, show gradient
+                          target.style.display = 'none';
+                          const fallback = target.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.classList.remove('hidden');
+                        }
+                      }}
+                    />
+                    {/* Fallback gradient (hidden by default) */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#3CBEC7] to-[#1A7C81] opacity-90 hidden">
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Monitor className="w-16 h-16 text-white opacity-50 group-hover:scale-110 transition-transform duration-300" />
+                      </div>
                     </div>
                     {/* Category Badge */}
-                    <div className="absolute top-4 right-4">
-                      <span className="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold rounded-full">
+                    <div className="absolute top-4 right-4 z-10">
+                      <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-gray-800 text-xs font-semibold rounded-full shadow-lg">
                         {item.category}
                       </span>
                     </div>
