@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Phone, ChevronDown, Briefcase, Home, User, BookOpen, Mail, Star, Layers } from 'lucide-react';
+import { Menu, X, Phone, ChevronDown, Briefcase, Home, User, BookOpen, Mail, Star, Layers, Facebook, Instagram, Linkedin, MapPin } from 'lucide-react';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -259,6 +259,60 @@ const Header = () => {
 
           {/* Desktop CTA Button */}
           <div className="hidden lg:flex items-center space-x-4">
+            {/* Social Media Links */}
+            <div className="hidden xl:flex items-center space-x-1 border-r border-gray-200 pr-4 mr-2">
+              <a 
+                href="https://share.google/OZPp85BfytCtF10Lj" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 text-gray-600 hover:text-[#3CBEC7] hover:bg-gray-50 rounded-lg transition-all duration-200"
+                aria-label="Google Business Profile for RAH Operations"
+                title="Google Business"
+              >
+                <MapPin className="w-4 h-4" />
+              </a>
+              <a 
+                href="https://www.instagram.com/rahoperations/" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 text-gray-600 hover:text-[#E4405F] hover:bg-pink-50 rounded-lg transition-all duration-200"
+                aria-label="RAH Operations Instagram"
+                title="Instagram"
+              >
+                <Instagram className="w-4 h-4" />
+              </a>
+              <a 
+                href="https://www.facebook.com/profile.php?id=61574789296433" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 text-gray-600 hover:text-[#1877F2] hover:bg-blue-50 rounded-lg transition-all duration-200"
+                aria-label="RAH Operations Facebook"
+                title="Facebook"
+              >
+                <Facebook className="w-4 h-4" />
+              </a>
+              <a 
+                href="https://www.yelp.com/biz/rah-operations-scottsdale" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 text-gray-600 hover:text-[#FF1A1A] hover:bg-red-50 rounded-lg transition-all duration-200"
+                aria-label="RAH Operations Yelp Reviews"
+                title="Yelp"
+              >
+                <Star className="w-4 h-4" />
+              </a>
+              <a 
+                href="https://linkedin.com/company/rah-operations-llc" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 text-gray-600 hover:text-[#0A66C2] hover:bg-blue-50 rounded-lg transition-all duration-200"
+                aria-label="RAH Operations LLC LinkedIn"
+                title="LinkedIn"
+              >
+                <Linkedin className="w-4 h-4" />
+              </a>
+            </div>
+            
             <a 
               href="tel:+18884724621" 
               className="hidden xl:flex items-center text-gray-600 hover:text-[#3CBEC7] transition-colors duration-300"
@@ -432,6 +486,55 @@ const Header = () => {
             
             {/* Mobile CTA Section */}
             <div className="pt-4 mt-4 border-t border-gray-200 space-y-3">
+              {/* Social Media Links for Mobile */}
+              <div className="flex items-center justify-center space-x-2 pb-3">
+                <a 
+                  href="https://share.google/OZPp85BfytCtF10Lj" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 bg-gray-100 rounded-lg text-gray-700 hover:bg-[#3CBEC7] hover:text-white transition-all duration-200"
+                  aria-label="Google Business Profile for RAH Operations"
+                >
+                  <MapPin className="w-5 h-5" />
+                </a>
+                <a 
+                  href="https://www.instagram.com/rahoperations/" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 bg-gray-100 rounded-lg text-gray-700 hover:bg-[#E4405F] hover:text-white transition-all duration-200"
+                  aria-label="RAH Operations Instagram"
+                >
+                  <Instagram className="w-5 h-5" />
+                </a>
+                <a 
+                  href="https://www.facebook.com/profile.php?id=61574789296433" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 bg-gray-100 rounded-lg text-gray-700 hover:bg-[#1877F2] hover:text-white transition-all duration-200"
+                  aria-label="RAH Operations Facebook"
+                >
+                  <Facebook className="w-5 h-5" />
+                </a>
+                <a 
+                  href="https://www.yelp.com/biz/rah-operations-scottsdale" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 bg-gray-100 rounded-lg text-gray-700 hover:bg-[#FF1A1A] hover:text-white transition-all duration-200"
+                  aria-label="RAH Operations Yelp Reviews"
+                >
+                  <Star className="w-5 h-5" />
+                </a>
+                <a 
+                  href="https://linkedin.com/company/rah-operations-llc" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 bg-gray-100 rounded-lg text-gray-700 hover:bg-[#0A66C2] hover:text-white transition-all duration-200"
+                  aria-label="RAH Operations LLC LinkedIn"
+                >
+                  <Linkedin className="w-5 h-5" />
+                </a>
+              </div>
+              
               <a 
                 href="tel:+18884724621" 
                 className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 rounded-lg text-[#3CBEC7] hover:bg-gray-100 font-medium transition-colors duration-200"
