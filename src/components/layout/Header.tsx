@@ -307,59 +307,7 @@ const Header = () => {
 
           {/* Desktop CTA Button */}
           <div className="hidden lg:flex items-center space-x-4">
-            {/* Social Media Links */}
-            <div className="hidden xl:flex items-center space-x-1 border-r border-gray-200 pr-4 mr-2">
-              <a 
-                href="https://share.google/OZPp85BfytCtF10Lj" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 text-gray-600 hover:text-[#3CBEC7] hover:bg-gray-50 rounded-lg transition-all duration-200"
-                aria-label="Google Business Profile for RAH Operations"
-                title="Google Business"
-              >
-                <MapPin className="w-4 h-4" />
-              </a>
-              <a 
-                href="https://www.instagram.com/rahoperations/" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 text-gray-600 hover:text-[#E4405F] hover:bg-pink-50 rounded-lg transition-all duration-200"
-                aria-label="RAH Operations Instagram"
-                title="Instagram"
-              >
-                <Instagram className="w-4 h-4" />
-              </a>
-              <a 
-                href="https://www.facebook.com/profile.php?id=61574789296433" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 text-gray-600 hover:text-[#1877F2] hover:bg-blue-50 rounded-lg transition-all duration-200"
-                aria-label="RAH Operations Facebook"
-                title="Facebook"
-              >
-                <Facebook className="w-4 h-4" />
-              </a>
-              <a 
-                href="https://www.yelp.com/biz/rah-operations-scottsdale" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 text-gray-600 hover:text-[#FF1A1A] hover:bg-red-50 rounded-lg transition-all duration-200"
-                aria-label="RAH Operations Yelp Reviews"
-                title="Yelp"
-              >
-                <Star className="w-4 h-4" />
-              </a>
-              <a 
-                href="https://linkedin.com/company/rah-operations-llc" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 text-gray-600 hover:text-[#0A66C2] hover:bg-blue-50 rounded-lg transition-all duration-200"
-                aria-label="RAH Operations LLC LinkedIn"
-                title="LinkedIn"
-              >
-                <Linkedin className="w-4 h-4" />
-              </a>
-            </div>
+            {/* Social Media Links - unified, see above */}
             
             <a 
               href="tel:+18884724621" 
@@ -534,35 +482,7 @@ const Header = () => {
             
             {/* Mobile CTA Section */}
             <div className="pt-4 mt-4 border-t border-gray-200 space-y-3">
-              {/* Social Media Links for Mobile */}
-              <div className="flex items-center justify-center space-x-2 pb-3">
-                <a 
-                  href="https://share.google/OZPp85BfytCtF10Lj" 
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2.5 bg-gray-100 rounded-lg text-gray-700 hover:bg-[#3CBEC7] hover:text-white transition-all duration-200"
-                  aria-label="Google Business Profile for RAH Operations"
-                >
-                  <MapPin className="w-5 h-5" />
-                </a>
-                <a 
-                  href="https://www.instagram.com/rahoperations/" 
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2.5 bg-gray-100 rounded-lg text-gray-700 hover:bg-[#E4405F] hover:text-white transition-all duration-200"
-                  aria-label="RAH Operations Instagram"
-                >
-                  <Instagram className="w-5 h-5" />
-                </a>
-                <a 
-                  href="https://www.facebook.com/profile.php?id=61574789296433" 
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2.5 bg-gray-100 rounded-lg text-gray-700 hover:bg-[#1877F2] hover:text-white transition-all duration-200"
-                  aria-label="RAH Operations Facebook"
-                >
-                  <Facebook className="w-5 h-5" />
-                </a>
+              {/* Social Media Links for Mobile - unified, see above */}
                 <a 
                   href="https://www.yelp.com/biz/rah-operations-scottsdale" 
                   target="_blank"
@@ -581,23 +501,7 @@ const Header = () => {
                 >
                   <Linkedin className="w-5 h-5" />
                 </a>
-              </div>
-              
-              <a 
-                href="tel:+18884724621" 
-                className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 rounded-lg text-[#3CBEC7] hover:bg-gray-100 font-medium transition-colors duration-200"
-              >
-                <Phone className="w-5 h-5" />
-                (888) 472-4621
-              </a>
-              
-              <Link 
-                to="/contact"
-                className="block text-center bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81] text-white px-6 py-3 rounded-lg font-semibold hover:from-[#1A7C81] hover:to-[#0F6168] transition-all duration-300 shadow-md"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Free Consultation
-              </Link>
+              {/* ...existing code... */}
             </div>
           </div>
         </div>
