@@ -1,6 +1,39 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Phone, ChevronDown, Briefcase, Home, User, BookOpen, Mail, Star, Layers, Facebook, Instagram, Linkedin, MapPin } from 'lucide-react';
+import { Menu, X, Phone, ChevronDown, Briefcase, Home, User, BookOpen, Mail, Star, Layers, Facebook, Instagram, Linkedin, MapPin, Globe } from 'lucide-react';
+  // Social links with brand colors
+  const socialLinks = [
+    {
+      href: 'https://www.instagram.com/rahoperations/',
+      label: 'Instagram',
+      icon: <Instagram className="w-5 h-5" />, 
+      color: 'hover:bg-[#E4405F] hover:text-white',
+    },
+    {
+      href: 'https://www.facebook.com/profile.php?id=61574789296433',
+      label: 'Facebook',
+      icon: <Facebook className="w-5 h-5" />, 
+      color: 'hover:bg-[#1877F2] hover:text-white',
+    },
+    {
+      href: 'https://linkedin.com/company/rah-operations-llc',
+      label: 'LinkedIn',
+      icon: <Linkedin className="w-5 h-5" />, 
+      color: 'hover:bg-[#0A66C2] hover:text-white',
+    },
+    {
+      href: 'https://www.yelp.com/biz/rah-operations-scottsdale',
+      label: 'Yelp',
+      icon: <Star className="w-5 h-5" />, 
+      color: 'hover:bg-[#FF1A1A] hover:text-white',
+    },
+    {
+      href: 'https://share.google/OZPp85BfytCtF10Lj',
+      label: 'Google',
+      icon: <Globe className="w-5 h-5" />, 
+      color: 'hover:bg-[#4285F4] hover:text-white',
+    },
+  ];
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -80,6 +113,21 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-1 xl:space-x-2">
+            {/* Social Icons */}
+            <div className="flex items-center gap-1 ml-4">
+              {socialLinks.map((link, idx) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={link.label}
+                  className={`p-2.5 bg-gray-100 rounded-lg text-gray-700 transition-all duration-200 ${link.color}`}
+                >
+                  {link.icon}
+                </a>
+              ))}
+            </div>
             <Link 
               to="/" 
               className={`relative px-4 py-2 text-sm font-semibold tracking-wide transition-all duration-300 rounded-lg
