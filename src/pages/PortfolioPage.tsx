@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useCallback } from 'react';
-import { Helmet } from 'react-helmet-async';
+import SEOHead from '../components/ui/SEOHead';
 import { ExternalLink, Globe, Code, Monitor, Sparkles, Zap } from 'lucide-react';
 
 // Define the structure of each portfolio item
@@ -151,16 +151,13 @@ const PortfolioPage: React.FC = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Portfolio - My Web Development Projects | Professional Websites</title>
-        <meta 
-          name="description" 
-          content="Explore my portfolio of professional websites including business sites, e-commerce platforms, and custom web applications built with modern technologies." 
-        />
-        {/* Add preconnect for external services */}
-        <link rel="preconnect" href="https://screenshot.rocks" />
-        <link rel="preconnect" href="https://image.thum.io" />
-      </Helmet>
+      <SEOHead
+        title="Portfolio - My Web Development Projects | Professional Websites"
+        description="Explore my portfolio of professional websites including business sites, e-commerce platforms, and custom web applications built with modern technologies."
+        url="https://www.rahoperations.com/portfolio"
+        imageUrl="/Updated%20RAH%20LOGO%20with%20Correct%20Color%20scheme.png"
+        keywords="web development portfolio, professional websites, Arizona web design, custom web applications"
+      />
 
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-[#F0FFFE]">
         {/* Hero Section */}

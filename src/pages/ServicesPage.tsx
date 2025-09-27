@@ -1,5 +1,5 @@
 // Build fix - timestamp: Jan 17 2025
-import React from 'react';
+// ...existing code...
 import { Globe, CreditCard, BarChart3, Building2, TrendingUp, Users, FileText, ArrowRight } from 'lucide-react';
 import SEOHead from '../components/ui/SEOHead';
 import { absoluteUrl } from '../utils/url';
@@ -16,7 +16,7 @@ const ServicesPage = () => {
       features: [
         'Custom Website Design',
         'Search Engine Optimization (SEO)',
-        'Local SEO for Arizona Markets',
+  'Local SEO for Arizona Markets',
         'Mobile-Responsive Design',
         'Google My Business Optimization'
       ]
@@ -101,33 +101,6 @@ const ServicesPage = () => {
     }
   ];
 
-  const structuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'Service',
-    name: 'Arizona Business Services',
-    description: 'Comprehensive business services including website design, SEO, business credit, and digital marketing for Arizona businesses.',
-    provider: {
-      '@type': 'LocalBusiness',
-      name: 'RAH Operations',
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: '6301 E Pinnacle Vista Dr Unit 2004',
-        addressLocality: 'Scottsdale',
-        addressRegion: 'AZ',
-        postalCode: '85266',
-        addressCountry: 'US'
-      },
-      telephone: '+1-480-472-4621'
-    },
-    areaServed: [
-      'Phoenix, AZ',
-      'Scottsdale, AZ',
-      'Tempe, AZ',
-      'Chandler, AZ',
-      'Mesa, AZ',
-      'Arizona'
-    ]
-  };
 
   return (
     <>
