@@ -1,54 +1,63 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Phone } from 'lucide-react';
+import { Mail, Phone, MapPin } from 'lucide-react';
 
-const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+const Footer = () => {
   return (
-    <header className="bg-white shadow-lg sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-4">
-          <Link to="/" className="flex items-center">
-            <img
-              src="/Updated%20RAH%20LOGO%20with%20Correct%20Color%20scheme.png"
-              alt="RAH Operations Logo"
-              className="h-12 w-auto"
-            />
-          </Link>
-          <nav className="hidden md:flex space-x-8">
-            <Link to="/" className="text-gray-700 hover:text-teal-500 font-medium">Home</Link>
-            <Link to="/services" className="text-gray-700 hover:text-teal-500 font-medium">Services</Link>
-            <Link to="/about" className="text-gray-700 hover:text-teal-500 font-medium">About</Link>
-            <Link to="/contact" className="text-gray-700 hover:text-teal-500 font-medium">Contact</Link>
-          </nav>
-          <div className="hidden md:flex items-center">
-            <a href="tel:+18884724621" className="flex items-center text-teal-600 hover:text-teal-800 font-medium">
-              <Phone className="w-4 h-4 mr-2" />
-              (888) 472-4621
-            </a>
-          </div>
-          <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
-        </div>
-        {isMenuOpen && (
-          <div className="md:hidden py-4 border-t">
-            <div className="flex flex-col space-y-4">
-              <Link to="/" onClick={() => setIsMenuOpen(false)}>Home</Link>
-              <Link to="/services" onClick={() => setIsMenuOpen(false)}>Services</Link>
-              <Link to="/about" onClick={() => setIsMenuOpen(false)}>About</Link>
-              <Link to="/contact" onClick={() => setIsMenuOpen(false)}>Contact</Link>
-              <a href="tel:+18884724621" className="flex items-center">
-                <Phone className="w-4 h-4 mr-2" />
+    <footer className="bg-gray-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Company Info */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">RAH Operations</h3>
+            <div className="space-y-3">
+              <p className="flex items-center text-gray-600">
+                <Phone className="w-5 h-5 mr-2" />
                 (888) 472-4621
-              </a>
+              </p>
+              <p className="flex items-center text-gray-600">
+                <Mail className="w-5 h-5 mr-2" />
+                daniel@rahoperations.com
+              </p>
+              <p className="flex items-center text-gray-600">
+                <MapPin className="w-5 h-5 mr-2" />
+                Scottsdale, AZ
+              </p>
             </div>
           </div>
-        )}
+
+          {/* Quick Links */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Links</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/" className="text-gray-600 hover:text-teal-600">Home</Link>
+              </li>
+              <li>
+                <Link to="/services" className="text-gray-600 hover:text-teal-600">Services</Link>
+              </li>
+              <li>
+                <Link to="/about" className="text-gray-600 hover:text-teal-600">About</Link>
+              </li>
+              <li>
+                <Link to="/contact" className="text-gray-600 hover:text-teal-600">Contact</Link>
+              </li>
+              <li>
+                <Link to="/privacy-policy" className="text-gray-600 hover:text-teal-600">Privacy Policy</Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Copyright */}
+        <div className="mt-8 pt-8 border-t border-gray-200">
+          <p className="text-center text-gray-500">
+            © {new Date().getFullYear()} RAH Operations. All rights reserved.
+          </p>
+        </div>
       </div>
-    </header>
+    </footer>
   );
 };
 
-export default Header;
+export default Footer;
