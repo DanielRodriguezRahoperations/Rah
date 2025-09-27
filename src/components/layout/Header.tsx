@@ -102,13 +102,19 @@ const Header = () => {
             to="/" 
             className="flex items-center group"
           >
-            <img
-              src="/Updated%20RAH%20LOGO%20with%20Correct%20Color%20scheme.png"
-              alt="RAH Operations Logo"
-              className={`transition-all duration-300 group-hover:scale-105 ${
-                scrolled ? 'h-10 md:h-12' : 'h-12 md:h-14'
-              }`}
-            />
+            <picture>
+              <source srcSet="/logo.webp" type="image/webp" />
+              <img
+                src="/Updated%20RAH%20LOGO%20with%20Correct%20Color%20scheme.png"
+                alt="RAH Operations Logo"
+                className={`transition-all duration-300 group-hover:scale-105 ${
+                  scrolled ? 'h-10 md:h-12' : 'h-12 md:h-14'
+                }`}
+                width={120}
+                height={56}
+                loading="eager"
+              />
+            </picture>
           </Link>
 
           {/* Desktop Navigation */}
