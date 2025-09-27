@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useRef, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ExternalLink, Globe, Code, Palette, Monitor, Sparkles, Zap } from 'lucide-react';
+import { ExternalLink, Globe, Code, Monitor, Sparkles, Zap } from 'lucide-react';
 
 // Define the structure of each portfolio item
 interface PortfolioItem {
@@ -14,104 +14,152 @@ interface PortfolioItem {
   features: string[];
 }
 
-const PortfolioPage: React.FC = () => {
-  // Trigger animations when component mounts
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const elements = document.querySelectorAll('.fade-in-up, .fade-in-left, .fade-in-right, .scale-in');
-      elements.forEach((el, index) => {
-        setTimeout(() => {
-          el.classList.add('visible');
-        }, index * 100);
-      });
-    }, 100);
+// Move portfolio items data outside component to prevent recreation
+const portfolioItemsData: PortfolioItem[] = [
+  {
+    id: 1,
+    title: "Empire Builds AZ",
+    url: "https://www.empirebuildsaz.com",
+    description: "Professional construction and building services company showcasing their portfolio of residential and commercial projects",
+    image: "/portfolio/empire-builds.png",
+    technologies: ["React", "Tailwind CSS", "SEO Optimized", "Mobile Responsive"],
+    category: "Construction",
+    features: ["Project Gallery", "Service Listings", "Contact Forms", "Testimonials"]
+  },
+  {
+    id: 2,
+    title: "Pinnacle Bookkeeping AZ",
+    url: "https://www.pinnaclebookkeepingaz.com/",
+    description: "Full-service bookkeeping and financial management solutions for small to medium businesses in Arizona",
+    image: "/portfolio/pinnacle-bookkeeping.png",
+    technologies: ["React", "TypeScript", "Professional Design", "Secure Forms"],
+    category: "Finance",
+    features: ["Service Calculator", "Client Portal", "Resource Center", "Appointment Booking"]
+  },
+  {
+    id: 3,
+    title: "The Scottsdale Injector",
+    url: "https://www.thescottsdaleinjector.com/",
+    description: "Premium medical aesthetics and cosmetic injection services with a focus on natural-looking results",
+    image: "/portfolio/scottsdale-injector.png",
+    technologies: ["React", "HIPAA Compliant", "Before/After Gallery", "Booking System"],
+    category: "Healthcare",
+    features: ["Treatment Menu", "Virtual Consultation", "Patient Forms", "Educational Blog"]
+  },
+  {
+    id: 4,
+    title: "SunVision Solar",
+    url: "https://www.sunvision-solar.com/",
+    description: "Solar energy solutions provider offering installation, maintenance, and consultation services across Arizona",
+    image: "/portfolio/sunvision-solar.png",
+    technologies: ["React", "Interactive Calculators", "3D Visualizations", "Lead Generation"],
+    category: "Energy",
+    features: ["Solar Calculator", "Project Showcase", "Financing Options", "Energy Reports"]
+  },
+  {
+    id: 5,
+    title: "Daniel Rodriguez",
+    url: "https://www.danielrodriguez.org/",
+    description: "Professional portfolio and personal brand website showcasing expertise and achievements",
+    image: "/portfolio/daniel-rodriguez.png",
+    technologies: ["React", "TypeScript", "Analytics", "Performance Optimized"],
+    category: "Personal Brand",
+    features: ["Portfolio Gallery", "Blog Section", "Resume Download", "Contact Integration"]
+  },
+  {
+    id: 6,
+    title: "Daniel Rodriguez Scottsdale",
+    url: "https://danielrodriguezscottsdale.carrd.co",
+    description: "Streamlined landing page for professional networking and quick contact information",
+    image: "/portfolio/daniel-rodriguez-scottsdale.png",
+    technologies: ["Carrd", "Single Page", "Fast Loading", "Mobile First"],
+    category: "Landing Page",
+    features: ["Social Links", "Contact Info", "Bio Section", "Call-to-Action"]
+  },
+  {
+    id: 7,
+    title: "Knox Strats",
+    url: "https://www.knoxstrats.com/",
+    description: "Strategic consulting firm specializing in business development and growth strategies",
+    image: "/portfolio/knox-strats.png",
+    technologies: ["React", "Data Visualization", "Client Dashboard", "Secure"],
+    category: "Consulting",
+    features: ["Case Studies", "Service Packages", "Client Resources", "Strategy Tools"]
+  }
+];
 
-    return () => clearTimeout(timer);
+// Utility function for generating screenshot URL with timestamp
+const getScreenshotUrl = (url: string, width: number, height: number) => {
+  const timestamp = new Date().getTime();
+  return `https://screenshot.rocks/api/screenshot?url=${encodeURIComponent(url)}&width=${width}&height=${height}&deviceScaleFactor=1&t=${timestamp}`;
+};
+
+const PortfolioPage: React.FC = () => {
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const animatedElementsRef = useRef<Set<Element>>(new Set());
+
+  // Memoize portfolio items and calculations
+  const portfolioItems = useMemo(() => portfolioItemsData, []);
+  const categories = useMemo(
+    () => Array.from(new Set(portfolioItems.map(item => item.category))),
+    [portfolioItems]
+  );
+  const totalTechnologies = useMemo(
+    () => Array.from(new Set(portfolioItems.flatMap(item => item.technologies))).length,
+    [portfolioItems]
+  );
+
+  // Intersection Observer callback
+  const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !animatedElementsRef.current.has(entry.target)) {
+        entry.target.classList.add('visible');
+        animatedElementsRef.current.add(entry.target);
+      }
+    });
   }, []);
 
-  // Your portfolio websites data
-  const portfolioItems: PortfolioItem[] = [
-    {
-      id: 1,
-      title: "Empire Builds AZ",
-      url: "https://www.empirebuildsaz.com",
-      description: "Professional construction and building services company showcasing their portfolio of residential and commercial projects",
-      image: "/portfolio/empire-builds.png",
-      technologies: ["React", "Tailwind CSS", "SEO Optimized", "Mobile Responsive"],
-      category: "Construction",
-      features: ["Project Gallery", "Service Listings", "Contact Forms", "Testimonials"]
-    },
-    {
-      id: 2,
-      title: "Pinnacle Bookkeeping AZ",
-      url: "https://www.pinnaclebookkeepingaz.com/",
-      description: "Full-service bookkeeping and financial management solutions for small to medium businesses in Arizona",
-      image: "/portfolio/pinnacle-bookkeeping.png",
-      technologies: ["React", "TypeScript", "Professional Design", "Secure Forms"],
-      category: "Finance",
-      features: ["Service Calculator", "Client Portal", "Resource Center", "Appointment Booking"]
-    },
-    {
-      id: 3,
-      title: "The Scottsdale Injector",
-      url: "https://www.thescottsdaleinjector.com/",
-      description: "Premium medical aesthetics and cosmetic injection services with a focus on natural-looking results",
-      image: "/portfolio/scottsdale-injector.png",
-      technologies: ["React", "HIPAA Compliant", "Before/After Gallery", "Booking System"],
-      category: "Healthcare",
-      features: ["Treatment Menu", "Virtual Consultation", "Patient Forms", "Educational Blog"]
-    },
-    {
-      id: 4,
-      title: "SunVision Solar",
-      url: "https://www.sunvision-solar.com/",
-      description: "Solar energy solutions provider offering installation, maintenance, and consultation services across Arizona",
-      image: "/portfolio/sunvision-solar.png",
-      technologies: ["React", "Interactive Calculators", "3D Visualizations", "Lead Generation"],
-      category: "Energy",
-      features: ["Solar Calculator", "Project Showcase", "Financing Options", "Energy Reports"]
-    },
-    {
-      id: 5,
-      title: "Daniel Rodriguez",
-      url: "https://www.danielrodriguez.org/",
-      description: "Professional portfolio and personal brand website showcasing expertise and achievements",
-      image: "/portfolio/daniel-rodriguez.png",
-      technologies: ["React", "TypeScript", "Analytics", "Performance Optimized"],
-      category: "Personal Brand",
-      features: ["Portfolio Gallery", "Blog Section", "Resume Download", "Contact Integration"]
-    },
-    {
-      id: 6,
-      title: "Daniel Rodriguez Scottsdale",
-      url: "https://danielrodriguezscottsdale.carrd.co",
-      description: "Streamlined landing page for professional networking and quick contact information",
-      image: "/portfolio/daniel-rodriguez-scottsdale.png",
-      technologies: ["Carrd", "Single Page", "Fast Loading", "Mobile First"],
-      category: "Landing Page",
-      features: ["Social Links", "Contact Info", "Bio Section", "Call-to-Action"]
-    },
-    {
-      id: 7,
-      title: "Knox Strats",
-      url: "https://www.knoxstrats.com/",
-      description: "Strategic consulting firm specializing in business development and growth strategies",
-      image: "/portfolio/knox-strats.png",
-      technologies: ["React", "Data Visualization", "Client Dashboard", "Secure"],
-      category: "Consulting",
-      features: ["Case Studies", "Service Packages", "Client Resources", "Strategy Tools"]
-    }
-  ];
+  // Setup Intersection Observer
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(handleIntersection, {
+      threshold: 0.1,
+      rootMargin: '50px'
+    });
 
-  // Group items by category for stats
-  const categories = Array.from(new Set(portfolioItems.map(item => item.category)));
-  const totalTechnologies = Array.from(new Set(portfolioItems.flatMap(item => item.technologies))).length;
+    const elements = document.querySelectorAll('.fade-in-up, .fade-in-left, .fade-in-right, .scale-in');
+    elements.forEach(el => observerRef.current?.observe(el));
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+      animatedElementsRef.current.clear();
+    };
+  }, [handleIntersection]);
+
+  // Preload first 3 screenshots
+  useEffect(() => {
+    const firstThreeItems = portfolioItems.slice(0, 3);
+    firstThreeItems.forEach(item => {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = getScreenshotUrl(item.url, 600, 400);
+      document.head.appendChild(link);
+    });
+  }, [portfolioItems]);
 
   return (
     <>
       <Helmet>
         <title>Portfolio - My Web Development Projects | Professional Websites</title>
-        <meta name="description" content="Explore my portfolio of professional websites including business sites, e-commerce platforms, and custom web applications built with modern technologies." />
+        <meta 
+          name="description" 
+          content="Explore my portfolio of professional websites including business sites, e-commerce platforms, and custom web applications built with modern technologies." 
+        />
+        {/* Add preconnect for external services */}
+        <link rel="preconnect" href="https://screenshot.rocks" />
+        <link rel="preconnect" href="https://image.thum.io" />
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-[#F0FFFE]">
@@ -177,28 +225,24 @@ const PortfolioPage: React.FC = () => {
                 >
                   {/* Website Preview Area */}
                   <div className="relative h-48 -mx-8 -mt-8 mb-6 overflow-hidden rounded-t-xl bg-gray-100">
-                    {/* Automatic Screenshot using screenshot.rocks (free service) */}
-                   <img 
-  src={`https://screenshot.rocks/api/screenshot?url=${encodeURIComponent(item.url)}&width=600&height=400&deviceScaleFactor=1&t=${Date.now()}`}
-  alt={`${item.title} preview`}
-  className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
-  loading="lazy"
-  onError={(e) => {
-    // Fallback to a simpler service if first fails
-    const target = e.currentTarget as HTMLImageElement;
-    if (!target.dataset.fallback) {
-      target.dataset.fallback = 'true';
-      // Also add timestamp to the fallback URL
-      target.src = `https://image.thum.io/get/width/600/crop/400/${item.url}?t=${Date.now()}`;
-    } else {
-      // If both fail, show gradient
-      target.style.display = 'none';
-      const fallback = target.nextElementSibling as HTMLElement;
-      if (fallback) fallback.classList.remove('hidden');
-    }
-  }}
-/>
-                    {/* Fallback gradient (hidden by default) */}
+                    <img 
+                      src={getScreenshotUrl(item.url, 600, 400)}
+                      alt={`${item.title} preview`}
+                      className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
+                      loading={index < 3 ? "eager" : "lazy"}
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement;
+                        if (!target.dataset.fallback) {
+                          target.dataset.fallback = 'true';
+                          target.src = `https://image.thum.io/get/width/600/crop/400/${item.url}`;
+                        } else {
+                          target.style.display = 'none';
+                          const fallback = target.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.classList.remove('hidden');
+                        }
+                      }}
+                    />
+                    {/* Fallback gradient */}
                     <div className="absolute inset-0 bg-gradient-to-br from-[#3CBEC7] to-[#1A7C81] opacity-90 hidden">
                       <div className="absolute inset-0 flex items-center justify-center">
                         <Monitor className="w-16 h-16 text-white opacity-50 group-hover:scale-110 transition-transform duration-300" />
