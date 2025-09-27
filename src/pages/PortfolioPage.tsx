@@ -178,25 +178,26 @@ const PortfolioPage: React.FC = () => {
                   {/* Website Preview Area */}
                   <div className="relative h-48 -mx-8 -mt-8 mb-6 overflow-hidden rounded-t-xl bg-gray-100">
                     {/* Automatic Screenshot using screenshot.rocks (free service) */}
-                    <img 
-                      src={`https://screenshot.rocks/api/screenshot?url=${encodeURIComponent(item.url)}&width=600&height=400&deviceScaleFactor=1`}
-                      alt={`${item.title} preview`}
-                      className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
-                      loading="lazy"
-                      onError={(e) => {
-                        // Fallback to a simpler service if first fails
-                        const target = e.currentTarget as HTMLImageElement;
-                        if (!target.dataset.fallback) {
-                          target.dataset.fallback = 'true';
-                          target.src = `https://image.thum.io/get/width/600/crop/400/${item.url}`;
-                        } else {
-                          // If both fail, show gradient
-                          target.style.display = 'none';
-                          const fallback = target.nextElementSibling as HTMLElement;
-                          if (fallback) fallback.classList.remove('hidden');
-                        }
-                      }}
-                    />
+                   <img 
+  src={`https://screenshot.rocks/api/screenshot?url=${encodeURIComponent(item.url)}&width=600&height=400&deviceScaleFactor=1&t=${Date.now()}`}
+  alt={`${item.title} preview`}
+  className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
+  loading="lazy"
+  onError={(e) => {
+    // Fallback to a simpler service if first fails
+    const target = e.currentTarget as HTMLImageElement;
+    if (!target.dataset.fallback) {
+      target.dataset.fallback = 'true';
+      // Also add timestamp to the fallback URL
+      target.src = `https://image.thum.io/get/width/600/crop/400/${item.url}?t=${Date.now()}`;
+    } else {
+      // If both fail, show gradient
+      target.style.display = 'none';
+      const fallback = target.nextElementSibling as HTMLElement;
+      if (fallback) fallback.classList.remove('hidden');
+    }
+  }}
+/>
                     {/* Fallback gradient (hidden by default) */}
                     <div className="absolute inset-0 bg-gradient-to-br from-[#3CBEC7] to-[#1A7C81] opacity-90 hidden">
                       <div className="absolute inset-0 flex items-center justify-center">
