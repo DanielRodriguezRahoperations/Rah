@@ -157,7 +157,7 @@ const ServicesPage = () => {
                   </ul>
                   
                   <Button variant="outline" to={service.link} className="w-full">
-                    Learn More
+                    Explore {service.title}
                     <ArrowRight className="ml-2 w-4 h-4" />
                   </Button>
                 </div>
@@ -177,7 +177,7 @@ const ServicesPage = () => {
             Let's discuss which services are right for your business goals and budget.
           </p>
           <Button variant="secondary" size="lg" to="/contact">
-            Schedule Consultation
+            Schedule Free Business Consultation
             <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
         </div>

@@ -415,7 +415,7 @@ const HomePage = () => {
                       to={service.link}
                       className="group-hover:bg-[#3CBEC7] group-hover:text-white group-hover:border-[#3CBEC7] border-[#1A7C81] text-[#1A7C81] transition-all duration-300"
                     >
-                      Learn More
+                      Get {service.title} Details
                       <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                     </Button>
                     <div className="w-2 h-2 bg-[#3CBEC7] rounded-full opacity-0 group-hover:opacity-100 group-hover:scale-150 transition-all duration-500"></div>
