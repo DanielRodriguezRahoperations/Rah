@@ -204,7 +204,7 @@ const NewBusinessSetupPage = () => {
             Let us handle the legal requirements while you focus on building your business.
           </p>
           <Button variant="secondary" size="lg" to="/contact">
-            Get Started Today
+            Start Your Business Setup Today
             <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
         </div>

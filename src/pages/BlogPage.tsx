@@ -295,12 +295,12 @@ Contact us now to get started the right way.`
                       >
                         {expandedPost === index ? (
                           <>
-                            Show Less
+                            Show Less Content
                             <ChevronUp className="w-4 h-4 ml-1" />
                           </>
                         ) : (
                           <>
-                            Read More
+                            Read Full Article
                             <ChevronDown className="w-4 h-4 ml-1" />
                           </>
                         )}

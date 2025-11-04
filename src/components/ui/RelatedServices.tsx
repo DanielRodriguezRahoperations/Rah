@@ -102,7 +102,7 @@ const RelatedServices: React.FC<RelatedServicesProps> = ({ currentService, categ
                 className="inline-flex items-center text-[#1A7C81] hover:text-[#0F6168] font-medium transition-colors"
                 title={`Get ${service.title} services`}
               >
-                Learn More
+                View {service.title} Details
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Link>
             </div>
@@ -115,7 +115,7 @@ const RelatedServices: React.FC<RelatedServicesProps> = ({ currentService, categ
             className="inline-flex items-center bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81] text-white px-8 py-3 rounded-lg font-semibold hover:from-[#1A7C81] hover:to-[#0F6168] transition-all duration-300 transform hover:scale-105"
             title="View all Arizona business services"
           >
-            View All Services
+            View All Arizona Business Services
             <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>
