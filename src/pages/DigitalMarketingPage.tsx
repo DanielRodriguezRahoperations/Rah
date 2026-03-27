@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Target, BarChart, Globe, TrendingUp, ArrowRight, CheckCircle } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 import SEOHead from '../components/ui/SEOHead';
 import Button from '../components/ui/Button';
@@ -7,156 +7,94 @@ import ContactForm from '../components/ui/ContactForm';
 import InternalLinks from '../components/ui/InternalLinks';
 
 const DigitalMarketingPage = () => {
-
-  const services = [
-    {
-      icon: Search,
-      title: 'Search Engine Optimization',
-      description: 'Rank higher on Google and dominate local Arizona search results.',
-      features: ['Keyword Strategy', 'On-Page SEO', 'Local SEO', 'Technical Optimization']
-    },
-    {
-      icon: Target,
-      title: 'Paid Advertising',
-      description: 'Generate leads fast with high-converting Google and Meta ad campaigns.',
-      features: ['Google Ads', 'Facebook Ads', 'Retargeting', 'Conversion Tracking']
-    },
-    {
-      icon: Globe,
-      title: 'Social Media Growth',
-      description: 'Build a brand that attracts and converts your ideal audience.',
-      features: ['Content Strategy', 'Posting Systems', 'Audience Growth', 'Brand Positioning']
-    },
-    {
-      icon: BarChart,
-      title: 'Analytics & Optimization',
-      description: 'Track performance and continuously improve ROI.',
-      features: ['Tracking Setup', 'ROI Analysis', 'Monthly Reporting', 'Optimization']
-    }
-  ];
-
-  const results = [
-    { metric: '300%', description: 'Increase in organic traffic' },
-    { metric: '250%', description: 'More inbound leads' },
-    { metric: '4.8x', description: 'Return on ad spend' },
-    { metric: '85%', description: 'Client retention rate' }
-  ];
-
   return (
     <>
       <SEOHead
         title="Digital Marketing Scottsdale & Phoenix | RAH Operations"
-        description="Results-driven digital marketing for Arizona businesses. SEO, paid ads, and growth strategies that generate real clients."
+        description="Digital marketing systems that generate consistent leads and real revenue for Arizona businesses."
       />
 
       {/* HERO */}
-      <section className="bg-gradient-to-br from-[#97EDED] via-[#C9F8F6] to-[#3CBEC7] py-24 text-center">
-        <div className="max-w-7xl mx-auto px-4">
-
-          <p className="text-sm font-semibold text-[#0F6168] mb-3 uppercase tracking-wide">
-            Scottsdale & Phoenix Digital Marketing Experts
-          </p>
-
-          <h1 className="text-4xl lg:text-5xl font-bold text-[#0F6168] mb-6">
-            Digital Marketing That Actually Brings You Clients — Not Just Clicks
-          </h1>
-
-          <p className="text-lg text-[#104A53] max-w-2xl mx-auto mb-8">
-            We build marketing systems that generate leads, convert customers, and scale your business.
-          </p>
-
-          <div className="flex justify-center gap-4 flex-wrap">
-            <Button size="lg" to="/contact">
-              Get Free Strategy Call <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-
-            <Button size="lg" to="/services" variant="outline">
-              View Services
-            </Button>
-          </div>
-
-        </div>
-      </section>
-
-      {/* AUTHORITY */}
-      <section className="py-20 text-center">
+      <section className="bg-gradient-to-br from-[#97EDED] via-[#C9F8F6] to-[#3CBEC7] py-28 text-center">
         <div className="max-w-5xl mx-auto px-4">
 
-          <h2 className="text-3xl font-bold mb-6">
-            Why Arizona Businesses Trust RAH Operations
-          </h2>
+          <h1 className="text-4xl lg:text-5xl font-bold text-[#0F6168] mb-6 leading-tight">
+            If Your Business Isn’t Generating Consistent Leads Online, You Don’t Have a Marketing System
+          </h1>
 
-          <p className="text-gray-600 mb-12 max-w-3xl mx-auto">
-            Most agencies focus on impressions and clicks. We focus on revenue.
-            Every strategy is built to generate leads and grow your business consistently.
+          <p className="text-lg text-[#104A53] mb-6">
+            Most companies are guessing. Running ads without a funnel. Posting content without strategy.
           </p>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="p-6 bg-gray-50 rounded-xl">
-              <h3 className="font-bold">Local Expertise</h3>
-              <p className="text-sm text-gray-600 mt-2">We understand Arizona markets.</p>
-            </div>
+          <p className="text-lg text-[#104A53] mb-10">
+            We build systems that attract the right people, convert them into leads, and turn those leads into paying customers.
+          </p>
 
-            <div className="p-6 bg-gray-50 rounded-xl">
-              <h3 className="font-bold">ROI Focused</h3>
-              <p className="text-sm text-gray-600 mt-2">Built for real results, not vanity metrics.</p>
-            </div>
-
-            <div className="p-6 bg-gray-50 rounded-xl">
-              <h3 className="font-bold">Scalable Systems</h3>
-              <p className="text-sm text-gray-600 mt-2">We help you grow predictably.</p>
-            </div>
-          </div>
+          <Button size="lg" to="/contact">
+            Get a Real Strategy <ArrowRight className="ml-2 w-5 h-5" />
+          </Button>
 
         </div>
       </section>
 
-      {/* WHO THIS IS FOR */}
-      <section className="py-20 bg-gray-50 text-center">
-        <h2 className="text-3xl font-bold mb-10">
-          Built for Businesses Ready to Grow
-        </h2>
+      {/* CORE POSITIONING */}
+      <section className="py-24 bg-white">
+        <div className="max-w-4xl mx-auto px-4 space-y-6 text-lg text-gray-700">
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto px-4">
-          <div className="bg-white p-6 rounded-xl shadow-sm">Local Service Businesses</div>
-          <div className="bg-white p-6 rounded-xl shadow-sm">Growing Companies</div>
-          <div className="bg-white p-6 rounded-xl shadow-sm">New Businesses</div>
+          <h2 className="text-3xl font-bold text-black">
+            Most Marketing Fails Because There’s No System
+          </h2>
+
+          <p>
+            Businesses don’t fail because marketing “doesn’t work.”
+            They fail because everything they’re doing is disconnected.
+          </p>
+
+          <p>
+            SEO is treated separately from ads.
+            Ads are run without a real conversion strategy.
+            Websites are built to look good — not to generate leads.
+          </p>
+
+          <p className="font-semibold text-black">
+            That’s why results feel inconsistent.
+          </p>
+
+          <p>
+            What we do is different.
+          </p>
+
+          <p>
+            We build a complete system — where traffic, messaging, conversion, and follow-up all work together.
+          </p>
+
         </div>
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="py-20 bg-white">
+      <section className="py-24 bg-gray-50">
         <div className="max-w-5xl mx-auto px-4">
 
-          <h2 className="text-3xl font-bold text-center mb-10">
-            How Our Digital Marketing Actually Works
+          <h2 className="text-3xl font-bold mb-10 text-center">
+            How Growth Actually Happens
           </h2>
 
-          <div className="space-y-8 text-gray-600">
+          <div className="space-y-8 text-gray-700 text-lg">
 
             <p>
-              Most businesses struggle because their marketing is fragmented.
-              We build complete systems designed to generate and convert leads consistently.
+              First, we identify where your current bottleneck is — traffic, conversion, or follow-up.
             </p>
 
             <p>
-              <strong>Market Analysis:</strong> We break down your competition and identify opportunities.
+              Then we fix that problem directly instead of throwing more marketing at it.
             </p>
 
             <p>
-              <strong>Traffic Strategy:</strong> SEO for long-term growth and ads for immediate leads.
+              Once the foundation is solid, we scale what’s already working.
             </p>
 
             <p>
-              <strong>Conversion Optimization:</strong> Turn visitors into customers.
-            </p>
-
-            <p>
-              <strong>Tracking & Data:</strong> Everything is measured and improved.
-            </p>
-
-            <p>
-              <strong>Scaling:</strong> Once it works, we scale aggressively.
+              That’s how you move from inconsistent results to predictable growth.
             </p>
 
           </div>
@@ -164,78 +102,104 @@ const DigitalMarketingPage = () => {
         </div>
       </section>
 
-      {/* SERVICES */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4">
+      {/* SERVICES (REAL EXPLANATION) */}
+      <section className="py-24 bg-white">
+        <div className="max-w-5xl mx-auto px-4 space-y-10">
 
-          <h2 className="text-3xl font-bold text-center mb-10">
-            Our Digital Marketing Services
+          <h2 className="text-3xl font-bold text-center">
+            What We Actually Do
           </h2>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {services.map((service, i) => {
-              const Icon = service.icon;
+          <div className="space-y-6 text-gray-700 text-lg">
 
-              return (
-                <div key={i} className="p-8 bg-gray-50 rounded-xl">
-                  <Icon className="mb-4 text-[#3CBEC7]" />
-                  <h3 className="font-bold text-xl mb-2">{service.title}</h3>
-                  <p className="text-gray-600 mb-3">{service.description}</p>
+            <p>
+              SEO is used to capture long-term demand from people actively searching for your service.
+            </p>
 
-                  <ul className="space-y-2">
-                    {service.features.map((f, idx) => (
-                      <li key={idx} className="text-sm text-gray-600 flex items-center">
-                        <CheckCircle className="w-4 h-4 mr-2 text-[#3CBEC7]" />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              );
-            })}
+            <p>
+              Paid advertising is used to generate immediate leads and test what messaging converts.
+            </p>
+
+            <p>
+              Your website is optimized to turn visitors into inquiries — not just look good.
+            </p>
+
+            <p>
+              Tracking systems are implemented so every lead and conversion is measurable.
+            </p>
+
+            <p className="font-semibold text-black">
+              This isn’t “marketing services.”
+              It’s a system designed to produce results.
+            </p>
+
           </div>
 
         </div>
       </section>
 
-      {/* RESULTS */}
-      <section className="py-20 bg-[#0F6168] text-white text-center">
-        <div className="grid md:grid-cols-4 gap-6 max-w-6xl mx-auto">
-          {results.map((r, i) => (
-            <div key={i}>
-              <div className="text-4xl font-bold">{r.metric}</div>
-              <p>{r.description}</p>
-            </div>
-          ))}
+      {/* RESULTS EXPECTATION */}
+      <section className="py-24 bg-gray-50 text-center">
+        <div className="max-w-4xl mx-auto px-4">
+
+          <h2 className="text-3xl font-bold mb-6">
+            What This Looks Like in Practice
+          </h2>
+
+          <div className="space-y-4 text-gray-700 text-lg">
+            <p>More inbound leads from people actively searching</p>
+            <p>Higher conversion rates from your existing traffic</p>
+            <p>Lower cost per lead over time</p>
+            <p>More predictable and scalable growth</p>
+          </div>
+
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="py-20 bg-gray-50">
+      {/* OBJECTIONS */}
+      <section className="py-24 bg-white text-center">
         <div className="max-w-4xl mx-auto px-4 space-y-4">
 
-          <details className="bg-white p-5 rounded-lg">
-            <summary className="font-bold">How long does it take?</summary>
-            <p className="text-gray-600 mt-2">
-              Paid ads can generate leads quickly, while SEO builds long-term growth.
-            </p>
-          </details>
+          <h2 className="text-3xl font-bold mb-6">
+            What Makes This Different
+          </h2>
 
-          <details className="bg-white p-5 rounded-lg">
-            <summary className="font-bold">Do you require contracts?</summary>
-            <p className="text-gray-600 mt-2">
-              No long-term contracts. Results keep clients.
-            </p>
-          </details>
+          <p>No long-term contracts</p>
+          <p>No generic strategies</p>
+          <p>No focus on vanity metrics</p>
+          <p>Everything is built around results</p>
+
+        </div>
+      </section>
+
+      {/* SEO CONTENT */}
+      <section className="py-24 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 text-gray-700 space-y-6">
+
+          <h2 className="text-3xl font-bold">
+            Digital Marketing in Scottsdale & Phoenix
+          </h2>
+
+          <p>
+            If you’re running a business in Arizona, your customers are already searching online for what you offer.
+          </p>
+
+          <p>
+            The difference is whether they find you — or your competitors.
+          </p>
+
+          <p>
+            A strong digital marketing system ensures your business shows up, stands out, and converts.
+          </p>
 
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-20 text-center">
+      <section className="py-24 text-center">
         <ContactForm
-          title="Get Your Free Marketing Strategy"
-          subtitle="We’ll show you how to grow your business."
+          title="Get a Real Strategy for Your Business"
+          subtitle="We’ll show you exactly what’s working, what’s not, and what to fix."
         />
       </section>
 
