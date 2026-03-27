@@ -50,7 +50,7 @@ const DigitalMarketingPage = () => {
       />
 
       {/* HERO */}
-      <section className="relative bg-gradient-to-br from-[#97EDED] via-[#C9F8F6] to-[#3CBEC7] py-24 text-center">
+      <section className="bg-gradient-to-br from-[#97EDED] via-[#C9F8F6] to-[#3CBEC7] py-24 text-center">
         <div className="max-w-7xl mx-auto px-4">
 
           <p className="text-sm font-semibold text-[#0F6168] mb-3 uppercase tracking-wide">
@@ -62,7 +62,7 @@ const DigitalMarketingPage = () => {
           </h1>
 
           <p className="text-lg text-[#104A53] max-w-2xl mx-auto mb-8">
-            We help Arizona businesses generate real leads, close more customers, and scale with proven systems.
+            We build marketing systems that generate leads, convert customers, and scale your business.
           </p>
 
           <div className="flex justify-center gap-4 flex-wrap">
@@ -86,24 +86,25 @@ const DigitalMarketingPage = () => {
             Why Arizona Businesses Trust RAH Operations
           </h2>
 
-          <p className="text-gray-600 mb-12">
-            We focus on results — leads, clients, and revenue — not vanity metrics.
+          <p className="text-gray-600 mb-12 max-w-3xl mx-auto">
+            Most agencies focus on impressions and clicks. We focus on revenue.
+            Every strategy is built to generate leads and grow your business consistently.
           </p>
 
           <div className="grid md:grid-cols-3 gap-6">
             <div className="p-6 bg-gray-50 rounded-xl">
               <h3 className="font-bold">Local Expertise</h3>
-              <p className="text-sm text-gray-600 mt-2">We understand the Arizona market.</p>
+              <p className="text-sm text-gray-600 mt-2">We understand Arizona markets.</p>
             </div>
 
             <div className="p-6 bg-gray-50 rounded-xl">
               <h3 className="font-bold">ROI Focused</h3>
-              <p className="text-sm text-gray-600 mt-2">We build strategies that make money.</p>
+              <p className="text-sm text-gray-600 mt-2">Built for real results, not vanity metrics.</p>
             </div>
 
             <div className="p-6 bg-gray-50 rounded-xl">
-              <h3 className="font-bold">Scalable Growth</h3>
-              <p className="text-sm text-gray-600 mt-2">We help you grow consistently.</p>
+              <h3 className="font-bold">Scalable Systems</h3>
+              <p className="text-sm text-gray-600 mt-2">We help you grow predictably.</p>
             </div>
           </div>
 
@@ -117,21 +118,56 @@ const DigitalMarketingPage = () => {
         </h2>
 
         <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto px-4">
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            Local Service Businesses
+          <div className="bg-white p-6 rounded-xl shadow-sm">Local Service Businesses</div>
+          <div className="bg-white p-6 rounded-xl shadow-sm">Growing Companies</div>
+          <div className="bg-white p-6 rounded-xl shadow-sm">New Businesses</div>
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section className="py-20 bg-white">
+        <div className="max-w-5xl mx-auto px-4">
+
+          <h2 className="text-3xl font-bold text-center mb-10">
+            How Our Digital Marketing Actually Works
+          </h2>
+
+          <div className="space-y-8 text-gray-600">
+
+            <p>
+              Most businesses struggle because their marketing is fragmented.
+              We build complete systems designed to generate and convert leads consistently.
+            </p>
+
+            <p>
+              <strong>Market Analysis:</strong> We break down your competition and identify opportunities.
+            </p>
+
+            <p>
+              <strong>Traffic Strategy:</strong> SEO for long-term growth and ads for immediate leads.
+            </p>
+
+            <p>
+              <strong>Conversion Optimization:</strong> Turn visitors into customers.
+            </p>
+
+            <p>
+              <strong>Tracking & Data:</strong> Everything is measured and improved.
+            </p>
+
+            <p>
+              <strong>Scaling:</strong> Once it works, we scale aggressively.
+            </p>
+
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            Growing Companies
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            New Businesses
-          </div>
+
         </div>
       </section>
 
       {/* SERVICES */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
+
           <h2 className="text-3xl font-bold text-center mb-10">
             Our Digital Marketing Services
           </h2>
@@ -158,18 +194,7 @@ const DigitalMarketingPage = () => {
               );
             })}
           </div>
-        </div>
-      </section>
 
-      {/* ACCORDION */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4">
-          {services.map((s, i) => (
-            <details key={i} className="mb-4 bg-white p-6 rounded-lg shadow-sm">
-              <summary className="font-bold">{s.title}</summary>
-              <p className="mt-2 text-gray-600">{s.description}</p>
-            </details>
-          ))}
         </div>
       </section>
 
@@ -188,15 +213,21 @@ const DigitalMarketingPage = () => {
       {/* FAQ */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 space-y-4">
+
           <details className="bg-white p-5 rounded-lg">
             <summary className="font-bold">How long does it take?</summary>
-            <p className="text-gray-600 mt-2">Depends on strategy, ads are faster than SEO.</p>
+            <p className="text-gray-600 mt-2">
+              Paid ads can generate leads quickly, while SEO builds long-term growth.
+            </p>
           </details>
 
           <details className="bg-white p-5 rounded-lg">
             <summary className="font-bold">Do you require contracts?</summary>
-            <p className="text-gray-600 mt-2">No long-term lock-ins.</p>
+            <p className="text-gray-600 mt-2">
+              No long-term contracts. Results keep clients.
+            </p>
           </details>
+
         </div>
       </section>
 
@@ -204,7 +235,7 @@ const DigitalMarketingPage = () => {
       <section className="py-20 text-center">
         <ContactForm
           title="Get Your Free Marketing Strategy"
-          subtitle="Let’s show you how to grow your business."
+          subtitle="We’ll show you how to grow your business."
         />
       </section>
 
