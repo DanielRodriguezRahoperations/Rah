@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
+
 import SEOHead from './components/ui/SEOHead';
 import { DEFAULT_TITLE, DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE } from './config/site';
 import { absoluteUrl } from './utils/url';
-import Header from './components/layout/Header';
-import Breadcrumbs from './components/ui/Breadcrumbs';
-import Footer from './components/layout/Footer';
+
+import Layout from './components/layout/Layout';
+
 import HomePage from './pages/HomePage';
 import ServicesPage from './pages/ServicesPage';
 import WebsiteDesignSEOPage from './pages/WebsiteDesignSEOPage';
@@ -23,15 +24,20 @@ import TestimonialsPage from './pages/TestimonialsPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import PortfolioPage from './pages/PortfolioPage';
 
+
 // Loading component
 const PageLoader = () => (
   <div className="fixed inset-0 bg-white z-50 flex items-center justify-center"> 
     <div className="relative">
       <div className="w-16 h-16 border-4 border-[#97EDED] border-t-[#3CBEC7] rounded-full animate-spin"></div>
-      <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-[#1A7C81] rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+      <div
+        className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-[#1A7C81] rounded-full animate-spin"
+        style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}
+      ></div>
     </div>
   </div>
 );
+
 
 // Page transition wrapper
 const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -50,7 +56,7 @@ const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) =
   useEffect(() => {
     if (!isLoading) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      
+
       const timer = setTimeout(() => {
         const elements = document.querySelectorAll('.fade-in-up, .fade-in-left, .fade-in-right, .scale-in');
         elements.forEach((el, index) => {
@@ -69,13 +75,17 @@ const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) =
   }
 
   return (
-    <div className="page-transition animate-in" style={{
-      animation: 'fadeInUp 0.5s ease-out'
-    }}>
+    <div
+      className="page-transition animate-in"
+      style={{
+        animation: 'fadeInUp 0.5s ease-out'
+      }}
+    >
       {children}
     </div>
   );
 };
+
 
 const SEOLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
@@ -93,6 +103,7 @@ const SEOLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     </>
   );
 };
+
 
 // Performance monitor component
 const PerformanceMonitor = () => {
@@ -116,6 +127,7 @@ const PerformanceMonitor = () => {
 
   return null;
 };
+
 
 function App() {
   const [isAppReady, setIsAppReady] = useState(false);
@@ -161,94 +173,10 @@ function App() {
       <Router>
         <SEOLayout>
           <PerformanceMonitor />
-          <div className="flex flex-col min-h-screen bg-white">
-            <Header />
-            <Breadcrumbs />
-            <main className="flex-grow">
-              <Routes>
-                <Route path="/" element={
-                  <PageTransition>
-                    <HomePage />
-                  </PageTransition>
-                } />
-                <Route path="/services" element={
-                  <PageTransition>
-                    <ServicesPage />
-                  </PageTransition>
-                } />
-                <Route path="/website-design-and-seo" element={
-                  <PageTransition>
-                    <WebsiteDesignSEOPage />
-                  </PageTransition>
-                } />
-                <Route path="/business-credit-and-funding" element={
-                  <PageTransition>
-                    <BusinessCreditPage />
-                  </PageTransition>
-                } />
-                <Route path="/digital-marketing" element={
-                  <PageTransition>
-                    <DigitalMarketingPage />
-                  </PageTransition>
-                } />
-                <Route path="/new-business-setup" element={
-                  <PageTransition>
-                    <NewBusinessSetupPage />
-                  </PageTransition>
-                } />
-                <Route path="/personal-credit-repair" element={
-                  <PageTransition>
-                    <PersonalCreditPage />
-                  </PageTransition>
-                } />
-                <Route path="/social-media-management" element={
-                  <PageTransition>
-                    <SocialMediaManagementPage />
-                  </PageTransition>
-                } />
-                <Route path="/notary-services" element={
-                  <PageTransition>
-                    <NotaryServicesPage />
-                  </PageTransition>
-                } />
-                <Route path="/portfolio" element={
-                  <PageTransition>
-                    <PortfolioPage />
-                  </PageTransition>
-                } />
-                <Route path="/about" element={
-                  <PageTransition>
-                    <AboutPage />
-                  </PageTransition>
-                } />
-                <Route path="/blogs" element={
-                  <PageTransition>
-                    <BlogPage />
-                  </PageTransition>
-                } />
-                <Route path="/contact" element={
-                  <PageTransition>
-                    <ContactPage />
-                  </PageTransition>
-                } />
-                <Route path="/testimonials" element={
-                  <PageTransition>
-                    <TestimonialsPage />
-                  </PageTransition>
-                } />
-                <Route path="/privacy-policy" element={
-                  <PageTransition>
-                    <PrivacyPolicyPage />
-                  </PageTransition>
-                } />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
-        </SEOLayout>
-      </Router>
-    </HelmetProvider>
-  );
-}
 
-export default App;
+          <Layout>
+            <Routes>
+              <Route path="/" element={<PageTransition><HomePage /></PageTransition>} />
+              <Route path="/services" element={<PageTransition><ServicesPage /></PageTransition>} />
+              <Route path="/website-design-and-seo" element={<PageTransition><WebsiteDesignSEOPage /></PageTransition>} />
+              <Route path="/business-credit-and-funding" element={<PageTransition><BusinessCredit
