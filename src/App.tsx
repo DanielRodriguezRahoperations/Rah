@@ -70,17 +70,10 @@ const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) =
     }
   }, [isLoading]);
 
-  if (isLoading) {
-    return <PageLoader />;
-  }
+  if (isLoading) return <PageLoader />;
 
   return (
-    <div
-      className="page-transition animate-in"
-      style={{
-        animation: 'fadeInUp 0.5s ease-out'
-      }}
-    >
+    <div className="page-transition animate-in" style={{ animation: 'fadeInUp 0.5s ease-out' }}>
       {children}
     </div>
   );
@@ -105,7 +98,7 @@ const SEOLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 };
 
 
-// Performance monitor component
+// Performance monitor
 const PerformanceMonitor = () => {
   useEffect(() => {
     const preloadLinks = [
@@ -119,10 +112,6 @@ const PerformanceMonitor = () => {
       link.href = href;
       document.head.appendChild(link);
     });
-
-    if (process.env.NODE_ENV === 'production') {
-      // Add GA4 tracking code here
-    }
   }, []);
 
   return null;
@@ -133,26 +122,13 @@ function App() {
   const [isAppReady, setIsAppReady] = useState(false);
 
   useEffect(() => {
-    const initializeApp = async () => {
-      try {
-        setIsAppReady(true);
-      } catch (error) {
-        console.warn('App initialization failed:', error);
-        setIsAppReady(true);
-      }
-    };
-
-    initializeApp();
+    setIsAppReady(true);
 
     if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
-          .then((registration) => {
-            console.log('SW registered: ', registration);
-          })
-          .catch((registrationError) => {
-            console.log('SW registration failed: ', registrationError);
-          });
+          .then(reg => console.log('SW registered:', reg))
+          .catch(err => console.log('SW failed:', err));
       });
     }
 
@@ -164,9 +140,7 @@ function App() {
     return () => window.removeEventListener('error', handleError);
   }, []);
 
-  if (!isAppReady) {
-    return <PageLoader />;
-  }
+  if (!isAppReady) return <PageLoader />;
 
   return (
     <HelmetProvider>
@@ -179,4 +153,25 @@ function App() {
               <Route path="/" element={<PageTransition><HomePage /></PageTransition>} />
               <Route path="/services" element={<PageTransition><ServicesPage /></PageTransition>} />
               <Route path="/website-design-and-seo" element={<PageTransition><WebsiteDesignSEOPage /></PageTransition>} />
-              <Route path="/business-credit-and-funding" element={<PageTransition><BusinessCredit
+              <Route path="/business-credit-and-funding" element={<PageTransition><BusinessCreditPage /></PageTransition>} />
+              <Route path="/digital-marketing" element={<PageTransition><DigitalMarketingPage /></PageTransition>} />
+              <Route path="/new-business-setup" element={<PageTransition><NewBusinessSetupPage /></PageTransition>} />
+              <Route path="/personal-credit-repair" element={<PageTransition><PersonalCreditPage /></PageTransition>} />
+              <Route path="/social-media-management" element={<PageTransition><SocialMediaManagementPage /></PageTransition>} />
+              <Route path="/notary-services" element={<PageTransition><NotaryServicesPage /></PageTransition>} />
+              <Route path="/portfolio" element={<PageTransition><PortfolioPage /></PageTransition>} />
+              <Route path="/about" element={<PageTransition><AboutPage /></PageTransition>} />
+              <Route path="/blogs" element={<PageTransition><BlogPage /></PageTransition>} />
+              <Route path="/contact" element={<PageTransition><ContactPage /></PageTransition>} />
+              <Route path="/testimonials" element={<PageTransition><TestimonialsPage /></PageTransition>} />
+              <Route path="/privacy-policy" element={<PageTransition><PrivacyPolicyPage /></PageTransition>} />
+            </Routes>
+          </Layout>
+
+        </SEOLayout>
+      </Router>
+    </HelmetProvider>
+  );
+}
+
+export default App;
