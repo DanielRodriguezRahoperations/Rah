@@ -24,10 +24,8 @@ import TestimonialsPage from './pages/TestimonialsPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import PortfolioPage from './pages/PortfolioPage';
 
-
-// Loading component
 const PageLoader = () => (
-  <div className="fixed inset-0 bg-white z-50 flex items-center justify-center"> 
+  <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
     <div className="relative">
       <div className="w-16 h-16 border-4 border-[#97EDED] border-t-[#3CBEC7] rounded-full animate-spin"></div>
       <div
@@ -38,8 +36,6 @@ const PageLoader = () => (
   </div>
 );
 
-
-// Page transition wrapper
 const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
@@ -79,10 +75,9 @@ const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) =
   );
 };
 
-
 const SEOLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
-  const canonical = absoluteUrl(location.pathname || "/");
+  const canonical = absoluteUrl(location.pathname || '/');
 
   return (
     <>
@@ -97,8 +92,6 @@ const SEOLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   );
 };
 
-
-// Performance monitor
 const PerformanceMonitor = () => {
   useEffect(() => {
     const preloadLinks = [
@@ -117,14 +110,13 @@ const PerformanceMonitor = () => {
   return null;
 };
 
-
 function App() {
   const [isAppReady, setIsAppReady] = useState(false);
 
   useEffect(() => {
     setIsAppReady(true);
 
-    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+    if ('serviceWorker' in navigator && import.meta.env.PROD) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
           .then(reg => console.log('SW registered:', reg))
@@ -147,7 +139,6 @@ function App() {
       <Router>
         <SEOLayout>
           <PerformanceMonitor />
-
           <Layout>
             <Routes>
               <Route path="/" element={<PageTransition><HomePage /></PageTransition>} />
@@ -167,7 +158,6 @@ function App() {
               <Route path="/privacy-policy" element={<PageTransition><PrivacyPolicyPage /></PageTransition>} />
             </Routes>
           </Layout>
-
         </SEOLayout>
       </Router>
     </HelmetProvider>

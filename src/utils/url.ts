@@ -1,5 +1,5 @@
 export const absoluteUrl = (path: string): string => {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.rahoperations.com';
+  const baseUrl = import.meta.env.VITE_APP_URL || 'https://www.rahoperations.com';
   return `${baseUrl}${path}`;
 };
 
