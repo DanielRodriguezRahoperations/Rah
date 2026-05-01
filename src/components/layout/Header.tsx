@@ -23,6 +23,7 @@ const Header = () => {
   const navLinks = [
     { to: '/', label: 'Home' },
     { to: '/portfolio', label: 'Portfolio' },
+    { to: '/case-studies', label: 'Case Studies' },
     { to: '/about', label: 'About' },
     { to: '/blogs', label: 'Blog' },
     { to: '/testimonials', label: 'Reviews' },
@@ -75,19 +76,16 @@ const Header = () => {
       <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
         <div className={`flex items-center justify-between transition-all duration-300 ${scrolled ? 'h-20' : 'h-24'}`}>
           <Link to="/" className="flex items-center" aria-label="RAH Operations Home">
-            <picture>
-              <source srcSet="/logo.webp" type="image/webp" />
-              <img
-                src="/logo.png"
-                alt="RAH Operations Logo"
-                className={`w-auto transition-all duration-300 ${scrolled ? 'h-11' : 'h-14'}`}
-                fetchPriority="high"
-                decoding="async"
-              />
-            </picture>
+            <img
+              src="/newlogo.png"
+              alt="RAH Operations Logo"
+              className={`w-auto object-contain transition-all duration-300 ${scrolled ? 'h-14' : 'h-16'}`}
+              fetchPriority="high"
+              decoding="async"
+            />
           </Link>
 
-          <nav className="hidden items-center gap-7 lg:flex">
+          <nav className="hidden items-center gap-6 lg:flex">
             {navLinks.slice(0, 1).map((link) => (
               <Link key={link.to} to={link.to} className={navClass(isActiveRoute(link.to))}>
                 {link.label}
@@ -120,9 +118,7 @@ const Header = () => {
               <div
                 onMouseLeave={() => setIsServicesOpen(false)}
                 className={`absolute left-1/2 top-full mt-6 w-[620px] -translate-x-1/2 overflow-hidden border border-neutral-200 bg-[#fbfaf7] shadow-[0_30px_80px_rgba(15,15,15,0.14)] transition-all duration-300 ${
-                  isServicesOpen
-                    ? 'translate-y-0 opacity-100'
-                    : '-translate-y-2 pointer-events-none opacity-0'
+                  isServicesOpen ? 'translate-y-0 opacity-100' : '-translate-y-2 pointer-events-none opacity-0'
                 }`}
               >
                 <div className="grid grid-cols-[0.9fr_1.4fr]">
