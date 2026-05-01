@@ -16,9 +16,16 @@ const EverAfterEditCaseStudy = () => {
         <div className="container-clean max-w-3xl">
           <p className="eyebrow mb-6">Case Study</p>
           <h1 className="mb-6">The Ever After Edit</h1>
-          <p className="text-lg">
+          <p className="mb-8 text-lg">
             A luxury wedding signage website built around editorial design, premium positioning, and a refined inquiry experience.
           </p>
+
+          <div className="flex flex-wrap gap-4">
+            <Button to="/contact">Start a Project</Button>
+            <Button href="https://www.everaftereditfl.com" variant="outline">
+              View Live Website
+            </Button>
+          </div>
         </div>
       </section>
 
@@ -37,10 +44,29 @@ const EverAfterEditCaseStudy = () => {
           <div className="card-clean">
             <h3 className="mb-4">Project Focus</h3>
             <div className="space-y-4 text-sm">
-              <div className="flex justify-between"><span>Industry</span><span className="font-semibold">Luxury Wedding Signage</span></div>
-              <div className="flex justify-between"><span>Primary Goal</span><span className="font-semibold">Premium Inquiry Flow</span></div>
-              <div className="flex justify-between"><span>Positioning</span><span className="font-semibold">Editorial Luxury</span></div>
-              <div className="flex justify-between"><span>Website</span><span className="font-semibold">everaftereditfl.com</span></div>
+              <div className="flex justify-between gap-6">
+                <span>Industry</span>
+                <span className="font-semibold">Luxury Wedding Signage</span>
+              </div>
+              <div className="flex justify-between gap-6">
+                <span>Primary Goal</span>
+                <span className="font-semibold">Premium Inquiry Flow</span>
+              </div>
+              <div className="flex justify-between gap-6">
+                <span>Positioning</span>
+                <span className="font-semibold">Editorial Luxury</span>
+              </div>
+              <div className="flex justify-between gap-6">
+                <span>Website</span>
+                <a
+                  href="https://www.everaftereditfl.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-neutral-950 underline underline-offset-4 hover:opacity-70"
+                >
+                  www.everaftereditfl.com
+                </a>
+              </div>
             </div>
           </div>
         </div>
