@@ -1,196 +1,151 @@
 import React from 'react';
-import { Shield, Star, AlertTriangle, Eye, MessageCircle, ArrowRight, TrendingUp, Users } from 'lucide-react';
 import SEOHead from '../components/ui/SEOHead';
+import { absoluteUrl } from '../utils/url';
 import Button from '../components/ui/Button';
 import ContactForm from '../components/ui/ContactForm';
 
 const ReputationManagementPage = () => {
-  const services = [
-    {
-      icon: Star,
-      title: 'Review Management',
-      description: 'Monitor, respond to, and generate positive customer reviews across all platforms.',
-      benefits: ['Increase positive reviews', 'Professional response management', 'Review monitoring alerts', 'Customer feedback analysis']
-    },
-    {
-      icon: Eye,
-      title: 'Online Monitoring',
-      description: '24/7 monitoring of your brand mentions across the web and social media.',
-      benefits: ['Real-time alerts', 'Social media monitoring', 'News mention tracking', 'Competitor analysis']
-    },
-    {
-      icon: Shield,
-      title: 'Crisis Management',
-      description: 'Rapid response strategies to protect your brand during reputation crises.',
-      benefits: ['Crisis response plans', 'Damage control strategies', 'Media relations', 'Recovery protocols']
-    },
-    {
-      icon: MessageCircle,
-      title: 'Content Strategy',
-      description: 'Positive content creation and promotion to improve your online presence.',
-      benefits: ['Positive content creation', 'SEO optimization', 'Social media content', 'Brand storytelling']
-    }
-  ];
-
   return (
     <>
       <SEOHead
-        title="Online Reputation Management Services"
-        description="Protect and enhance your brand reputation with professional online reputation management. Review management, crisis response, and brand protection services in Atlanta."
-        keywords="reputation management, online reputation, review management, brand protection, crisis management, Atlanta reputation management"
+        title="Reputation Management | RAH Operations"
+        description="Reputation management systems designed to strengthen trust, improve brand perception, and support business growth."
+        url={absoluteUrl('/reputation-management')}
       />
 
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-[#3CBEC7] to-[#1A7C81] text-white py-20 lg:py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h1 className="text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-                Protect Your
-                <span className="text-[#97EDED] block">Brand Reputation</span>
-              </h1>
-              <p className="text-xl mb-8 text-gray-100 leading-relaxed">
-                In today's digital world, your online reputation is everything. We help businesses monitor, 
-                protect, and enhance their brand reputation across all digital platforms.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button variant="secondary" size="lg" to="/contact">
-                  Free Reputation Audit
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-                <Button variant="outline" size="lg" href="tel:+1234567890">
-                  Emergency Response
-                </Button>
-              </div>
-            </div>
-            <div className="relative">
-              <img
-                src="https://images.pexels.com/photos/590016/pexels-photo-590016.jpg"
-                alt="Online reputation management and brand protection"
-                className="rounded-xl shadow-2xl"
-              />
-            </div>
+      <section className="section">
+        <div className="container-clean max-w-3xl">
+          <p className="eyebrow mb-6">Reputation Management</p>
+
+          <h1 className="mb-6">
+            Your Reputation Is Part of Your Sales System
+          </h1>
+
+          <p className="text-lg mb-8">
+            Before people contact you, they check how your business looks online.
+            We help strengthen the trust signals that influence whether prospects move forward or disappear.
+          </p>
+
+          <div className="flex gap-4 flex-wrap">
+            <Button to="/contact">Request a Reputation Review</Button>
+            <Button variant="outline" href="tel:+18884724621">(888) 472-4621</Button>
           </div>
         </div>
       </section>
 
-      {/* Services Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Comprehensive Reputation Solutions
+      <section className="section border-t border-neutral-200">
+        <div className="container-clean grid lg:grid-cols-2 gap-16">
+          <div>
+            <h2 className="mb-6">
+              Trust Gets Built Before the First Conversation
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              From proactive monitoring to crisis response, we protect and enhance your brand's online presence.
+
+            <p className="mb-6">
+              Reviews, search results, social presence, and brand consistency all shape how a prospect judges your business.
+            </p>
+
+            <p>
+              If your reputation is weak, outdated, inconsistent, or unmanaged, you lose opportunities before you know they existed.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {services.map((service, index) => {
-              const Icon = service.icon;
-              return (
-                <div key={index} className="bg-gray-50 rounded-xl p-8 hover:shadow-lg transition-all duration-300">
-                  <div className="w-16 h-16 bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81] rounded-lg flex items-center justify-center mb-6">
-                    <Icon className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">{service.title}</h3>
-                  <p className="text-gray-600 mb-6 leading-relaxed">{service.description}</p>
-                  <ul className="space-y-2">
-                    {service.benefits.map((benefit, idx) => (
-                      <li key={idx} className="flex items-center text-gray-700">
-                        <div className="w-2 h-2 bg-[#3CBEC7] rounded-full mr-3"></div>
-                        {benefit}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+          <div className="card-clean">
+            <h3 className="mb-4">What This Improves</h3>
 
-      {/* Why It Matters Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <img
-                src="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg"
-                alt="Business reputation and customer reviews management"
-                className="rounded-xl shadow-xl"
-              />
-            </div>
-            <div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-8">
-                Why Reputation Management Matters
-              </h2>
-              <div className="space-y-6">
-                <div className="flex items-start space-x-4">
-                  <AlertTriangle className="w-8 h-8 text-red-500 mt-1" />
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">90% of consumers read reviews</h3>
-                    <p className="text-gray-600">Before making purchasing decisions, customers research your business online.</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-4">
-                  <TrendingUp className="w-8 h-8 text-[#3CBEC7] mt-1" />
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Revenue Impact</h3>
-                    <p className="text-gray-600">A one-star increase in reviews can increase revenue by 5-9%.</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-4">
-                  <Users className="w-8 h-8 text-[#3CBEC7] mt-1" />
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Trust & Credibility</h3>
-                    <p className="text-gray-600">Positive online presence builds trust and credibility with potential customers.</p>
-                  </div>
-                </div>
+            <div className="space-y-4 text-sm">
+              <div className="flex justify-between">
+                <span>Review presence</span>
+                <span className="font-semibold">More trust</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Brand perception</span>
+                <span className="font-semibold">Stronger credibility</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Local visibility</span>
+                <span className="font-semibold">Better authority</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Response quality</span>
+                <span className="font-semibold">Professional tone</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Process Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Our Reputation Management Process
-            </h2>
-            <p className="text-xl text-gray-600">
-              Systematic approach to building and protecting your online reputation
+      <section className="section border-t border-neutral-200">
+        <div className="container-clean">
+          <div className="max-w-2xl mb-16">
+            <p className="eyebrow mb-4">Capabilities</p>
+            <h2 className="mb-4">What We Handle</h2>
+            <p>
+              Everything required to improve how your business is perceived online.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {['Audit', 'Monitor', 'Respond', 'Improve'].map((step, index) => (
-              <div key={index} className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81] rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold">
-                  {index + 1}
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">{step}</h3>
-                <p className="text-gray-600">
-                  {index === 0 && "Comprehensive analysis of your current online reputation and review profiles."}
-                  {index === 1 && "Continuous monitoring of reviews, mentions, and brand conversations online."}
-                  {index === 2 && "Professional responses to reviews and proactive customer engagement."}
-                  {index === 3 && "Ongoing strategies to improve ratings and build positive brand perception."}
-                </p>
+          <div className="grid md:grid-cols-2 gap-10">
+            {[
+              'Review profile analysis',
+              'Review response strategy',
+              'Google Business Profile support',
+              'Brand mention monitoring',
+              'Customer feedback systems',
+              'Reputation improvement planning',
+              'Trust signal optimization',
+              'Ongoing reputation guidance'
+            ].map((item, i) => (
+              <div key={i} className="border-b border-neutral-200 pb-4">
+                <p className="text-sm">{item}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Contact Form Section */}
-      <section className="py-20 bg-gradient-to-br from-[#C9F8F6] to-[#B5F3F0]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <ContactForm 
-            title="Protect Your Brand Today"
-            subtitle="Get a free reputation audit and learn how we can help improve your online presence."
+      <section className="section border-t border-neutral-200">
+        <div className="container-clean">
+          <div className="max-w-2xl mb-16">
+            <p className="eyebrow mb-4">Process</p>
+            <h2 className="mb-4">How We Improve It</h2>
+          </div>
+
+          <div className="grid md:grid-cols-4 gap-8">
+            {[
+              { title: 'Audit', desc: 'Review your current online reputation.' },
+              { title: 'Identify', desc: 'Find gaps that damage trust or visibility.' },
+              { title: 'Improve', desc: 'Strengthen reviews, responses, and perception.' },
+              { title: 'Maintain', desc: 'Keep your reputation consistent over time.' }
+            ].map((step, i) => (
+              <div key={i}>
+                <p className="text-sm text-neutral-400 mb-2">0{i + 1}</p>
+                <h3 className="mb-2">{step.title}</h3>
+                <p className="text-sm">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section border-t border-neutral-200">
+        <div className="container-clean text-center">
+          <h2 className="mb-6">
+            If Prospects Don’t Trust What They See, They Won’t Reach Out
+          </h2>
+
+          <p className="mb-10 max-w-xl mx-auto">
+            We’ll review your online reputation and show you what needs to improve.
+          </p>
+
+          <Button to="/contact">Request a Reputation Review</Button>
+        </div>
+      </section>
+
+      <section className="section border-t border-neutral-200">
+        <div className="container-clean max-w-3xl">
+          <ContactForm
+            title="Start Your Reputation Review"
+            subtitle="Tell us where your business stands now and we’ll help identify the trust gaps."
           />
         </div>
       </section>
