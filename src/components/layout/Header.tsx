@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ChevronDown, Menu, Phone, X } from 'lucide-react';
+import { ChevronDown, Menu, X } from 'lucide-react';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -25,8 +25,7 @@ const Header = () => {
     { to: '/portfolio', label: 'Portfolio' },
     { to: '/case-studies', label: 'Case Studies' },
     { to: '/about', label: 'About' },
-    { to: '/blogs', label: 'Blog' },
-    { to: '/testimonials', label: 'Reviews' },
+    { to: '/blogs', label: 'Insights' },
     { to: '/contact', label: 'Contact' }
   ];
 
@@ -61,7 +60,7 @@ const Header = () => {
   };
 
   const navClass = (active: boolean) =>
-    `relative px-1 py-2 text-[12px] font-medium uppercase tracking-[0.18em] transition-colors duration-300 ${
+    `relative px-1 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] transition-colors duration-300 ${
       active ? 'text-neutral-950' : 'text-neutral-500 hover:text-neutral-950'
     }`;
 
@@ -69,33 +68,31 @@ const Header = () => {
     <header
       className={`sticky top-0 z-50 border-b transition-all duration-300 ${
         scrolled
-          ? 'border-neutral-200 bg-white/95 shadow-[0_12px_40px_rgba(15,15,15,0.06)] backdrop-blur-xl'
-          : 'border-neutral-100 bg-[#fbfaf7]/90 backdrop-blur-xl'
+          ? 'border-neutral-200 bg-[#fbfaf7]/96 shadow-[0_12px_40px_rgba(15,15,15,0.045)] backdrop-blur-xl'
+          : 'border-neutral-200/70 bg-[#fbfaf7]/92 backdrop-blur-xl'
       }`}
     >
       <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
-        <div className={`flex items-center justify-between transition-all duration-300 ${scrolled ? 'h-20' : 'h-24'}`}>
-          <Link to="/" className="flex items-center" aria-label="RAH Operations Home">
+        <div className={`flex items-center justify-between transition-all duration-300 ${scrolled ? 'h-18' : 'h-20'}`}>
+          <Link to="/" className="flex shrink-0 items-center" aria-label="RAH Operations Home">
             <img
               src="/newlogo.png"
               alt="RAH Operations Logo"
-              className={`w-auto object-contain transition-all duration-300 ${scrolled ? 'h-14' : 'h-16'}`}
+              className={`w-auto object-contain transition-all duration-300 ${scrolled ? 'h-11' : 'h-12'}`}
               fetchPriority="high"
               decoding="async"
             />
           </Link>
 
-          <nav className="hidden items-center gap-6 lg:flex">
-            {navLinks.slice(0, 1).map((link) => (
-              <Link key={link.to} to={link.to} className={navClass(isActiveRoute(link.to))}>
-                {link.label}
-                <span
-                  className={`absolute bottom-0 left-0 h-px bg-neutral-950 transition-all duration-300 ${
-                    isActiveRoute(link.to) ? 'w-full' : 'w-0'
-                  }`}
-                />
-              </Link>
-            ))}
+          <nav className="hidden items-center gap-7 lg:flex">
+            <Link to="/" className={navClass(isActiveRoute('/'))}>
+              Home
+              <span
+                className={`absolute bottom-0 left-0 h-px bg-neutral-950 transition-all duration-300 ${
+                  isActiveRoute('/') ? 'w-full' : 'w-0'
+                }`}
+              />
+            </Link>
 
             <div className="relative" ref={dropdownRef}>
               <button
@@ -117,22 +114,24 @@ const Header = () => {
 
               <div
                 onMouseLeave={() => setIsServicesOpen(false)}
-                className={`absolute left-1/2 top-full mt-6 w-[620px] -translate-x-1/2 overflow-hidden border border-neutral-200 bg-[#fbfaf7] shadow-[0_30px_80px_rgba(15,15,15,0.14)] transition-all duration-300 ${
+                className={`absolute left-1/2 top-full mt-5 w-[680px] -translate-x-1/2 overflow-hidden border border-neutral-200 bg-[#fbfaf7] shadow-[0_30px_80px_rgba(15,15,15,0.13)] transition-all duration-300 ${
                   isServicesOpen ? 'translate-y-0 opacity-100' : '-translate-y-2 pointer-events-none opacity-0'
                 }`}
               >
-                <div className="grid grid-cols-[0.9fr_1.4fr]">
+                <div className="grid grid-cols-[0.85fr_1.55fr]">
                   <div className="bg-neutral-950 p-8 text-white">
-                    <p className="text-[11px] font-medium uppercase tracking-[0.24em] text-neutral-400">
-                      RAH Operations
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-neutral-400">
+                      Services
                     </p>
-                    <p className="mt-4 text-2xl font-semibold leading-tight">
-                      Strategy, visibility, and digital systems built to convert.
+
+                    <p className="mt-5 text-2xl font-semibold leading-tight">
+                      Business infrastructure built for credibility, visibility, and growth.
                     </p>
+
                     <Link
                       to="/services"
                       onClick={() => setIsServicesOpen(false)}
-                      className="mt-8 inline-flex border border-white/25 px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-white transition-colors duration-300 hover:bg-white hover:text-neutral-950"
+                      className="mt-8 inline-flex border border-white/25 px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-white transition-colors duration-300 hover:bg-white hover:text-neutral-950"
                     >
                       View All Services
                     </Link>
@@ -173,18 +172,10 @@ const Header = () => {
             ))}
           </nav>
 
-          <div className="hidden items-center gap-4 lg:flex">
-            <a
-              href="tel:+18884724621"
-              className="hidden items-center gap-2 text-sm font-medium text-neutral-500 transition-colors duration-300 hover:text-neutral-950 xl:flex"
-            >
-              <Phone className="h-4 w-4" />
-              (888) 472-4621
-            </a>
-
+          <div className="hidden shrink-0 items-center lg:flex">
             <Link
               to="/contact"
-              className="border border-neutral-950 bg-neutral-950 px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white transition-all duration-300 hover:bg-transparent hover:text-neutral-950"
+              className="border border-neutral-950 bg-neutral-950 px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-white transition-all duration-300 hover:bg-transparent hover:text-neutral-950"
             >
               Start a Project
             </Link>
@@ -192,7 +183,7 @@ const Header = () => {
 
           <button
             type="button"
-            className="inline-flex h-11 w-11 items-center justify-center border border-neutral-200 bg-white text-neutral-950 transition-colors duration-300 hover:bg-neutral-950 hover:text-white lg:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center border border-neutral-200 bg-[#fbfaf7] text-neutral-950 transition-colors duration-300 hover:bg-neutral-950 hover:text-white lg:hidden"
             onClick={() => setIsMenuOpen((open) => !open)}
             aria-label="Toggle navigation menu"
             aria-expanded={isMenuOpen}
@@ -210,17 +201,14 @@ const Header = () => {
       >
         <div className="px-5 py-6">
           <div className="space-y-1">
-            {navLinks.slice(0, 1).map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className={`block border-b border-neutral-200 py-4 text-sm font-semibold uppercase tracking-[0.18em] ${
-                  isActiveRoute(link.to) ? 'text-neutral-950' : 'text-neutral-500'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+            <Link
+              to="/"
+              className={`block border-b border-neutral-200 py-4 text-sm font-semibold uppercase tracking-[0.18em] ${
+                isActiveRoute('/') ? 'text-neutral-950' : 'text-neutral-500'
+              }`}
+            >
+              Home
+            </Link>
 
             <button
               type="button"
@@ -275,9 +263,8 @@ const Header = () => {
           <div className="mt-6 grid gap-3">
             <a
               href="tel:+18884724621"
-              className="flex items-center justify-center gap-2 border border-neutral-300 px-5 py-4 text-sm font-semibold text-neutral-950"
+              className="border border-neutral-300 px-5 py-4 text-center text-sm font-semibold text-neutral-950"
             >
-              <Phone className="h-4 w-4" />
               (888) 472-4621
             </a>
 
