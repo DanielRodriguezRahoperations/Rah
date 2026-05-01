@@ -25,22 +25,26 @@ const Button: React.FC<ButtonProps> = ({
   type = 'button',
   ...props
 }) => {
-  const baseClasses = 'inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl';
-  
+  const baseClasses =
+    'inline-flex items-center justify-center border font-medium tracking-wide transition-all duration-300 disabled:pointer-events-none disabled:opacity-50';
+
   const variantClasses = {
-    primary: 'bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81] text-white hover:from-[#1A7C81] hover:to-[#0F6168]',
-    secondary: 'bg-gradient-to-r from-[#97EDED] to-[#C9F8F6] text-[#0F6168] hover:from-[#C9F8F6] hover:to-[#B5F3F0]',
-    outline: 'border-2 border-[#3CBEC7] text-[#3CBEC7] hover:bg-[#3CBEC7] hover:text-white'
+    primary:
+      'border-neutral-950 bg-neutral-950 text-white hover:bg-transparent hover:text-neutral-950',
+    secondary:
+      'border-neutral-300 bg-transparent text-neutral-950 hover:border-neutral-950',
+    outline:
+      'border-neutral-950 bg-transparent text-neutral-950 hover:bg-neutral-950 hover:text-white'
   };
-  
+
   const sizeClasses = {
-    sm: 'px-4 py-2 text-sm',
-    md: 'px-6 py-3 text-base',
-    lg: 'px-8 py-4 text-lg'
+    sm: 'px-4 py-2 text-xs',
+    md: 'px-6 py-3 text-sm',
+    lg: 'px-8 py-4 text-sm'
   };
-  
+
   const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
-  
+
   if (to) {
     return (
       <Link to={to} className={classes} {...props}>
@@ -48,7 +52,7 @@ const Button: React.FC<ButtonProps> = ({
       </Link>
     );
   }
-  
+
   if (href) {
     return (
       <a href={href} className={classes} {...props}>
@@ -56,7 +60,7 @@ const Button: React.FC<ButtonProps> = ({
       </a>
     );
   }
-  
+
   return (
     <button
       type={type}
