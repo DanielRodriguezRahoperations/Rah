@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 
@@ -24,57 +24,22 @@ import TestimonialsPage from './pages/TestimonialsPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import PortfolioPage from './pages/PortfolioPage';
 
-const PageLoader = () => (
-  <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
-    <div className="relative">
-      <div className="w-16 h-16 border-4 border-[#97EDED] border-t-[#3CBEC7] rounded-full animate-spin"></div>
-      <div
-        className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-[#1A7C81] rounded-full animate-spin"
-        style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}
-      ></div>
-    </div>
-  </div>
-);
-
-const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const location = useLocation();
+/* --------
+   CLEAN SCROLL HANDLER
+--------- */
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
 
   useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 300);
+    window.scrollTo({ top: 0 });
+  }, [pathname]);
 
-    return () => clearTimeout(timer);
-  }, [location]);
-
-  useEffect(() => {
-    if (!isLoading) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-
-      const timer = setTimeout(() => {
-        const elements = document.querySelectorAll('.fade-in-up, .fade-in-left, .fade-in-right, .scale-in');
-        elements.forEach((el, index) => {
-          setTimeout(() => {
-            el.classList.add('visible');
-          }, index * 50);
-        });
-      }, 100);
-
-      return () => clearTimeout(timer);
-    }
-  }, [isLoading]);
-
-  if (isLoading) return <PageLoader />;
-
-  return (
-    <div className="page-transition animate-in" style={{ animation: 'fadeInUp 0.5s ease-out' }}>
-      {children}
-    </div>
-  );
+  return null;
 };
 
+/* --------
+   SEO WRAPPER
+--------- */
 const SEOLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const canonical = absoluteUrl(location.pathname || '/');
@@ -92,13 +57,16 @@ const SEOLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   );
 };
 
+/* --------
+   PERFORMANCE PRELOAD
+--------- */
 const PerformanceMonitor = () => {
   useEffect(() => {
     const preloadLinks = [
-      '/Updated%20RAH%20LOGO%20with%20Correct%20Color%20scheme.png',
+      '/logo.webp',
     ];
 
-    preloadLinks.forEach(href => {
+    preloadLinks.forEach((href) => {
       const link = document.createElement('link');
       link.rel = 'preload';
       link.as = 'image';
@@ -111,51 +79,37 @@ const PerformanceMonitor = () => {
 };
 
 function App() {
-  const [isAppReady, setIsAppReady] = useState(false);
-
   useEffect(() => {
-    setIsAppReady(true);
-
     if ('serviceWorker' in navigator && import.meta.env.PROD) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then(reg => console.log('SW registered:', reg))
-          .catch(err => console.log('SW failed:', err));
-      });
+      navigator.serviceWorker
+        .register('/sw.js')
+        .catch(() => {});
     }
-
-    const handleError = (event: ErrorEvent) => {
-      console.error('Global error:', event.error);
-    };
-
-    window.addEventListener('error', handleError);
-    return () => window.removeEventListener('error', handleError);
   }, []);
-
-  if (!isAppReady) return <PageLoader />;
 
   return (
     <HelmetProvider>
       <Router>
         <SEOLayout>
           <PerformanceMonitor />
+          <ScrollToTop />
           <Layout>
             <Routes>
-              <Route path="/" element={<PageTransition><HomePage /></PageTransition>} />
-              <Route path="/services" element={<PageTransition><ServicesPage /></PageTransition>} />
-              <Route path="/website-design-and-seo" element={<PageTransition><WebsiteDesignSEOPage /></PageTransition>} />
-              <Route path="/business-credit-and-funding" element={<PageTransition><BusinessCreditPage /></PageTransition>} />
-              <Route path="/digital-marketing" element={<PageTransition><DigitalMarketingPage /></PageTransition>} />
-              <Route path="/new-business-setup" element={<PageTransition><NewBusinessSetupPage /></PageTransition>} />
-              <Route path="/personal-credit-repair" element={<PageTransition><PersonalCreditPage /></PageTransition>} />
-              <Route path="/social-media-management" element={<PageTransition><SocialMediaManagementPage /></PageTransition>} />
-              <Route path="/notary-services" element={<PageTransition><NotaryServicesPage /></PageTransition>} />
-              <Route path="/portfolio" element={<PageTransition><PortfolioPage /></PageTransition>} />
-              <Route path="/about" element={<PageTransition><AboutPage /></PageTransition>} />
-              <Route path="/blogs" element={<PageTransition><BlogPage /></PageTransition>} />
-              <Route path="/contact" element={<PageTransition><ContactPage /></PageTransition>} />
-              <Route path="/testimonials" element={<PageTransition><TestimonialsPage /></PageTransition>} />
-              <Route path="/privacy-policy" element={<PageTransition><PrivacyPolicyPage /></PageTransition>} />
+              <Route path="/" element={<HomePage />} />
+              <Route path="/services" element={<ServicesPage />} />
+              <Route path="/website-design-and-seo" element={<WebsiteDesignSEOPage />} />
+              <Route path="/business-credit-and-funding" element={<BusinessCreditPage />} />
+              <Route path="/digital-marketing" element={<DigitalMarketingPage />} />
+              <Route path="/new-business-setup" element={<NewBusinessSetupPage />} />
+              <Route path="/personal-credit-repair" element={<PersonalCreditPage />} />
+              <Route path="/social-media-management" element={<SocialMediaManagementPage />} />
+              <Route path="/notary-services" element={<NotaryServicesPage />} />
+              <Route path="/portfolio" element={<PortfolioPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/blogs" element={<BlogPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/testimonials" element={<TestimonialsPage />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
             </Routes>
           </Layout>
         </SEOLayout>
