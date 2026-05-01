@@ -1,63 +1,97 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin } from 'lucide-react';
 
 const Footer = () => {
+  const services = [
+    { to: '/website-design-and-seo', label: 'Website Design & SEO' },
+    { to: '/digital-marketing', label: 'Digital Marketing' },
+    { to: '/social-media-management', label: 'Social Media Management' },
+    { to: '/business-credit-and-funding', label: 'Business Credit & Funding' },
+    { to: '/personal-credit-repair', label: 'Personal Credit Repair' },
+    { to: '/new-business-setup', label: 'New Business Setup' }
+  ];
+
+  const company = [
+    { to: '/', label: 'Home' },
+    { to: '/services', label: 'Services' },
+    { to: '/portfolio', label: 'Portfolio' },
+    { to: '/about', label: 'About' },
+    { to: '/blogs', label: 'Blog' },
+    { to: '/testimonials', label: 'Reviews' },
+    { to: '/contact', label: 'Contact' },
+    { to: '/privacy-policy', label: 'Privacy Policy' }
+  ];
+
   return (
-    <footer className="bg-gray-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Company Info */}
+    <footer className="border-t border-neutral-800 bg-neutral-950 text-white">
+      <div className="container-clean py-16 lg:py-20">
+        <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr]">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">RAH Operations</h3>
-            <div className="space-y-3">
-              <p className="flex items-center text-gray-600">
-                <Phone className="w-5 h-5 mr-2" />
-                (888) 472-4621
+            <p className="mb-5 text-[11px] font-medium uppercase tracking-[0.24em] text-neutral-500">
+              RAH Operations
+            </p>
+
+            <h2 className="mb-6 max-w-xl text-3xl font-semibold leading-tight text-white lg:text-4xl">
+              Website design, SEO, and digital systems for serious business growth.
+            </h2>
+
+            <div className="space-y-2 text-sm text-neutral-400">
+              <p>
+                <a href="tel:+18884724621" className="hover:text-white">
+                  (888) 472-4621
+                </a>
               </p>
-              <p className="flex items-center text-gray-600">
-                <Mail className="w-5 h-5 mr-2" />
-                daniel@rahoperations.com
+              <p>
+                <a href="mailto:daniel@rahoperations.com" className="hover:text-white">
+                  daniel@rahoperations.com
+                </a>
               </p>
-              <p className="flex items-center text-gray-600">
-                <MapPin className="w-5 h-5 mr-2" />
-                Scottsdale, AZ
-              </p>
+              <p>Scottsdale, Arizona</p>
             </div>
           </div>
 
-          {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Links</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link to="/" className="text-gray-600 hover:text-teal-600">Home</Link>
-              </li>
-              <li>
-                <Link to="/services" className="text-gray-600 hover:text-teal-600">Services</Link>
-              </li>
-              <li>
-                <Link to="/about" className="text-gray-600 hover:text-teal-600">About</Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-gray-600 hover:text-teal-600">Contact</Link>
-              </li>
-              <li>
-                <Link to="/privacy-policy" className="text-gray-600 hover:text-teal-600">Privacy Policy</Link>
-              </li>
+            <p className="mb-5 text-[11px] font-medium uppercase tracking-[0.24em] text-neutral-500">
+              Services
+            </p>
+
+            <ul className="space-y-3">
+              {services.map((link) => (
+                <li key={link.to}>
+                  <Link to={link.to} className="text-sm text-neutral-400 hover:text-white">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <p className="mb-5 text-[11px] font-medium uppercase tracking-[0.24em] text-neutral-500">
+              Company
+            </p>
+
+            <ul className="space-y-3">
+              {company.map((link) => (
+                <li key={link.to}>
+                  <Link to={link.to} className="text-sm text-neutral-400 hover:text-white">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
 
-        {/* Copyright */}
-        <div className="mt-8 pt-8 border-t border-gray-200">
-          <p className="text-center text-gray-500">
-            © {new Date().getFullYear()} RAH Operations. All rights reserved.
-          </p>
+        <div className="mt-14 flex flex-col gap-4 border-t border-neutral-800 pt-8 text-sm text-neutral-500 md:flex-row md:items-center md:justify-between">
+          <p>© {new Date().getFullYear()} RAH Operations. All rights reserved.</p>
+          <p>Website Design & SEO Specialists</p>
         </div>
       </div>
     </footer>
   );
 };
+
+export default Footer;
 
 export default Footer;
