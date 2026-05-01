@@ -19,6 +19,7 @@ import SocialMediaManagementPage from './pages/SocialMediaManagementPage';
 import NotaryServicesPage from './pages/NotaryServicesPage';
 import AboutPage from './pages/AboutPage';
 import BlogPage from './pages/BlogPage';
+import BlogPost from './pages/BlogPost';
 import ContactPage from './pages/ContactPage';
 import TestimonialsPage from './pages/TestimonialsPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
@@ -58,7 +59,7 @@ const SEOLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 const PerformanceMonitor = () => {
   useEffect(() => {
-    const preloadLinks = ['/logo.webp'];
+    const preloadLinks = ['/newlogo.png'];
 
     preloadLinks.forEach((href) => {
       const link = document.createElement('link');
@@ -103,6 +104,7 @@ function App() {
               <Route path="/case-studies/scottsdale-injector" element={<ScottsdaleInjectorCaseStudy />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/blogs" element={<BlogPage />} />
+              <Route path="/blogs/:slug" element={<BlogPost />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/testimonials" element={<TestimonialsPage />} />
               <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
