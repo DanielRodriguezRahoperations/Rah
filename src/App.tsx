@@ -16,6 +16,7 @@ import DigitalMarketingPage from './pages/DigitalMarketingPage';
 import NewBusinessSetupPage from './pages/NewBusinessSetupPage';
 import PersonalCreditPage from './pages/PersonalCreditPage';
 import SocialMediaManagementPage from './pages/SocialMediaManagementPage';
+import ReputationManagementPage from './pages/ReputationManagementPage';
 import NotaryServicesPage from './pages/NotaryServicesPage';
 import AboutPage from './pages/AboutPage';
 import BlogPage from './pages/BlogPage';
@@ -96,6 +97,7 @@ function App() {
               <Route path="/new-business-setup" element={<NewBusinessSetupPage />} />
               <Route path="/personal-credit-repair" element={<PersonalCreditPage />} />
               <Route path="/social-media-management" element={<SocialMediaManagementPage />} />
+              <Route path="/reputation-management" element={<ReputationManagementPage />} />
               <Route path="/notary-services" element={<NotaryServicesPage />} />
               <Route path="/portfolio" element={<PortfolioPage />} />
               <Route path="/case-studies" element={<CaseStudiesPage />} />
