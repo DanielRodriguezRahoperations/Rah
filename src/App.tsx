@@ -24,9 +24,11 @@ import TestimonialsPage from './pages/TestimonialsPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import PortfolioPage from './pages/PortfolioPage';
 
-/* --------
-   CLEAN SCROLL HANDLER
---------- */
+import CaseStudiesPage from './pages/CaseStudiesPage';
+import Tier1CustomsCaseStudy from './pages/case-studies/Tier1CustomsCaseStudy';
+import EverAfterEditCaseStudy from './pages/case-studies/EverAfterEditCaseStudy';
+import ScottsdaleInjectorCaseStudy from './pages/case-studies/ScottsdaleInjectorCaseStudy';
+
 const ScrollToTop = () => {
   const { pathname } = useLocation();
 
@@ -37,9 +39,6 @@ const ScrollToTop = () => {
   return null;
 };
 
-/* --------
-   SEO WRAPPER
---------- */
 const SEOLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const canonical = absoluteUrl(location.pathname || '/');
@@ -57,14 +56,9 @@ const SEOLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   );
 };
 
-/* --------
-   PERFORMANCE PRELOAD
---------- */
 const PerformanceMonitor = () => {
   useEffect(() => {
-    const preloadLinks = [
-      '/logo.webp',
-    ];
+    const preloadLinks = ['/logo.webp'];
 
     preloadLinks.forEach((href) => {
       const link = document.createElement('link');
@@ -81,9 +75,7 @@ const PerformanceMonitor = () => {
 function App() {
   useEffect(() => {
     if ('serviceWorker' in navigator && import.meta.env.PROD) {
-      navigator.serviceWorker
-        .register('/sw.js')
-        .catch(() => {});
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
     }
   }, []);
 
@@ -105,6 +97,10 @@ function App() {
               <Route path="/social-media-management" element={<SocialMediaManagementPage />} />
               <Route path="/notary-services" element={<NotaryServicesPage />} />
               <Route path="/portfolio" element={<PortfolioPage />} />
+              <Route path="/case-studies" element={<CaseStudiesPage />} />
+              <Route path="/case-studies/tier-1-customs" element={<Tier1CustomsCaseStudy />} />
+              <Route path="/case-studies/ever-after-edit" element={<EverAfterEditCaseStudy />} />
+              <Route path="/case-studies/scottsdale-injector" element={<ScottsdaleInjectorCaseStudy />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/blogs" element={<BlogPage />} />
               <Route path="/contact" element={<ContactPage />} />
