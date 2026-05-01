@@ -1,188 +1,181 @@
 import React from 'react';
-import { Building2, FileText, CheckCircle, Users, Shield, ArrowRight } from 'lucide-react';
 import SEOHead from '../components/ui/SEOHead';
+import { absoluteUrl } from '../utils/url';
 import Button from '../components/ui/Button';
 import ContactForm from '../components/ui/ContactForm';
 
 const LLCSetupPage = () => {
-  const services = [
-    'Business Entity Formation (LLC, Corporation, Partnership)',
-    'EIN Registration and Tax Setup',
-    'Operating Agreement Drafting',
-    'Business License and Permit Assistance',
-    'Registered Agent Services',
-    'Annual Compliance Management',
-    'Business Banking Setup',
-    'Business Structure Optimization'
-  ];
-
-  const benefits = [
-    {
-      icon: Shield,
-      title: 'Asset Protection',
-      description: 'Protect your personal assets from business liabilities with proper legal structure.'
-    },
-    {
-      icon: FileText,
-      title: 'Tax Advantages',
-      description: 'Optimize your tax strategy with the right business structure and deductions.'
-    },
-    {
-      icon: Users,
-      title: 'Professional Credibility',
-      description: 'Establish credibility with customers, vendors, and financial institutions.'
-    }
-  ];
-
   return (
     <>
       <SEOHead
-        title="LLC Setup & Business Structuring Services"
-        description="Professional LLC formation, business structuring, and compliance services. Expert guidance for business entity setup, tax optimization, and legal protection in Atlanta."
-        keywords="LLC setup, business formation, business structuring, entity formation, business registration, Atlanta LLC services"
+        title="Business Structuring & LLC Setup | RAH Operations"
+        description="Business formation and structuring designed to build a strong, scalable foundation from day one."
+        url={absoluteUrl('/llc-setup')}
       />
 
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-[#97EDED] via-[#C9F8F6] to-[#3CBEC7] py-20 lg:py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h1 className="text-5xl lg:text-6xl font-bold mb-6 leading-tight text-[#0F6168]">
-                LLC Setup &
-                <span className="text-[#1A7C81] block">Business Structuring</span>
-              </h1>
-              <p className="text-xl mb-8 text-[#104A53] leading-relaxed">
-                Start your business on the right foundation. Our expert team handles all aspects of business formation, 
-                from entity selection to compliance management, ensuring your business is properly structured for success.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" to="/contact">
-                  Start Business Formation
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-                <Button variant="outline" size="lg" href="tel:+1234567890">
-                  Free Consultation
-                </Button>
-              </div>
-            </div>
-            <div className="relative">
-              <img
-                src="https://images.pexels.com/photos/3760067/pexels-photo-3760067.jpeg"
-                alt="LLC setup and business formation services"
-                className="rounded-xl shadow-2xl"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* HERO */}
+      <section className="section">
+        <div className="container-clean max-w-3xl">
+          <p className="eyebrow mb-6">Business Structuring</p>
 
-      {/* Services Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Complete Business Formation Services
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Everything you need to establish and maintain your business entity with full legal compliance.
-            </p>
-          </div>
+          <h1 className="mb-6">
+            Filing an LLC Is Easy. Building It Correctly Is Not.
+          </h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
-            {services.map((service, index) => (
-              <div key={index} className="flex items-center space-x-4 p-6 bg-gray-50 rounded-lg hover:bg-[#C9F8F6] transition-colors">
-                <CheckCircle className="w-6 h-6 text-[#3CBEC7] flex-shrink-0" />
-                <span className="text-gray-700 font-medium">{service}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Why Proper Business Structure Matters
-            </h2>
-            <p className="text-xl text-gray-600">
-              The right business structure provides protection, tax benefits, and professional credibility
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {benefits.map((benefit, index) => {
-              const Icon = benefit.icon;
-              return (
-                <div key={index} className="text-center">
-                  <div className="w-20 h-20 bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81] rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Icon className="w-10 h-10 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">{benefit.title}</h3>
-                  <p className="text-gray-600 leading-relaxed">{benefit.description}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Process Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Simple Formation Process
-            </h2>
-            <p className="text-xl text-gray-600">
-              We handle all the paperwork and legal requirements so you can focus on your business
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
-            {[
-              { title: 'Consultation', desc: 'Discuss your business goals and structure options' },
-              { title: 'Entity Selection', desc: 'Choose the best business entity for your needs' },
-              { title: 'Filing', desc: 'We handle all state filings and documentation' },
-              { title: 'Setup', desc: 'EIN registration, banking, and operational setup' },
-              { title: 'Ongoing Support', desc: 'Continued compliance and growth support' }
-            ].map((step, index) => (
-              <div key={index} className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-[#3CBEC7] to-[#1A7C81] rounded-full flex items-center justify-center mx-auto mb-6 text-white text-xl font-bold">
-                  {index + 1}
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-3">{step.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{step.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-[#104A53] to-[#0F6168] text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6">
-            Ready to Structure Your Business?
-          </h2>
-          <p className="text-xl mb-8 text-gray-200">
-            Get expert guidance on business formation and structuring. Protect your assets and optimize for growth.
+          <p className="text-lg mb-8">
+            Most businesses are formed with zero strategy behind them.
+            That leads to problems with credit, taxes, compliance, and growth.
+            We structure your business the right way from the start.
           </p>
-          <Button variant="secondary" size="lg" to="/contact">
-            Start Business Formation
-            <ArrowRight className="ml-2 w-5 h-5" />
+
+          <div className="flex gap-4 flex-wrap">
+            <Button to="/contact">
+              Start Your Business Setup
+            </Button>
+
+            <Button variant="outline" href="tel:+18884724621">
+              (888) 472-4621
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* POSITIONING */}
+      <section className="section border-t border-neutral-200">
+        <div className="container-clean grid lg:grid-cols-2 gap-16">
+          <div>
+            <h2 className="mb-6">
+              Most Businesses Are Built Without a Real Structure
+            </h2>
+
+            <p className="mb-6">
+              Filing paperwork does not create a real business.
+              Without the right structure, you limit your ability to access funding,
+              protect yourself legally, and operate professionally.
+            </p>
+
+            <p>
+              We build your business with those factors in mind from day one,
+              so you’re not fixing mistakes later.
+            </p>
+          </div>
+
+          <div className="card-clean">
+            <h3 className="mb-4">What This Impacts</h3>
+
+            <div className="space-y-4 text-sm">
+              <div className="flex justify-between">
+                <span>Legal protection</span>
+                <span className="font-semibold">Personal separation</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span>Tax positioning</span>
+                <span className="font-semibold">Better structure</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span>Business credibility</span>
+                <span className="font-semibold">Stronger presence</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span>Funding readiness</span>
+                <span className="font-semibold">Higher approvals</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SERVICES */}
+      <section className="section border-t border-neutral-200">
+        <div className="container-clean">
+          <div className="max-w-2xl mb-16">
+            <p className="eyebrow mb-4">Capabilities</p>
+            <h2 className="mb-4">What We Handle</h2>
+            <p>
+              Everything required to properly establish and structure your business.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-10">
+            {[
+              'LLC and corporation formation',
+              'Business structure consultation',
+              'EIN registration',
+              'Operating agreement setup',
+              'Compliance and filing guidance',
+              'Business banking setup',
+              'Entity optimization',
+              'Foundation for business credit'
+            ].map((item, i) => (
+              <div key={i} className="border-b border-neutral-200 pb-4">
+                <p className="text-sm">{item}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PROCESS */}
+      <section className="section border-t border-neutral-200">
+        <div className="container-clean">
+          <div className="max-w-2xl mb-16">
+            <p className="eyebrow mb-4">Process</p>
+            <h2 className="mb-4">How We Build It</h2>
+          </div>
+
+          <div className="grid md:grid-cols-4 gap-8">
+            {[
+              {
+                title: 'Plan',
+                desc: 'Define the right structure for your goals.'
+              },
+              {
+                title: 'Form',
+                desc: 'Handle filings and documentation.'
+              },
+              {
+                title: 'Set Up',
+                desc: 'Establish banking and compliance systems.'
+              },
+              {
+                title: 'Position',
+                desc: 'Prepare for growth, credit, and scalability.'
+              }
+            ].map((step, i) => (
+              <div key={i}>
+                <p className="text-sm text-neutral-400 mb-2">0{i + 1}</p>
+                <h3 className="mb-2">{step.title}</h3>
+                <p className="text-sm">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="section border-t border-neutral-200">
+        <div className="container-clean text-center">
+          <h2 className="mb-6">
+            If Your Business Isn’t Structured Right, It Will Hold You Back
+          </h2>
+
+          <p className="mb-10 max-w-xl mx-auto">
+            We’ll make sure your foundation is built correctly from day one.
+          </p>
+
+          <Button to="/contact">
+            Start Your Business Setup
           </Button>
         </div>
       </section>
 
-      {/* Contact Form Section */}
-      <section className="py-20 bg-gradient-to-br from-[#C9F8F6] to-[#B5F3F0]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <ContactForm 
-            title="Get Started with Business Formation"
-            subtitle="Schedule a consultation to discuss your business structure needs and formation options."
-          />
+      {/* CONTACT */}
+      <section className="section border-t border-neutral-200">
+        <div className="container-clean max-w-3xl">
+          <ContactForm />
         </div>
       </section>
     </>
