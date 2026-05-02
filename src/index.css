@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -29,16 +29,16 @@
   h3,
   h4 {
     font-family: 'Playfair Display', serif;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.04em;
     color: #151515;
   }
 
   h1 {
-    @apply text-4xl font-semibold leading-[0.98] md:text-6xl lg:text-7xl;
+    @apply text-5xl font-semibold leading-[0.95] md:text-6xl lg:text-7xl xl:text-8xl;
   }
 
   h2 {
-    @apply text-3xl font-semibold leading-tight md:text-5xl;
+    @apply text-4xl font-semibold leading-[1.02] md:text-5xl lg:text-6xl;
   }
 
   h3 {
@@ -47,6 +47,10 @@
 
   p {
     @apply text-neutral-600;
+  }
+
+  img {
+    max-width: 100%;
   }
 
   ::selection {
@@ -141,9 +145,10 @@
   .red-corner::after {
     content: '';
     position: absolute;
-    width: 34px;
-    height: 34px;
+    width: 38px;
+    height: 38px;
     pointer-events: none;
+    z-index: 10;
   }
 
   .red-corner::before {
@@ -162,8 +167,9 @@
 
   .editorial-number {
     font-family: 'Playfair Display', serif;
-    color: rgba(122, 28, 28, 0.22);
+    color: rgba(122, 28, 28, 0.24);
     line-height: 1;
+    letter-spacing: -0.08em;
   }
 
   .btn-primary {
@@ -206,10 +212,27 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.035;
+    opacity: 0.04;
     background-image:
-      linear-gradient(rgba(17, 17, 17, 0.28) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(17, 17, 17, 0.28) 1px, transparent 1px);
+      linear-gradient(rgba(255, 255, 255, 0.24) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.24) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+
+  .premium-panel {
+    @apply border border-neutral-200 bg-white;
+    box-shadow: 0 30px 90px rgba(17, 17, 17, 0.075);
+  }
+
+  .premium-panel-dark {
+    @apply border border-white/10 bg-white/[0.035] text-white backdrop-blur-sm;
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.28);
+  }
+
+  .subtle-grid {
+    background-image:
+      linear-gradient(rgba(17, 17, 17, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(17, 17, 17, 0.045) 1px, transparent 1px);
     background-size: 42px 42px;
   }
 }
@@ -233,6 +256,14 @@
 
   .bg-luxury-red {
     background-color: #7a1c1c;
+  }
+
+  .shadow-premium {
+    box-shadow: 0 30px 90px rgba(17, 17, 17, 0.08);
+  }
+
+  .shadow-premium-dark {
+    box-shadow: 0 40px 120px rgba(0, 0, 0, 0.42);
   }
 }
 
