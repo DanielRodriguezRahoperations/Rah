@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -12,33 +12,46 @@
   html {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     scroll-behavior: smooth;
+    background: #f7f3ed;
   }
 
   body {
-    @apply bg-[#fbfaf7] text-neutral-900;
+    @apply text-neutral-900;
+    background:
+      radial-gradient(circle at 20% 0%, rgba(122, 28, 28, 0.08), transparent 32%),
+      linear-gradient(135deg, #fbfaf7 0%, #f4eee6 48%, #fbfaf7 100%);
     line-height: 1.65;
     overflow-x: hidden;
   }
 
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     font-family: 'Playfair Display', serif;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.035em;
+    color: #151515;
   }
 
   h1 {
-    @apply text-3xl lg:text-5xl font-semibold;
+    @apply text-4xl font-semibold leading-[0.98] md:text-6xl lg:text-7xl;
   }
 
   h2 {
-    @apply text-2xl lg:text-4xl font-semibold;
+    @apply text-3xl font-semibold leading-tight md:text-5xl;
   }
 
   h3 {
-    @apply text-xl lg:text-2xl font-medium;
+    @apply text-2xl font-semibold leading-tight;
   }
 
   p {
     @apply text-neutral-600;
+  }
+
+  ::selection {
+    background: #7a1c1c;
+    color: #fff;
   }
 }
 
@@ -48,50 +61,156 @@
 
 @layer components {
   .section {
-    @apply py-20 lg:py-28;
+    @apply relative py-20 lg:py-32;
+  }
+
+  .section-tight {
+    @apply relative py-14 lg:py-20;
+  }
+
+  .section-dark {
+    @apply relative bg-[#111111] text-white;
+  }
+
+  .section-dark h1,
+  .section-dark h2,
+  .section-dark h3 {
+    color: #fff;
+  }
+
+  .section-dark p {
+    @apply text-neutral-300;
   }
 
   .container-clean {
-    @apply max-w-7xl mx-auto px-5 sm:px-6 lg:px-8;
+    @apply mx-auto max-w-7xl px-5 sm:px-6 lg:px-8;
   }
 
-  /* Buttons */
-  .btn-primary {
-    @apply bg-neutral-950 text-white px-6 py-3 text-sm font-medium tracking-wide
-           transition-all duration-300 hover:bg-neutral-800;
+  .container-narrow {
+    @apply mx-auto max-w-4xl px-5 sm:px-6 lg:px-8;
   }
 
-  .btn-secondary {
-    @apply border border-neutral-300 text-neutral-900 px-6 py-3 text-sm font-medium
-           transition-all duration-300 hover:border-neutral-900;
+  .surface {
+    @apply border border-neutral-200/80 bg-[#fbfaf7]/80 backdrop-blur-sm;
+    box-shadow: 0 24px 80px rgba(17, 17, 17, 0.06);
   }
 
-  /* Cards */
+  .surface-white {
+    @apply border border-neutral-200 bg-white;
+    box-shadow: 0 22px 70px rgba(17, 17, 17, 0.055);
+  }
+
+  .surface-dark {
+    @apply border border-white/10 bg-[#171717] text-white;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+  }
+
   .card-clean {
-    @apply bg-white border border-neutral-200 p-8 transition-all duration-300;
+    @apply border border-neutral-200 bg-[#fbfaf7] p-8 transition-all duration-300;
+    box-shadow: 0 18px 50px rgba(17, 17, 17, 0.035);
   }
 
   .card-clean:hover {
-    @apply shadow-[0_20px_60px_rgba(0,0,0,0.06)];
+    border-color: rgba(122, 28, 28, 0.45);
+    box-shadow: 0 28px 80px rgba(17, 17, 17, 0.08);
   }
 
-  /* Subtle divider */
-  .divider {
-    @apply w-full h-px bg-neutral-200;
-  }
-
-  /* Eyebrow text */
   .eyebrow {
-    @apply text-[11px] uppercase tracking-[0.22em] text-neutral-400;
+    @apply text-[11px] font-semibold uppercase tracking-[0.28em] text-neutral-500;
   }
 
-  /* Minimal hover lift */
+  .eyebrow-red {
+    @apply text-[11px] font-semibold uppercase tracking-[0.28em];
+    color: #7a1c1c;
+  }
+
+  .luxury-rule {
+    @apply h-px w-full;
+    background: linear-gradient(90deg, transparent, rgba(122, 28, 28, 0.65), transparent);
+  }
+
+  .red-rule-left {
+    border-left: 2px solid #7a1c1c;
+  }
+
+  .red-corner {
+    position: relative;
+  }
+
+  .red-corner::before,
+  .red-corner::after {
+    content: '';
+    position: absolute;
+    width: 34px;
+    height: 34px;
+    pointer-events: none;
+  }
+
+  .red-corner::before {
+    top: -1px;
+    left: -1px;
+    border-top: 1px solid #7a1c1c;
+    border-left: 1px solid #7a1c1c;
+  }
+
+  .red-corner::after {
+    right: -1px;
+    bottom: -1px;
+    border-right: 1px solid #7a1c1c;
+    border-bottom: 1px solid #7a1c1c;
+  }
+
+  .editorial-number {
+    font-family: 'Playfair Display', serif;
+    color: rgba(122, 28, 28, 0.22);
+    line-height: 1;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center bg-neutral-950 px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-white transition-all duration-300;
+  }
+
+  .btn-primary:hover {
+    background: #7a1c1c;
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center border border-neutral-300 px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-neutral-950 transition-all duration-300;
+  }
+
+  .btn-secondary:hover {
+    border-color: #7a1c1c;
+    color: #7a1c1c;
+    transform: translateY(-1px);
+  }
+
+  .divider {
+    @apply h-px w-full bg-neutral-200;
+  }
+
   .hover-lift {
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
   }
 
   .hover-lift:hover {
     transform: translateY(-4px);
+  }
+
+  .grain {
+    position: relative;
+  }
+
+  .grain::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image:
+      linear-gradient(rgba(17, 17, 17, 0.28) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(17, 17, 17, 0.28) 1px, transparent 1px);
+    background-size: 42px 42px;
   }
 }
 
@@ -103,27 +222,39 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  .text-luxury-red {
+    color: #7a1c1c;
+  }
+
+  .border-luxury-red {
+    border-color: #7a1c1c;
+  }
+
+  .bg-luxury-red {
+    background-color: #7a1c1c;
+  }
 }
 
 /* -------------------------
-   SCROLLBAR (SUBTLE)
+   SCROLLBAR
 ------------------------- */
 
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #fbfaf7;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d4d4d4;
+  background: #b8afa6;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a3a3a3;
+  background: #7a1c1c;
 }
 
 /* -------------------------
@@ -144,6 +275,6 @@ a:focus,
 button:focus,
 input:focus,
 textarea:focus {
-  outline: 2px solid #111;
-  outline-offset: 2px;
+  outline: 2px solid #7a1c1c;
+  outline-offset: 3px;
 }
