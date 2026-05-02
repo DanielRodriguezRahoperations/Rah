@@ -9,6 +9,7 @@ interface PortfolioItem {
   category: string;
   description: string;
   focus: string;
+  featured?: boolean;
 }
 
 const portfolioItems: PortfolioItem[] = [
@@ -17,64 +18,51 @@ const portfolioItems: PortfolioItem[] = [
     url: 'https://www.tier1customs.com',
     category: 'Automotive Customization',
     description:
-      'A premium website built for an automotive customization brand focused on wraps, paint protection film, chrome delete, ceramic coating, and high-intent local SEO.',
-    focus: 'Website Design, SEO, Local Service Pages'
+      'High-performance automotive website built for local SEO dominance and premium service positioning.',
+    focus: 'Website Design, SEO, Local Service Pages',
+    featured: true
   },
   {
     title: 'The Ever After Edit',
     url: 'https://www.everaftereditfl.com',
-    category: 'Luxury Wedding Signage',
+    category: 'Luxury Wedding Brand',
     description:
-      'A refined wedding signage website built with a clean editorial feel, elevated visual direction, and a premium inquiry flow for custom event projects.',
-    focus: 'Brand Positioning, Website Design, Inquiry Experience'
-  },
-  {
-    title: 'Empire Builds AZ',
-    url: 'https://www.empirebuildsaz.com',
-    category: 'Construction',
-    description:
-      'A professional website for a construction and building services company showcasing services, credibility, and project experience.',
-    focus: 'Website Design, Service Positioning'
-  },
-  {
-    title: 'Pinnacle Bookkeeping AZ',
-    url: 'https://www.pinnaclebookkeepingaz.com',
-    category: 'Bookkeeping',
-    description:
-      'A business services website designed to create trust, explain service offerings, and support lead generation for bookkeeping clients.',
-    focus: 'Website Design, Lead Conversion'
+      'Editorial-style luxury website designed for high-end custom wedding clientele.',
+    focus: 'Brand Positioning, Website Design',
+    featured: true
   },
   {
     title: 'The Scottsdale Injector',
     url: 'https://www.thescottsdaleinjector.com',
     category: 'Medical Aesthetics',
     description:
-      'A premium aesthetic services website built to support authority, service education, and client inquiries in a competitive local market.',
-    focus: 'Website Design, Local SEO, Brand Trust'
+      'Premium aesthetic website built for authority, trust, and local SEO performance.',
+    focus: 'Website Design, Local SEO',
+    featured: true
+  },
+  {
+    title: 'Empire Builds AZ',
+    url: 'https://www.empirebuildsaz.com',
+    category: 'Construction',
+    description:
+      'Professional contractor website focused on service clarity and lead generation.',
+    focus: 'Website Design'
+  },
+  {
+    title: 'Pinnacle Bookkeeping AZ',
+    url: 'https://www.pinnaclebookkeepingaz.com',
+    category: 'Bookkeeping',
+    description:
+      'Service-based website built for trust, clarity, and client acquisition.',
+    focus: 'Website Design'
   },
   {
     title: 'SunVision Solar',
     url: 'https://www.sunvision-solar.com',
     category: 'Solar',
     description:
-      'A solar services website created to communicate value, educate homeowners, and generate qualified project inquiries.',
+      'Lead-focused solar website designed to educate and convert homeowners.',
     focus: 'Website Design, Lead Generation'
-  },
-  {
-    title: 'Daniel Rodriguez',
-    url: 'https://www.danielrodriguez.org',
-    category: 'Personal Brand',
-    description:
-      'A personal brand website built to support credibility, professional positioning, and online search presence.',
-    focus: 'Personal Branding, SEO Presence'
-  },
-  {
-    title: 'Knox Strats',
-    url: 'https://www.knoxstrats.com',
-    category: 'Consulting',
-    description:
-      'A consulting website designed around strategic positioning, service clarity, and professional credibility.',
-    focus: 'Website Design, Brand Positioning'
   }
 ];
 
@@ -82,123 +70,157 @@ const PortfolioPage: React.FC = () => {
   return (
     <>
       <SEOHead
-        title="Portfolio | RAH Operations"
-        description="Explore website design, SEO, branding, and digital growth projects built by RAH Operations."
+        title="Website Portfolio Scottsdale & Phoenix | RAH Operations"
+        description="Explore high-conversion website design and SEO projects built for businesses in Scottsdale, Phoenix, and across Arizona."
         url={absoluteUrl('/portfolio')}
       />
 
       {/* HERO */}
-      <section className="section">
-        <div className="container-clean max-w-3xl">
-          <p className="eyebrow mb-6">Portfolio</p>
+      <section className="section section-dark relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.05] bg-[radial-gradient(circle_at_top_left,red,transparent_60%)]" />
 
-          <h1 className="mb-6">
-            Websites Built to Position, Convert, and Grow
+        <div className="container-clean max-w-4xl text-center">
+          <p className="eyebrow eyebrow-red mb-6">
+            Portfolio — Scottsdale & Phoenix
+          </p>
+
+          <h1 className="text-white mb-6">
+            This Is What High-Performance Websites Look Like
           </h1>
 
-          <p className="text-lg">
-            A look at selected websites and digital projects built for businesses that needed stronger positioning,
-            cleaner design, and a better foundation for growth.
+          <p className="text-lg text-neutral-300">
+            Every project is built to rank, convert, and position the business as the authority in its market.
           </p>
         </div>
       </section>
 
-      {/* FEATURED WORK */}
-      <section className="section border-t border-neutral-200">
+      {/* FEATURED PROJECTS */}
+      <section className="section">
         <div className="container-clean">
           <div className="mb-16 max-w-2xl">
-            <p className="eyebrow mb-4">Selected Work</p>
-            <h2 className="mb-4">Recent Projects</h2>
-            <p>
-              Each project is built around the same core principles: clarity, trust, search visibility,
-              and conversion.
-            </p>
+            <p className="eyebrow mb-4">Featured Work</p>
+            <h2 className="mb-4">Top Performing Projects</h2>
           </div>
 
-          <div className="divide-y border-y border-neutral-200">
-            {portfolioItems.map((item, index) => (
-              <article
-                key={index}
-                className="grid gap-8 py-10 lg:grid-cols-[0.8fr_1.4fr_auto] lg:items-start"
-              >
-                <div>
-                  <p className="eyebrow mb-3">{item.category}</p>
-                  <h2 className="text-2xl">{item.title}</h2>
-                </div>
+          <div className="grid lg:grid-cols-3 gap-10">
+            {portfolioItems
+              .filter((p) => p.featured)
+              .map((item, index) => (
+                <div
+                  key={index}
+                  className="surface-dark rounded-2xl p-6 border border-white/10 hover:scale-[1.02] transition"
+                >
+                  {/* MOCKUP */}
+                  <div className="mb-6 bg-black rounded-lg border border-white/10 overflow-hidden">
+                    <div className="h-6 bg-neutral-900 flex items-center px-3 gap-2">
+                      <span className="w-2 h-2 bg-red-500 rounded-full" />
+                      <span className="w-2 h-2 bg-yellow-500 rounded-full" />
+                      <span className="w-2 h-2 bg-green-500 rounded-full" />
+                    </div>
 
-                <div>
-                  <p className="mb-5">{item.description}</p>
-                  <p className="text-sm font-semibold text-neutral-950">{item.focus}</p>
-                </div>
+                    <div className="h-40 bg-neutral-900" />
+                  </div>
 
-                <div className="lg:text-right">
-                  <a
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex border border-neutral-950 px-5 py-3 text-sm font-medium text-neutral-950 transition-all duration-300 hover:bg-neutral-950 hover:text-white"
-                  >
-                    View Website
-                  </a>
+                  <p className="eyebrow mb-2">{item.category}</p>
+                  <h3 className="text-white mb-3">{item.title}</h3>
+
+                  <p className="text-sm text-neutral-300 mb-4">
+                    {item.description}
+                  </p>
+
+                  <Button to="/case-studies">
+                    View Case Study
+                  </Button>
                 </div>
-              </article>
-            ))}
+              ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ALL PROJECTS */}
+      <section className="section section-tight bg-neutral-50">
+        <div className="container-clean">
+          <div className="grid md:grid-cols-2 gap-10">
+            {portfolioItems
+              .filter((p) => !p.featured)
+              .map((item, index) => (
+                <div
+                  key={index}
+                  className="surface p-8 rounded-xl border border-neutral-200"
+                >
+                  <p className="eyebrow mb-2">{item.category}</p>
+                  <h3 className="mb-3">{item.title}</h3>
+
+                  <p className="mb-4 text-sm">{item.description}</p>
+
+                  <div className="flex gap-3">
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-medium underline"
+                    >
+                      Visit Website
+                    </a>
+
+                    <span className="text-neutral-400">•</span>
+
+                    <span className="text-sm text-neutral-500">
+                      {item.focus}
+                    </span>
+                  </div>
+                </div>
+              ))}
           </div>
         </div>
       </section>
 
       {/* POSITIONING */}
-      <section className="section border-t border-neutral-200">
-        <div className="container-clean grid gap-16 lg:grid-cols-2">
+      <section className="section">
+        <div className="container-clean grid lg:grid-cols-2 gap-16">
           <div>
-            <p className="eyebrow mb-4">Approach</p>
+            <p className="eyebrow mb-4">What This Means</p>
+
             <h2 className="mb-6">
-              The Work Is Not Just Design. It’s Business Positioning.
+              These Are Not Just Websites.
+              <br /> They Are Revenue Systems.
             </h2>
 
             <p>
-              A website should do more than exist online. It should clarify what the business does,
-              build trust quickly, support search visibility, and make the next step obvious.
+              Every build is designed to eliminate confusion, increase trust,
+              and turn traffic into actual business.
             </p>
           </div>
 
-          <div className="card-clean">
-            <h3 className="mb-4">What These Projects Have in Common</h3>
+          <div className="space-y-6">
+            <div>
+              <h3 className="font-semibold">Stronger Positioning</h3>
+              <p>Clear messaging that instantly communicates value.</p>
+            </div>
 
-            <div className="space-y-4 text-sm">
-              <div className="flex justify-between gap-6">
-                <span>Cleaner brand presentation</span>
-                <span className="font-semibold">Premium feel</span>
-              </div>
+            <div>
+              <h3 className="font-semibold">Higher Conversion</h3>
+              <p>Designed to turn visitors into leads and customers.</p>
+            </div>
 
-              <div className="flex justify-between gap-6">
-                <span>Improved service clarity</span>
-                <span className="font-semibold">Better messaging</span>
-              </div>
-
-              <div className="flex justify-between gap-6">
-                <span>Stronger local positioning</span>
-                <span className="font-semibold">SEO foundation</span>
-              </div>
-
-              <div className="flex justify-between gap-6">
-                <span>Clearer conversion path</span>
-                <span className="font-semibold">More inquiries</span>
-              </div>
+            <div>
+              <h3 className="font-semibold">Search Visibility</h3>
+              <p>Built with SEO structure for long-term traffic growth.</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="section border-t border-neutral-200">
+      <section className="section section-dark">
         <div className="container-clean text-center">
-          <h2 className="mb-6">
-            Your Website Should Be One of Your Strongest Sales Assets
+          <h2 className="text-white mb-6">
+            Your Website Should Be Doing This For You
           </h2>
 
-          <p className="mb-10 max-w-xl mx-auto">
-            If it is not helping you build authority, generate leads, or close trust gaps, it needs to be rebuilt.
+          <p className="text-neutral-300 mb-10 max-w-xl mx-auto">
+            If it’s not generating leads, building trust, or positioning your business —
+            it’s holding you back.
           </p>
 
           <Button to="/contact">
