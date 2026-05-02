@@ -13,140 +13,155 @@ const HomePage = () => {
         url={absoluteUrl('/')}
       />
 
-      {/* HERO — COMPLETELY UPGRADED */}
+      {/* HERO — LAYERED + PREMIUM */}
       <section className="section">
-        <div className="container-clean grid gap-16 lg:grid-cols-[1.1fr_0.9fr] items-center">
-          
+        <div className="container-clean relative grid gap-20 lg:grid-cols-[1fr_1fr] items-center">
+
           {/* LEFT */}
           <div>
-            <p className="eyebrow mb-6">RAH Operations</p>
+            <p className="eyebrow-red mb-6">RAH Operations</p>
 
-            <h1 className="mb-8 text-balance">
-              Website Design in Scottsdale That Actually Brings You Business
+            <h1 className="mb-8">
+              Website Design in Scottsdale
+              <br />
+              That Actually Produces Revenue
             </h1>
 
             <p className="mb-10 max-w-xl text-lg">
               We design and build websites for businesses in Scottsdale and Phoenix
-              that need more than something that “looks good.” You need visibility,
-              trust, and conversion.
+              that need more than just something that looks good. You need visibility,
+              positioning, and conversion.
             </p>
 
             <div className="flex flex-wrap gap-4">
               <Button to="/contact">Start a Project</Button>
-              <Button to="/case-studies" variant="outline">View Case Studies</Button>
+              <Button to="/case-studies" variant="secondary">View Case Studies</Button>
             </div>
           </div>
 
-          {/* RIGHT — STRATEGY PANEL (THIS IS WHAT YOU WERE MISSING) */}
-          <div className="border border-neutral-200 bg-white p-8 shadow-[0_20px_60px_rgba(0,0,0,0.05)]">
-            <p className="text-xs uppercase tracking-[0.2em] text-neutral-500 mb-6">
-              What’s Broken on Most Sites
-            </p>
+          {/* RIGHT — LAYERED PANEL */}
+          <div className="relative">
 
-            <div className="space-y-5 text-sm">
-              <div className="flex justify-between">
-                <span className="text-neutral-500">No SEO structure</span>
-                <span className="font-semibold">No visibility</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-neutral-500">Weak messaging</span>
-                <span className="font-semibold">No trust</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-neutral-500">Generic design</span>
-                <span className="font-semibold">No differentiation</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-neutral-500">No conversion path</span>
-                <span className="font-semibold">No leads</span>
-              </div>
-            </div>
+            {/* BACK PANEL (DEPTH) */}
+            <div className="absolute top-6 left-6 right-0 bottom-0 border border-neutral-200 bg-[#f3eee7]" />
 
-            <div className="mt-8 border-t pt-6">
-              <p className="text-sm text-neutral-600">
-                If your website has any of these issues, it’s not helping your business grow.
+            {/* FRONT PANEL */}
+            <div className="relative surface-white p-10 red-corner">
+              <p className="text-xs uppercase tracking-[0.25em] text-neutral-500 mb-6">
+                Why Most Websites Fail
               </p>
+
+              <div className="space-y-6 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-neutral-500">No SEO strategy</span>
+                  <span className="font-semibold">Invisible online</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span className="text-neutral-500">Weak positioning</span>
+                  <span className="font-semibold">No trust</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span className="text-neutral-500">Template design</span>
+                  <span className="font-semibold">No differentiation</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span className="text-neutral-500">No conversion path</span>
+                  <span className="font-semibold">No leads</span>
+                </div>
+              </div>
             </div>
           </div>
+
         </div>
       </section>
 
-      {/* DARK SECTION (ADDS PREMIUM CONTRAST) */}
-      <section className="section bg-neutral-950 text-white">
-        <div className="container-clean max-w-4xl">
-          <h2 className="text-3xl md:text-4xl leading-tight">
-            Most Businesses Don’t Need a Better Website.
+      {/* STATEMENT — HIGH-END SECTION */}
+      <section className="section-dark">
+        <div className="container-narrow">
+          <h2>
+            Most Agencies Build Websites.
             <br />
-            They Need a Smarter One.
+            We Build Business Assets.
           </h2>
 
-          <p className="mt-6 text-neutral-300 max-w-2xl">
-            A website should rank locally, build trust instantly, and guide visitors
-            toward action. If it doesn’t do those things, it’s not a growth asset.
+          <div className="luxury-rule mt-8 mb-8" />
+
+          <p>
+            A website should rank locally, build trust instantly, and convert traffic into
+            real opportunities. If it doesn’t do those things, it’s not an asset.
           </p>
         </div>
       </section>
 
-      {/* CASE STUDIES — LESS TEMPLATE FEEL */}
+      {/* CASE STUDIES — OFFSET */}
       <section className="section">
         <div className="container-clean">
-          <div className="mb-16 max-w-2xl">
+
+          <div className="mb-20 max-w-xl">
             <p className="eyebrow mb-4">Case Studies</p>
-            <h2>Built for Real Businesses, Not Just Design Awards</h2>
+            <h2>Work That Actually Moves the Business</h2>
           </div>
 
-          <div className="space-y-16">
+          <div className="space-y-24">
+
             {[
               {
                 title: 'Tier 1 Customs',
-                desc: 'SEO-driven automotive website built to capture high-intent local traffic.',
+                desc: 'SEO-focused automotive website built to capture high-intent local traffic and convert leads.',
                 link: '/case-studies/tier-1-customs'
               },
               {
                 title: 'The Ever After Edit',
-                desc: 'Luxury brand positioning through refined design and stronger inquiry flow.',
+                desc: 'Luxury brand positioning with editorial design and stronger inquiry flow.',
                 link: '/case-studies/ever-after-edit'
               }
             ].map((item, i) => (
-              <div key={i} className="grid gap-6 lg:grid-cols-[1fr_auto] items-center">
+              <div key={i} className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] items-center">
+
                 <div>
-                  <h3 className="text-2xl mb-2">{item.title}</h3>
-                  <p className="max-w-xl">{item.desc}</p>
+                  <h3 className="text-3xl mb-4">{item.title}</h3>
+                  <p className="max-w-lg">{item.desc}</p>
                 </div>
 
-                <Button to={item.link} variant="outline">
-                  View Case Study
-                </Button>
+                <div className="lg:text-right">
+                  <Button to={item.link} variant="outline">
+                    View Case Study
+                  </Button>
+                </div>
+
               </div>
             ))}
+
           </div>
         </div>
       </section>
 
-      {/* SERVICES — CLEANER, LESS CARDY */}
+      {/* SERVICES — NOT CARDS ANYMORE */}
       <section className="section border-t border-neutral-200">
         <div className="container-clean">
-          <div className="mb-16 max-w-2xl">
-            <p className="eyebrow mb-4">What We Do</p>
-            <h2>Website Design, SEO, and Growth Systems</h2>
+
+          <div className="mb-16 max-w-xl">
+            <p className="eyebrow mb-4">Services</p>
+            <h2>What We Build</h2>
           </div>
 
-          <div className="space-y-10">
+          <div className="space-y-8">
             {[
               'Website Design & SEO',
               'Digital Marketing',
               'Reputation Management',
               'Business Credit & Funding'
             ].map((service, i) => (
-              <div
-                key={i}
-                className="border-b border-neutral-200 pb-6 flex justify-between items-center"
-              >
-                <h3 className="text-lg font-semibold">{service}</h3>
-                <span className="text-sm text-neutral-500">Learn More</span>
+              <div key={i} className="flex justify-between items-center border-b border-neutral-200 pb-5 hover:pl-2 transition-all">
+                <h3 className="text-lg">{service}</h3>
+                <span className="text-sm text-neutral-400">→</span>
               </div>
             ))}
           </div>
+
         </div>
       </section>
 
@@ -154,12 +169,11 @@ const HomePage = () => {
       <section className="section border-t border-neutral-200">
         <div className="container-clean text-center">
           <h2 className="mb-6">
-            If Your Website Isn’t Bringing In Leads, It’s Not Doing Its Job
+            If Your Website Isn’t Producing Leads, It’s a Liability
           </h2>
 
           <p className="mx-auto mb-10 max-w-xl">
-            We help businesses in Scottsdale and Phoenix build websites that rank,
-            convert, and support real growth.
+            We build websites for Scottsdale and Phoenix businesses that need real results.
           </p>
 
           <Button to="/contact">Start a Project</Button>
