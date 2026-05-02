@@ -9,18 +9,17 @@ const HomePage = () => {
     <>
       <SEOHead
         title="Website Design Scottsdale | High-Converting Websites That Generate Leads"
-        description="Website design, website development, and SEO in Scottsdale and Phoenix."
+        description="Website design, website development, and SEO in Scottsdale and Phoenix. RAH Operations builds premium websites designed to rank locally, convert visitors, and generate leads."
         url={absoluteUrl('/')}
       />
 
       {/* HERO */}
       <section className="relative overflow-hidden bg-[#111111] text-white">
-        
         {/* MOBILE IMAGE */}
         <div className="block h-[420px] overflow-hidden lg:hidden">
           <img
             src="/newhero.png"
-            alt="RAH Operations workspace"
+            alt="RAH Operations premium website design and SEO workspace"
             className="h-full w-full object-cover"
             style={{ objectPosition: '70% center' }}
           />
@@ -30,11 +29,12 @@ const HomePage = () => {
         <div className="absolute bottom-0 right-[-7%] top-0 hidden w-[72%] lg:block">
           <img
             src="/newhero.png"
-            alt="RAH Operations workspace"
+            alt="RAH Operations premium website design and SEO workspace"
             className="h-full w-full object-cover"
           />
 
           <div className="absolute inset-0 bg-gradient-to-r from-[#111111]/55 via-[#111111]/18 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/35 via-transparent to-transparent" />
         </div>
 
         {/* CONTENT */}
@@ -77,7 +77,7 @@ const HomePage = () => {
 
           <img
             src="/theproblem.png"
-            alt="Website problems"
+            alt="Common website problems that stop businesses from generating leads"
             className="w-full rounded-xl shadow-[0_30px_80px_rgba(0,0,0,0.08)]"
           />
         </div>
@@ -139,41 +139,42 @@ const HomePage = () => {
                 title: 'Tier 1 Customs',
                 category: 'Automotive / Local SEO',
                 copy: 'A stronger digital presence built around service clarity, premium positioning, and local search intent.',
-                link: '/case-studies/tier-1-customs'
+                link: '/case-studies/tier-1-customs',
+                image: '/t1.png',
+                alt: 'Tier 1 Customs website case study preview'
               },
               {
                 title: 'The Ever After Edit',
                 category: 'Luxury Wedding Brand',
                 copy: 'A refined website experience built for high-end perception, cleaner inquiry flow, and stronger brand trust.',
-                link: '/case-studies/ever-after-edit'
+                link: '/case-studies/ever-after-edit',
+                image: '/ee.png',
+                alt: 'The Ever After Edit website case study preview'
               }
             ].map((study) => (
               <article key={study.title} className="surface-white overflow-hidden">
-                <div className="bg-[#111111] p-6">
-                  <div className="rounded-t-xl border border-white/10 bg-[#1a1a1a] p-3">
-                    <div className="mb-3 flex gap-2">
-                      <span className="h-2.5 w-2.5 rounded-full bg-[#d14b4b]" />
-                      <span className="h-2.5 w-2.5 rounded-full bg-neutral-500" />
-                      <span className="h-2.5 w-2.5 rounded-full bg-neutral-700" />
-                    </div>
-
-                    <div className="bg-[#fbfaf7] p-5">
-                      <div className="mb-4 h-2 w-24 bg-[#7a1c1c]" />
-                      <div className="mb-3 h-7 w-3/4 bg-neutral-950" />
-                      <div className="mb-6 h-7 w-1/2 bg-neutral-300" />
-
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="h-20 bg-white shadow-sm" />
-                        <div className="h-20 bg-neutral-200 shadow-sm" />
-                      </div>
-                    </div>
+                <div className="bg-[#111111] p-4 sm:p-6">
+                  <div className="overflow-hidden rounded-xl border border-white/10 bg-[#0f0f0f] shadow-[0_30px_90px_rgba(0,0,0,0.35)]">
+                    <img
+                      src={study.image}
+                      alt={study.alt}
+                      className="aspect-[16/10] w-full object-cover transition duration-500 hover:scale-[1.025]"
+                    />
                   </div>
                 </div>
 
                 <div className="p-8">
-                  <p className="eyebrow-red mb-3">{study.category}</p>
-                  <h3 className="mb-4">{study.title}</h3>
-                  <p className="mb-8">{study.copy}</p>
+                  <p className="eyebrow-red mb-3">
+                    {study.category}
+                  </p>
+
+                  <h3 className="mb-4">
+                    {study.title}
+                  </h3>
+
+                  <p className="mb-8">
+                    {study.copy}
+                  </p>
 
                   <Button to={study.link} variant="outline">
                     View Case Study
@@ -185,12 +186,64 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* SERVICES */}
+      <section className="section border-t border-neutral-200">
+        <div className="container-clean grid gap-16 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <p className="eyebrow-red mb-4">What We Build</p>
+
+            <h2>
+              Not Random Services. A Growth System.
+            </h2>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            {[
+              ['Website Design & Development', '/website-design-and-seo'],
+              ['Local SEO Optimization', '/website-design-and-seo'],
+              ['Digital Marketing', '/digital-marketing'],
+              ['Reputation Management', '/reputation-management']
+            ].map((service) => (
+              <Button
+                key={service[0]}
+                to={service[1]}
+                variant="secondary"
+                className="justify-between"
+              >
+                {service[0]}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="section bg-[#111111] text-white">
+        <div className="container-clean text-center">
+          <p className="mb-6 text-[11px] font-semibold uppercase tracking-[0.3em] text-[#d14b4b]">
+            Start Here
+          </p>
+
+          <h2 className="mx-auto mb-8 max-w-3xl text-white">
+            If Your Website Looks Average, Your Business Feels Average.
+          </h2>
+
+          <p className="mx-auto mb-10 max-w-2xl text-neutral-300">
+            RAH Operations builds websites for Scottsdale and Phoenix businesses that need stronger visibility, better trust, and a cleaner path from visitor to lead.
+          </p>
+
+          <Button to="/contact">
+            Start a Project
+          </Button>
+        </div>
+      </section>
+
       {/* CONTACT */}
       <section className="section border-t border-neutral-200">
         <div className="container-clean max-w-3xl">
           <ContactForm
             title="Start Your Project"
-            subtitle="Tell us what you're building. We'll show you how to turn it into a website that actually performs."
+            subtitle="Tell us what you're building. We'll show you how to turn it into a website and growth system that actually performs."
           />
         </div>
       </section>
