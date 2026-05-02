@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 interface ButtonProps {
   children: React.ReactNode;
-  variant?: 'primary' | 'secondary' | 'outline';
+  variant?: 'primary' | 'secondary' | 'outline' | 'dark';
   size?: 'sm' | 'md' | 'lg';
   className?: string;
   to?: string;
@@ -32,9 +32,11 @@ const Button: React.FC<ButtonProps> = ({
     primary:
       'border-neutral-950 bg-neutral-950 text-white shadow-[0_18px_45px_rgba(17,17,17,0.16)] before:absolute before:inset-0 before:-translate-x-full before:bg-[#7a1c1c] before:transition-transform before:duration-300 hover:border-[#7a1c1c] hover:before:translate-x-0',
     secondary:
-      'border-neutral-300 bg-[#fbfaf7] text-neutral-950 hover:border-[#7a1c1c] hover:text-[#7a1c1c]',
+      'border-neutral-300 bg-[#fbfaf7] text-neutral-950 hover:border-[#7a1c1c] hover:text-[#7a1c1c] hover:shadow-[0_16px_42px_rgba(17,17,17,0.08)]',
     outline:
-      'border-neutral-950 bg-transparent text-neutral-950 hover:border-[#7a1c1c] hover:text-[#7a1c1c]'
+      'border-neutral-950 bg-transparent text-neutral-950 hover:border-[#7a1c1c] hover:text-[#7a1c1c]',
+    dark:
+      'border-white/20 bg-white/[0.04] text-white backdrop-blur-sm hover:border-[#d14b4b] hover:text-white hover:bg-white/[0.08]'
   };
 
   const sizeClasses = {
