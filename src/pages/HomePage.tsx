@@ -11,6 +11,24 @@ const HomePage = () => {
     ['Conversion', 'Clearer offers, stronger trust signals, and cleaner inquiry paths.']
   ];
 
+  const diagnosisCards = [
+    {
+      title: 'What Your Site Says',
+      copy: 'Your website is already creating an impression. The problem is whether that impression makes people trust you, doubt you, or ignore you.',
+      points: ['Perceived value', 'Brand credibility', 'Service clarity']
+    },
+    {
+      title: 'What Customers Notice',
+      copy: 'Visitors judge speed, layout, wording, mobile experience, proof, and professionalism before they ever fill out a form.',
+      points: ['Mobile polish', 'Trust signals', 'Clear next step']
+    },
+    {
+      title: 'What We Fix',
+      copy: 'We rebuild the page structure, messaging, design system, SEO foundation, and conversion flow so the site has a real job.',
+      points: ['Better positioning', 'Cleaner SEO structure', 'Stronger conversion path']
+    }
+  ];
+
   const auditPoints = [
     ['First Impression', 'Does the site immediately make the business look credible, premium, and worth contacting?'],
     ['Offer Clarity', 'Can visitors understand what you do, who you help, and why you are different in seconds?'],
@@ -18,6 +36,14 @@ const HomePage = () => {
     ['Conversion Flow', 'Does every section move the visitor closer to a call, form submission, or next step?'],
     ['Mobile Experience', 'Does the site feel sharp on a phone, or does it look like the desktop was simply squeezed down?'],
     ['Trust Signals', 'Is there enough proof, positioning, and authority to make the visitor choose you over competitors?']
+  ];
+
+  const rahMethod = [
+    ['01', 'Positioning', 'Clarify what makes the business worth choosing.'],
+    ['02', 'Design System', 'Build a premium visual direction that feels custom.'],
+    ['03', 'SEO Structure', 'Create pages around search intent and service clarity.'],
+    ['04', 'Conversion Flow', 'Guide visitors toward calls, forms, and action.'],
+    ['05', 'Growth Layer', 'Improve content, reputation, authority, and visibility.']
   ];
 
   const processSteps = [
@@ -57,7 +83,8 @@ const HomePage = () => {
       image: '/t1.png',
       alt: 'Tier 1 Customs website case study preview',
       result: 'Sharper service positioning',
-      detail: 'Built for local search and premium automotive trust.'
+      detail: 'Built for local search and premium automotive trust.',
+      proof: ['Premium service hierarchy', 'Local intent structure', 'Stronger brand perception']
     },
     {
       title: 'The Ever After Edit',
@@ -67,7 +94,8 @@ const HomePage = () => {
       image: '/ee.png',
       alt: 'The Ever After Edit website case study preview',
       result: 'Luxury inquiry experience',
-      detail: 'Built for emotional impact, clarity, and elevated perception.'
+      detail: 'Built for emotional impact, clarity, and elevated perception.',
+      proof: ['Luxury visual direction', 'Cleaner inquiry journey', 'Higher-end brand trust']
     }
   ];
 
@@ -92,6 +120,21 @@ const HomePage = () => {
       copy: 'Trust-building systems that make your business look stronger before the customer ever contacts you.',
       link: '/reputation-management'
     }
+  ];
+
+  const buildQuality = [
+    'React',
+    'Vite',
+    'TypeScript',
+    'Tailwind',
+    'SEO Metadata',
+    'Schema Ready',
+    'Mobile First',
+    'Fast Load Structure',
+    'Conversion Copy',
+    'Internal Links',
+    'Local SEO',
+    'Vercel Deploy'
   ];
 
   const industries = [
@@ -201,8 +244,63 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* PROBLEM */}
+      {/* DIAGNOSIS */}
       <section className="section bg-[#fbfaf7] py-16 sm:py-20 lg:py-32">
+        <div className="container-clean">
+          <div className="mb-10 grid gap-7 lg:mb-16 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
+            <div>
+              <p className="eyebrow-red mb-4">Website Diagnosis</p>
+              <h2 className="text-[2.45rem] sm:text-5xl lg:text-6xl">
+                Your Website Is Either Building Trust or Creating Doubt.
+              </h2>
+            </div>
+
+            <p className="max-w-2xl text-base leading-7 text-neutral-600 sm:text-lg sm:leading-8 lg:ml-auto">
+              Most websites do not fail because they are ugly. They fail because they are unclear, forgettable, slow to trust, and weak on mobile.
+            </p>
+          </div>
+
+          <div className="grid gap-5 lg:grid-cols-3">
+            {diagnosisCards.map((card, index) => (
+              <article
+                key={card.title}
+                className={`relative overflow-hidden border border-neutral-200 p-6 shadow-[0_22px_70px_rgba(17,17,17,0.06)] sm:p-8 ${
+                  index === 1 ? 'bg-[#111111] text-white lg:-mt-6' : 'bg-white'
+                }`}
+              >
+                <div className="mb-8 flex items-center justify-between">
+                  <p className={`text-[11px] font-semibold uppercase tracking-[0.24em] ${index === 1 ? 'text-[#d14b4b]' : 'text-[#7a1c1c]'}`}>
+                    0{index + 1}
+                  </p>
+                  <span className={`h-px w-14 ${index === 1 ? 'bg-white/15' : 'bg-neutral-200'}`} />
+                </div>
+
+                <h3 className={`mb-4 text-3xl ${index === 1 ? 'text-white' : ''}`}>
+                  {card.title}
+                </h3>
+
+                <p className={`mb-7 text-sm leading-6 sm:text-base sm:leading-7 ${index === 1 ? 'text-neutral-300' : ''}`}>
+                  {card.copy}
+                </p>
+
+                <div className="space-y-3">
+                  {card.points.map((point) => (
+                    <div key={point} className="flex items-center gap-3">
+                      <span className={`h-1.5 w-1.5 rounded-full ${index === 1 ? 'bg-[#d14b4b]' : 'bg-[#7a1c1c]'}`} />
+                      <p className={`text-sm font-semibold ${index === 1 ? 'text-neutral-200' : 'text-neutral-800'}`}>
+                        {point}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PROBLEM */}
+      <section className="section bg-white py-16 sm:py-20 lg:py-32">
         <div className="container-clean">
           <div className="grid gap-7 lg:grid-cols-[0.9fr_1.1fr] lg:items-end lg:gap-12">
             <div>
@@ -243,8 +341,57 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* RAH METHOD */}
+      <section className="relative overflow-hidden bg-[#111111] text-white">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(122,28,28,0.28),transparent_28%),radial-gradient(circle_at_85%_15%,rgba(255,255,255,0.07),transparent_24%)]" />
+
+        <div className="container-clean relative py-16 sm:py-20 lg:py-32">
+          <div className="mb-10 grid gap-7 lg:mb-16 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+            <div>
+              <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-[#d14b4b]">
+                The RAH Method
+              </p>
+              <h2 className="text-[2.45rem] text-white sm:text-5xl lg:text-6xl">
+                A Website Growth System, Not a Pretty Page With Buttons.
+              </h2>
+            </div>
+
+            <p className="max-w-2xl text-base leading-7 text-neutral-300 sm:text-lg sm:leading-8 lg:ml-auto">
+              This is the difference between a website that looks nice and a website that supports sales, search visibility, trust, and customer action.
+            </p>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-5">
+            {rahMethod.map((item, index) => (
+              <article
+                key={item[1]}
+                className={`relative overflow-hidden border border-white/10 bg-white/[0.035] p-5 backdrop-blur-sm sm:p-6 ${
+                  index % 2 === 1 ? 'lg:mt-12' : ''
+                }`}
+              >
+                <p className="mb-8 text-5xl font-semibold leading-none text-[#7a1c1c]/70">
+                  {item[0]}
+                </p>
+
+                <h3 className="mb-4 text-2xl text-white">{item[1]}</h3>
+                <p className="text-sm leading-6 text-neutral-300">{item[2]}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className="mt-10 border border-white/10 bg-white/[0.035] p-5 sm:p-7 lg:mt-16 lg:grid lg:grid-cols-[0.7fr_1.3fr] lg:items-center lg:gap-10">
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#d14b4b] lg:mb-0">
+              The Point
+            </p>
+            <p className="text-2xl font-semibold leading-tight text-white sm:text-3xl">
+              Every section has a purpose: prove credibility, explain value, remove doubt, support SEO, or move the visitor closer to action.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* BEFORE AFTER */}
-      <section className="section-tight bg-white py-16 lg:py-24">
+      <section className="section-tight bg-[#fbfaf7] py-16 lg:py-24">
         <div className="container-clean">
           <div className="mb-10 max-w-4xl lg:mb-14">
             <p className="eyebrow-red mb-4">The Transformation</p>
@@ -297,20 +444,8 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* POSITIONING */}
-      <section className="section-tight bg-[#111111] text-white">
-        <div className="container-clean">
-          <div className="grid gap-6 border-y border-white/10 py-10 sm:gap-10 sm:py-12 lg:grid-cols-[0.75fr_1.25fr] lg:items-center">
-            <p className="eyebrow-red">What RAH Actually Builds</p>
-            <h2 className="text-[2.25rem] text-white sm:text-5xl lg:text-6xl">
-              Not a homepage. Not a brochure. A digital sales asset that makes the business easier to trust, easier to understand, and easier to choose.
-            </h2>
-          </div>
-        </div>
-      </section>
-
       {/* AUDIT */}
-      <section className="section bg-[#fbfaf7] py-16 sm:py-20 lg:py-32">
+      <section className="section bg-white py-16 sm:py-20 lg:py-32">
         <div className="container-clean">
           <div className="mb-10 grid gap-7 lg:mb-16 lg:grid-cols-[0.82fr_1.18fr] lg:items-end lg:gap-12">
             <div>
@@ -432,6 +567,16 @@ const HomePage = () => {
                     <h3 className="mb-4 text-3xl sm:text-4xl">{study.title}</h3>
                     <p className="mb-6 text-sm leading-6 sm:mb-8 sm:text-lg sm:leading-8">{study.copy}</p>
 
+                    <div className="mb-6 grid gap-3 sm:grid-cols-3">
+                      {study.proof.map((item) => (
+                        <div key={item} className="border border-neutral-200 bg-[#fbfaf7] p-4">
+                          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-neutral-800">
+                            {item}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+
                     <div className="mb-7 border-l-2 border-[#7a1c1c] pl-4 sm:mb-8 sm:pl-5">
                       <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-neutral-950 sm:text-sm sm:tracking-[0.2em]">
                         {study.result}
@@ -445,6 +590,36 @@ const HomePage = () => {
                   </Button>
                 </div>
               </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* BUILD QUALITY */}
+      <section className="section-tight bg-[#111111] py-14 text-white sm:py-16 lg:py-20">
+        <div className="container-clean">
+          <div className="mb-8 grid gap-6 lg:grid-cols-[0.75fr_1.25fr] lg:items-end">
+            <div>
+              <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-[#d14b4b]">
+                Build Quality
+              </p>
+              <h2 className="text-[2.35rem] text-white sm:text-5xl">
+                Built Cleaner Than the Average Small Business Website.
+              </h2>
+            </div>
+
+            <p className="max-w-2xl text-base leading-7 text-neutral-300 sm:text-lg sm:leading-8 lg:ml-auto">
+              Design matters, but execution matters too. The site needs to be structured properly, load cleanly, support SEO, and feel polished across devices.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+            {buildQuality.map((item) => (
+              <div key={item} className="border border-white/10 bg-white/[0.035] px-4 py-4 text-center">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-300">
+                  {item}
+                </p>
+              </div>
             ))}
           </div>
         </div>
