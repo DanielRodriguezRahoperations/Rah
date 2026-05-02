@@ -13,19 +13,24 @@ const HomePage = () => {
         url={absoluteUrl('/')}
       />
 
-      <section className="relative overflow-hidden bg-[#111111] py-24 text-white lg:py-32">
-        <div className="absolute inset-0 opacity-[0.08]">
-          <div className="absolute left-[-10%] top-[-20%] h-[420px] w-[420px] rounded-full bg-[#7a1c1c] blur-3xl" />
-          <div className="absolute bottom-[-20%] right-[-10%] h-[420px] w-[420px] rounded-full bg-white blur-3xl" />
+      <section className="relative overflow-hidden bg-[#111111] text-white">
+        <div className="absolute inset-0">
+          <img
+            src="/newhero.png"
+            alt="RAH Operations premium website design and SEO workspace"
+            className="h-full w-full object-cover opacity-55"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#111111] via-[#111111]/85 to-[#111111]/35" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#111111] via-transparent to-[#111111]/30" />
         </div>
 
-        <div className="container-clean relative grid items-center gap-16 lg:grid-cols-[1fr_0.95fr]">
-          <div>
+        <div className="container-clean relative py-28 lg:py-40">
+          <div className="max-w-3xl">
             <p className="mb-6 text-[11px] font-semibold uppercase tracking-[0.3em] text-[#d14b4b]">
               Scottsdale Website Design / Phoenix SEO
             </p>
 
-            <h1 className="mb-8 text-white">
+            <h1 className="mb-8 max-w-4xl text-white">
               Your Website Should Be Your Best Salesperson.
             </h1>
 
@@ -38,36 +43,6 @@ const HomePage = () => {
               <Button to="/case-studies" variant="secondary">View Work</Button>
             </div>
           </div>
-
-          <div className="relative">
-            <div className="absolute -right-6 -top-6 h-full w-full border border-[#7a1c1c]/60" />
-
-            <div className="relative rounded-t-2xl border border-white/15 bg-[#1a1a1a] p-4 shadow-[0_30px_100px_rgba(0,0,0,0.45)]">
-              <div className="mb-4 flex gap-2">
-                <span className="h-3 w-3 rounded-full bg-[#d14b4b]" />
-                <span className="h-3 w-3 rounded-full bg-neutral-500" />
-                <span className="h-3 w-3 rounded-full bg-neutral-700" />
-              </div>
-
-              <div className="bg-[#f7f3ed] p-6 text-neutral-950">
-                <div className="mb-6 h-3 w-32 bg-[#7a1c1c]" />
-                <div className="mb-4 h-10 w-4/5 bg-neutral-950" />
-                <div className="mb-8 h-10 w-3/5 bg-neutral-300" />
-
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="h-28 bg-white shadow-sm" />
-                  <div className="h-28 bg-neutral-200 shadow-sm" />
-                  <div className="h-28 bg-white shadow-sm" />
-                </div>
-              </div>
-            </div>
-
-            <div className="absolute -bottom-10 -left-8 w-40 border border-white/15 bg-[#151515] p-4 shadow-2xl">
-              <p className="text-[10px] uppercase tracking-[0.22em] text-neutral-400">Lead Flow</p>
-              <p className="mt-2 text-3xl font-semibold text-white">SEO</p>
-              <p className="mt-2 text-xs text-neutral-400">Structure. Rank. Convert.</p>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -78,19 +53,38 @@ const HomePage = () => {
             <h2>Pretty Websites Don’t Pay the Bills. Performing Websites Do.</h2>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-4">
-            {[
-              ['01', 'No Local SEO', 'Your site does not show up when customers search in Scottsdale or Phoenix.'],
-              ['02', 'Weak Design', 'The business looks average before the first conversation starts.'],
-              ['03', 'No Conversion Path', 'Visitors land on the site but do not know what to do next.'],
-              ['04', 'No Trust System', 'No case studies, proof, reviews, or authority structure.']
-            ].map((item) => (
-              <div key={item[0]} className="surface-white red-corner p-6">
-                <span className="editorial-number block text-6xl font-bold">{item[0]}</span>
-                <h3 className="mt-6 mb-3 text-xl">{item[1]}</h3>
-                <p className="text-sm">{item[2]}</p>
-              </div>
-            ))}
+          <div className="relative overflow-hidden rounded-2xl bg-[#fbfaf7]">
+            <img
+              src="/theproblem.png"
+              alt="Four premium website problem panels"
+              className="absolute inset-0 hidden h-full w-full object-cover lg:block"
+            />
+
+            <div className="relative grid gap-6 p-0 lg:grid-cols-4 lg:gap-8 lg:px-8 lg:py-12">
+              {[
+                ['01', 'No Local SEO', 'Your site does not show up when customers search in Scottsdale or Phoenix.'],
+                ['02', 'Weak Design', 'The business looks average before the first conversation starts.'],
+                ['03', 'No Conversion Path', 'Visitors land on the site but do not know what to do next.'],
+                ['04', 'No Trust System', 'No case studies, proof, reviews, or authority structure.']
+              ].map((item) => (
+                <div
+                  key={item[0]}
+                  className="min-h-[280px] bg-white/92 p-7 shadow-xl backdrop-blur-sm lg:min-h-[330px]"
+                >
+                  <span className="editorial-number block text-6xl font-bold">
+                    {item[0]}
+                  </span>
+
+                  <h3 className="mt-8 mb-4 text-xl">
+                    {item[1]}
+                  </h3>
+
+                  <p className="text-sm leading-relaxed">
+                    {item[2]}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
