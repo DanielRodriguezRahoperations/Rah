@@ -15,25 +15,36 @@ const HomePage = () => {
 
       {/* HERO */}
       <section className="relative min-h-[780px] overflow-hidden bg-[#111111] text-white">
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-[#111111]" />
+
+        <div className="absolute bottom-0 right-[-7%] top-0 hidden w-[72%] lg:block">
           <img
             src="/newhero.png"
             alt="RAH Operations premium website design and SEO workspace"
-            className="h-full w-full object-cover scale-[1.08]"
+            className="h-full w-full object-cover"
+            style={{ objectPosition: 'center center' }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#111111]/55 via-[#111111]/18 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/35 via-transparent to-transparent" />
+        </div>
+
+        <div className="absolute inset-0 lg:hidden">
+          <img
+            src="/newhero.png"
+            alt="RAH Operations premium website design and SEO workspace"
+            className="h-full w-full object-cover"
             style={{ objectPosition: '72% center' }}
           />
-
-          <div className="absolute inset-0 bg-gradient-to-r from-[#111111]/90 via-[#111111]/55 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/45 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-[#111111]/72" />
         </div>
 
         <div className="container-clean relative flex min-h-[780px] items-center py-28">
-          <div className="max-w-3xl">
+          <div className="max-w-[720px]">
             <p className="mb-6 text-[11px] font-semibold uppercase tracking-[0.3em] text-[#d14b4b]">
               Scottsdale Website Design / Phoenix SEO
             </p>
 
-            <h1 className="mb-8 text-white drop-shadow-2xl">
+            <h1 className="mb-8 max-w-[760px] text-white drop-shadow-2xl">
               Your Website Should Be Your Best Salesperson.
             </h1>
 
@@ -160,17 +171,9 @@ const HomePage = () => {
                 </div>
 
                 <div className="p-8">
-                  <p className="eyebrow-red mb-3">
-                    {study.category}
-                  </p>
-
-                  <h3 className="mb-4">
-                    {study.title}
-                  </h3>
-
-                  <p className="mb-8">
-                    {study.copy}
-                  </p>
+                  <p className="eyebrow-red mb-3">{study.category}</p>
+                  <h3 className="mb-4">{study.title}</h3>
+                  <p className="mb-8">{study.copy}</p>
 
                   <Button to={study.link} variant="outline">
                     View Case Study
