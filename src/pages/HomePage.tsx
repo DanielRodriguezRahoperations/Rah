@@ -14,28 +14,28 @@ const HomePage = () => {
       />
 
       {/* HERO */}
-      <section className="relative overflow-hidden bg-[#111111] text-white">
+      <section className="relative min-h-[760px] overflow-hidden bg-[#111111] text-white">
         <div className="absolute inset-0">
           <img
             src="/newhero.png"
             alt="RAH Operations premium website design and SEO workspace"
-            className="h-full w-full object-cover opacity-90"
+            className="h-full w-full object-cover opacity-100"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#111111]/95 via-[#111111]/70 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/80 via-transparent to-[#111111]/20" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#111111]/92 via-[#111111]/52 to-[#111111]/5" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/45 via-transparent to-[#111111]/10" />
         </div>
 
-        <div className="container-clean relative py-28 lg:py-44">
+        <div className="container-clean relative flex min-h-[760px] items-center py-28">
           <div className="max-w-3xl">
             <p className="mb-6 text-[11px] font-semibold uppercase tracking-[0.3em] text-[#d14b4b]">
               Scottsdale Website Design / Phoenix SEO
             </p>
 
-            <h1 className="mb-8 text-white drop-shadow-2xl">
+            <h1 className="mb-8 max-w-4xl text-white drop-shadow-2xl">
               Your Website Should Be Your Best Salesperson.
             </h1>
 
-            <p className="mb-10 max-w-2xl text-lg text-neutral-200">
+            <p className="mb-10 max-w-2xl text-lg text-neutral-100 drop-shadow-lg">
               We build premium websites for Scottsdale and Phoenix businesses that need more than a pretty homepage. We build for local SEO, trust, conversion, and real lead generation.
             </p>
 
@@ -50,59 +50,67 @@ const HomePage = () => {
       {/* PROBLEM */}
       <section className="section bg-[#fbfaf7]">
         <div className="container-clean">
-          <div className="mb-16 max-w-3xl">
+          <div className="mb-16 max-w-4xl">
             <p className="eyebrow-red mb-4">The Problem</p>
             <h2>Pretty Websites Don’t Pay the Bills. Performing Websites Do.</h2>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+          {/* DESKTOP: USE THE DESIGNED IMAGE AS THE FOUNDATION */}
+          <div className="relative hidden overflow-hidden rounded-2xl lg:block">
+            <img
+              src="/theproblem.png"
+              alt="Website performance problems layout"
+              className="w-full"
+            />
+
+            <div className="absolute inset-x-[5.2%] bottom-[8.5%] grid grid-cols-4 gap-[3.4%]">
+              {[
+                ['01', 'No Local SEO', 'Your site does not show up when customers search in Scottsdale or Phoenix.'],
+                ['02', 'Weak Design', 'The business looks average before the first conversation starts.'],
+                ['03', 'No Conversion Path', 'Visitors land on the site but do not know what to do next.'],
+                ['04', 'No Trust System', 'No case studies, proof, reviews, or authority structure.']
+              ].map((item) => (
+                <div key={item[0]} className="px-8 pb-8">
+                  <p className="mb-5 text-5xl font-bold leading-none text-[#8f1d1d]">
+                    {item[0]}
+                  </p>
+
+                  <h3 className="mb-5 text-2xl leading-tight text-neutral-950">
+                    {item[1]}
+                  </h3>
+
+                  <div className="mb-5 h-[3px] w-8 bg-[#8f1d1d]" />
+
+                  <p className="max-w-[260px] text-[15px] leading-relaxed text-neutral-700">
+                    {item[2]}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* MOBILE/TABLET FALLBACK */}
+          <div className="grid gap-8 lg:hidden">
             {[
               ['01', 'No Local SEO', 'Your site does not show up when customers search in Scottsdale or Phoenix.'],
               ['02', 'Weak Design', 'The business looks average before the first conversation starts.'],
               ['03', 'No Conversion Path', 'Visitors land on the site but do not know what to do next.'],
               ['04', 'No Trust System', 'No case studies, proof, reviews, or authority structure.']
-            ].map((item, index) => (
-              <div
-                key={item[0]}
-                className="group relative min-h-[390px] overflow-hidden bg-white shadow-[0_25px_80px_rgba(0,0,0,0.10)]"
-              >
-                {/* IMAGE TOP */}
-                <div className="h-[190px] overflow-hidden bg-[#111111]">
-                  <img
-                    src="/theproblem.png"
-                    alt=""
-                    className="h-full w-full object-cover opacity-80 transition duration-500 group-hover:scale-105"
-                    style={{
-                      objectPosition:
-                        index === 0
-                          ? 'left center'
-                          : index === 1
-                          ? '35% center'
-                          : index === 2
-                          ? '65% center'
-                          : 'right center'
-                    }}
-                  />
-                </div>
+            ].map((item) => (
+              <div key={item[0]} className="surface-white red-corner p-8">
+                <p className="mb-5 text-5xl font-bold leading-none text-[#8f1d1d]">
+                  {item[0]}
+                </p>
 
-                {/* CONTENT */}
-                <div className="relative p-7">
-                  <span className="mb-5 block text-5xl font-bold text-[#7a1c1c]">
-                    {item[0]}
-                  </span>
+                <h3 className="mb-4 text-2xl text-neutral-950">
+                  {item[1]}
+                </h3>
 
-                  <h3 className="mb-3 text-xl text-neutral-950">
-                    {item[1]}
-                  </h3>
+                <div className="mb-5 h-[3px] w-8 bg-[#8f1d1d]" />
 
-                  <p className="text-sm leading-relaxed text-neutral-700">
-                    {item[2]}
-                  </p>
-                </div>
-
-                {/* CORNERS */}
-                <div className="absolute left-0 top-0 h-10 w-10 border-l border-t border-[#7a1c1c]" />
-                <div className="absolute bottom-0 right-0 h-10 w-10 border-b border-r border-[#7a1c1c]" />
+                <p className="text-sm leading-relaxed text-neutral-700">
+                  {item[2]}
+                </p>
               </div>
             ))}
           </div>
@@ -132,6 +140,84 @@ const HomePage = () => {
                 <h3 className="mb-4 text-2xl text-white">{step[1]}</h3>
                 <p className="text-sm text-neutral-300">{step[2]}</p>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FEATURED WORK */}
+      <section className="section">
+        <div className="container-clean">
+          <div className="mb-16 max-w-3xl">
+            <p className="eyebrow mb-4">Featured Work</p>
+            <h2>Websites Built to Make Businesses Look Sharper and Convert Better</h2>
+          </div>
+
+          <div className="grid gap-8 lg:grid-cols-2">
+            {[
+              {
+                title: 'Tier 1 Customs',
+                category: 'Automotive / Local SEO',
+                copy: 'A stronger digital presence built around service clarity, premium positioning, and local search intent.',
+                link: '/case-studies/tier-1-customs'
+              },
+              {
+                title: 'The Ever After Edit',
+                category: 'Luxury Wedding Brand',
+                copy: 'A refined website experience built for high-end perception, cleaner inquiry flow, and stronger brand trust.',
+                link: '/case-studies/ever-after-edit'
+              }
+            ].map((study) => (
+              <article key={study.title} className="surface-white overflow-hidden">
+                <div className="bg-[#111111] p-6">
+                  <div className="rounded-t-xl border border-white/10 bg-[#1a1a1a] p-3">
+                    <div className="mb-3 flex gap-2">
+                      <span className="h-2.5 w-2.5 rounded-full bg-[#d14b4b]" />
+                      <span className="h-2.5 w-2.5 rounded-full bg-neutral-500" />
+                      <span className="h-2.5 w-2.5 rounded-full bg-neutral-700" />
+                    </div>
+                    <div className="bg-[#fbfaf7] p-5">
+                      <div className="mb-4 h-2 w-24 bg-[#7a1c1c]" />
+                      <div className="mb-3 h-7 w-3/4 bg-neutral-950" />
+                      <div className="mb-6 h-7 w-1/2 bg-neutral-300" />
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="h-20 bg-white shadow-sm" />
+                        <div className="h-20 bg-neutral-200 shadow-sm" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-8">
+                  <p className="eyebrow-red mb-3">{study.category}</p>
+                  <h3 className="mb-4">{study.title}</h3>
+                  <p className="mb-8">{study.copy}</p>
+                  <Button to={study.link} variant="outline">View Case Study</Button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SERVICES */}
+      <section className="section border-t border-neutral-200">
+        <div className="container-clean grid gap-16 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <p className="eyebrow-red mb-4">What We Build</p>
+            <h2>Not Random Services. A Growth System.</h2>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            {[
+              ['Website Design & Development', '/website-design-and-seo'],
+              ['Local SEO Optimization', '/website-design-and-seo'],
+              ['Digital Marketing', '/digital-marketing'],
+              ['Reputation Management', '/reputation-management']
+            ].map((service) => (
+              <Button key={service[0]} to={service[1]} variant="secondary" className="justify-between">
+                {service[0]}
+              </Button>
             ))}
           </div>
         </div>
