@@ -9,46 +9,46 @@ const HomePage = () => {
     <>
       <SEOHead
         title="Website Design Scottsdale | High-Converting Websites That Generate Leads"
-        description="Website design, website development, and SEO in Scottsdale and Phoenix. RAH Operations builds premium websites designed to rank locally, convert visitors, and generate leads."
+        description="Website design, website development, and SEO in Scottsdale and Phoenix."
         url={absoluteUrl('/')}
       />
 
       {/* HERO */}
-      <section className="relative min-h-[780px] overflow-hidden bg-[#111111] text-white">
-        <div className="absolute inset-0 bg-[#111111]" />
+      <section className="relative overflow-hidden bg-[#111111] text-white">
+        
+        {/* MOBILE IMAGE */}
+        <div className="block h-[420px] overflow-hidden lg:hidden">
+          <img
+            src="/newhero.png"
+            alt="RAH Operations workspace"
+            className="h-full w-full object-cover"
+            style={{ objectPosition: '70% center' }}
+          />
+        </div>
 
+        {/* DESKTOP IMAGE */}
         <div className="absolute bottom-0 right-[-7%] top-0 hidden w-[72%] lg:block">
           <img
             src="/newhero.png"
-            alt="RAH Operations premium website design and SEO workspace"
+            alt="RAH Operations workspace"
             className="h-full w-full object-cover"
-            style={{ objectPosition: 'center center' }}
           />
+
           <div className="absolute inset-0 bg-gradient-to-r from-[#111111]/55 via-[#111111]/18 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/35 via-transparent to-transparent" />
         </div>
 
-        <div className="absolute inset-0 lg:hidden">
-          <img
-            src="/newhero.png"
-            alt="RAH Operations premium website design and SEO workspace"
-            className="h-full w-full object-cover"
-            style={{ objectPosition: '72% center' }}
-          />
-          <div className="absolute inset-0 bg-[#111111]/72" />
-        </div>
-
-        <div className="container-clean relative flex min-h-[780px] items-center py-28">
+        {/* CONTENT */}
+        <div className="container-clean relative py-14 lg:flex lg:min-h-[780px] lg:items-center lg:py-28">
           <div className="max-w-[720px]">
             <p className="mb-6 text-[11px] font-semibold uppercase tracking-[0.3em] text-[#d14b4b]">
               Scottsdale Website Design / Phoenix SEO
             </p>
 
-            <h1 className="mb-8 max-w-[760px] text-white drop-shadow-2xl">
+            <h1 className="mb-8 text-white drop-shadow-2xl">
               Your Website Should Be Your Best Salesperson.
             </h1>
 
-            <p className="mb-10 max-w-2xl text-lg text-neutral-200 drop-shadow-lg">
+            <p className="mb-10 max-w-2xl text-lg text-neutral-200">
               We build premium websites for Scottsdale and Phoenix businesses that need more than a pretty homepage. We build for local SEO, trust, conversion, and real lead generation.
             </p>
 
@@ -77,7 +77,7 @@ const HomePage = () => {
 
           <img
             src="/theproblem.png"
-            alt="Common website problems that stop businesses from generating leads"
+            alt="Website problems"
             className="w-full rounded-xl shadow-[0_30px_80px_rgba(0,0,0,0.08)]"
           />
         </div>
@@ -185,64 +185,12 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* SERVICES */}
-      <section className="section border-t border-neutral-200">
-        <div className="container-clean grid gap-16 lg:grid-cols-[0.8fr_1.2fr]">
-          <div>
-            <p className="eyebrow-red mb-4">What We Build</p>
-
-            <h2>
-              Not Random Services. A Growth System.
-            </h2>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2">
-            {[
-              ['Website Design & Development', '/website-design-and-seo'],
-              ['Local SEO Optimization', '/website-design-and-seo'],
-              ['Digital Marketing', '/digital-marketing'],
-              ['Reputation Management', '/reputation-management']
-            ].map((service) => (
-              <Button
-                key={service[0]}
-                to={service[1]}
-                variant="secondary"
-                className="justify-between"
-              >
-                {service[0]}
-              </Button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="section bg-[#111111] text-white">
-        <div className="container-clean text-center">
-          <p className="mb-6 text-[11px] font-semibold uppercase tracking-[0.3em] text-[#d14b4b]">
-            Start Here
-          </p>
-
-          <h2 className="mx-auto mb-8 max-w-3xl text-white">
-            If Your Website Looks Average, Your Business Feels Average.
-          </h2>
-
-          <p className="mx-auto mb-10 max-w-2xl text-neutral-300">
-            RAH Operations builds websites for Scottsdale and Phoenix businesses that need stronger visibility, better trust, and a cleaner path from visitor to lead.
-          </p>
-
-          <Button to="/contact">
-            Start a Project
-          </Button>
-        </div>
-      </section>
-
       {/* CONTACT */}
       <section className="section border-t border-neutral-200">
         <div className="container-clean max-w-3xl">
           <ContactForm
             title="Start Your Project"
-            subtitle="Tell us what you're building. We'll show you how to turn it into a website and growth system that actually performs."
+            subtitle="Tell us what you're building. We'll show you how to turn it into a website that actually performs."
           />
         </div>
       </section>
