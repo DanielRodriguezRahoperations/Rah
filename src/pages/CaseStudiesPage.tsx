@@ -10,135 +10,141 @@ const CaseStudiesPage = () => {
       title: 'Tier 1 Customs',
       industry: 'Automotive Customization',
       description:
-        'A premium automotive customization website built for service clarity, local SEO, and high-intent lead generation.',
-      link: '/case-studies/tier-1-customs'
+        'Rebuilt a local automotive brand into a high-authority website focused on service clarity, SEO visibility, and lead generation.',
+      link: '/case-studies/tier-1-customs',
+      featured: true
     },
     {
       title: 'The Ever After Edit',
-      industry: 'Luxury Wedding Signage',
+      industry: 'Luxury Wedding Brand',
       description:
-        'A refined wedding signage website built around editorial design, premium positioning, and a stronger inquiry experience.',
-      link: '/case-studies/ever-after-edit'
+        'Transformed a basic offering into a premium, editorial-style brand experience designed for high-end clientele.',
+      link: '/case-studies/ever-after-edit',
+      featured: true
     },
     {
       title: 'The Scottsdale Injector',
       industry: 'Medical Aesthetics',
       description:
-        'A premium aesthetics website built to strengthen trust, service clarity, and local brand authority.',
-      link: '/case-studies/scottsdale-injector'
+        'Built a high-trust aesthetic website designed to increase credibility, service clarity, and client inquiries.',
+      link: '/case-studies/scottsdale-injector',
+      featured: true
     }
   ];
 
   return (
     <>
       <SEOHead
-        title="Case Studies | RAH Operations"
-        description="Explore selected case studies from RAH Operations, including website design, SEO, brand positioning, and conversion-focused digital systems."
+        title="Website Case Studies Scottsdale & Phoenix | RAH Operations"
+        description="Explore real website design and SEO case studies showing how RAH Operations builds high-conversion systems for businesses in Scottsdale, Phoenix, and Arizona."
         url={absoluteUrl('/case-studies')}
       />
 
-      <section className="section">
-        <div className="container-clean max-w-3xl">
-          <p className="eyebrow mb-6">Case Studies</p>
+      {/* HERO */}
+      <section className="section section-dark relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.05] bg-[radial-gradient(circle_at_top_left,red,transparent_60%)]" />
 
-          <h1 className="mb-6">
-            Proof That Strategy, Design, and Structure Matter
+        <div className="container-clean max-w-4xl text-center">
+          <p className="eyebrow eyebrow-red mb-6">
+            Case Studies — Scottsdale & Phoenix
+          </p>
+
+          <h1 className="text-white mb-6">
+            This Is What Happens When Strategy Meets Execution
           </h1>
 
-          <p className="text-lg">
-            These projects show how RAH Operations helps businesses look more credible,
-            communicate more clearly, and build digital systems that support growth.
+          <p className="text-lg text-neutral-300">
+            These case studies break down how we take underperforming websites
+            and turn them into high-conversion business assets.
           </p>
         </div>
       </section>
 
-      <section className="section border-t border-neutral-200">
+      {/* FEATURED CASE STUDIES */}
+      <section className="section">
         <div className="container-clean">
-          <div className="divide-y border-y border-neutral-200">
+          <div className="grid lg:grid-cols-3 gap-10">
             {caseStudies.map((study, index) => (
-              <article
+              <div
                 key={index}
-                className="grid gap-8 py-10 lg:grid-cols-[0.8fr_1.4fr_auto] lg:items-start"
+                className="surface-dark rounded-2xl p-6 border border-white/10 hover:scale-[1.02] transition"
               >
-                <div>
-                  <p className="eyebrow mb-3">{study.industry}</p>
-                  <h2 className="text-2xl">{study.title}</h2>
+                {/* MOCKUP */}
+                <div className="mb-6 bg-black rounded-lg border border-white/10 overflow-hidden">
+                  <div className="h-6 bg-neutral-900 flex items-center px-3 gap-2">
+                    <span className="w-2 h-2 bg-red-500 rounded-full" />
+                    <span className="w-2 h-2 bg-yellow-500 rounded-full" />
+                    <span className="w-2 h-2 bg-green-500 rounded-full" />
+                  </div>
+
+                  <div className="h-40 bg-neutral-900" />
                 </div>
 
-                <div>
-                  <p>{study.description}</p>
-                </div>
+                <p className="eyebrow mb-2">{study.industry}</p>
+                <h3 className="text-white mb-3">{study.title}</h3>
 
-                <div className="lg:text-right">
-                  <Link
-                    to={study.link}
-                    className="inline-flex border border-neutral-950 px-5 py-3 text-sm font-medium text-neutral-950 transition-all duration-300 hover:bg-neutral-950 hover:text-white"
-                  >
-                    View Case Study
-                  </Link>
-                </div>
-              </article>
+                <p className="text-sm text-neutral-300 mb-6">
+                  {study.description}
+                </p>
+
+                <Link
+                  to={study.link}
+                  className="inline-flex bg-red-600 px-5 py-3 text-sm font-medium text-white hover:opacity-90 transition"
+                >
+                  View Full Case Study
+                </Link>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="section border-t border-neutral-200">
+      {/* VALUE EXPLANATION */}
+      <section className="section section-tight bg-neutral-50">
         <div className="container-clean grid gap-16 lg:grid-cols-2">
           <div>
-            <p className="eyebrow mb-4">Why Case Studies Matter</p>
+            <p className="eyebrow mb-4">Why This Matters</p>
 
             <h2 className="mb-6">
-              Good Work Should Explain the Thinking Behind It
+              A Portfolio Shows Work.
+              <br /> A Case Study Shows Thinking.
             </h2>
 
-            <p className="mb-6">
-              A portfolio shows what was built. A case study shows why it was built,
-              how it was structured, and what business problem it solved.
-            </p>
-
             <p>
-              That is the difference between showing design work and proving strategic value.
+              Anyone can design a website. Very few can structure one
+              that actually improves business performance.
             </p>
           </div>
 
-          <div className="card-clean">
-            <h3 className="mb-4">What We Build Around</h3>
+          <div className="space-y-6">
+            <div>
+              <h3 className="font-semibold">Clear Positioning</h3>
+              <p>Eliminating confusion so customers instantly understand value.</p>
+            </div>
 
-            <div className="space-y-4 text-sm">
-              <div className="flex justify-between gap-6">
-                <span>Positioning</span>
-                <span className="font-semibold">Clearer market fit</span>
-              </div>
+            <div>
+              <h3 className="font-semibold">Stronger Conversion</h3>
+              <p>Designing the site to guide users toward taking action.</p>
+            </div>
 
-              <div className="flex justify-between gap-6">
-                <span>Website structure</span>
-                <span className="font-semibold">Better conversion</span>
-              </div>
-
-              <div className="flex justify-between gap-6">
-                <span>SEO foundation</span>
-                <span className="font-semibold">More visibility</span>
-              </div>
-
-              <div className="flex justify-between gap-6">
-                <span>Brand perception</span>
-                <span className="font-semibold">More trust</span>
-              </div>
+            <div>
+              <h3 className="font-semibold">Search Visibility</h3>
+              <p>Structuring content to rank and generate long-term traffic.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="section border-t border-neutral-200">
+      {/* CTA */}
+      <section className="section section-dark">
         <div className="container-clean text-center">
-          <h2 className="mb-6">
-            Your Website Should Be a Business Asset
+          <h2 className="text-white mb-6">
+            Your Website Should Be Doing This Too
           </h2>
 
-          <p className="mb-10 max-w-xl mx-auto">
-            If your current site is not helping you build trust, generate leads,
-            or position your business properly, it is underperforming.
+          <p className="text-neutral-300 mb-10 max-w-xl mx-auto">
+            If your current website isn’t generating leads or building authority,
+            it’s costing you opportunities.
           </p>
 
           <Button to="/contact">
