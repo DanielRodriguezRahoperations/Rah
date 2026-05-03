@@ -44,6 +44,19 @@ const portfolioItems: PortfolioItem[] = [
     featured: true
   },
   {
+    title: 'Empire Builds AZ',
+    url: 'https://www.empirebuildsaz.com',
+    category: 'Construction / Contractor Website',
+    description:
+      'A professional contractor website built to make construction services feel more credible, organized, and easier to request.',
+    focus: 'Website Design, Service Clarity, Lead Generation',
+    positioning: 'Built to give a local construction brand a stronger first impression, clearer service structure, and a more professional digital presence.',
+    proof: ['Contractor credibility', 'Clear service framing', 'Lead-focused CTA path'],
+    image: '/emp.png',
+    caseStudy: '/case-studies/empire-builds-az',
+    featured: true
+  },
+  {
     title: 'The Scottsdale Injector',
     url: 'https://www.thescottsdaleinjector.com',
     category: 'Medical Aesthetics',
@@ -52,18 +65,7 @@ const portfolioItems: PortfolioItem[] = [
     focus: 'Website Design, Local SEO',
     positioning: 'Built to support credibility in a competitive aesthetics market where trust matters immediately.',
     proof: ['Authority-first layout', 'Service clarity', 'Local search intent'],
-    caseStudy: '/case-studies/scottsdale-injector',
-    featured: true
-  },
-  {
-    title: 'Empire Builds AZ',
-    url: 'https://www.empirebuildsaz.com',
-    category: 'Construction',
-    description:
-      'A professional contractor website focused on service clarity, credibility, and lead generation.',
-    focus: 'Website Design',
-    positioning: 'Built to make construction services easier to understand and easier to request.',
-    proof: ['Clear service structure', 'Professional presentation', 'Lead-focused CTA']
+    caseStudy: '/case-studies/scottsdale-injector'
   },
   {
     title: 'Pinnacle Bookkeeping AZ',
