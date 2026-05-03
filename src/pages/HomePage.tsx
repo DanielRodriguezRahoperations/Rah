@@ -96,6 +96,17 @@ const HomePage = () => {
       result: 'Luxury inquiry experience',
       detail: 'Built for emotional impact, clarity, and elevated perception.',
       proof: ['Luxury visual direction', 'Cleaner inquiry journey', 'Higher-end brand trust']
+    },
+    {
+      title: 'Empire Builds AZ',
+      category: 'Construction / Contractor Website',
+      copy: 'A professional contractor website built to make construction services feel more credible, organized, and easier to request.',
+      link: '/case-studies/empire-builds-az',
+      image: '/emp.png',
+      alt: 'Empire Builds AZ website case study preview',
+      result: 'Stronger contractor credibility',
+      detail: 'Built for service clarity, professional trust, and lead-focused project inquiries.',
+      proof: ['Clear service framing', 'Professional presentation', 'Lead-focused CTA path']
     }
   ];
 
@@ -591,6 +602,12 @@ const HomePage = () => {
                 </div>
               </article>
             ))}
+          </div>
+
+          <div className="mt-10 flex justify-center">
+            <Button to="/portfolio" variant="outline" size="lg" className="w-full sm:w-auto">
+              View Full Portfolio
+            </Button>
           </div>
         </div>
       </section>
