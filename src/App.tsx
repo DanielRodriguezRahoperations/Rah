@@ -29,7 +29,7 @@ import PortfolioPage from './pages/PortfolioPage';
 import CaseStudiesPage from './pages/CaseStudiesPage';
 import Tier1CustomsCaseStudy from './pages/case-studies/Tier1CustomsCaseStudy';
 import EverAfterEditCaseStudy from './pages/case-studies/EverAfterEditCaseStudy';
-import ScottsdaleInjectorCaseStudy from './pages/case-studies/ScottsdaleInjectorCaseStudy';
+import EmpireBuildsAzCaseStudy from './pages/case-studies/EmpireBuildsAz';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -103,7 +103,7 @@ function App() {
               <Route path="/case-studies" element={<CaseStudiesPage />} />
               <Route path="/case-studies/tier-1-customs" element={<Tier1CustomsCaseStudy />} />
               <Route path="/case-studies/ever-after-edit" element={<EverAfterEditCaseStudy />} />
-              <Route path="/case-studies/scottsdale-injector" element={<ScottsdaleInjectorCaseStudy />} />
+              <Route path="/case-studies/empire-builds-az" element={<EmpireBuildsAzCaseStudy />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/blogs" element={<BlogPage />} />
               <Route path="/blogs/:slug" element={<BlogPost />} />
