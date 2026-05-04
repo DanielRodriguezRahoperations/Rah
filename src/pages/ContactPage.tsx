@@ -37,8 +37,8 @@ const ContactPage = () => {
             <div className="flex gap-4">
               <div className="flex items-center gap-2 text-white">
                 <span className="text-2xl">📞</span>
-                <a href="tel:+18884724621" className="font-semibold hover:text-luxury-red transition-colors">
-                  (888) 472-4621
+                <a href="tel:+16236408884" className="font-semibold hover:text-luxury-red transition-colors">
+                  (623) 640-8884
                 </a>
               </div>
             </div>
@@ -192,8 +192,8 @@ const ContactPage = () => {
             <p className="text-xl font-serif-body mb-12 max-w-2xl mx-auto leading-relaxed opacity-90">
               Submit the form above, call us directly, or schedule a time that works best. We're excited to talk about what you're building.
             </p>
-            <Button to="tel:+18884724621" size="lg" className="bg-white text-luxury-red hover:bg-cream-50">
-              Call (888) 472-4621
+            <Button to="tel:+16236408884" size="lg" className="bg-white text-luxury-red hover:bg-cream-50">
+              Call (623) 640-8884
             </Button>
           </motion.div>
         </div>

@@ -48,7 +48,7 @@ const PersonalCreditPage = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button to="/contact" size="lg">Request a Credit Review</Button>
-              <Button variant="secondary" size="lg" href="tel:+18884724621">(888) 472-4621</Button>
+              <Button variant="secondary" size="lg" href="tel:+16236408884">(623) 640-8884</Button>
             </div>
           </motion.div>
 

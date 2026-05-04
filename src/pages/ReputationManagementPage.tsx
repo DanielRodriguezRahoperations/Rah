@@ -38,8 +38,8 @@ const ReputationManagementPage = () => {
               <Button to="/contact" size="lg" className="bg-[#a8c5a0] border-[#a8c5a0] text-[#0f1f0f] hover:bg-[#8fb087]">
                 Begin Assessment
               </Button>
-              <Button to="tel:+18884724621" variant="outline" size="lg" className="border-[#f5f0e8]/30 text-[#f5f0e8] hover:border-[#a8c5a0] hover:text-[#a8c5a0]">
-                (888) 472-4621
+              <Button to="tel:+16236408884" variant="outline" size="lg" className="border-[#f5f0e8]/30 text-[#f5f0e8] hover:border-[#a8c5a0] hover:text-[#a8c5a0]">
+                (623) 640-8884
               </Button>
             </div>
           </motion.div>

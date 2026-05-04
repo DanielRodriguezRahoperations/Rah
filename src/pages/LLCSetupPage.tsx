@@ -70,7 +70,7 @@ const LLCSetupPage = () => {
             transition={{ duration: 0.7, delay: 0.5 }}
           >
             <Button to="/contact" size="lg">Start Your Business Setup</Button>
-            <Button variant="secondary" size="lg" href="tel:+18884724621">(888) 472-4621</Button>
+            <Button variant="secondary" size="lg" href="tel:+16236408884">(623) 640-8884</Button>
           </motion.div>
 
           {/* Blueprint label strip */}

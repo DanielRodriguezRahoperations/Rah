@@ -276,11 +276,11 @@ const Header = () => {
 
           <div className="mt-6 grid gap-3">
             <a
-              href="tel:+18884724621"
+              href="tel:+16236408884"
               onClick={closeAllMenus}
               className="border border-neutral-300 bg-white px-5 py-4 text-center text-sm font-semibold text-neutral-950"
             >
-              (888) 472-4621
+              (623) 640-8884
             </a>
 
             <Link
