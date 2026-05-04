@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import SEOHead from '../../components/ui/SEOHead';
 import { absoluteUrl } from '../../utils/url';
 import Button from '../../components/ui/Button';
@@ -47,248 +48,296 @@ const EverAfterEditCaseStudy = () => {
       />
 
       {/* HERO */}
-      <section className="section section-dark relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.05] bg-[radial-gradient(circle_at_top_left,red,transparent_60%)]" />
+      <section className="relative py-32 lg:py-48 bg-gradient-to-br from-emerald-50 via-rose-50 to-amber-50 overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-20 w-64 h-64 bg-rose-200 rounded-full blur-3xl opacity-30 animate-pulse" />
+          <div className="absolute bottom-20 right-20 w-48 h-48 bg-emerald-200 rounded-full blur-3xl opacity-25 animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-amber-200 rounded-full blur-2xl opacity-20 animate-bounce" />
+        </div>
 
-        <div className="container-clean grid gap-16 lg:grid-cols-2 lg:items-center">
-          <div>
-            <p className="eyebrow eyebrow-red mb-6">
+        <div className="container-clean relative z-10 grid gap-16 lg:grid-cols-2 lg:items-center">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1 }}
+          >
+            <div className="text-sm uppercase tracking-widest text-emerald-700 mb-6 font-serif">
               Case Study — Luxury Wedding Brand
-            </p>
-
-            <h1 className="text-white mb-6">
-              Turning The Ever After Edit Into a Premium Editorial Wedding Brand
-            </h1>
-
-            <p className="text-lg text-neutral-300 mb-8">
-              A refined wedding signage website built around luxury positioning,
-              editorial design, and a stronger inquiry experience for custom event projects.
-            </p>
-
-            <div className="flex flex-wrap gap-4">
-              <Button to="/contact">Start a Project</Button>
-
-              <Button href="https://www.everaftereditfl.com" variant="outline">
-                View Live Website
-              </Button>
             </div>
-          </div>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-800 mb-8 leading-tight font-serif">
+              Ever After
+              <span className="block text-rose-600">Edit</span>
+              <span className="block text-emerald-600 text-3xl">Blossoming Elegance</span>
+            </h1>
+            <p className="text-xl text-gray-600 mb-12 leading-relaxed max-w-lg">
+              Where wedding dreams bloom into reality. A garden of refined signage and timeless elegance.
+            </p>
+
+            <motion.div
+              className="flex gap-6 flex-wrap"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <Button to="/contact" size="lg" className="bg-rose-500 text-white hover:bg-rose-600 border border-rose-500 font-serif">
+                Begin Your Story
+              </Button>
+              <Button href="https://www.everaftereditfl.com" variant="outline" size="lg" className="border-emerald-400 text-emerald-700 hover:bg-emerald-50 font-serif">
+                Explore the Garden
+              </Button>
+            </motion.div>
+          </motion.div>
 
           {/* MOCKUP PANEL */}
-          <div className="relative">
-            <div className="surface-dark rounded-2xl border border-white/10 p-6 shadow-2xl">
-              <div className="rounded-xl overflow-hidden border border-white/10 bg-black">
-                <div className="h-6 bg-neutral-900 flex items-center px-3 gap-2">
-                  <span className="w-2 h-2 rounded-full bg-red-500" />
-                  <span className="w-2 h-2 rounded-full bg-yellow-500" />
-                  <span className="w-2 h-2 rounded-full bg-green-500" />
+          <motion.div
+            className="relative"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, delay: 0.2 }}
+          >
+            <div className="bg-gradient-to-br from-white to-emerald-50 p-8 rounded-3xl border-2 border-rose-200/50 shadow-2xl relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-rose-100/20 to-emerald-100/20" />
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="w-3 h-3 bg-rose-400 rounded-full" />
+                  <div className="w-3 h-3 bg-emerald-400 rounded-full" />
+                  <div className="w-3 h-3 bg-amber-400 rounded-full" />
                 </div>
 
-                <div className="p-6 bg-neutral-950">
-                  <div className="mb-6">
-                    <div className="h-4 w-28 bg-red-600 rounded mb-4" />
-                    <div className="h-8 w-3/4 bg-neutral-700 rounded mb-3" />
-                    <div className="h-4 w-1/2 bg-neutral-800 rounded" />
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="h-28 rounded-lg bg-neutral-900 border border-white/10" />
-                    <div className="h-36 rounded-lg bg-neutral-900 border border-white/10" />
-                    <div className="h-28 rounded-lg bg-neutral-900 border border-white/10" />
-                  </div>
-
-                  <div className="mt-5 h-10 w-36 rounded bg-red-600" />
+                <div className="space-y-4 mb-8">
+                  <div className="h-6 bg-gradient-to-r from-rose-300 to-emerald-300 rounded" />
+                  <div className="h-4 bg-gray-200 rounded w-3/4" />
+                  <div className="h-4 bg-gray-300 rounded w-1/2" />
                 </div>
+
+                <div className="grid grid-cols-3 gap-3 mb-6">
+                  <div className="h-24 bg-gradient-to-br from-rose-100 to-rose-200 rounded-lg border border-rose-200/50" />
+                  <div className="h-32 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-lg border border-emerald-200/50" />
+                  <div className="h-28 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg border border-amber-200/50" />
+                </div>
+
+                <div className="h-12 bg-gradient-to-r from-rose-400 to-emerald-400 rounded-lg" />
               </div>
             </div>
-
-            <div className="absolute -bottom-6 -right-6 h-40 w-40 bg-red-600 blur-[120px] opacity-35" />
-          </div>
+            <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-rose-300 rounded-full blur-2xl opacity-50 animate-pulse" />
+          </motion.div>
         </div>
       </section>
 
       {/* PROJECT SNAPSHOT */}
-      <section className="section">
+      <section className="section bg-gradient-to-r from-emerald-50 to-rose-50">
         <div className="container-clean grid gap-16 lg:grid-cols-2">
-          <div>
-            <p className="eyebrow mb-4">The Challenge</p>
-
-            <h2 className="mb-6">
-              The Brand Could Not Afford to Look Basic
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <p className="eyebrow-emerald mb-6">The Challenge</p>
+            <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight text-gray-800 font-serif">
+              From Seed to
+              <span className="block text-rose-600">Blooming Beauty</span>
             </h2>
-
-            <p className="mb-6">
-              The Ever After Edit needed to avoid the common trap most wedding vendors fall into:
-              looking handmade, small, or template-based when the offer is actually custom and premium.
+            <p className="text-xl text-gray-600 mb-6 leading-relaxed">
+              Every wedding deserves its perfect signage. The Ever After Edit needed a digital presence as elegant as their creations.
             </p>
-
-            <p>
-              The site needed to feel elevated, refined, and intentional enough to support higher-value
-              wedding projects while making the inquiry process feel curated and professional.
+            <p className="text-lg text-gray-500">
+              The journey: Transform a promising concept into a flourishing brand that attracts discerning couples.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="surface p-8 rounded-2xl border border-neutral-200">
-            <h3 className="mb-6">Project Snapshot</h3>
-
-            <div className="space-y-5 text-sm">
-              {projectStats.map(([label, value]) => (
-                <div
+          <motion.div
+            className="bg-white/70 backdrop-blur-sm p-8 rounded-3xl border border-emerald-200/50 shadow-xl"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
+            <h3 className="text-2xl font-bold text-emerald-700 mb-8 font-serif">PROJECT GARDEN</h3>
+            <div className="space-y-6">
+              {projectStats.map(([label, value], i) => (
+                <motion.div
                   key={label}
-                  className="flex justify-between gap-6 border-b border-neutral-200 pb-3 last:border-0 last:pb-0"
+                  className="flex justify-between items-center p-4 bg-emerald-50/50 rounded-lg border border-emerald-200/30"
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
                 >
-                  <span>{label}</span>
-                  <span className="font-semibold text-neutral-950 text-right">
-                    {value}
-                  </span>
-                </div>
+                  <span className="text-gray-600 font-serif">{label}:</span>
+                  <span className="text-rose-600 font-bold">{value}</span>
+                </motion.div>
               ))}
-
-              <div className="pt-2">
+              <div className="pt-4 border-t border-emerald-200/50">
                 <a
                   href="https://www.everaftereditfl.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm font-semibold text-neutral-950 underline underline-offset-4 hover:opacity-70"
+                  className="text-emerald-600 hover:text-rose-600 transition-colors font-serif"
                 >
-                  www.everaftereditfl.com
+                  www.everaftereditfl.com →
                 </a>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* STRATEGY */}
-      <section className="section section-tight bg-neutral-50">
-        <div className="container-clean">
-          <div className="mb-16 max-w-2xl">
-            <p className="eyebrow mb-4">Strategic Build</p>
-
-            <h2 className="mb-4">
-              We Built a Brand Experience,
-              <br /> Not Just a Website
+      <section className="section bg-gradient-to-br from-rose-50 via-amber-50 to-emerald-50 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-20 left-20 w-40 h-40 bg-rose-200 rounded-full blur-2xl animate-pulse" />
+          <div className="absolute bottom-20 right-20 w-32 h-32 bg-emerald-200 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '0.5s' }} />
+        </div>
+        <div className="container-clean relative z-10">
+          <motion.div
+            className="mb-20 text-center"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+          >
+            <p className="eyebrow-rose mb-8">Strategic Growth</p>
+            <h2 className="text-5xl md:text-6xl font-bold mb-8 leading-tight text-gray-800 font-serif">
+              Nurturing a
+              <span className="block text-emerald-600">Premium Bloom</span>
             </h2>
-
-            <p>
-              The goal was to make the digital experience feel like the type of event work the brand wants to attract:
-              refined, selective, polished, and premium.
+            <p className="text-xl opacity-90 text-gray-600">
+              Like tending a garden, we cultivated an experience of elegance and refinement.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid gap-10 md:grid-cols-3">
+          <div className="grid gap-8 md:grid-cols-3">
             {strategyItems.map((item, index) => (
-              <div
+              <motion.div
                 key={item.title}
-                className="surface p-8 rounded-2xl border border-neutral-200"
+                className="bg-white/60 backdrop-blur-sm p-8 rounded-2xl border border-rose-200/50 shadow-lg"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.2 }}
               >
-                <p className="editorial-number mb-4">0{index + 1}</p>
-
-                <h3 className="mb-3">{item.title}</h3>
-
-                <p className="text-sm">{item.description}</p>
-              </div>
+                <div className="text-4xl font-bold text-rose-500 mb-6 font-serif">
+                  0{index + 1}
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-emerald-700 font-serif">{item.title}</h3>
+                <p className="text-gray-600 leading-relaxed">{item.description}</p>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* WHAT WE BUILT */}
-      <section className="section">
+      <section className="section bg-gradient-to-r from-amber-50 to-rose-50">
         <div className="container-clean grid gap-16 lg:grid-cols-2">
-          <div>
-            <p className="eyebrow mb-4">What We Built</p>
-
-            <h2 className="mb-6">
-              A More Elevated Path From First Impression to Inquiry
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+          >
+            <p className="eyebrow-emerald mb-6">What We Built</p>
+            <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight text-gray-800 font-serif">
+              A Garden of
+              <span className="block text-rose-600">Elegant Signage</span>
             </h2>
-
-            <p className="mb-6">
-              RAH Operations created a cleaner website experience with stronger spacing,
-              visual hierarchy, refined copy, and a more premium service structure.
+            <p className="text-xl text-gray-600 mb-6 leading-relaxed">
+              Every petal, every leaf, every detail crafted with wedding magic in mind.
             </p>
-
-            <p>
-              The site now supports custom signage inquiries through a stronger brand presence,
-              clearer project categories, and a more intentional inquiry flow.
+            <p className="text-lg text-gray-500">
+              From first glance to final inquiry, a journey through refined beauty.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid gap-4">
+          <div className="grid gap-6">
             {buildItems.map((item, index) => (
-              <div
+              <motion.div
                 key={index}
-                className="flex gap-4 border-b border-neutral-200 pb-4"
+                className="flex gap-4 p-4 bg-white/50 rounded-lg border border-emerald-200/30"
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
               >
-                <span className="text-luxury-red font-semibold">
-                  0{index + 1}
+                <span className="text-rose-500 font-bold font-serif text-xl">
+                  {String(index + 1).padStart(2, '0')}
                 </span>
-
-                <p className="text-sm">{item}</p>
-              </div>
+                <p className="text-gray-700 leading-relaxed">{item}</p>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* OUTCOME */}
-      <section className="section section-dark">
-        <div className="container-clean grid gap-16 lg:grid-cols-2 lg:items-center">
-          <div>
-            <p className="eyebrow eyebrow-red mb-4">The Outcome</p>
-
-            <h2 className="text-white mb-6">
-              A More Premium Digital Presence for a More Premium Client
+      <section className="section bg-gradient-to-br from-emerald-100 to-rose-100 text-gray-800 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-rose-200 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-emerald-200 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '0.7s' }} />
+        </div>
+        <div className="container-clean grid gap-16 lg:grid-cols-2 lg:items-center relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <p className="eyebrow-rose mb-6">The Outcome</p>
+            <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight font-serif">
+              A Wedding Brand
+              <span className="block text-emerald-600">in Full Bloom</span>
             </h2>
-
-            <p className="text-neutral-300 mb-6">
-              The new site helps The Ever After Edit feel more refined, more intentional,
-              and more aligned with custom wedding clients who care about design quality.
+            <p className="text-xl text-gray-600 mb-6 leading-relaxed">
+              The Ever After Edit now radiates the elegance their clients deserve. A garden of possibilities awaits.
             </p>
-
-            <p className="text-neutral-300">
-              Instead of feeling like a standard vendor site, the brand now has a digital experience
-              that supports higher perceived value and stronger inquiry confidence.
+            <p className="text-lg text-gray-500">
+              From humble beginnings to flourishing success, one beautiful redesign at a time.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="surface-dark rounded-2xl border border-white/10 p-8">
-            <h3 className="text-white mb-6">The Shift</h3>
-
-            <div className="space-y-6">
-              <div>
-                <p className="eyebrow eyebrow-red mb-2">Before</p>
-                <p className="text-sm text-neutral-300">
+          <motion.div
+            className="bg-white/70 backdrop-blur-sm p-8 rounded-3xl border border-rose-200/50 shadow-xl"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
+            <h3 className="text-2xl font-bold text-rose-600 mb-8 font-serif">THE BLOSSOMING</h3>
+            <div className="space-y-8">
+              <div className="p-6 bg-rose-50 rounded-lg border border-rose-200/50">
+                <p className="eyebrow-rose mb-4">BEFORE</p>
+                <p className="text-gray-600">
                   Risk of looking like a small, template-based wedding vendor instead of a custom premium brand.
                 </p>
               </div>
-
-              <div>
-                <p className="eyebrow eyebrow-red mb-2">After</p>
-                <p className="text-sm text-neutral-300">
+              <div className="text-center text-4xl text-emerald-500 font-bold">🌸</div>
+              <div className="p-6 bg-emerald-50 rounded-lg border border-emerald-200/50">
+                <p className="eyebrow-emerald mb-4">AFTER</p>
+                <p className="text-gray-600">
                   Editorial luxury positioning, stronger inquiry flow, and a more refined brand presentation.
                 </p>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="section">
-        <div className="container-clean text-center">
-          <h2 className="mb-6">
-            Premium Brands Need Premium Digital Experiences
-          </h2>
-
-          <p className="mb-10 max-w-xl mx-auto">
-            If your website makes your business look smaller, cheaper, or less polished than it really is,
-            it is costing you better clients.
-          </p>
-
-          <Button to="/contact">
-            Start a Project
-          </Button>
+      <section className="section bg-gradient-to-r from-rose-50 to-emerald-50">
+        <div className="container-narrow text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <div className="text-6xl mb-8">💐✨</div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-800 font-serif">
+              Ready to Let Your Brand Bloom?
+            </h2>
+            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+              Let's create a digital garden that attracts your dream clients.
+            </p>
+            <Button to="/contact" size="lg" className="bg-emerald-500 text-white hover:bg-emerald-600 font-serif">
+              PLANT YOUR SEED
+            </Button>
+          </motion.div>
         </div>
       </section>
     </>

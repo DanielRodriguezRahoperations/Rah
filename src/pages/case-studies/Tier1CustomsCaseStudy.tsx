@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import SEOHead from '../../components/ui/SEOHead';
 import { absoluteUrl } from '../../utils/url';
 import Button from '../../components/ui/Button';
@@ -47,259 +48,296 @@ const Tier1CustomsCaseStudy = () => {
       />
 
       {/* HERO */}
-      <section className="section section-dark relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.05] bg-[radial-gradient(circle_at_top_left,red,transparent_60%)]" />
+      <section className="relative py-32 lg:py-48 bg-gradient-to-br from-purple-900 via-blue-900 to-black overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-32 h-32 border-2 border-cyan-400 rounded-full animate-spin opacity-20" />
+          <div className="absolute bottom-20 right-20 w-24 h-24 border border-pink-400 rotate-45 animate-pulse opacity-30" />
+          <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-yellow-400 rounded-full blur-xl animate-bounce" />
+        </div>
 
-        <div className="container-clean grid gap-16 lg:grid-cols-2 lg:items-center">
-          <div>
-            <p className="eyebrow eyebrow-red mb-6">
+        <div className="container-clean relative z-10 grid gap-16 lg:grid-cols-2 lg:items-center">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1 }}
+          >
+            <div className="text-sm uppercase tracking-widest text-cyan-400 mb-6 font-mono">
               Case Study — Automotive Customization
-            </p>
-
-            <h1 className="text-white mb-6">
-              Turning Tier 1 Customs Into a Premium Local Automotive Brand
-            </h1>
-
-            <p className="text-lg text-neutral-300 mb-8">
-              A high-conversion website and local SEO foundation built for vehicle wraps,
-              paint protection film, chrome delete, ceramic coating, and high-intent
-              Scottsdale and Phoenix searches.
-            </p>
-
-            <div className="flex flex-wrap gap-4">
-              <Button to="/contact">Start a Project</Button>
-
-              <Button href="https://www.tier1customs.com" variant="outline">
-                View Live Website
-              </Button>
             </div>
-          </div>
+            <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-8 leading-tight font-mono">
+              Tier 1
+              <span className="block text-cyan-400">Customs</span>
+              <span className="block text-pink-400 text-4xl">NEON ERA</span>
+            </h1>
+            <p className="text-xl text-gray-300 mb-12 leading-relaxed">
+              High-octane website design for Scottsdale's premier automotive customization studio. Where pixel meets piston.
+            </p>
+
+            <motion.div
+              className="flex gap-6 flex-wrap"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <Button to="/contact" size="lg" className="bg-cyan-500 text-black hover:bg-cyan-400 border border-cyan-500 font-mono">
+                INITIATE PROJECT
+              </Button>
+              <Button href="https://www.tier1customs.com" variant="outline" size="lg" className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black font-mono">
+                VIEW MATRIX
+              </Button>
+            </motion.div>
+          </motion.div>
 
           {/* MOCKUP PANEL */}
-          <div className="relative">
-            <div className="surface-dark rounded-2xl border border-white/10 p-6 shadow-2xl">
-              <div className="rounded-xl overflow-hidden border border-white/10 bg-black">
-                <div className="h-6 bg-neutral-900 flex items-center px-3 gap-2">
-                  <span className="w-2 h-2 rounded-full bg-red-500" />
-                  <span className="w-2 h-2 rounded-full bg-yellow-500" />
-                  <span className="w-2 h-2 rounded-full bg-green-500" />
+          <motion.div
+            className="relative"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, delay: 0.2 }}
+          >
+            <div className="bg-gradient-to-br from-gray-900 to-black p-8 rounded-3xl border-2 border-cyan-400/50 shadow-2xl relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-pink-500/10" />
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="w-3 h-3 bg-red-500 rounded-full" />
+                  <div className="w-3 h-3 bg-yellow-500 rounded-full" />
+                  <div className="w-3 h-3 bg-green-500 rounded-full" />
                 </div>
 
-                <div className="p-6">
-                  <div className="mb-6">
-                    <div className="h-4 w-24 bg-red-600 rounded mb-4" />
-                    <div className="h-8 w-3/4 bg-neutral-700 rounded mb-3" />
-                    <div className="h-4 w-1/2 bg-neutral-800 rounded" />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="h-28 rounded-lg bg-neutral-900 border border-white/10" />
-                    <div className="h-28 rounded-lg bg-neutral-900 border border-white/10" />
-                  </div>
-
-                  <div className="mt-5 h-10 w-36 rounded bg-red-600" />
+                <div className="space-y-4 mb-8">
+                  <div className="h-6 bg-gradient-to-r from-cyan-400 to-pink-400 rounded" />
+                  <div className="h-4 bg-gray-700 rounded w-3/4" />
+                  <div className="h-4 bg-gray-800 rounded w-1/2" />
                 </div>
+
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="h-20 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg border border-cyan-400/30" />
+                  <div className="h-20 bg-gradient-to-br from-pink-600 to-red-600 rounded-lg border border-pink-400/30" />
+                </div>
+
+                <div className="h-12 bg-gradient-to-r from-cyan-500 to-pink-500 rounded-lg" />
               </div>
             </div>
-
-            <div className="absolute -bottom-6 -right-6 h-40 w-40 bg-red-600 blur-[120px] opacity-40" />
-          </div>
+            <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-cyan-500 rounded-full blur-2xl opacity-50 animate-pulse" />
+          </motion.div>
         </div>
       </section>
 
       {/* PROJECT SNAPSHOT */}
-      <section className="section">
+      <section className="section bg-gray-900 text-white">
         <div className="container-clean grid gap-16 lg:grid-cols-2">
-          <div>
-            <p className="eyebrow mb-4">The Challenge</p>
-
-            <h2 className="mb-6">
-              The Brand Needed to Look as Premium as the Work
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <p className="eyebrow-cyan mb-6">The Challenge</p>
+            <h2 className="text-5xl md:text-6xl font-bold mb-8 leading-tight">
+              From Garage to
+              <span className="block text-cyan-400">Cyber Garage</span>
             </h2>
-
-            <p className="mb-6">
-              Tier 1 Customs needed more than a basic online presence. The business needed a
-              website that could instantly communicate quality, trust, and serious automotive
-              expertise.
+            <p className="text-xl text-gray-300 mb-6 leading-relaxed">
+              Tier 1 Customs needed a digital presence that matched their high-end automotive craftsmanship. No more basic websites.
             </p>
-
-            <p>
-              The problem was simple: in a competitive local market, a weak website makes even
-              great work look average. The site had to position Tier 1 Customs as a premium
-              provider while also supporting local SEO for Scottsdale and Phoenix searches.
+            <p className="text-lg text-gray-400">
+              The mission: Create a retro-futuristic interface that screams premium customization while dominating local search.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="surface p-8 rounded-2xl border border-neutral-200">
-            <h3 className="mb-6">Project Snapshot</h3>
-
-            <div className="space-y-5 text-sm">
-              {projectStats.map(([label, value]) => (
-                <div
+          <motion.div
+            className="bg-gradient-to-br from-gray-800 to-black p-8 rounded-3xl border border-cyan-400/30"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
+            <h3 className="text-2xl font-bold text-cyan-400 mb-8 font-mono">PROJECT MATRIX</h3>
+            <div className="space-y-6">
+              {projectStats.map(([label, value], i) => (
+                <motion.div
                   key={label}
-                  className="flex justify-between gap-6 border-b border-neutral-200 pb-3 last:border-0 last:pb-0"
+                  className="flex justify-between items-center p-4 bg-gray-900/50 rounded-lg border border-gray-700"
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
                 >
-                  <span>{label}</span>
-                  <span className="font-semibold text-neutral-950 text-right">
-                    {value}
-                  </span>
-                </div>
+                  <span className="text-gray-400 font-mono">{label}:</span>
+                  <span className="text-cyan-400 font-bold">{value}</span>
+                </motion.div>
               ))}
-
-              <div className="pt-2">
+              <div className="pt-4 border-t border-gray-700">
                 <a
                   href="https://www.tier1customs.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm font-semibold text-neutral-950 underline underline-offset-4 hover:opacity-70"
+                  className="text-cyan-400 hover:text-pink-400 transition-colors font-mono"
                 >
-                  www.tier1customs.com
+                  www.tier1customs.com →
                 </a>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* STRATEGY */}
-      <section className="section section-tight bg-neutral-50">
-        <div className="container-clean">
-          <div className="mb-16 max-w-2xl">
-            <p className="eyebrow mb-4">Strategic Build</p>
-
-            <h2 className="mb-4">
-              We Did Not Just Make It Look Better.
-              <br /> We Rebuilt the Website Around Intent.
+      <section className="section bg-gradient-to-r from-purple-900 to-blue-900 text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-20 left-20 w-40 h-40 border border-cyan-400 rounded-full animate-spin" />
+          <div className="absolute bottom-20 right-20 w-32 h-32 border border-pink-400 rotate-45 animate-pulse" />
+        </div>
+        <div className="container-clean relative z-10">
+          <motion.div
+            className="mb-20 text-center"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+          >
+            <p className="eyebrow-pink mb-8">Strategic Build</p>
+            <h2 className="text-6xl md:text-7xl font-bold mb-8 leading-tight">
+              Rebuilding the
+              <span className="block text-cyan-400">Digital Engine</span>
             </h2>
-
-            <p>
-              The goal was to create a structure that made sense for both users and search engines.
+            <p className="text-xl opacity-90">
+              Code meets chrome in this high-performance redesign.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid gap-10 md:grid-cols-3">
+          <div className="grid gap-8 md:grid-cols-3">
             {strategyItems.map((item, index) => (
-              <div
+              <motion.div
                 key={item.title}
-                className="surface p-8 rounded-2xl border border-neutral-200"
+                className="bg-black/30 backdrop-blur-sm p-8 rounded-2xl border border-cyan-400/30"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.2 }}
               >
-                <p className="editorial-number mb-4">
+                <div className="text-5xl font-bold text-pink-400 mb-6 font-mono">
                   0{index + 1}
-                </p>
-
-                <h3 className="mb-3">{item.title}</h3>
-
-                <p className="text-sm">
-                  {item.description}
-                </p>
-              </div>
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-cyan-400">{item.title}</h3>
+                <p className="text-gray-300 leading-relaxed">{item.description}</p>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* WHAT WE BUILT */}
-      <section className="section">
+      <section className="section bg-black text-white">
         <div className="container-clean grid gap-16 lg:grid-cols-2">
-          <div>
-            <p className="eyebrow mb-4">What We Built</p>
-
-            <h2 className="mb-6">
-              A Website Structured for Premium Services and Local Search
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+          >
+            <p className="eyebrow-cyan mb-6">What We Built</p>
+            <h2 className="text-5xl md:text-6xl font-bold mb-8 leading-tight">
+              Premium Services
+              <span className="block text-pink-400">in Neon</span>
             </h2>
-
-            <p className="mb-6">
-              RAH Operations created a cleaner digital structure around the services customers
-              actually search for: vehicle wraps, paint protection film, chrome delete,
-              ceramic coating, and related customization services.
+            <p className="text-xl text-gray-300 mb-6 leading-relaxed">
+              A website that turns automotive customization into a digital art form.
             </p>
-
-            <p>
-              The finished site gives Tier 1 Customs a stronger sales asset, clearer service
-              hierarchy, and a better foundation for long-term local SEO growth.
+            <p className="text-lg text-gray-400">
+              Every service page optimized for search, every pixel engineered for trust.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid gap-4">
+          <div className="grid gap-6">
             {buildItems.map((item, index) => (
-              <div
+              <motion.div
                 key={index}
-                className="flex gap-4 border-b border-neutral-200 pb-4"
+                className="flex gap-4 p-4 bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg border border-cyan-400/20"
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
               >
-                <span className="text-luxury-red font-semibold">
-                  0{index + 1}
+                <span className="text-cyan-400 font-bold font-mono text-xl">
+                  {String(index + 1).padStart(2, '0')}
                 </span>
-
-                <p className="text-sm">
-                  {item}
-                </p>
-              </div>
+                <p className="text-gray-300 leading-relaxed">{item}</p>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* OUTCOME */}
-      <section className="section section-dark">
-        <div className="container-clean grid gap-16 lg:grid-cols-2 lg:items-center">
-          <div>
-            <p className="eyebrow eyebrow-red mb-4">The Outcome</p>
-
-            <h2 className="text-white mb-6">
-              A Stronger Website That Matches the Quality of the Brand
+      <section className="section bg-gradient-to-br from-cyan-900 to-purple-900 text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 border-2 border-pink-400 rounded-full animate-spin" />
+          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 border border-cyan-400 rotate-45 animate-pulse" />
+        </div>
+        <div className="container-clean grid gap-16 lg:grid-cols-2 lg:items-center relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <p className="eyebrow-pink mb-6">The Outcome</p>
+            <h2 className="text-5xl md:text-6xl font-bold mb-8 leading-tight">
+              Automotive
+              <span className="block text-cyan-400">Excellence</span>
+              <span className="block text-pink-400 text-3xl">DIGITIZED</span>
             </h2>
-
-            <p className="text-neutral-300 mb-6">
-              The new website gives Tier 1 Customs a more premium online presence,
-              stronger service positioning, and a better structure for local search visibility.
+            <p className="text-xl text-gray-300 mb-6 leading-relaxed">
+              Tier 1 Customs now has a website that matches their craftsmanship. Premium, powerful, unforgettable.
             </p>
-
-            <p className="text-neutral-300">
-              Instead of looking like another local automotive shop, the brand now has a site
-              that supports trust, authority, and serious buyer intent.
+            <p className="text-lg text-gray-400">
+              From basic shop to digital powerhouse in one rebuild.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="surface-dark rounded-2xl border border-white/10 p-8">
-            <h3 className="text-white mb-6">
-              The Shift
-            </h3>
-
-            <div className="space-y-6">
-              <div>
-                <p className="eyebrow eyebrow-red mb-2">Before</p>
-                <p className="text-sm text-neutral-300">
+          <motion.div
+            className="bg-black/50 backdrop-blur-sm p-8 rounded-3xl border border-pink-400/50"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
+            <h3 className="text-2xl font-bold text-pink-400 mb-8 font-mono">THE TRANSFORMATION</h3>
+            <div className="space-y-8">
+              <div className="p-6 bg-red-900/20 rounded-lg border border-red-500/30">
+                <p className="eyebrow-red mb-4">BEFORE</p>
+                <p className="text-gray-300">
                   Basic service presentation with limited authority and less strategic SEO structure.
                 </p>
               </div>
-
-              <div>
-                <p className="eyebrow eyebrow-red mb-2">After</p>
-                <p className="text-sm text-neutral-300">
-                  Premium automotive positioning, clearer service paths, and a stronger foundation
-                  for Scottsdale and Phoenix search visibility.
+              <div className="text-center text-4xl text-cyan-400 font-bold">↓</div>
+              <div className="p-6 bg-green-900/20 rounded-lg border border-green-500/30">
+                <p className="eyebrow-green mb-4">AFTER</p>
+                <p className="text-gray-300">
+                  Premium automotive positioning, clearer service paths, and a stronger foundation for Scottsdale and Phoenix search visibility.
                 </p>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="section">
-        <div className="container-clean text-center">
-          <h2 className="mb-6">
-            Your Website Should Sell Before You Ever Speak
-          </h2>
-
-          <p className="mb-10 max-w-xl mx-auto">
-            If your business relies on local search, trust, and premium presentation,
-            your website cannot look average.
-          </p>
-
-          <Button to="/contact">
-            Start a Project
-          </Button>
+      <section className="section bg-black text-white">
+        <div className="container-narrow text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <div className="text-6xl mb-8">🚗⚡</div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Ready to Upgrade Your Digital Engine?
+            </h2>
+            <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
+              Let's build a website that accelerates your business growth.
+            </p>
+            <Button to="/contact" size="lg" className="bg-cyan-500 text-black hover:bg-cyan-400 font-mono">
+              START PROJECT
+            </Button>
+          </motion.div>
         </div>
       </section>
     </>

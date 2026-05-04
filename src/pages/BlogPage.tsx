@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import SEOHead from '../components/ui/SEOHead';
 import { absoluteUrl } from '../utils/url';
 
@@ -52,54 +53,101 @@ const BlogPage = () => {
         keywords="business growth insights, website design strategy, SEO insights, local SEO, digital marketing strategy, business setup"
       />
 
-      <section className="section">
-        <div className="container-clean max-w-4xl">
-          <p className="eyebrow mb-6">Insights</p>
-
-          <h1 className="mb-6 text-balance">
-            Strategy Notes for Businesses That Want to Look Sharper, Rank Better, and Convert More Leads.
-          </h1>
-
-          <p className="max-w-2xl text-lg">
-            Practical thinking on website design, SEO, business structure, reputation, and the systems that make a business look credible before the first conversation.
-          </p>
+      {/* HERO */}
+      <section className="section bg-gradient-to-br from-stone-50 to-white relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-slate-800 to-slate-600" />
+        <div className="container-clean max-w-5xl py-20">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+          >
+            <div className="text-sm uppercase tracking-widest text-slate-600 mb-6 font-medium">
+              Strategic Insights
+            </div>
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif-display font-bold text-slate-900 mb-8 leading-tight">
+              Business
+              <span className="block text-slate-700">Intelligence</span>
+            </h1>
+            <p className="text-xl md:text-2xl text-slate-700 font-serif-body leading-relaxed max-w-3xl">
+              Practical frameworks for businesses that demand precision, credibility, and measurable results in the digital landscape.
+            </p>
+          </motion.div>
         </div>
       </section>
 
-      <section className="section border-t border-neutral-200">
-        <div className="container-clean">
-          <div className="grid gap-5">
-            {posts.map((post) => (
-              <article
+      {/* ARTICLES */}
+      <section className="section bg-white">
+        <div className="container-clean max-w-6xl">
+          <div className="grid gap-12">
+            {posts.map((post, i) => (
+              <motion.article
                 key={post.slug}
-                className="card-clean hover-lift grid gap-8 p-8 md:p-10 lg:grid-cols-[1fr_auto] lg:items-center"
+                className="group border-b border-slate-200 pb-12 last:border-b-0"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
               >
-                <div>
-                  <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-neutral-500">
-                    {post.category} / {post.date}
-                  </p>
+                <div className="grid lg:grid-cols-3 gap-8 items-start">
+                  <div className="lg:col-span-2">
+                    <div className="flex items-center gap-4 mb-6">
+                      <span className="text-xs uppercase tracking-wider text-slate-500 font-medium">
+                        {post.category}
+                      </span>
+                      <span className="text-slate-400">•</span>
+                      <span className="text-xs text-slate-500">
+                        {post.date}
+                      </span>
+                    </div>
 
-                  <h2 className="mb-4 text-2xl md:text-3xl">
-                    {post.displayTitle}
-                  </h2>
+                    <h2 className="text-3xl md:text-4xl font-serif-display font-bold text-slate-900 mb-6 leading-tight group-hover:text-slate-700 transition-colors">
+                      {post.displayTitle}
+                    </h2>
 
-                  <p className="max-w-2xl">
-                    {post.excerpt}
-                  </p>
+                    <p className="text-lg text-slate-600 font-serif-body leading-relaxed mb-8 max-w-2xl">
+                      {post.excerpt}
+                    </p>
+
+                    <Link
+                      to={`/blogs/${post.slug}`}
+                      className="inline-flex items-center gap-2 text-slate-900 font-medium hover:text-slate-700 transition-colors group"
+                    >
+                      <span>Read Full Article</span>
+                      <span className="transform group-hover:translate-x-1 transition-transform">→</span>
+                    </Link>
+                  </div>
+
+                  <div className="lg:col-span-1">
+                    <div className="bg-slate-100 h-48 rounded-lg flex items-center justify-center text-slate-400 text-sm font-medium">
+                      Article Preview
+                    </div>
+                  </div>
                 </div>
-
-                <div className="flex lg:justify-end">
-                  <Link
-                    to={`/blogs/${post.slug}`}
-                    aria-label={`Read article: ${post.title}`}
-                    className="inline-flex border border-neutral-950 px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-950 transition-all duration-300 hover:bg-neutral-950 hover:text-white"
-                  >
-                    Read Article
-                  </Link>
-                </div>
-              </article>
+              </motion.article>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="section bg-slate-900 text-white">
+        <div className="container-narrow text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl md:text-5xl font-serif-display font-bold mb-6">
+              Stay Informed
+            </h2>
+            <p className="text-lg font-serif-body mb-8 max-w-xl mx-auto opacity-90">
+              Subscribe for weekly insights on business growth, digital strategy, and market positioning.
+            </p>
+            <button className="bg-white text-slate-900 px-8 py-3 font-medium hover:bg-slate-100 transition-colors">
+              Subscribe to Updates
+            </button>
+          </motion.div>
         </div>
       </section>
     </>

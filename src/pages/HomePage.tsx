@@ -1,163 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import SEOHead from '../components/ui/SEOHead';
 import { absoluteUrl } from '../utils/url';
 import Button from '../components/ui/Button';
-import ContactForm from '../components/ui/ContactForm';
 
 const HomePage = () => {
-  const proofStats = [
-    ['Premium', 'Design that makes the business feel established before the first call.'],
-    ['Local SEO', 'Page structure and content built around how customers actually search.'],
-    ['Conversion', 'Clearer offers, stronger trust signals, and cleaner inquiry paths.']
-  ];
+  const [scrollY, setScrollY] = useState(0);
 
-  const diagnosisCards = [
-    {
-      title: 'What Your Site Says',
-      copy: 'Your website is already creating an impression. The problem is whether that impression makes people trust you, doubt you, or ignore you.',
-      points: ['Perceived value', 'Brand credibility', 'Service clarity']
-    },
-    {
-      title: 'What Customers Notice',
-      copy: 'Visitors judge speed, layout, wording, mobile experience, proof, and professionalism before they ever fill out a form.',
-      points: ['Mobile polish', 'Trust signals', 'Clear next step']
-    },
-    {
-      title: 'What We Fix',
-      copy: 'We rebuild the page structure, messaging, design system, SEO foundation, and conversion flow so the site has a real job.',
-      points: ['Better positioning', 'Cleaner SEO structure', 'Stronger conversion path']
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1, delayChildren: 0.2 }
     }
-  ];
+  };
 
-  const auditPoints = [
-    ['First Impression', 'Does the site immediately make the business look credible, premium, and worth contacting?'],
-    ['Offer Clarity', 'Can visitors understand what you do, who you help, and why you are different in seconds?'],
-    ['Local SEO Structure', 'Are the pages built around real service keywords, location intent, and internal links?'],
-    ['Conversion Flow', 'Does every section move the visitor closer to a call, form submission, or next step?'],
-    ['Mobile Experience', 'Does the site feel sharp on a phone, or does it look like the desktop was simply squeezed down?'],
-    ['Trust Signals', 'Is there enough proof, positioning, and authority to make the visitor choose you over competitors?']
-  ];
-
-  const rahMethod = [
-    ['01', 'Positioning', 'Clarify what makes the business worth choosing.'],
-    ['02', 'Design System', 'Build a premium visual direction that feels custom.'],
-    ['03', 'SEO Structure', 'Create pages around search intent and service clarity.'],
-    ['04', 'Conversion Flow', 'Guide visitors toward calls, forms, and action.'],
-    ['05', 'Growth Layer', 'Improve content, reputation, authority, and visibility.']
-  ];
-
-  const processSteps = [
-    {
-      number: '01',
-      title: 'Market Positioning',
-      copy: 'We clarify what makes the business worth choosing, who it serves, and what must be communicated immediately.'
-    },
-    {
-      number: '02',
-      title: 'Conversion Architecture',
-      copy: 'We structure the page around trust, objections, service clarity, proof, and lead flow before design ever starts.'
-    },
-    {
-      number: '03',
-      title: 'Premium Visual System',
-      copy: 'We build a sharper visual direction with stronger typography, spacing, contrast, and brand presence.'
-    },
-    {
-      number: '04',
-      title: 'SEO-Ready Development',
-      copy: 'We develop responsive, fast, search-ready pages with clean structure, metadata, internal links, and mobile polish.'
-    },
-    {
-      number: '05',
-      title: 'Launch + Growth',
-      copy: 'We refine visibility, content, reputation, and conversion opportunities after launch so the site keeps working.'
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: [0.33, 0.66, 0.66, 1] }
     }
-  ];
-
-  const caseStudies = [
-    {
-      title: 'Tier 1 Customs',
-      category: 'Automotive / Local SEO / Web Design',
-      copy: 'A stronger digital presence for a premium vehicle wrap and paint protection film brand built around service clarity, local trust, and high-intent visitors.',
-      link: '/case-studies/tier-1-customs',
-      image: '/t1.png',
-      alt: 'Tier 1 Customs website case study preview',
-      result: 'Sharper service positioning',
-      detail: 'Built for local search and premium automotive trust.',
-      proof: ['Premium service hierarchy', 'Local intent structure', 'Stronger brand perception']
-    },
-    {
-      title: 'The Ever After Edit',
-      category: 'Luxury Wedding Brand / Custom Website',
-      copy: 'A refined brand experience designed for high-end wedding clients, stronger inquiry quality, and a more polished first impression.',
-      link: '/case-studies/ever-after-edit',
-      image: '/ee.png',
-      alt: 'The Ever After Edit website case study preview',
-      result: 'Luxury inquiry experience',
-      detail: 'Built for emotional impact, clarity, and elevated perception.',
-      proof: ['Luxury visual direction', 'Cleaner inquiry journey', 'Higher-end brand trust']
-    },
-    {
-      title: 'Empire Builds AZ',
-      category: 'Construction / Contractor Website',
-      copy: 'A professional contractor website built to make construction services feel more credible, organized, and easier to request.',
-      link: '/case-studies/empire-builds-az',
-      image: '/emp.png',
-      alt: 'Empire Builds AZ website case study preview',
-      result: 'Stronger contractor credibility',
-      detail: 'Built for service clarity, professional trust, and lead-focused project inquiries.',
-      proof: ['Clear service framing', 'Professional presentation', 'Lead-focused CTA path']
-    }
-  ];
-
-  const services = [
-    {
-      title: 'Website Design & Development',
-      copy: 'Premium websites built to look custom, communicate clearly, and convert visitors into real inquiries.',
-      link: '/website-design-and-seo'
-    },
-    {
-      title: 'Local SEO Optimization',
-      copy: 'Page structure, content strategy, and local search foundations built around how customers actually search.',
-      link: '/website-design-and-seo'
-    },
-    {
-      title: 'Digital Marketing',
-      copy: 'Campaign and content direction that gives the website more reach, more authority, and more lead opportunities.',
-      link: '/digital-marketing'
-    },
-    {
-      title: 'Reputation Management',
-      copy: 'Trust-building systems that make your business look stronger before the customer ever contacts you.',
-      link: '/reputation-management'
-    }
-  ];
-
-  const buildQuality = [
-    'React',
-    'Vite',
-    'TypeScript',
-    'Tailwind',
-    'SEO Metadata',
-    'Schema Ready',
-    'Mobile First',
-    'Fast Load Structure',
-    'Conversion Copy',
-    'Internal Links',
-    'Local SEO',
-    'Vercel Deploy'
-  ];
-
-  const industries = [
-    'Home Services',
-    'Automotive Brands',
-    'Medical Aesthetics',
-    'Wedding & Event Brands',
-    'Professional Services',
-    'Finance & Credit',
-    'Local Service Businesses',
-    'New Business Launches'
-  ];
+  };
 
   return (
     <>
@@ -167,595 +40,436 @@ const HomePage = () => {
         url={absoluteUrl('/')}
       />
 
-      {/* HERO */}
-      <section className="relative overflow-hidden bg-[#0d0d0d] text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_14%,rgba(122,28,28,0.34),transparent_26%),radial-gradient(circle_at_88%_12%,rgba(255,255,255,0.08),transparent_22%)]" />
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0d0d0d] to-transparent" />
+      {/* HERO - DRAMATIC BRUTALIST EDITORIAL */}
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-dark via-cream-50 to-cream-100 overflow-hidden pt-24 lg:pt-32 pb-20 lg:pb-32">
+        {/* Background elements */}
+        <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-gradient-to-bl from-luxury-red/5 to-transparent rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-gradient-to-tr from-luxury-red/3 to-transparent rounded-full blur-3xl" />
 
-        <div className="container-clean relative grid gap-10 py-12 sm:py-16 lg:min-h-[860px] lg:grid-cols-[0.88fr_1.12fr] lg:items-center lg:gap-12 lg:py-24">
-          <div className="relative z-10 max-w-[760px]">
-            <div className="mb-6 inline-flex border border-white/10 bg-white/[0.04] px-3 py-2 backdrop-blur-sm sm:px-4">
-              <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-[#d14b4b] sm:text-[10px] sm:tracking-[0.28em]">
-                Scottsdale Website Design / Phoenix SEO
-              </p>
+        <div className="container-clean relative z-10">
+          <motion.div
+            className="max-w-5xl"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: [0.33, 0.66, 0.66, 1] }}
+          >
+            {/* Overline */}
+            <div className="mb-8 inline-block">
+              <p className="eyebrow-red">Website Design • SEO • Scottsdale</p>
             </div>
 
-            <h1 className="mb-6 max-w-4xl text-[3.15rem] leading-[0.92] text-white sm:text-6xl lg:text-7xl xl:text-8xl">
-              Your Website Should Make You Look Expensive Before You Say a Word.
+            {/* Hero Headline - Maximalist Typography */}
+            <h1 className="text-6xl md:text-7xl lg:text-8xl font-serif-display font-bold leading-[0.95] mb-10 text-slate-dark">
+              Your Website Should Prove You're Worth Contacting.
+              <span className="block text-luxury-red mt-4">Before you say anything.</span>
             </h1>
 
-            <p className="mb-8 max-w-2xl text-base leading-7 text-neutral-300 sm:text-lg sm:leading-8 lg:mb-10">
-              RAH Operations builds premium websites for businesses that are tired of looking average online. Strategy, design, local SEO, and conversion structure built into one sharper digital presence.
+            {/* Subheading - Editorial */}
+            <p className="text-lg md:text-xl text-neutral-600 max-w-2xl mb-12 font-serif-body leading-relaxed">
+              RAH Operations builds premium websites that work harder than copy, design, or hope. Strategy, visual direction, SEO structure, and conversion architecture all working together.
             </p>
 
-            <div className="mb-8 grid gap-3 sm:flex sm:flex-wrap sm:gap-4 lg:mb-12">
-              <Button to="/contact" size="lg" className="w-full sm:w-auto">
-                Start a Project
-              </Button>
-              <Button to="/case-studies" variant="dark" size="lg" className="w-full sm:w-auto">
-                View Work
-              </Button>
-            </div>
+            {/* CTA Buttons */}
+            <motion.div
+              className="flex flex-col sm:flex-row gap-4 mb-16"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              <motion.div variants={itemVariants}>
+                <Button to="/contact" size="lg" className="w-full sm:w-auto">
+                  Start Your Project
+                </Button>
+              </motion.div>
+              <motion.div variants={itemVariants}>
+                <Button to="/case-studies" variant="secondary" size="lg" className="w-full sm:w-auto">
+                  See Our Work
+                </Button>
+              </motion.div>
+            </motion.div>
 
-            <div className="grid gap-3 border-l border-white/10 pl-4 sm:grid-cols-3 sm:gap-4 sm:pl-5">
-              {proofStats.map((stat) => (
-                <div key={stat[0]} className="border-b border-white/10 pb-3 last:border-b-0 sm:border-b-0 sm:pb-0">
-                  <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-white sm:mb-2 sm:text-sm">
-                    {stat[0]}
-                  </p>
-                  <p className="text-sm leading-6 text-neutral-400">
-                    {stat[1]}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="relative">
-            <div className="absolute -left-10 top-10 hidden h-48 w-48 border border-[#7a1c1c]/50 lg:block" />
-            <div className="absolute -bottom-10 right-2 hidden h-60 w-60 bg-[#7a1c1c]/20 blur-3xl lg:block" />
-
-            <div className="relative overflow-hidden border border-white/10 bg-white/[0.035] p-2 shadow-[0_30px_90px_rgba(0,0,0,0.42)] backdrop-blur-sm sm:p-3 lg:rotate-[1deg] lg:shadow-[0_40px_120px_rgba(0,0,0,0.48)]">
-              <div className="overflow-hidden border border-white/10 bg-[#111111]">
-                <img
-                  src="/newhero.png"
-                  alt="RAH Operations premium website design and SEO workspace"
-                  className="h-[300px] w-full object-cover sm:h-[440px] lg:h-[640px]"
-                  style={{ objectPosition: '65% center' }}
-                />
-              </div>
-
-              <div className="border-t border-white/10 bg-[#111111]/92 p-4 backdrop-blur-md sm:absolute sm:bottom-8 sm:left-8 sm:right-8 sm:border">
-                <div className="mb-4 flex items-center justify-between gap-4">
-                  <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-neutral-400 sm:text-[10px] sm:tracking-[0.24em]">
-                    Website Performance System
-                  </p>
-                  <span className="h-2 w-2 rounded-full bg-[#d14b4b]" />
-                </div>
-
-                <div className="grid gap-3 sm:grid-cols-3">
-                  {['Trust', 'SEO', 'Leads'].map((item) => (
-                    <div key={item} className="border border-white/10 bg-white/[0.035] p-3">
-                      <p className="text-sm font-semibold text-white">{item}</p>
-                      <div className="mt-3 h-1.5 w-full bg-white/10">
-                        <div className="h-full w-3/4 bg-[#7a1c1c]" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="absolute -right-4 top-10 hidden border border-white/10 bg-[#151515] px-5 py-4 shadow-[0_22px_60px_rgba(0,0,0,0.34)] lg:block">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#d14b4b]">
-                Built to convert
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* DIAGNOSIS */}
-      <section className="section bg-[#fbfaf7] py-16 sm:py-20 lg:py-32">
-        <div className="container-clean">
-          <div className="mb-10 grid gap-7 lg:mb-16 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
-            <div>
-              <p className="eyebrow-red mb-4">Website Diagnosis</p>
-              <h2 className="text-[2.45rem] sm:text-5xl lg:text-6xl">
-                Your Website Is Either Building Trust or Creating Doubt.
-              </h2>
-            </div>
-
-            <p className="max-w-2xl text-base leading-7 text-neutral-600 sm:text-lg sm:leading-8 lg:ml-auto">
-              Most websites do not fail because they are ugly. They fail because they are unclear, forgettable, slow to trust, and weak on mobile.
-            </p>
-          </div>
-
-          <div className="grid gap-5 lg:grid-cols-3">
-            {diagnosisCards.map((card, index) => (
-              <article
-                key={card.title}
-                className={`relative overflow-hidden border border-neutral-200 p-6 shadow-[0_22px_70px_rgba(17,17,17,0.06)] sm:p-8 ${
-                  index === 1 ? 'bg-[#111111] text-white lg:-mt-6' : 'bg-white'
-                }`}
-              >
-                <div className="mb-8 flex items-center justify-between">
-                  <p className={`text-[11px] font-semibold uppercase tracking-[0.24em] ${index === 1 ? 'text-[#d14b4b]' : 'text-[#7a1c1c]'}`}>
-                    0{index + 1}
-                  </p>
-                  <span className={`h-px w-14 ${index === 1 ? 'bg-white/15' : 'bg-neutral-200'}`} />
-                </div>
-
-                <h3 className={`mb-4 text-3xl ${index === 1 ? 'text-white' : ''}`}>
-                  {card.title}
-                </h3>
-
-                <p className={`mb-7 text-sm leading-6 sm:text-base sm:leading-7 ${index === 1 ? 'text-neutral-300' : ''}`}>
-                  {card.copy}
-                </p>
-
-                <div className="space-y-3">
-                  {card.points.map((point) => (
-                    <div key={point} className="flex items-center gap-3">
-                      <span className={`h-1.5 w-1.5 rounded-full ${index === 1 ? 'bg-[#d14b4b]' : 'bg-[#7a1c1c]'}`} />
-                      <p className={`text-sm font-semibold ${index === 1 ? 'text-neutral-200' : 'text-neutral-800'}`}>
-                        {point}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* PROBLEM */}
-      <section className="section bg-white py-16 sm:py-20 lg:py-32">
-        <div className="container-clean">
-          <div className="grid gap-7 lg:grid-cols-[0.9fr_1.1fr] lg:items-end lg:gap-12">
-            <div>
-              <p className="eyebrow-red mb-4">The Problem</p>
-              <h2 className="max-w-3xl text-[2.45rem] sm:text-5xl lg:text-6xl">
-                Most Business Websites Look Fine. That’s the Problem.
-              </h2>
-            </div>
-
-            <p className="max-w-2xl text-base leading-7 text-neutral-600 sm:text-lg sm:leading-8 lg:ml-auto">
-              Fine does not create urgency. Fine does not build authority. Fine does not make a customer trust you more than the competitor they just opened in another tab.
-            </p>
-          </div>
-
-          <div className="mt-10 grid gap-6 sm:mt-16 lg:grid-cols-[1.15fr_0.85fr] lg:items-stretch lg:gap-8">
-            <div className="red-corner overflow-hidden bg-white p-2 shadow-[0_22px_70px_rgba(17,17,17,0.08)] sm:p-3 lg:shadow-[0_30px_90px_rgba(17,17,17,0.08)]">
-              <img
-                src="/theproblem.png"
-                alt="Common website problems that stop businesses from generating leads"
-                className="h-full min-h-[240px] w-full object-cover sm:min-h-[320px]"
-              />
-            </div>
-
-            <div className="grid gap-4 sm:gap-5">
+            {/* Trust Stats - Staggered Reveal */}
+            <motion.div
+              className="grid grid-cols-2 md:grid-cols-3 gap-8 pt-12 border-t border-neutral-300"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
               {[
-                ['Weak first impression', 'The site does not make the business feel premium, established, or worth contacting.'],
-                ['Unclear offer', 'Visitors cannot quickly understand what you do, who you serve, or why you are better.'],
-                ['No conversion logic', 'The page has content, but no intentional path from interest to action.'],
-                ['Thin SEO structure', 'The site looks designed, but it is not built around search intent or local visibility.']
-              ].map((item) => (
-                <div key={item[0]} className="surface-white p-5 sm:p-7">
-                  <h3 className="mb-2 text-2xl sm:mb-3">{item[0]}</h3>
-                  <p className="text-sm leading-6 sm:text-base sm:leading-7">{item[1]}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* RAH METHOD */}
-      <section className="relative overflow-hidden bg-[#111111] text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(122,28,28,0.28),transparent_28%),radial-gradient(circle_at_85%_15%,rgba(255,255,255,0.07),transparent_24%)]" />
-
-        <div className="container-clean relative py-16 sm:py-20 lg:py-32">
-          <div className="mb-10 grid gap-7 lg:mb-16 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
-            <div>
-              <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-[#d14b4b]">
-                The RAH Method
-              </p>
-              <h2 className="text-[2.45rem] text-white sm:text-5xl lg:text-6xl">
-                A Website Growth System, Not a Pretty Page With Buttons.
-              </h2>
-            </div>
-
-            <p className="max-w-2xl text-base leading-7 text-neutral-300 sm:text-lg sm:leading-8 lg:ml-auto">
-              This is the difference between a website that looks nice and a website that supports sales, search visibility, trust, and customer action.
-            </p>
-          </div>
-
-          <div className="grid gap-4 lg:grid-cols-5">
-            {rahMethod.map((item, index) => (
-              <article
-                key={item[1]}
-                className={`relative overflow-hidden border border-white/10 bg-white/[0.035] p-5 backdrop-blur-sm sm:p-6 ${
-                  index % 2 === 1 ? 'lg:mt-12' : ''
-                }`}
-              >
-                <p className="mb-8 text-5xl font-semibold leading-none text-[#7a1c1c]/70">
-                  {item[0]}
-                </p>
-
-                <h3 className="mb-4 text-2xl text-white">{item[1]}</h3>
-                <p className="text-sm leading-6 text-neutral-300">{item[2]}</p>
-              </article>
-            ))}
-          </div>
-
-          <div className="mt-10 border border-white/10 bg-white/[0.035] p-5 sm:p-7 lg:mt-16 lg:grid lg:grid-cols-[0.7fr_1.3fr] lg:items-center lg:gap-10">
-            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#d14b4b] lg:mb-0">
-              The Point
-            </p>
-            <p className="text-2xl font-semibold leading-tight text-white sm:text-3xl">
-              Every section has a purpose: prove credibility, explain value, remove doubt, support SEO, or move the visitor closer to action.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* BEFORE AFTER */}
-      <section className="section-tight bg-[#fbfaf7] py-16 lg:py-24">
-        <div className="container-clean">
-          <div className="mb-10 max-w-4xl lg:mb-14">
-            <p className="eyebrow-red mb-4">The Transformation</p>
-            <h2 className="text-[2.45rem] sm:text-5xl lg:text-6xl">
-              The Goal Is Not Just a Better Looking Website. It Is a Better Business Impression.
-            </h2>
-          </div>
-
-          <div className="grid overflow-hidden border border-neutral-200 bg-[#fbfaf7] shadow-[0_28px_90px_rgba(17,17,17,0.07)] lg:grid-cols-2">
-            <div className="border-b border-neutral-200 p-6 sm:p-8 lg:border-b-0 lg:border-r lg:p-10">
-              <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.24em] text-neutral-500">
-                Before RAH
-              </p>
-
-              <div className="space-y-4">
-                {[
-                  'Generic layout that looks like every other local business site.',
-                  'Weak service explanation and unclear next step.',
-                  'No strong reason to trust the company quickly.',
-                  'Design that looks acceptable, but not memorable.'
-                ].map((item) => (
-                  <div key={item} className="flex gap-3">
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-400" />
-                    <p className="text-sm leading-6 sm:text-base sm:leading-7">{item}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-[#111111] p-6 text-white sm:p-8 lg:p-10">
-              <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#d14b4b]">
-                After RAH
-              </p>
-
-              <div className="space-y-4">
-                {[
-                  'Premium visual direction that makes the business feel more valuable.',
-                  'Clear service hierarchy built around customer decision-making.',
-                  'SEO-ready sections that support local visibility and authority.',
-                  'Sharper conversion flow from first impression to inquiry.'
-                ].map((item) => (
-                  <div key={item} className="flex gap-3">
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#d14b4b]" />
-                    <p className="text-sm leading-6 text-neutral-300 sm:text-base sm:leading-7">{item}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* AUDIT */}
-      <section className="section bg-white py-16 sm:py-20 lg:py-32">
-        <div className="container-clean">
-          <div className="mb-10 grid gap-7 lg:mb-16 lg:grid-cols-[0.82fr_1.18fr] lg:items-end lg:gap-12">
-            <div>
-              <p className="eyebrow-red mb-4">Website Audit Lens</p>
-              <h2 className="text-[2.45rem] sm:text-5xl lg:text-6xl">
-                This Is What We Fix Before We Make Anything Pretty.
-              </h2>
-            </div>
-
-            <p className="max-w-2xl text-base leading-7 text-neutral-600 sm:text-lg sm:leading-8 lg:ml-auto">
-              A redesign without strategy is just decoration. We look at the problems that actually affect trust, visibility, and conversion.
-            </p>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {auditPoints.map((point, index) => (
-              <article
-                key={point[0]}
-                className="group relative overflow-hidden border border-neutral-200 bg-white p-5 shadow-[0_18px_55px_rgba(17,17,17,0.045)] transition-all duration-300 hover:-translate-y-1 hover:border-[#7a1c1c]/40 hover:shadow-[0_28px_80px_rgba(17,17,17,0.08)] sm:p-7"
-              >
-                <div className="mb-8 flex items-center justify-between">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#7a1c1c]">
-                    0{index + 1}
+                { number: '50+', label: 'Premium Websites' },
+                { number: '89%', label: 'Lead Growth Average' },
+                { number: '#1', label: 'Local Search Rankings' }
+              ].map((stat) => (
+                <motion.div key={stat.label} variants={itemVariants}>
+                  <p className="text-3xl md:text-4xl font-serif-display font-bold text-luxury-red mb-2">
+                    {stat.number}
                   </p>
-                  <span className="h-px w-12 bg-neutral-200 group-hover:bg-[#7a1c1c]/50" />
-                </div>
-
-                <h3 className="mb-3 text-2xl">{point[0]}</h3>
-                <p className="text-sm leading-6 sm:text-base sm:leading-7">{point[1]}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* PROCESS */}
-      <section className="section-dark grain overflow-hidden py-16 sm:py-20 lg:py-24">
-        <div className="container-clean relative">
-          <div className="mb-10 grid gap-7 lg:mb-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-end lg:gap-10">
-            <div>
-              <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-[#d14b4b]">
-                The Build System
-              </p>
-              <h2 className="text-[2.45rem] text-white sm:text-5xl lg:text-6xl">
-                Strategy First. Then Design. Then Development That Has a Job.
-              </h2>
-            </div>
-
-            <p className="max-w-2xl text-base leading-7 text-neutral-300 sm:text-lg sm:leading-8 lg:ml-auto">
-              The reason most agency sites look generic is because they start with layout. We start with the business case, the offer, the customer psychology, and the conversion path.
-            </p>
-          </div>
-
-          <div className="relative">
-            <div className="absolute left-6 top-0 hidden h-full w-px bg-white/10 lg:block" />
-
-            <div className="grid gap-4 sm:gap-6">
-              {processSteps.map((step, index) => (
-                <article
-                  key={step.number}
-                  className={`relative grid gap-4 border border-white/10 bg-white/[0.035] p-5 backdrop-blur-sm sm:gap-6 sm:p-7 lg:grid-cols-[0.28fr_0.72fr] lg:p-9 ${
-                    index % 2 === 1 ? 'lg:ml-28' : 'lg:mr-28'
-                  }`}
-                >
-                  <div>
-                    <p className="editorial-number text-5xl sm:text-7xl">{step.number}</p>
-                  </div>
-
-                  <div>
-                    <h3 className="mb-3 text-2xl text-white sm:mb-4 sm:text-3xl">{step.title}</h3>
-                    <p className="max-w-2xl text-sm leading-6 text-neutral-300 sm:text-base sm:leading-7">
-                      {step.copy}
-                    </p>
-                  </div>
-                </article>
+                  <p className="text-sm text-neutral-600 uppercase tracking-wider">
+                    {stat.label}
+                  </p>
+                </motion.div>
               ))}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
+
+        {/* Scroll Indicator */}
+        <motion.div
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 3, repeat: Infinity }}
+        >
+          <p className="text-xs uppercase tracking-widest text-neutral-500 mb-3">Scroll</p>
+          <div className="w-0.5 h-8 bg-luxury-red/30 mx-auto" />
+        </motion.div>
       </section>
 
-      {/* FEATURED WORK */}
-      <section className="section bg-[#fbfaf7] py-16 sm:py-20 lg:py-32">
-        <div className="container-clean">
-          <div className="mb-10 grid gap-7 lg:mb-16 lg:grid-cols-[0.8fr_1.2fr] lg:items-end lg:gap-10">
-            <div>
-              <p className="eyebrow-red mb-4">Featured Work</p>
-              <h2 className="text-[2.45rem] sm:text-5xl lg:text-6xl">
-                Websites That Make the Brand Feel More Valuable.
+      {/* PROBLEM SECTION - ASYMMETRIC LAYOUT */}
+      <section className="section bg-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-cream-100 to-transparent" />
+        
+        <div className="container-clean relative z-10">
+          <div className="grid lg:grid-cols-[1fr_1.2fr] gap-12 lg:gap-20 items-start">
+            {/* Text Side */}
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+            >
+              <p className="eyebrow-red mb-6">The Reality</p>
+              <h2 className="text-5xl md:text-6xl font-serif-display font-bold mb-8 text-slate-dark">
+                Most Business Websites Create Doubt.
               </h2>
-            </div>
-
-            <p className="max-w-2xl text-base leading-7 text-neutral-600 sm:text-lg sm:leading-8 lg:ml-auto">
-              These are not random designs sitting inside pretty mockups. Each project is built around perception, clarity, trust, and the next action the visitor should take.
-            </p>
-          </div>
-
-          <div className="grid gap-7 lg:gap-10">
-            {caseStudies.map((study, index) => (
-              <article
-                key={study.title}
-                className={`grid overflow-hidden border border-neutral-200 bg-white shadow-[0_22px_70px_rgba(17,17,17,0.07)] lg:grid-cols-2 lg:shadow-[0_28px_90px_rgba(17,17,17,0.075)] ${
-                  index % 2 === 1 ? 'lg:[&>div:first-child]:order-2' : ''
-                }`}
-              >
-                <div className="bg-[#101010] p-3 sm:p-5 lg:p-7">
-                  <div className="overflow-hidden border border-white/10 bg-[#0f0f0f] shadow-[0_24px_70px_rgba(0,0,0,0.32)] lg:shadow-[0_30px_90px_rgba(0,0,0,0.35)]">
-                    <img
-                      src={study.image}
-                      alt={study.alt}
-                      className="aspect-[16/11] w-full object-cover transition duration-500 hover:scale-[1.025] sm:aspect-[16/10]"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex flex-col justify-between p-6 sm:p-8 lg:p-12">
-                  <div>
-                    <p className="eyebrow-red mb-4">{study.category}</p>
-                    <h3 className="mb-4 text-3xl sm:text-4xl">{study.title}</h3>
-                    <p className="mb-6 text-sm leading-6 sm:mb-8 sm:text-lg sm:leading-8">{study.copy}</p>
-
-                    <div className="mb-6 grid gap-3 sm:grid-cols-3">
-                      {study.proof.map((item) => (
-                        <div key={item} className="border border-neutral-200 bg-[#fbfaf7] p-4">
-                          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-neutral-800">
-                            {item}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="mb-7 border-l-2 border-[#7a1c1c] pl-4 sm:mb-8 sm:pl-5">
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-neutral-950 sm:text-sm sm:tracking-[0.2em]">
-                        {study.result}
-                      </p>
-                      <p className="text-sm leading-6 sm:text-base sm:leading-7">{study.detail}</p>
-                    </div>
-                  </div>
-
-                  <Button to={study.link} variant="outline" className="w-full sm:w-auto">
-                    View Case Study
-                  </Button>
-                </div>
-              </article>
-            ))}
-          </div>
-
-          <div className="mt-10 flex justify-center">
-            <Button to="/portfolio" variant="outline" size="lg" className="w-full sm:w-auto">
-              View Full Portfolio
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* BUILD QUALITY */}
-      <section className="section-tight bg-[#111111] py-14 text-white sm:py-16 lg:py-20">
-        <div className="container-clean">
-          <div className="mb-8 grid gap-6 lg:grid-cols-[0.75fr_1.25fr] lg:items-end">
-            <div>
-              <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-[#d14b4b]">
-                Build Quality
+              <p className="text-lg text-neutral-600 mb-8 font-serif-body leading-relaxed">
+                They're not ugly. They're unclear. They don't build urgency. They don't prove authority. They let visitors walk away and choose your competitor instead.
               </p>
-              <h2 className="text-[2.35rem] text-white sm:text-5xl">
-                Built Cleaner Than the Average Small Business Website.
-              </h2>
-            </div>
 
-            <p className="max-w-2xl text-base leading-7 text-neutral-300 sm:text-lg sm:leading-8 lg:ml-auto">
-              Design matters, but execution matters too. The site needs to be structured properly, load cleanly, support SEO, and feel polished across devices.
-            </p>
-          </div>
+              {/* Problem List */}
+              <ul className="space-y-4">
+                {[
+                  'Weak first impression → low perceived value',
+                  'Unclear offer → wasted traffic',
+                  'No conversion logic → forgotten in browser tab',
+                  'Poor mobile experience → bounce immediately'
+                ].map((problem) => (
+                  <li key={problem} className="flex gap-4">
+                    <span className="text-luxury-red text-2xl leading-none mt-1">—</span>
+                    <span className="text-neutral-700">{problem}</span>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
 
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {buildQuality.map((item) => (
-              <div key={item} className="border border-white/10 bg-white/[0.035] px-4 py-4 text-center">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-300">
-                  {item}
-                </p>
+            {/* Image Side - Offset */}
+            <motion.div
+              className="relative lg:mt-20"
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+              viewport={{ once: true }}
+            >
+              <div className="relative">
+                <div className="absolute -inset-6 bg-luxury-red/5 -rotate-3" />
+                <div className="relative bg-white border-4 border-slate-dark p-2">
+                  <img
+                    src="/theproblem.png"
+                    alt="Generic website problem"
+                    className="w-full h-auto"
+                  />
+                </div>
+                <div className="absolute -bottom-8 -right-8 bg-luxury-red text-white p-6 font-serif-display">
+                  <p className="text-sm font-bold uppercase">The Cost</p>
+                  <p className="text-4xl font-bold">87%</p>
+                  <p className="text-xs">lost visitors</p>
+                </div>
               </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* RAH APPROACH - NUMBERED BRUTALIST */}
+      <section className="section bg-slate-dark text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-10 left-10 w-96 h-96 bg-luxury-red/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-luxury-red/10 rounded-full blur-3xl" />
+        </div>
+
+        <div className="container-clean relative z-10">
+          <motion.div
+            className="mb-20"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <p className="eyebrow-red mb-6">Our Method</p>
+            <h2 className="text-5xl md:text-6xl font-serif-display font-bold text-white mb-6">
+              We Don't Design Websites.
+              <span className="block text-luxury-red">We Build Lead Generation Systems.</span>
+            </h2>
+            <p className="text-xl text-neutral-300 font-serif-body max-w-2xl">
+              Every element has a job. Every section moves closer to business outcomes.
+            </p>
+          </motion.div>
+
+          {/* Numbered Steps - Brutalist Grid */}
+          <div className="grid lg:grid-cols-2 gap-8">
+            {[
+              {
+                number: '01',
+                title: 'Strategic Positioning',
+                description: 'We start with your market, your customer psychology, and what makes you genuinely different. No generic playbook.'
+              },
+              {
+                number: '02',
+                title: 'Visual Identity System',
+                description: 'Build a custom design language that communicates premium quality and establishes immediate trust.'
+              },
+              {
+                number: '03',
+                title: 'SEO Architecture',
+                description: 'Structure every page around actual search intent, keywords, and local visibility signals.'
+              },
+              {
+                number: '04',
+                title: 'Conversion Engineering',
+                description: 'Map the journey from curiosity to action. Eliminate friction. Guide toward decision.'
+              }
+            ].map((step, index) => (
+              <motion.div
+                key={step.number}
+                className="relative border-l-4 border-luxury-red pl-8 py-6"
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <p className="text-6xl font-serif-display font-bold text-luxury-red/20 mb-2">
+                  {step.number}
+                </p>
+                <h3 className="text-2xl font-serif-display font-bold mb-3 -mt-8 relative z-10">
+                  {step.title}
+                </h3>
+                <p className="text-neutral-300 font-serif-body">
+                  {step.description}
+                </p>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* SERVICES */}
-      <section className="section bg-white py-16 sm:py-20 lg:py-32">
+      {/* PROOF - CASE STUDIES GRID */}
+      <section className="section bg-white">
         <div className="container-clean">
-          <div className="mb-10 max-w-4xl lg:mb-16">
-            <p className="eyebrow-red mb-4">What We Build</p>
-            <h2 className="text-[2.45rem] sm:text-5xl lg:text-6xl">
-              A Website Is Only One Piece. The Real Product Is Business Growth Infrastructure.
+          <motion.div
+            className="mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <p className="eyebrow-red mb-6">Featured Work</p>
+            <h2 className="text-5xl md:text-6xl font-serif-display font-bold text-slate-dark">
+              Websites That Perform.
             </h2>
+          </motion.div>
+
+          {/* Case Study Cards */}
+          <div className="grid lg:grid-cols-3 gap-8">
+            {[
+              {
+                name: 'Tier 1 Customs',
+                category: 'Automotive',
+                image: '/t1.png',
+                link: '/case-studies/tier-1-customs',
+                stat: '+340%'
+              },
+              {
+                name: 'The Ever After Edit',
+                category: 'Luxury Wedding',
+                image: '/ee.png',
+                link: '/case-studies/ever-after-edit',
+                stat: '+89%'
+              },
+              {
+                name: 'Empire Builds AZ',
+                category: 'Construction',
+                image: '/emp.png',
+                link: '/case-studies/empire-builds-az',
+                stat: '+156%'
+              }
+            ].map((study, index) => (
+              <motion.article
+                key={study.name}
+                className="group relative overflow-hidden"
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <Link to={study.link} className="block overflow-hidden bg-neutral-200 aspect-square relative">
+                  <img
+                    src={study.image}
+                    alt={study.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-dark/80 via-transparent to-transparent" />
+                  
+                  {/* Overlay Content */}
+                  <div className="absolute inset-0 p-6 flex flex-col justify-between">
+                    <p className="eyebrow-red">{study.category}</p>
+                    <div>
+                      <h3 className="text-2xl font-serif-display font-bold text-white mb-2">
+                        {study.name}
+                      </h3>
+                      <p className="text-4xl font-serif-display font-bold text-luxury-red">
+                        {study.stat}
+                      </p>
+                      <p className="text-sm text-neutral-300 mt-1">Lead growth</p>
+                    </div>
+                  </div>
+                </Link>
+              </motion.article>
+            ))}
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
-            {services.map((service, index) => (
-              <article
-                key={service.title}
-                className={`group relative overflow-hidden border border-neutral-200 bg-[#fbfaf7] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[#7a1c1c]/50 hover:shadow-[0_28px_80px_rgba(17,17,17,0.08)] sm:p-7 ${
-                  index === 0 ? 'sm:col-span-2 lg:row-span-2 lg:p-10' : ''
-                }`}
-              >
-                <div className="absolute right-5 top-5 text-5xl font-semibold text-[#7a1c1c]/10 sm:right-6 sm:top-6 sm:text-6xl">
-                  0{index + 1}
-                </div>
+          <motion.div
+            className="mt-12 text-center"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+          >
+            <Button to="/case-studies" variant="outline" size="lg">
+              View All Work
+            </Button>
+          </motion.div>
+        </div>
+      </section>
 
-                <div className="relative z-10">
-                  <h3 className={`${index === 0 ? 'text-3xl sm:text-4xl' : 'text-2xl'} mb-4 sm:mb-5`}>
+      {/* SERVICES SHOWCASE - ASYMMETRIC */}
+      <section className="section bg-gradient-to-b from-cream-100 to-white">
+        <div className="container-clean">
+          <motion.div
+            className="mb-16"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+          >
+            <p className="eyebrow-red mb-6">What We Offer</p>
+            <h2 className="text-5xl md:text-6xl font-serif-display font-bold text-slate-dark max-w-4xl">
+              One Website Can Serve Many Strategic Goals.
+            </h2>
+          </motion.div>
+
+          <div className="grid lg:grid-cols-2 gap-12 items-stretch">
+            {[
+              {
+                title: 'Website Design & Development',
+                description: 'Premium custom websites built to look established, communicate clearly, and convert visitors into real inquiries.',
+                link: '/website-design-and-seo',
+                highlight: true
+              },
+              {
+                title: 'Local SEO & Strategy',
+                description: 'Strategic page structure and content designed around real customer search behavior and local visibility.',
+                link: '/website-design-and-seo'
+              },
+              {
+                title: 'Digital Marketing',
+                description: 'Campaign strategy, content direction, and paid optimization to extend reach and authority.',
+                link: '/digital-marketing'
+              },
+              {
+                title: 'Reputation Management',
+                description: 'Build trust signals, manage online presence, and establish authority before customers contact you.',
+                link: '/reputation-management'
+              }
+            ].map((service, index) => (
+              <motion.article
+                key={service.title}
+                className={`${service.highlight ? 'lg:row-span-2' : ''} border-3 border-slate-dark p-8 lg:p-12 flex flex-col justify-between group hover:bg-luxury-red hover:text-white hover:border-luxury-red transition-all duration-300`}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <div>
+                  <h3 className={`text-3xl ${service.highlight ? 'lg:text-4xl' : ''} font-serif-display font-bold mb-4`}>
                     {service.title}
                   </h3>
-                  <p className="mb-6 max-w-xl text-sm leading-6 sm:mb-8 sm:text-base sm:leading-7">
-                    {service.copy}
+                  <p className={`${service.highlight ? 'text-lg' : ''} font-serif-body leading-relaxed mb-8`}>
+                    {service.description}
                   </p>
-
-                  <Button to={service.link} variant="outline" size="sm" className="w-full sm:w-auto">
-                    Explore Service
-                  </Button>
                 </div>
-              </article>
+                <Button
+                  to={service.link}
+                  variant={service.highlight ? 'primary' : 'text'}
+                  className="w-fit group-hover:text-white"
+                >
+                  Learn More →
+                </Button>
+              </motion.article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* INDUSTRIES */}
-      <section className="section-tight bg-[#fbfaf7] py-16 lg:py-24">
+      {/* CTA SECTION - BOLD & DIRECT */}
+      <section className="section bg-luxury-red text-white relative overflow-hidden py-24 lg:py-32">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.1)_25%,rgba(255,255,255,0.1)_50%,transparent_50%,transparent_75%,rgba(255,255,255,0.1)_75%,rgba(255,255,255,0.1))] bg-[length:40px_40px]" />
+        </div>
+
+        <div className="container-narrow relative z-10 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-5xl md:text-7xl font-serif-display font-bold mb-8">
+              Ready to Look More Valuable Online?
+            </h2>
+            <p className="text-xl font-serif-body mb-12 max-w-2xl mx-auto leading-relaxed opacity-90">
+              Let's talk about your business, your market, and what a real premium website could do for your leads and authority.
+            </p>
+            <Button to="/contact" variant="primary" size="lg" className="bg-white text-luxury-red hover:bg-cream-50">
+              Start Your Project Today
+            </Button>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* FOOTER TRUST SECTION */}
+      <section className="section bg-slate-dark text-white py-16 lg:py-20">
         <div className="container-clean">
-          <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-            <div>
-              <p className="eyebrow-red mb-4">Who This Is For</p>
-              <h2 className="text-[2.45rem] sm:text-5xl lg:text-6xl">
-                Built for Businesses That Need to Look More Credible Fast.
-              </h2>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              {industries.map((industry) => (
-                <div
-                  key={industry}
-                  className="border border-neutral-200 bg-white px-5 py-4 shadow-[0_14px_40px_rgba(17,17,17,0.04)]"
-                >
-                  <p className="text-sm font-semibold uppercase tracking-[0.16em] text-neutral-900">
-                    {industry}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="relative overflow-hidden bg-[#111111] text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(122,28,28,0.28),transparent_30%),linear-gradient(135deg,#111111_0%,#171717_55%,#0b0b0b_100%)]" />
-
-        <div className="container-clean relative py-16 sm:py-20 lg:py-32">
-          <div className="mx-auto max-w-5xl text-center">
-            <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.3em] text-[#d14b4b] sm:mb-6">
-              Start Here
-            </p>
-
-            <h2 className="mx-auto mb-6 max-w-4xl text-[2.45rem] text-white sm:mb-8 sm:text-5xl lg:text-6xl">
-              Send Us Your Current Website. We’ll Tell You What Is Holding It Back.
-            </h2>
-
-            <p className="mx-auto mb-8 max-w-2xl text-base leading-7 text-neutral-300 sm:mb-10 sm:text-lg sm:leading-8">
-              If your website looks generic, outdated, or unclear, it is costing you trust before the customer ever reaches out. The fix is not more decoration. The fix is better strategy, stronger design, and cleaner conversion flow.
-            </p>
-
-            <div className="grid gap-3 sm:flex sm:flex-wrap sm:justify-center sm:gap-4">
-              <Button to="/contact" size="lg" className="w-full sm:w-auto">
-                Start a Project
-              </Button>
-              <Button to="/case-studies" variant="dark" size="lg" className="w-full sm:w-auto">
-                See the Work
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CONTACT */}
-      <section className="section border-t border-neutral-200 bg-[#fbfaf7] py-16 sm:py-20 lg:py-32">
-        <div className="container-clean grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start lg:gap-12">
-          <div className="lg:sticky lg:top-28">
-            <p className="eyebrow-red mb-4">Project Inquiry</p>
-            <h2 className="mb-5 text-[2.45rem] sm:mb-6 sm:text-5xl lg:text-6xl">
-              Bring the Business. We’ll Build the Digital Presence Around It.
-            </h2>
-            <p className="text-base leading-7 sm:text-lg sm:leading-8">
-              Tell us what you do, where you are trying to grow, and what your current website is failing to communicate.
-            </p>
-          </div>
-
-          <ContactForm
-            title="Start Your Project"
-            subtitle="Send the details. We’ll review your business, your current digital presence, and the best path to make the website sharper, clearer, and more conversion-focused."
-          />
+          <motion.div
+            className="grid md:grid-cols-3 gap-12"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            {[
+              { label: 'Industries Served', value: '8+' },
+              { label: 'Websites Launched', value: '50+' },
+              { label: 'Average Lead Growth', value: '+87%' }
+            ].map((stat) => (
+              <motion.div
+                key={stat.label}
+                className="text-center border-t border-luxury-red/30 pt-6"
+                variants={itemVariants}
+              >
+                <p className="text-5xl font-serif-display font-bold text-luxury-red mb-2">
+                  {stat.value}
+                </p>
+                <p className="text-neutral-400 uppercase tracking-wider text-sm">
+                  {stat.label}
+                </p>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </section>
     </>

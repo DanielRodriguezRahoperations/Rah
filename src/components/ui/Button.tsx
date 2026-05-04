@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 interface ButtonProps {
   children: React.ReactNode;
-  variant?: 'primary' | 'secondary' | 'outline' | 'dark';
+  variant?: 'primary' | 'secondary' | 'outline' | 'dark' | 'text';
   size?: 'sm' | 'md' | 'lg';
   className?: string;
   to?: string;
@@ -36,7 +36,9 @@ const Button: React.FC<ButtonProps> = ({
     outline:
       'border-neutral-950 bg-transparent text-neutral-950 hover:border-[#7a1c1c] hover:text-[#7a1c1c]',
     dark:
-      'border-white/20 bg-white/[0.04] text-white backdrop-blur-sm hover:border-[#d14b4b] hover:text-white hover:bg-white/[0.08]'
+      'border-white/20 bg-white/[0.04] text-white backdrop-blur-sm hover:border-[#d14b4b] hover:text-white hover:bg-white/[0.08]',
+    text:
+      'border-transparent bg-transparent text-inherit hover:text-[#7a1c1c] hover:underline'
   };
 
   const sizeClasses = {
