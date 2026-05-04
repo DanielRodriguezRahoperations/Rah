@@ -8,8 +8,8 @@ const ReputationManagementPage = () => {
   return (
     <>
       <SEOHead
-        title="Reputation Management | RAH Operations"
-        description="Reputation management systems designed to strengthen trust, improve brand perception, and support business growth."
+        title="Reputation Management Scottsdale & Phoenix AZ | RAH Operations"
+        description="Online reputation management for Scottsdale and Phoenix Arizona businesses. Strengthen trust, improve brand perception, and take control of your online presence."
         url={absoluteUrl('/reputation-management')}
       />
 

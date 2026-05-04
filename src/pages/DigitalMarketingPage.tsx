@@ -9,8 +9,8 @@ const DigitalMarketingPage = () => {
   return (
     <>
       <SEOHead
-        title="Digital Marketing | RAH Operations"
-        description="Digital marketing systems built to generate visibility, qualified leads, and measurable business growth."
+        title="Digital Marketing Scottsdale & Phoenix AZ | RAH Operations"
+        description="Digital marketing systems built to generate visibility, qualified leads, and measurable revenue growth for Scottsdale and Phoenix Arizona businesses."
         url={absoluteUrl('/digital-marketing')}
       />
 

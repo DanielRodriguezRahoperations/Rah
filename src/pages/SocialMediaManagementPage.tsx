@@ -8,8 +8,8 @@ const SocialMediaManagementPage = () => {
   return (
     <>
       <SEOHead
-        title="Social Media Management | RAH Operations"
-        description="Social media strategy and content systems built to strengthen brand positioning and drive real engagement."
+        title="Social Media Management Scottsdale & Phoenix AZ | RAH Operations"
+        description="Social media strategy and content systems for Scottsdale and Phoenix Arizona businesses. Build brand authority, drive real engagement, and grow your audience."
         url={absoluteUrl('/social-media-management')}
       />
 

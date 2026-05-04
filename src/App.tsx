@@ -18,6 +18,7 @@ import PersonalCreditPage from './pages/PersonalCreditPage';
 import SocialMediaManagementPage from './pages/SocialMediaManagementPage';
 import ReputationManagementPage from './pages/ReputationManagementPage';
 import NotaryServicesPage from './pages/NotaryServicesPage';
+import LLCSetupPage from './pages/LLCSetupPage';
 import AboutPage from './pages/AboutPage';
 import BlogPage from './pages/BlogPage';
 import BlogPost from './pages/BlogPost';
@@ -99,6 +100,7 @@ function App() {
               <Route path="/social-media-management" element={<SocialMediaManagementPage />} />
               <Route path="/reputation-management" element={<ReputationManagementPage />} />
               <Route path="/notary-services" element={<NotaryServicesPage />} />
+              <Route path="/llc-setup" element={<LLCSetupPage />} />
               <Route path="/portfolio" element={<PortfolioPage />} />
               <Route path="/case-studies" element={<CaseStudiesPage />} />
               <Route path="/case-studies/tier-1-customs" element={<Tier1CustomsCaseStudy />} />

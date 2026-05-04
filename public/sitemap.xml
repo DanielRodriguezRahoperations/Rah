@@ -3,82 +3,143 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <!-- ===== TIER 1: HOMEPAGE ===== -->
   <url>
     <loc>https://www.rahoperations.com/</loc>
-    <lastmod>2025-09-11</lastmod>
+    <lastmod>2026-05-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+
+  <!-- ===== TIER 1: MONEY PAGES ===== -->
   <url>
     <loc>https://www.rahoperations.com/website-design-and-seo</loc>
-    <lastmod>2025-09-11</lastmod>
+    <lastmod>2026-05-03</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://www.rahoperations.com/business-credit-and-funding</loc>
-    <lastmod>2025-09-11</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.95</priority>
   </url>
   <url>
     <loc>https://www.rahoperations.com/digital-marketing</loc>
-    <lastmod>2025-09-11</lastmod>
+    <lastmod>2026-05-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://www.rahoperations.com/business-credit-and-funding</loc>
+    <lastmod>2026-05-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
+
+  <!-- ===== TIER 2: SERVICE HUB & SECONDARY SERVICES ===== -->
   <url>
-    <loc>https://www.rahoperations.com/new-business-setup</loc>
-    <lastmod>2025-09-11</lastmod>
+    <loc>https://www.rahoperations.com/services</loc>
+    <lastmod>2026-05-03</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://www.rahoperations.com/personal-credit-repair</loc>
-    <lastmod>2025-09-11</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.rahoperations.com/social-media-management</loc>
-    <lastmod>2025-09-11</lastmod>
+    <lastmod>2026-05-03</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://www.rahoperations.com/notary-services</loc>
-    <lastmod>2025-09-11</lastmod>
+    <loc>https://www.rahoperations.com/reputation-management</loc>
+    <lastmod>2026-05-03</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://www.rahoperations.com/about</loc>
-    <lastmod>2025-09-11</lastmod>
+    <loc>https://www.rahoperations.com/new-business-setup</loc>
+    <lastmod>2026-05-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.rahoperations.com/blogs</loc>
-    <lastmod>2025-09-11</lastmod>
-    <changefreq>weekly</changefreq>
+    <loc>https://www.rahoperations.com/llc-setup</loc>
+    <lastmod>2026-05-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.rahoperations.com/personal-credit-repair</loc>
+    <lastmod>2026-05-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.rahoperations.com/notary-services</loc>
+    <lastmod>2026-05-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <!-- ===== TIER 3: AUTHORITY & TRUST PAGES ===== -->
+  <url>
+    <loc>https://www.rahoperations.com/about</loc>
+    <lastmod>2026-05-03</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.rahoperations.com/testimonials</loc>
-    <lastmod>2025-09-11</lastmod>
+    <lastmod>2026-05-03</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.75</priority>
   </url>
   <url>
+    <loc>https://www.rahoperations.com/portfolio</loc>
+    <lastmod>2026-05-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://www.rahoperations.com/case-studies</loc>
+    <lastmod>2026-05-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://www.rahoperations.com/case-studies/tier-1-customs</loc>
+    <lastmod>2026-05-03</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://www.rahoperations.com/case-studies/ever-after-edit</loc>
+    <lastmod>2026-05-03</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://www.rahoperations.com/case-studies/empire-builds-az</loc>
+    <lastmod>2026-05-03</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.65</priority>
+  </url>
+
+  <!-- ===== TIER 4: BLOG & CONTENT ===== -->
+  <url>
+    <loc>https://www.rahoperations.com/blogs</loc>
+    <lastmod>2026-05-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- ===== UTILITY ===== -->
+  <url>
     <loc>https://www.rahoperations.com/contact</loc>
-    <lastmod>2025-09-11</lastmod>
+    <lastmod>2026-05-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.rahoperations.com/privacy-policy</loc>
-    <lastmod>2025-09-11</lastmod>
+    <lastmod>2026-05-03</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
+
 </urlset>
