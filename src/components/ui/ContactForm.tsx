@@ -27,25 +27,19 @@ const ContactForm: React.FC<ContactFormProps> = ({
     setStatus('loading');
 
     try {
-      const res = await fetch('https://formsubmit.co/ajax/daniel@rahoperations.com', {
+      const res = await fetch('/api/contact', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          _subject: `New Inquiry — ${formData.service || 'RAH Operations'}`,
-          _template: 'table',
-          Name: formData.name,
-          Email: formData.email,
-          Phone: formData.phone || 'Not provided',
-          Service: formData.service || 'Not specified',
-          Message: formData.message,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          service: formData.service,
+          message: formData.message,
         }),
       });
 
-      const data = await res.json();
-      if (data.success === 'true' || data.success === true) {
+      if (res.ok) {
         setStatus('success');
       } else {
         setStatus('error');
