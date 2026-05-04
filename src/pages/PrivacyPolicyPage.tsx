@@ -1,6 +1,32 @@
-import React from 'react';
 import SEOHead from '../components/ui/SEOHead';
 import { absoluteUrl } from '../utils/url';
+
+const sections = [
+  {
+    title: 'Information We Collect',
+    body: 'We may collect personal information such as your name, email address, phone number, and business-related information when you interact with our website or services.'
+  },
+  {
+    title: 'How We Use Your Information',
+    body: 'Your information may be used to respond to inquiries, provide services, improve our offerings, and communicate updates related to your request or engagement.'
+  },
+  {
+    title: 'Data Protection',
+    body: 'We take reasonable measures to protect your personal information from unauthorized access, disclosure, or misuse.'
+  },
+  {
+    title: 'Third-Party Sharing',
+    body: 'We do not sell or share your personal information with third parties unless required by law or necessary to provide requested services.'
+  },
+  {
+    title: 'Your Rights',
+    body: 'You may request access to or deletion of your personal data at any time by contacting us.'
+  },
+  {
+    title: 'Contact',
+    body: 'For any privacy-related questions, reach us at info@rahoperations.com'
+  },
+];
 
 const PrivacyPolicyPage = () => {
   return (
@@ -11,67 +37,25 @@ const PrivacyPolicyPage = () => {
         url={absoluteUrl('/privacy-policy')}
       />
 
-      <section className="section">
+      <section className="bg-[#faf8f4] pt-32 pb-24">
         <div className="container-clean max-w-3xl">
-          <p className="eyebrow mb-6">Privacy Policy</p>
+          <div className="border-b-4 border-[#1a1a1a] pb-8 mb-12">
+            <p className="text-[#7a1c1c] text-xs uppercase tracking-[0.3em] mb-4">Legal</p>
+            <h1 className="text-5xl md:text-6xl font-serif-display font-bold text-[#1a1a1a] leading-tight">
+              Privacy Policy
+            </h1>
+            <p className="text-sm text-neutral-400 mt-4">
+              Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </p>
+          </div>
 
-          <h1 className="mb-6">
-            Privacy Policy
-          </h1>
-
-          <p className="text-sm text-neutral-500 mb-10">
-            Last updated: {new Date().toLocaleDateString()}
-          </p>
-
-          <div className="space-y-10 text-sm leading-relaxed">
-            <div>
-              <h2 className="mb-3 text-base font-semibold">Information We Collect</h2>
-              <p>
-                We may collect personal information such as your name, email address, phone number,
-                and business-related information when you interact with our website or services.
-              </p>
-            </div>
-
-            <div>
-              <h2 className="mb-3 text-base font-semibold">How We Use Your Information</h2>
-              <p>
-                Your information may be used to respond to inquiries, provide services, improve our offerings,
-                and communicate updates related to your request or engagement.
-              </p>
-            </div>
-
-            <div>
-              <h2 className="mb-3 text-base font-semibold">Data Protection</h2>
-              <p>
-                We take reasonable measures to protect your personal information from unauthorized access,
-                disclosure, or misuse.
-              </p>
-            </div>
-
-            <div>
-              <h2 className="mb-3 text-base font-semibold">Third-Party Sharing</h2>
-              <p>
-                We do not sell or share your personal information with third parties unless required by law
-                or necessary to provide requested services.
-              </p>
-            </div>
-
-            <div>
-              <h2 className="mb-3 text-base font-semibold">Your Rights</h2>
-              <p>
-                You may request access to or deletion of your personal data at any time by contacting us.
-              </p>
-            </div>
-
-            <div>
-              <h2 className="mb-3 text-base font-semibold">Contact</h2>
-              <p>
-                For any privacy-related questions, contact us at:
-              </p>
-              <p className="mt-2 font-medium">
-                info@rahoperations.com
-              </p>
-            </div>
+          <div className="space-y-12">
+            {sections.map((section, i) => (
+              <div key={i} className="grid md:grid-cols-[1fr_2fr] gap-8 border-b border-neutral-200 pb-12 last:border-0">
+                <h2 className="text-lg font-serif-display font-bold text-[#1a1a1a]">{section.title}</h2>
+                <p className="text-neutral-600 font-serif-body leading-relaxed">{section.body}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

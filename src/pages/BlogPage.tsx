@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SEOHead from '../components/ui/SEOHead';
@@ -9,37 +8,37 @@ const BlogPage = () => {
     {
       title: 'The Right Way to Start a Business',
       displayTitle: 'The Right Way to Start a Business (And Why Most People Get It Wrong)',
-      date: 'January 15, 2024',
+      date: 'Jan 15, 2024',
+      issue: 'No. 001',
       category: 'Business Formation',
-      excerpt:
-        'Starting a business is not about filing paperwork. It is about building the structure, banking, compliance, credit readiness, and digital foundation that support real growth.',
+      excerpt: 'Starting a business is not about filing paperwork. It is about building the structure, banking, compliance, credit readiness, and digital foundation that support real growth.',
       slug: 'the-right-way-to-start-a-business'
     },
     {
       title: 'Why Most Business Websites Fail',
       displayTitle: 'Why Most Business Websites Fail (And How to Fix It)',
-      date: 'January 12, 2024',
+      date: 'Jan 12, 2024',
+      issue: 'No. 002',
       category: 'Website Design',
-      excerpt:
-        'Most websites look acceptable but do not convert. The problem is usually weak positioning, poor SEO structure, unclear proof, and no real conversion path.',
+      excerpt: 'Most websites look acceptable but do not convert. The problem is usually weak positioning, poor SEO structure, unclear proof, and no real conversion path.',
       slug: 'why-websites-fail'
     },
     {
       title: 'Local SEO Is Not Optional Anymore',
       displayTitle: 'Local SEO Is Not Optional Anymore',
-      date: 'January 10, 2024',
+      date: 'Jan 10, 2024',
+      issue: 'No. 003',
       category: 'SEO',
-      excerpt:
-        'Local SEO is where high-intent customers find businesses. If your Google profile, reviews, service pages, and local signals are weak, competitors get the calls.',
+      excerpt: 'Local SEO is where high-intent customers find businesses. If your Google profile, reviews, service pages, and local signals are weak, competitors get the calls.',
       slug: 'local-seo-is-not-optional'
     },
     {
       title: 'What Actually Drives Business Growth Online',
       displayTitle: 'What Actually Drives Business Growth Online',
-      date: 'January 8, 2024',
+      date: 'Jan 8, 2024',
+      issue: 'No. 004',
       category: 'Digital Marketing',
-      excerpt:
-        'Traffic alone does not grow a business. Growth comes from visibility, positioning, trust, conversion, and follow-up working as one system.',
+      excerpt: 'Traffic alone does not grow a business. Growth comes from visibility, positioning, trust, conversion, and follow-up working as one system.',
       slug: 'what-drives-business-growth-online'
     }
   ];
@@ -53,75 +52,77 @@ const BlogPage = () => {
         keywords="business growth insights, website design strategy, SEO insights, local SEO, digital marketing strategy, business setup"
       />
 
-      {/* HERO */}
-      <section className="section bg-gradient-to-br from-stone-50 to-white relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-slate-800 to-slate-600" />
-        <div className="container-clean max-w-5xl py-20">
+      {/* MASTHEAD — broadsheet newspaper aesthetic */}
+      <section className="bg-[#faf8f4] border-b-4 border-[#1a1a1a] pt-32 pb-0">
+        <div className="container-clean">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
           >
-            <div className="text-sm uppercase tracking-widest text-slate-600 mb-6 font-medium">
-              Strategic Insights
+            <div className="flex items-baseline justify-between border-b border-[#1a1a1a]/20 pb-4 mb-6">
+              <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">RAH Operations</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">Strategic Intelligence</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">Arizona</p>
             </div>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif-display font-bold text-slate-900 mb-8 leading-tight">
-              Business
-              <span className="block text-slate-700">Intelligence</span>
+
+            <h1 className="text-[clamp(4rem,12vw,10rem)] font-serif-display font-bold leading-[0.85] text-[#1a1a1a] tracking-tight mb-6">
+              The Brief
             </h1>
-            <p className="text-xl md:text-2xl text-slate-700 font-serif-body leading-relaxed max-w-3xl">
-              Practical frameworks for businesses that demand precision, credibility, and measurable results in the digital landscape.
-            </p>
+
+            <div className="flex items-center justify-between border-t-4 border-[#1a1a1a] pt-6 pb-8">
+              <p className="text-sm font-serif-body text-neutral-600 max-w-xl">
+                Practical frameworks for businesses that demand precision, credibility, and measurable results in the digital landscape.
+              </p>
+              <p className="text-xs uppercase tracking-widest text-neutral-400 hidden md:block">Vol. I, 2024</p>
+            </div>
           </motion.div>
         </div>
       </section>
 
-      {/* ARTICLES */}
-      <section className="section bg-white">
-        <div className="container-clean max-w-6xl">
-          <div className="grid gap-12">
+      {/* ARTICLES — newspaper column layout */}
+      <section className="bg-[#faf8f4] py-16 lg:py-24">
+        <div className="container-clean">
+          <div className="divide-y-2 divide-[#1a1a1a]/10">
             {posts.map((post, i) => (
               <motion.article
                 key={post.slug}
-                className="group border-b border-slate-200 pb-12 last:border-b-0"
+                className="group py-12 lg:py-16"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
-                <div className="grid lg:grid-cols-3 gap-8 items-start">
-                  <div className="lg:col-span-2">
-                    <div className="flex items-center gap-4 mb-6">
-                      <span className="text-xs uppercase tracking-wider text-slate-500 font-medium">
-                        {post.category}
-                      </span>
-                      <span className="text-slate-400">•</span>
-                      <span className="text-xs text-slate-500">
-                        {post.date}
-                      </span>
-                    </div>
+                <div className="grid lg:grid-cols-[2fr_3fr_1fr] gap-8 lg:gap-12 items-start">
+                  {/* Left: meta */}
+                  <div className="lg:pt-2">
+                    <p className="text-[#7a1c1c] text-xs font-bold uppercase tracking-[0.25em] mb-3">{post.issue}</p>
+                    <p className="text-xs uppercase tracking-widest text-neutral-400 mb-2">{post.category}</p>
+                    <p className="text-xs text-neutral-400">{post.date}</p>
+                  </div>
 
-                    <h2 className="text-3xl md:text-4xl font-serif-display font-bold text-slate-900 mb-6 leading-tight group-hover:text-slate-700 transition-colors">
+                  {/* Center: content */}
+                  <div>
+                    <h2 className="text-3xl md:text-4xl font-serif-display font-bold text-[#1a1a1a] mb-5 leading-tight group-hover:text-[#7a1c1c] transition-colors duration-300">
                       {post.displayTitle}
                     </h2>
-
-                    <p className="text-lg text-slate-600 font-serif-body leading-relaxed mb-8 max-w-2xl">
+                    <p className="text-lg text-neutral-600 font-serif-body leading-relaxed mb-8">
                       {post.excerpt}
                     </p>
-
                     <Link
                       to={`/blogs/${post.slug}`}
-                      className="inline-flex items-center gap-2 text-slate-900 font-medium hover:text-slate-700 transition-colors group"
+                      className="inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-widest text-[#1a1a1a] border-b-2 border-[#1a1a1a] pb-1 hover:text-[#7a1c1c] hover:border-[#7a1c1c] transition-colors"
                     >
-                      <span>Read Full Article</span>
-                      <span className="transform group-hover:translate-x-1 transition-transform">→</span>
+                      Read Article
+                      <span className="group-hover:translate-x-1 transition-transform">→</span>
                     </Link>
                   </div>
 
-                  <div className="lg:col-span-1">
-                    <div className="bg-slate-100 h-48 rounded-lg flex items-center justify-center text-slate-400 text-sm font-medium">
-                      Article Preview
-                    </div>
+                  {/* Right: decorative number */}
+                  <div className="hidden lg:flex items-center justify-end">
+                    <span className="text-[8rem] font-serif-display font-bold text-[#1a1a1a]/5 leading-none select-none">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
                   </div>
                 </div>
               </motion.article>
@@ -130,23 +131,27 @@ const BlogPage = () => {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="section bg-slate-900 text-white">
+      {/* FOOTER CTA */}
+      <section className="bg-[#1a1a1a] text-white py-20 lg:py-28">
         <div className="container-narrow text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-5xl font-serif-display font-bold mb-6">
-              Stay Informed
+            <p className="text-[#7a1c1c] text-xs uppercase tracking-[0.3em] mb-6">Put It Into Practice</p>
+            <h2 className="text-4xl md:text-5xl font-serif-display font-bold mb-6 leading-tight">
+              Read the Strategy. Build the System.
             </h2>
-            <p className="text-lg font-serif-body mb-8 max-w-xl mx-auto opacity-90">
-              Subscribe for weekly insights on business growth, digital strategy, and market positioning.
+            <p className="text-lg font-serif-body text-white/70 mb-10 max-w-xl mx-auto leading-relaxed">
+              Every article here reflects how we actually work. If you're ready to apply these principles to your business, let's talk.
             </p>
-            <button className="bg-white text-slate-900 px-8 py-3 font-medium hover:bg-slate-100 transition-colors">
-              Subscribe to Updates
-            </button>
+            <Link
+              to="/contact"
+              className="inline-block bg-white text-[#1a1a1a] px-10 py-4 font-semibold uppercase tracking-widest text-sm hover:bg-[#faf8f4] transition-colors"
+            >
+              Start a Project
+            </Link>
           </motion.div>
         </div>
       </section>

@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import SEOHead from '../components/ui/SEOHead';
 import { absoluteUrl } from '../utils/url';
@@ -14,143 +13,148 @@ const SocialMediaManagementPage = () => {
         url={absoluteUrl('/social-media-management')}
       />
 
-      {/* HERO */}
-      <section className="relative py-32 lg:py-48 bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-10 left-10 w-20 h-20 bg-yellow-300 rounded-full blur-xl animate-bounce" />
-          <div className="absolute bottom-10 right-10 w-16 h-16 bg-green-300 rounded-full blur-xl animate-pulse" />
-          <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-red-300 rounded-full blur-lg animate-ping" />
-        </div>
+      {/* HERO — Kinetic street editorial: black + electric coral */}
+      <section className="relative min-h-screen bg-[#0a0a0a] overflow-hidden flex items-end pb-16 lg:pb-24 pt-32">
+        <div className="absolute top-0 right-0 w-[60vw] h-[60vw] rounded-full bg-[#ff4c00]/10 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[30vw] h-[30vw] rounded-full bg-[#ff4c00]/5 blur-[80px] pointer-events-none" />
 
         <div className="container-clean relative z-10">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, type: "spring", bounce: 0.4 }}
-            className="max-w-4xl text-center"
+          <motion.p
+            className="text-[#ff4c00] text-xs uppercase tracking-[0.3em] mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
           >
-            <div className="text-8xl mb-8">📱✨🎉</div>
-            <h1 className="text-7xl md:text-8xl lg:text-9xl font-bold leading-[0.8] text-white mb-10 drop-shadow-lg">
-              Social Media Magic!
-            </h1>
-            <p className="text-2xl text-white font-light leading-relaxed mb-12 max-w-2xl mx-auto">
-              Turn your feeds into funnels! We sprinkle strategy dust to make your brand sparkle and convert likes into leads.
-            </p>
+            001 / Social Media
+          </motion.p>
 
-            <motion.div
-              className="flex gap-6 justify-center flex-wrap"
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-            >
-              <Button to="/contact" size="lg" className="bg-white text-purple-600 hover:bg-yellow-100 transform hover:scale-110 transition-all">
-                🚀 Start the Fun!
-              </Button>
-              <Button to="/portfolio" variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-purple-600 transform hover:scale-110 transition-all">
-                👀 See Our Sparkles
-              </Button>
-            </motion.div>
+          <motion.h1
+            className="text-[clamp(3.5rem,10vw,9rem)] font-serif-display font-bold leading-[0.88] text-white mb-12 max-w-5xl"
+            initial={{ opacity: 0, y: 60 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, ease: [0.33, 0.66, 0.66, 1] }}
+          >
+            Your Brand Needs
+            <span className="block text-[#ff4c00]">a Voice,</span>
+            Not a Feed.
+          </motion.h1>
+
+          <motion.div
+            className="flex flex-col sm:flex-row gap-5 items-start"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+          >
+            <Button to="/contact" size="lg" className="bg-[#ff4c00] border-[#ff4c00] text-white hover:bg-[#e03d00]">
+              Build Your Presence
+            </Button>
+            <Button to="/portfolio" variant="outline" size="lg" className="border-white/30 text-white hover:border-[#ff4c00] hover:text-[#ff4c00]">
+              See Our Work
+            </Button>
+          </motion.div>
+
+          {/* Stats row */}
+          <motion.div
+            className="mt-20 grid grid-cols-3 gap-8 border-t border-white/10 pt-10"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+          >
+            {[
+              { n: '3×', label: 'Avg. Engagement Lift' },
+              { n: '60+', label: 'Brands Managed' },
+              { n: '100%', label: 'Strategy-First' },
+            ].map((s) => (
+              <div key={s.label}>
+                <p className="text-4xl md:text-5xl font-serif-display font-bold text-[#ff4c00]">{s.n}</p>
+                <p className="text-xs uppercase tracking-widest text-white/50 mt-2">{s.label}</p>
+              </div>
+            ))}
           </motion.div>
         </div>
       </section>
 
-      {/* POSITIONING */}
-      <section className="section bg-yellow-50 relative">
-        <div className="absolute top-0 left-0 w-full h-20 bg-gradient-to-r from-pink-200 to-blue-200 transform -skew-y-1" />
-        <div className="container-clean grid lg:grid-cols-2 gap-16 relative z-10">
+      {/* POSITIONING — Asymmetric split */}
+      <section className="section bg-[#f5f1eb] relative overflow-hidden">
+        <div className="container-clean grid lg:grid-cols-[1.1fr_0.9fr] gap-16 lg:gap-24 items-center">
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-5xl md:text-6xl font-bold text-purple-800 mb-8 leading-tight">
-              Social Media Should Be a Party, Not a Chore! 🎈
+            <p className="text-[#ff4c00] text-xs uppercase tracking-[0.3em] mb-8">The Problem</p>
+            <h2 className="text-5xl md:text-6xl font-serif-display font-bold text-[#0a0a0a] mb-8 leading-[0.95]">
+              Posting Without Strategy Is Just Noise.
             </h2>
-            <p className="text-xl text-purple-700 mb-6 font-medium">
-              Most businesses post like robots. Boring! We turn your feeds into festivals of engagement.
+            <p className="text-lg text-neutral-700 font-serif-body leading-relaxed mb-6">
+              Most business social media fails because it's treated like a task, not a system. Random posts, no direction, no voice — and nothing to show for it.
             </p>
-            <p className="text-lg text-purple-600">
-              Strategic fun that builds trust, drives traffic, and makes your competitors jealous.
+            <p className="text-lg text-neutral-600 font-serif-body leading-relaxed">
+              We build content systems around your positioning: who you are, what you stand for, and what your ideal client needs to see before they trust you enough to reach out.
             </p>
           </motion.div>
 
           <motion.div
-            className="bg-white rounded-3xl p-8 shadow-2xl transform rotate-2 hover:rotate-0 transition-transform"
-            initial={{ opacity: 0, x: 50 }}
+            className="relative"
+            initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            transition={{ duration: 0.8, delay: 0.15 }}
           >
-            <h3 className="text-3xl font-bold text-pink-600 mb-6">What You'll Get 🎁</h3>
-            <div className="space-y-4">
+            <div className="border-l-4 border-[#ff4c00] pl-8 space-y-8">
               {[
-                { label: 'Viral Vibes', value: 'Trending content' },
-                { label: 'Engaged Fans', value: 'Real interactions' },
-                { label: 'Brand Buzz', value: 'Word-of-mouth magic' },
-                { label: 'Lead Lightning', value: 'Conversions galore' }
+                { label: 'Without Strategy', value: 'Invisible to your audience' },
+                { label: 'With Presence Only', value: 'Noise without conversion' },
+                { label: 'With RAH', value: 'Intentional brand authority' },
               ].map((item, i) => (
-                <motion.div
-                  key={i}
-                  className="flex justify-between items-center p-3 bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                >
-                  <span className="font-semibold text-purple-800">{item.label}</span>
-                  <span className="text-pink-600 font-bold">{item.value}</span>
-                </motion.div>
+                <div key={i} className="group">
+                  <p className="text-xs uppercase tracking-widest text-neutral-500 mb-1">{item.label}</p>
+                  <p className="text-2xl font-serif-display font-bold text-[#0a0a0a]">{item.value}</p>
+                </div>
               ))}
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* SERVICES */}
-      <section className="section bg-gradient-to-r from-green-400 to-blue-500 text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 w-32 h-32 bg-white rounded-full blur-2xl" />
-          <div className="absolute bottom-20 right-20 w-24 h-24 bg-yellow-300 rounded-full blur-xl" />
-        </div>
-        <div className="container-clean relative z-10">
+      {/* SERVICES — Dark grid */}
+      <section className="section bg-[#0a0a0a] text-white">
+        <div className="container-clean">
           <motion.div
-            className="max-w-3xl mb-16 text-center"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            className="mb-16"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
           >
-            <p className="eyebrow-white mb-6">Our Superpowers 🦸‍♀️</p>
-            <h2 className="text-6xl md:text-7xl font-bold mb-8 leading-tight">
-              What We Handle Like Pros
+            <p className="text-[#ff4c00] text-xs uppercase tracking-[0.3em] mb-6">002 / What We Handle</p>
+            <h2 className="text-5xl md:text-6xl font-serif-display font-bold text-white max-w-3xl leading-tight">
+              The Full Scope of Social Execution.
             </h2>
-            <p className="text-xl font-light">
-              From strategy to sparkle, we've got your social covered.
-            </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-white/10">
             {[
-              { icon: '🎯', title: 'Content Strategy', desc: 'Planned perfection' },
-              { icon: '🎨', title: 'Creative Creation', desc: 'Art that pops' },
-              { icon: '💬', title: 'Voice & Messaging', desc: 'Your unique tone' },
-              { icon: '📊', title: 'Platform Magic', desc: 'All channels optimized' },
-              { icon: '❤️', title: 'Engagement Boost', desc: 'Fans that love you' },
-              { icon: '💰', title: 'Paid Promotions', desc: 'Targeted growth' },
-              { icon: '📈', title: 'Analytics Wizardry', desc: 'Data-driven wins' },
-              { icon: '🔄', title: 'Constant Optimization', desc: 'Always improving' }
+              { num: '01', title: 'Content Strategy', desc: 'Built around your brand positioning, not trending audio' },
+              { num: '02', title: 'Copy & Voice', desc: 'Consistent tone that sounds like you — at your best' },
+              { num: '03', title: 'Platform Direction', desc: 'Right channels, right cadence for your audience' },
+              { num: '04', title: 'Creative Production', desc: 'Visuals that stop the scroll for the right reasons' },
+              { num: '05', title: 'Engagement Systems', desc: 'Community management that builds real relationships' },
+              { num: '06', title: 'Paid Social', desc: 'Targeted distribution that expands your reach with precision' },
+              { num: '07', title: 'Analytics & Reporting', desc: 'Clear data tied to business outcomes, not vanity metrics' },
+              { num: '08', title: 'Ongoing Optimization', desc: 'Monthly refinement based on what actually performs' },
             ].map((item, i) => (
               <motion.div
                 key={i}
-                className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center hover:bg-white/20 transition-all transform hover:scale-105"
+                className="bg-[#111] p-8 hover:bg-[#ff4c00]/10 transition-colors duration-300"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
+                transition={{ delay: i * 0.06 }}
               >
-                <div className="text-5xl mb-4">{item.icon}</div>
-                <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                <p className="text-sm opacity-90">{item.desc}</p>
+                <p className="text-[#ff4c00] text-xs font-bold mb-4">{item.num}</p>
+                <h3 className="text-xl font-serif-display font-bold mb-3">{item.title}</h3>
+                <p className="text-sm text-white/60 leading-relaxed">{item.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -158,40 +162,38 @@ const SocialMediaManagementPage = () => {
       </section>
 
       {/* PROCESS */}
-      <section className="section bg-pink-50">
+      <section className="section bg-white">
         <div className="container-clean">
           <motion.div
-            className="max-w-3xl mb-16 text-center"
+            className="mb-16 max-w-2xl"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
           >
-            <p className="eyebrow-red mb-6">The Fun Process 🎢</p>
-            <h2 className="text-6xl md:text-7xl font-bold text-purple-800 mb-8">
-              How We Make Magic Happen
+            <p className="text-[#ff4c00] text-xs uppercase tracking-[0.3em] mb-6">003 / How It Works</p>
+            <h2 className="text-5xl md:text-6xl font-serif-display font-bold text-[#0a0a0a] leading-tight">
+              Four Phases. One Coherent System.
             </h2>
           </motion.div>
 
           <div className="grid md:grid-cols-4 gap-8">
             {[
-              { num: '01', title: 'Audit Adventure', desc: 'Discover your current sparkle level', color: 'from-red-400 to-pink-500' },
-              { num: '02', title: 'Strategy Spark', desc: 'Craft your winning plan', color: 'from-yellow-400 to-orange-500' },
-              { num: '03', title: 'Content Carnival', desc: 'Create and launch amazing posts', color: 'from-green-400 to-blue-500' },
-              { num: '04', title: 'Growth Galaxy', desc: 'Optimize and expand your reach', color: 'from-purple-400 to-indigo-500' }
+              { num: '01', title: 'Brand Audit', desc: 'We analyze your current presence, audience, and positioning gaps.' },
+              { num: '02', title: 'Strategy Build', desc: 'A clear content direction tied to your business goals.' },
+              { num: '03', title: 'Content Launch', desc: 'We produce and publish with consistency and intentionality.' },
+              { num: '04', title: 'Growth Cycle', desc: 'Monthly performance reviews, refinements, and strategic pivots.' },
             ].map((step, i) => (
               <motion.div
                 key={i}
-                className={`relative bg-gradient-to-br ${step.color} rounded-3xl p-8 text-white text-center transform hover:rotate-3 transition-transform`}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                className="border-t-4 border-[#ff4c00] pt-8"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.15, type: "spring" }}
+                transition={{ delay: i * 0.12 }}
               >
-                <div className="absolute -top-4 -right-4 w-12 h-12 bg-white rounded-full flex items-center justify-center text-2xl font-bold text-gray-800">
-                  {step.num}
-                </div>
-                <h3 className="text-2xl font-bold mb-4 mt-4">{step.title}</h3>
-                <p className="text-sm opacity-90">{step.desc}</p>
+                <p className="text-6xl font-serif-display font-bold text-[#ff4c00]/20 mb-4 leading-none">{step.num}</p>
+                <h3 className="text-2xl font-serif-display font-bold text-[#0a0a0a] mb-3">{step.title}</h3>
+                <p className="text-neutral-600 font-serif-body leading-relaxed">{step.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -199,43 +201,38 @@ const SocialMediaManagementPage = () => {
       </section>
 
       {/* CTA */}
-      <section className="section bg-gradient-to-r from-indigo-600 to-purple-700 text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-1/4 left-1/4 w-40 h-40 bg-yellow-300 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-1/4 right-1/4 w-32 h-32 bg-pink-300 rounded-full blur-2xl animate-bounce" />
-        </div>
+      <section className="section bg-[#ff4c00] text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10 bg-[repeating-linear-gradient(45deg,#fff_0px,#fff_1px,transparent_1px,transparent_50px)]" />
         <div className="container-narrow text-center relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <div className="text-6xl mb-8">🎊</div>
-            <h2 className="text-5xl md:text-6xl font-bold mb-8 leading-tight">
-              Ready to Social Media Superstar?
+            <h2 className="text-5xl md:text-7xl font-serif-display font-bold mb-8 leading-[0.9]">
+              Ready to Build a Real Presence?
             </h2>
-            <p className="text-xl font-light mb-12 max-w-2xl mx-auto leading-relaxed">
-              Let's turn your feeds into fan clubs and your posts into profits!
+            <p className="text-xl font-serif-body mb-12 max-w-2xl mx-auto opacity-90 leading-relaxed">
+              Let's replace the random posting with a system that actually works for your brand.
             </p>
-            <Button to="/contact" size="lg" className="bg-white text-purple-600 hover:bg-yellow-100 transform hover:scale-110 transition-all">
-              Let's Get Social! 🚀
+            <Button to="/contact" size="lg" className="bg-white text-[#ff4c00] hover:bg-[#fff5f0] border-white">
+              Start the Conversation
             </Button>
           </motion.div>
         </div>
       </section>
 
       {/* CONTACT */}
-      <section className="section bg-yellow-50">
+      <section className="section bg-[#f5f1eb]">
         <div className="container-clean max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
           >
             <ContactForm
-              title="Start Your Social Journey"
-              subtitle="Tell us about your brand and we'll craft a social strategy that's uniquely you!"
+              title="Tell Us About Your Brand"
+              subtitle="We'll build a social strategy that's designed specifically for your audience and goals."
             />
           </motion.div>
         </div>

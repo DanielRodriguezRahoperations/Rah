@@ -15,8 +15,9 @@ const HomePage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const videoOpacity = Math.max(0, 1 - scrollY / window.innerHeight);
-  const contentOpacity = Math.min(1, Math.max(0, (scrollY - window.innerHeight * 0.4) / (window.innerHeight * 0.4)));
+  const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
+  const videoOpacity = Math.max(0, 1 - scrollY / vh);
+  const contentOpacity = Math.min(1, Math.max(0, (scrollY - vh * 0.4) / (vh * 0.4)));
 
   // Animation variants
   const containerVariants = {
@@ -44,39 +45,38 @@ const HomePage = () => {
         url={absoluteUrl('/')}
       />
 
-      {/* VIDEO HERO - Fixed fullscreen, fades on scroll */}
-      <div
-        className="fixed inset-0 w-full h-screen z-0"
-        style={{
-          opacity: videoOpacity,
-          pointerEvents: videoOpacity === 0 ? 'none' : 'auto',
-        }}
-      >
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-          src="/hero.mp4"
-        />
-        {/* Subtle dark overlay for legibility */}
-        <div className="absolute inset-0 bg-slate-dark/30" />
-
-        {/* Scroll indicator */}
-        <motion.div
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 text-center text-white z-10"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2.5, repeat: Infinity }}
+      {/* VIDEO HERO — sticky approach works on iOS + all devices */}
+      <div style={{ height: '100svh', position: 'relative', overflow: 'hidden' }}>
+        <div
+          style={{
+            position: 'sticky',
+            top: 0,
+            height: '100svh',
+            opacity: videoOpacity,
+            pointerEvents: videoOpacity < 0.05 ? 'none' : 'auto',
+          }}
         >
-          <p className="text-xs uppercase tracking-[0.25em] mb-3 opacity-60">Scroll</p>
-          <div className="w-px h-10 bg-white/40 mx-auto" />
-        </motion.div>
-      </div>
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+            src="/hero.mp4"
+          />
+          <div className="absolute inset-0 bg-slate-dark/30" />
 
-      {/* Spacer — keeps video visible for one full viewport height */}
-      <div className="relative h-screen z-10" style={{ pointerEvents: 'none' }} />
+          <motion.div
+            className="absolute bottom-10 left-1/2 -translate-x-1/2 text-center text-white z-10"
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 2.5, repeat: Infinity }}
+          >
+            <p className="text-xs uppercase tracking-[0.25em] mb-3 opacity-60">Scroll</p>
+            <div className="w-px h-10 bg-white/40 mx-auto" />
+          </motion.div>
+        </div>
+      </div>
 
       {/* SITE CONTENT — fades in as video fades out */}
       <div
