@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import SEOHead from '../components/ui/SEOHead';
 import { absoluteUrl } from '../utils/url';
 import Button from '../components/ui/Button';
@@ -184,6 +185,51 @@ const DigitalMarketingPage = () => {
               </div>
             ))}
           </motion.div>
+        </div>
+      </section>
+
+      {/* RELATED SERVICES — SEO internal links */}
+      <section className="section section-dark">
+        <div className="container-clean">
+          <p className="eyebrow-red mb-6">Related Services</p>
+          <h2 className="text-4xl md:text-5xl font-serif-display font-bold text-white mb-12">
+            Complete the Full Growth Stack
+          </h2>
+          <div className="grid md:grid-cols-3 gap-4">
+            {[
+              {
+                title: 'Website Design & SEO',
+                desc: 'Marketing without a high-converting website wastes every dollar. We build web development that ranks in Scottsdale and Phoenix.',
+                link: '/website-design-and-seo',
+                anchor: 'website design SEO Scottsdale Phoenix AZ',
+              },
+              {
+                title: 'Social Media Management',
+                desc: 'Digital marketing and social media work together. We build the content system that amplifies your paid campaigns.',
+                link: '/social-media-management',
+                anchor: 'social media management near Phoenix Arizona',
+              },
+              {
+                title: 'Business Credit & Funding',
+                desc: 'Scale your marketing budget with business credit. We help Arizona companies build the financial infrastructure to grow.',
+                link: '/business-credit-and-funding',
+                anchor: 'business credit building Phoenix Scottsdale',
+              },
+            ].map((s) => (
+              <Link
+                key={s.title}
+                to={s.link}
+                title={s.anchor}
+                className="block border border-white/10 p-7 hover:border-luxury-red/50 hover:bg-white/5 transition-all duration-300 group"
+              >
+                <h3 className="text-lg font-serif-display font-bold text-white mb-3 group-hover:text-luxury-red transition-colors">
+                  {s.title}
+                </h3>
+                <p className="text-sm text-neutral-400 leading-relaxed mb-4">{s.desc}</p>
+                <span className="text-xs uppercase tracking-widest text-luxury-red">Learn More →</span>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 

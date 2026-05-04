@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import SEOHead from '../components/ui/SEOHead';
 import { absoluteUrl } from '../utils/url';
 import Button from '../components/ui/Button';
@@ -159,6 +160,51 @@ const WebsiteDesignSEOPage = () => {
               </motion.div>
             ))}
           </motion.div>
+        </div>
+      </section>
+
+      {/* RELATED SERVICES — SEO internal links */}
+      <section className="section section-dark">
+        <div className="container-clean">
+          <p className="eyebrow-red mb-6">Related Services</p>
+          <h2 className="text-4xl md:text-5xl font-serif-display font-bold text-white mb-12">
+            Pair Web Development With These Growth Systems
+          </h2>
+          <div className="grid md:grid-cols-3 gap-4">
+            {[
+              {
+                title: 'Digital Marketing',
+                desc: 'Your website ranks — now drive traffic with paid and organic digital marketing in Phoenix and Scottsdale.',
+                link: '/digital-marketing',
+                anchor: 'digital marketing Scottsdale Phoenix AZ',
+              },
+              {
+                title: 'Social Media Management',
+                desc: 'Amplify your web presence with strategic social media content that builds brand authority near Scottsdale.',
+                link: '/social-media-management',
+                anchor: 'social media management Scottsdale Arizona',
+              },
+              {
+                title: 'Business Credit & Funding',
+                desc: 'A professional website signals legitimacy to lenders. Pair it with our business credit building system.',
+                link: '/business-credit-and-funding',
+                anchor: 'business credit funding Arizona',
+              },
+            ].map((s) => (
+              <Link
+                key={s.title}
+                to={s.link}
+                title={s.anchor}
+                className="block border border-white/10 p-7 hover:border-luxury-red/50 hover:bg-white/5 transition-all duration-300 group"
+              >
+                <h3 className="text-lg font-serif-display font-bold text-white mb-3 group-hover:text-luxury-red transition-colors">
+                  {s.title}
+                </h3>
+                <p className="text-sm text-neutral-400 leading-relaxed mb-4">{s.desc}</p>
+                <span className="text-xs uppercase tracking-widest text-luxury-red">Learn More →</span>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
