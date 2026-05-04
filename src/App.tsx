@@ -29,7 +29,7 @@ import PortfolioPage from './pages/PortfolioPage';
 import CaseStudiesPage from './pages/CaseStudiesPage';
 import Tier1CustomsCaseStudy from './pages/case-studies/Tier1CustomsCaseStudy';
 import EverAfterEditCaseStudy from './pages/case-studies/EverAfterEditCaseStudy';
-import EmpireBuildsAzCaseStudy from './pages/case-studies/EmpireBuildsAz';
+import EmpireBuildsAzCaseStudy from './pages/case-studies/EmpireBuildsAzCaseStudy';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
