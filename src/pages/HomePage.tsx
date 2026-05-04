@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SEOHead from '../components/ui/SEOHead';
@@ -7,12 +7,16 @@ import Button from '../components/ui/Button';
 
 const HomePage = () => {
   const [scrollY, setScrollY] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const videoOpacity = Math.max(0, 1 - scrollY / window.innerHeight);
+  const contentOpacity = Math.min(1, Math.max(0, (scrollY - window.innerHeight * 0.4) / (window.innerHeight * 0.4)));
 
   // Animation variants
   const containerVariants = {
@@ -40,9 +44,48 @@ const HomePage = () => {
         url={absoluteUrl('/')}
       />
 
-      {/* HERO - DRAMATIC BRUTALIST EDITORIAL */}
-      <section className="relative min-h-screen bg-gradient-to-br from-slate-dark via-cream-50 to-cream-100 overflow-hidden pt-24 lg:pt-32 pb-20 lg:pb-32">
-        {/* Background elements */}
+      {/* VIDEO HERO - Fixed fullscreen, fades on scroll */}
+      <div
+        className="fixed inset-0 w-full h-screen z-0"
+        style={{
+          opacity: videoOpacity,
+          pointerEvents: videoOpacity === 0 ? 'none' : 'auto',
+        }}
+      >
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+          src="/hero.mp4"
+        />
+        {/* Subtle dark overlay for legibility */}
+        <div className="absolute inset-0 bg-slate-dark/30" />
+
+        {/* Scroll indicator */}
+        <motion.div
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 text-center text-white z-10"
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 2.5, repeat: Infinity }}
+        >
+          <p className="text-xs uppercase tracking-[0.25em] mb-3 opacity-60">Scroll</p>
+          <div className="w-px h-10 bg-white/40 mx-auto" />
+        </motion.div>
+      </div>
+
+      {/* Spacer — keeps video visible for one full viewport height */}
+      <div className="relative h-screen z-10" style={{ pointerEvents: 'none' }} />
+
+      {/* SITE CONTENT — fades in as video fades out */}
+      <div
+        className="relative z-10"
+        style={{ opacity: contentOpacity }}
+      >
+
+      {/* HERO TEXT — first content section after video */}
+      <section className="relative bg-gradient-to-br from-slate-dark via-cream-50 to-cream-100 overflow-hidden pt-24 lg:pt-32 pb-20 lg:pb-32">
         <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-gradient-to-bl from-luxury-red/5 to-transparent rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-gradient-to-tr from-luxury-red/3 to-transparent rounded-full blur-3xl" />
 
@@ -50,31 +93,29 @@ const HomePage = () => {
           <motion.div
             className="max-w-5xl"
             initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
             transition={{ duration: 1, ease: [0.33, 0.66, 0.66, 1] }}
           >
-            {/* Overline */}
             <div className="mb-8 inline-block">
               <p className="eyebrow-red">Website Design • SEO • Scottsdale</p>
             </div>
 
-            {/* Hero Headline - Maximalist Typography */}
             <h1 className="text-6xl md:text-7xl lg:text-8xl font-serif-display font-bold leading-[0.95] mb-10 text-slate-dark">
               Your Website Should Prove You're Worth Contacting.
               <span className="block text-luxury-red mt-4">Before you say anything.</span>
             </h1>
 
-            {/* Subheading - Editorial */}
             <p className="text-lg md:text-xl text-neutral-600 max-w-2xl mb-12 font-serif-body leading-relaxed">
               RAH Operations builds premium websites that work harder than copy, design, or hope. Strategy, visual direction, SEO structure, and conversion architecture all working together.
             </p>
 
-            {/* CTA Buttons */}
             <motion.div
               className="flex flex-col sm:flex-row gap-4 mb-16"
               variants={containerVariants}
               initial="hidden"
-              animate="visible"
+              whileInView="visible"
+              viewport={{ once: true }}
             >
               <motion.div variants={itemVariants}>
                 <Button to="/contact" size="lg" className="w-full sm:w-auto">
@@ -88,12 +129,12 @@ const HomePage = () => {
               </motion.div>
             </motion.div>
 
-            {/* Trust Stats - Staggered Reveal */}
             <motion.div
               className="grid grid-cols-2 md:grid-cols-3 gap-8 pt-12 border-t border-neutral-300"
               variants={containerVariants}
               initial="hidden"
-              animate="visible"
+              whileInView="visible"
+              viewport={{ once: true }}
             >
               {[
                 { number: '50+', label: 'Premium Websites' },
@@ -112,16 +153,6 @@ const HomePage = () => {
             </motion.div>
           </motion.div>
         </div>
-
-        {/* Scroll Indicator */}
-        <motion.div
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 3, repeat: Infinity }}
-        >
-          <p className="text-xs uppercase tracking-widest text-neutral-500 mb-3">Scroll</p>
-          <div className="w-0.5 h-8 bg-luxury-red/30 mx-auto" />
-        </motion.div>
       </section>
 
       {/* PROBLEM SECTION - ASYMMETRIC LAYOUT */}
@@ -472,6 +503,7 @@ const HomePage = () => {
           </motion.div>
         </div>
       </section>
+      </div>{/* end content fade-in wrapper */}
     </>
   );
 };
