@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import SEOHead from '../components/ui/SEOHead';
 import { absoluteUrl } from '../utils/url';
@@ -27,7 +26,7 @@ const AboutPage = () => {
             className="max-w-4xl"
           >
             <p className="eyebrow-red mb-8">About RAH Operations</p>
-            <h1 className="text-6xl md:text-8xl font-serif-display font-bold leading-[0.85] mb-10 text-slate-dark">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-serif-display font-bold leading-[0.85] mb-10 text-slate-dark">
               We Build Websites
               <span className="block text-luxury-red">That Work.</span>
             </h1>

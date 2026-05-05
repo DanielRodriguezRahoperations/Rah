@@ -356,7 +356,7 @@
 ------------------------- */
 
 * {
-  transition-property: color, background-color, border-color, opacity, transform, box-shadow;
+  transition-property: color, background-color, border-color, transform, box-shadow;
   transition-duration: 250ms;
   transition-timing-function: cubic-bezier(0.33, 0.66, 0.66, 1);
 }

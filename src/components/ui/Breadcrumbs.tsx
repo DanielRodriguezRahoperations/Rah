@@ -9,27 +9,27 @@ const Breadcrumbs: React.FC = () => {
   if (pathnames.length === 0) return null;
 
   return (
-    <nav className="bg-gray-50 border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center py-3">
-          <Link to="/" className="text-gray-500 hover:text-[#3CBEC7] transition-colors">
-            <Home className="w-4 h-4" />
+    <nav className="border-b border-neutral-200 bg-cream-100" aria-label="Breadcrumb">
+      <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-1 py-2.5 overflow-x-auto scrollbar-none">
+          <Link to="/" className="flex-shrink-0 text-neutral-400 hover:text-[#7a1c1c] transition-colors" aria-label="Home">
+            <Home className="w-3.5 h-3.5" />
           </Link>
           {pathnames.map((name, index) => {
             const routeTo = `/${pathnames.slice(0, index + 1).join('/')}`;
             const isLast = index === pathnames.length - 1;
-            
+
             return (
               <React.Fragment key={name}>
-                <ChevronRight className="w-4 h-4 text-gray-400 mx-2" />
+                <ChevronRight className="w-3 h-3 flex-shrink-0 text-neutral-300" />
                 {isLast ? (
-                  <span className="text-gray-900 font-medium capitalize">
+                  <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-neutral-600 capitalize whitespace-nowrap">
                     {name.replace(/-/g, ' ')}
                   </span>
                 ) : (
                   <Link
                     to={routeTo}
-                    className="text-gray-500 hover:text-[#3CBEC7] transition-colors capitalize"
+                    className="text-[11px] font-medium uppercase tracking-[0.12em] text-neutral-400 hover:text-[#7a1c1c] transition-colors capitalize whitespace-nowrap"
                   >
                     {name.replace(/-/g, ' ')}
                   </Link>

@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import SEOHead from '../components/ui/SEOHead';
@@ -30,7 +29,7 @@ const WebsiteDesignSEOPage = () => {
             <div className="mb-8">
               <p className="eyebrow-red mb-6">Website Design • Local SEO • Development</p>
             </div>
-            <h1 className="text-6xl md:text-7xl lg:text-8xl font-serif-display font-bold leading-[0.9] mb-12 text-slate-dark">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-serif-display font-bold leading-[0.9] mb-12 text-slate-dark">
               Your Website Should Earn Your Business Trust.
               <span className="block text-luxury-red mt-6">Not Destroy It.</span>
             </h1>

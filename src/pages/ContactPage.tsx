@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import SEOHead from '../components/ui/SEOHead';
 import { absoluteUrl } from '../utils/url';
@@ -27,7 +26,7 @@ const ContactPage = () => {
             transition={{ duration: 1 }}
             className="max-w-2xl"
           >
-            <h1 className="text-6xl md:text-7xl lg:text-8xl font-serif-display font-bold leading-[0.9] text-white mb-10">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-serif-display font-bold leading-[0.9] text-white mb-10">
               Let's Build Something Better.
             </h1>
             <p className="text-xl text-neutral-300 font-serif-body leading-relaxed mb-8">

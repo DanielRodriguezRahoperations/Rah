@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import SEOHead from '../../components/ui/SEOHead';
 import { absoluteUrl } from '../../utils/url';
@@ -64,7 +63,7 @@ const Tier1CustomsCaseStudy = () => {
             <div className="text-sm uppercase tracking-widest text-cyan-400 mb-6 font-mono">
               Case Study — Automotive Customization
             </div>
-            <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-8 leading-tight font-mono">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-8 leading-tight font-mono">
               Tier 1
               <span className="block text-cyan-400">Customs</span>
               <span className="block text-pink-400 text-4xl">NEON ERA</span>

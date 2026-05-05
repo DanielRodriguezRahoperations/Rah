@@ -175,7 +175,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
 
             <div className="relative mb-10">
               <p className="eyebrow-red mb-4">Contact</p>
-              <h2 className="mb-4">{title}</h2>
+              <h2 className="text-2xl sm:text-3xl mb-4">{title}</h2>
               <p className="max-w-2xl text-lg leading-8">{subtitle}</p>
             </div>
 

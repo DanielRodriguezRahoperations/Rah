@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SEOHead from '../components/ui/SEOHead';
@@ -57,7 +56,7 @@ const CaseStudiesPage = () => {
             transition={{ duration: 1 }}
           >
             <p className="eyebrow-red mb-8">Portfolio</p>
-            <h1 className="text-6xl md:text-8xl font-serif-display font-bold leading-[0.85] mb-10">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-serif-display font-bold leading-[0.85] mb-10">
               Websites Built to
               <span className="block text-luxury-red">Produce Results.</span>
             </h1>

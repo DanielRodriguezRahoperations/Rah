@@ -101,7 +101,7 @@ const HomePage = () => {
               <p className="eyebrow-red">Website Design • SEO • Scottsdale</p>
             </div>
 
-            <h1 className="text-6xl md:text-7xl lg:text-8xl font-serif-display font-bold leading-[0.95] mb-10 text-slate-dark">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-serif-display font-bold leading-[0.95] mb-10 text-slate-dark">
               Your Website Should Prove You're Worth Contacting.
               <span className="block text-luxury-red mt-4">Before you say anything.</span>
             </h1>
@@ -209,7 +209,7 @@ const HomePage = () => {
                     className="w-full h-auto"
                   />
                 </div>
-                <div className="absolute -bottom-8 -right-8 bg-luxury-red text-white p-6 font-serif-display">
+                <div className="absolute -bottom-6 -right-4 sm:-bottom-8 sm:-right-8 bg-luxury-red text-white p-4 sm:p-6 font-serif-display">
                   <p className="text-sm font-bold uppercase">The Cost</p>
                   <p className="text-4xl font-bold">87%</p>
                   <p className="text-xs">lost visitors</p>

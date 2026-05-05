@@ -37,7 +37,7 @@ const Footer = () => {
   return (
     <footer className="border-t border-neutral-800 bg-neutral-950 text-white">
       <div className="container-clean py-16 lg:py-20">
-        <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div className="grid gap-8 lg:gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
             <p className="mb-5 text-[11px] font-medium uppercase tracking-[0.24em] text-neutral-500">
               RAH Operations
