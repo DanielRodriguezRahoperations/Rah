@@ -1,8 +1,8 @@
 import ServiceLocationTemplate, { ServicePageContent } from '../../components/templates/ServiceLocationTemplate';
 
 const content: ServicePageContent = {
-  seoTitle: 'Local SEO Phoenix AZ | RAH Operations',
-  seoDescription: 'Local SEO services in Phoenix, AZ. Rank in Google Maps and the local pack for Phoenix area searches. We help Phoenix businesses get found by customers ready to buy.',
+  seoTitle: 'Local SEO Phoenix | Google Maps Rankings for Phoenix Businesses',
+  seoDescription: 'Local SEO services in Phoenix, AZ. Rank in Google Maps and the local pack for Phoenix near-me searches. We help Phoenix businesses get found by buyers ready to act.',
   seoKeywords: 'local SEO Phoenix, local SEO services Phoenix AZ, Google Maps Phoenix, local search optimization Phoenix, Phoenix local SEO company',
   path: '/services/local-seo-phoenix',
   heroEyebrow: 'RAH Operations — Phoenix, AZ',
@@ -54,8 +54,13 @@ const content: ServicePageContent = {
   localBody: [
     'Phoenix is not a monolithic market. Residents search by neighborhood and submarket: Ahwatukee, Arcadia, Camelback East, Laveen, Maryvale, South Mountain, Deer Valley, and dozens of others. A roofing company serving South Phoenix competes differently than one serving Arcadia. A physical therapist in Ahwatukee targets different keywords than one near Camelback Mountain.',
     'Our local SEO strategy accounts for the geographic specificity of how Phoenix customers actually search. We build neighborhood-level content, optimize for proximity-based signals, and ensure your business profile is structured to appear in the searches that matter most in the specific areas you serve.',
-    'If you want to stop watching competitors show up above you in Phoenix Maps results, let\'s start with a free local audit. We will show you the gaps and tell you exactly what will move the needle.',
+    'Phoenix business owners searching for local SEO near me often underestimate how many signals Google actually evaluates for local pack rankings. Start with a free local audit — we will show you the gaps and tell you exactly what will move the needle for your Phoenix service area.',
   ],
+  crossLink: {
+    to: '/services/local-seo-scottsdale',
+    label: 'local SEO in Scottsdale',
+    context: 'We also work with businesses looking for',
+  },
   ctaTitle: 'Own the Phoenix Local Pack for Your Service Category.',
   ctaBody: 'High-intent Phoenix buyers are searching right now. Local SEO determines who they call. Let\'s make sure it\'s you.',
   relatedServices: [

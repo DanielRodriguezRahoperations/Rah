@@ -1,8 +1,8 @@
 import ServiceLocationTemplate, { ServicePageContent } from '../../components/templates/ServiceLocationTemplate';
 
 const content: ServicePageContent = {
-  seoTitle: 'Local SEO Scottsdale AZ | RAH Operations',
-  seoDescription: 'Local SEO services in Scottsdale, AZ. We help Scottsdale businesses rank in Google Maps, the local pack, and near-me searches to capture high-intent local customers.',
+  seoTitle: 'Local SEO Scottsdale | Rank in Google Maps & Local Search',
+  seoDescription: 'Local SEO services in Scottsdale, AZ. We help Scottsdale businesses rank in Google Maps, the local pack, and near-me searches to capture high-intent buyers.',
   seoKeywords: 'local SEO Scottsdale, local SEO services Scottsdale AZ, Google Maps Scottsdale, local search optimization Scottsdale, Scottsdale local SEO company',
   path: '/services/local-seo-scottsdale',
   heroEyebrow: 'RAH Operations — Scottsdale, AZ',
@@ -54,8 +54,13 @@ const content: ServicePageContent = {
   localBody: [
     'Scottsdale\'s local search results are competitive in categories like home services, legal, medical, hospitality, and fitness. In Old Town Scottsdale, North Scottsdale, and the Scottsdale Airpark area, there are well-established local businesses with strong review profiles and solid local SEO foundations. Breaking into the top three of the local pack requires a systematic approach, not just adding a pin to Google Maps.',
     'We have experience in the Scottsdale local search landscape and we understand what it takes to rank in different neighborhoods and service categories here. Whether you serve the entire Scottsdale area or are focused on a specific corridor, we build the local search presence that gets you found.',
-    'Start with a free local SEO audit. We will show you exactly where your Scottsdale business stands in local search results and what changes will have the biggest impact on your local visibility.',
+    'Many Scottsdale small businesses searching for local SEO near me or "local SEO Scottsdale" find agencies that only touch the Google Business Profile without addressing the full local search system. Start with a free local SEO audit — we will show you exactly where your Scottsdale business stands and what changes will move the needle most.',
   ],
+  crossLink: {
+    to: '/services/local-seo-phoenix',
+    label: 'local SEO in Phoenix',
+    context: 'We also work with business owners who need',
+  },
   ctaTitle: 'Get Found First When Scottsdale Customers Are Ready to Buy.',
   ctaBody: 'The local pack is where high-intent customers make decisions. We put your business there.',
   relatedServices: [

@@ -192,9 +192,19 @@ const DigitalMarketingPage = () => {
       <section className="section section-dark">
         <div className="container-clean">
           <p className="eyebrow-red mb-6">Related Services</p>
-          <h2 className="text-4xl md:text-5xl font-serif-display font-bold text-white mb-12">
+          <h2 className="text-4xl md:text-5xl font-serif-display font-bold text-white mb-6">
             Complete the Full Growth Stack
           </h2>
+          <p className="text-neutral-400 text-base leading-relaxed mb-10 max-w-3xl">
+            We build integrated systems for Arizona businesses — from{' '}
+            <Link to="/services/digital-marketing-scottsdale" className="text-white/70 hover:text-white underline underline-offset-2 transition-colors">digital marketing in Scottsdale</Link>{' '}
+            and{' '}
+            <Link to="/services/digital-marketing-phoenix" className="text-white/70 hover:text-white underline underline-offset-2 transition-colors">digital marketing in Phoenix</Link>{' '}
+            to{' '}
+            <Link to="/services/seo-scottsdale" className="text-white/70 hover:text-white underline underline-offset-2 transition-colors">SEO services in Scottsdale</Link>,{' '}
+            <Link to="/services/seo-phoenix" className="text-white/70 hover:text-white underline underline-offset-2 transition-colors">SEO services in Phoenix</Link>, and{' '}
+            <Link to="/services/google-business-profile-optimization-phoenix" className="text-white/70 hover:text-white underline underline-offset-2 transition-colors">Google Business Profile optimization in Phoenix</Link>.
+          </p>
           <div className="grid md:grid-cols-3 gap-4">
             {[
               {

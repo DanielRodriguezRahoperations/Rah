@@ -63,6 +63,11 @@ const content: ServicePageContent = {
     { title: 'Website Design Scottsdale', to: '/services/website-design-scottsdale', desc: 'A credibility-focused website that reinforces your strong reputation.' },
     { title: 'Digital Marketing Scottsdale', to: '/services/digital-marketing-scottsdale', desc: 'Amplify your reputation across paid and organic channels in Scottsdale.' },
   ],
+  crossLink: {
+    to: '/services/reputation-management-phoenix',
+    label: 'reputation management in Phoenix',
+    context: 'We also support business owners looking for',
+  },
   formTitle: 'Request a Free Scottsdale Reputation Audit',
   formSubtitle: 'Tell us about your business and current review situation. We\'ll assess your full digital reputation and identify the highest-priority improvements.',
 };

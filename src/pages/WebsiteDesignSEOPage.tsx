@@ -167,9 +167,17 @@ const WebsiteDesignSEOPage = () => {
       <section className="section section-dark">
         <div className="container-clean">
           <p className="eyebrow-red mb-6">Related Services</p>
-          <h2 className="text-4xl md:text-5xl font-serif-display font-bold text-white mb-12">
+          <h2 className="text-4xl md:text-5xl font-serif-display font-bold text-white mb-6">
             Pair Web Development With These Growth Systems
           </h2>
+          <p className="text-neutral-400 text-base leading-relaxed mb-10 max-w-3xl">
+            RAH Operations also supports business owners looking for{' '}
+            <Link to="/services/website-design-scottsdale" className="text-white/70 hover:text-white underline underline-offset-2 transition-colors">Website Design in Scottsdale</Link>,{' '}
+            <Link to="/services/seo-scottsdale" className="text-white/70 hover:text-white underline underline-offset-2 transition-colors">SEO services in Scottsdale</Link>,{' '}
+            <Link to="/services/local-seo-scottsdale" className="text-white/70 hover:text-white underline underline-offset-2 transition-colors">Local SEO in Scottsdale</Link>, and{' '}
+            <Link to="/services/google-business-profile-optimization-scottsdale" className="text-white/70 hover:text-white underline underline-offset-2 transition-colors">Google Business Profile optimization in Scottsdale</Link>{' '}
+            — as well as the Phoenix equivalents for every service we offer.
+          </p>
           <div className="grid md:grid-cols-3 gap-4">
             {[
               {

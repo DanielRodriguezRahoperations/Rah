@@ -1,8 +1,8 @@
 import ServiceLocationTemplate, { ServicePageContent } from '../../components/templates/ServiceLocationTemplate';
 
 const content: ServicePageContent = {
-  seoTitle: 'SEO Scottsdale AZ | RAH Operations',
-  seoDescription: 'SEO services in Scottsdale, AZ. We help Scottsdale businesses rank higher on Google, build organic search authority, and generate consistent leads from search traffic.',
+  seoTitle: 'SEO Scottsdale | Search Engine Optimization for Scottsdale Businesses',
+  seoDescription: 'SEO services in Scottsdale, AZ. We help Scottsdale businesses rank on Google, grow organic traffic, and generate consistent leads — without depending on paid ads.',
   seoKeywords: 'SEO Scottsdale, SEO services Scottsdale AZ, search engine optimization Scottsdale, Scottsdale SEO company, SEO agency Scottsdale Arizona',
   path: '/services/seo-scottsdale',
   heroEyebrow: 'RAH Operations — Scottsdale, AZ',
@@ -54,8 +54,13 @@ const content: ServicePageContent = {
   localBody: [
     'Scottsdale is not a generic market. The search behavior here is shaped by the types of businesses that dominate the local economy — luxury services, healthcare, real estate, home improvement, hospitality, and professional services. Ranking for Scottsdale-specific keywords means understanding the competitive landscape in each of these verticals.',
     'A pest control company in North Scottsdale competes differently than a financial advisor near Kierland Commons. A cosmetic dentist in Old Town Scottsdale has different keyword opportunities than a general contractor in the Scottsdale Airpark area. We build SEO strategies that are specific to your business, your location, and your target customer — not generic templates applied to every client.',
-    'If your Scottsdale business is ready to invest in organic search authority that compounds over time, reach out for a free audit. We will show you exactly where you stand and what it would take to rank for the terms that matter most.',
+    'Many local business owners searching for an SEO company near me in Scottsdale end up with generalist agencies that do not understand the local competitive dynamics here. If your Scottsdale business is ready to invest in organic search authority that compounds over time, reach out for a free audit. We will show you exactly where you stand and what it would take to rank for the terms that matter most.',
   ],
+  crossLink: {
+    to: '/services/seo-phoenix',
+    label: 'SEO services in Phoenix',
+    context: 'We also work with business owners across the valley who need',
+  },
   ctaTitle: 'Stop Being Invisible in Scottsdale Search Results.',
   ctaBody: 'The customers who are searching for your service right now are choosing someone. Make sure it is you.',
   relatedServices: [

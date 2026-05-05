@@ -121,6 +121,15 @@ const BlogPage = () => {
       category: 'Digital Marketing',
       excerpt: 'Arizona contractors have a digital marketing opportunity most are not capitalizing on. Here is what moves the needle for home services leads in the Phoenix metro.',
       slug: 'digital-marketing-for-contractors-arizona'
+    },
+    {
+      title: 'How to Choose the Right Website Design Company in Scottsdale',
+      displayTitle: 'How to Choose the Right Website Design Company in Scottsdale',
+      date: 'May 4, 2024',
+      issue: 'No. 014',
+      category: 'Website Design',
+      excerpt: 'A practical guide for Scottsdale business owners on how to evaluate web design options — what to look for, what to avoid, and what questions reveal whether a designer truly understands local performance.',
+      slug: 'how-to-choose-website-design-company-scottsdale'
     }
   ];
 

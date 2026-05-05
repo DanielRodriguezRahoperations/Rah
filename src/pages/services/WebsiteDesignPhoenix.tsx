@@ -1,8 +1,8 @@
 import ServiceLocationTemplate, { ServicePageContent } from '../../components/templates/ServiceLocationTemplate';
 
 const content: ServicePageContent = {
-  seoTitle: 'Website Design Phoenix AZ | RAH Operations',
-  seoDescription: 'Custom website design in Phoenix, AZ. We build high-performance business websites for Phoenix companies ready to rank locally, generate leads, and grow revenue.',
+  seoTitle: 'Website Design Phoenix | Professional Websites for Phoenix Businesses',
+  seoDescription: 'Need website design in Phoenix? RAH Operations builds high-performance, SEO-ready websites for Phoenix businesses ready to rank locally and generate real leads.',
   seoKeywords: 'website design Phoenix, Phoenix web design, website design Phoenix AZ, web designer Phoenix, custom website Phoenix Arizona',
   path: '/services/website-design-phoenix',
   heroEyebrow: 'RAH Operations — Phoenix, AZ',
@@ -54,8 +54,13 @@ const content: ServicePageContent = {
   localBody: [
     'Phoenix is not one market — it is a network of distinct neighborhoods, industries, and customer profiles. A website for a contractor in Ahwatukee needs different positioning than a consulting firm in Downtown Phoenix. A restaurant in Tempe has different conversion needs than a medical practice in Paradise Valley.',
     'We build websites with that nuance in mind. Our Phoenix clients get location-relevant content, properly tagged service areas, neighborhood-specific landing pages where relevant, and a design that speaks to the specific type of customer they are trying to reach.',
-    'If you are a Phoenix business ready to stop being invisible online, the starting point is a website built with strategy — not just pixels. We will show you what your current site is missing and what a professionally built site can change.',
+    'Many Phoenix small businesses search for website design near me and end up with a template solution that fails to rank or convert. We will show you what your current site is missing and what a professionally built, locally optimized website can change for your Phoenix business.',
   ],
+  crossLink: {
+    to: '/services/website-design-scottsdale',
+    label: 'website design in Scottsdale',
+    context: 'We also work with business owners looking for',
+  },
   ctaTitle: 'Let\'s Build the Website Your Phoenix Business Deserves.',
   ctaBody: 'Most Phoenix businesses are losing leads because their website is not doing its job. Let\'s fix that.',
   relatedServices: [

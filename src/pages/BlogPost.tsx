@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SEOHead from '../components/ui/SEOHead';
@@ -6,7 +7,7 @@ import Button from '../components/ui/Button';
 
 type BlogSection = {
   heading: string;
-  body: string[];
+  body: React.ReactNode[];
 };
 
 type BlogPostData = {
@@ -211,7 +212,78 @@ const blogPosts: Record<string, BlogPostData> = {
       { heading: 'Google Ads for Contractors: When It Makes Sense', body: ['Google Ads can generate immediate leads for Arizona contractors while organic SEO is building. For emergency services like HVAC repair, plumbing, or roofing after a storm, paid search is often the right channel because those searches happen urgently and the cost per lead can be justified by the job value.', 'The key is sending Google Ads traffic to a dedicated landing page, not a homepage. An Arizona homeowner searching "emergency roof repair Phoenix" who clicks a Google Ad should land on a page specifically about emergency roof repair — with a phone number large and visible, a fast-loading form, and no distractions.'] },
       { heading: 'Reviews Are the Contractor\'s Unfair Advantage', body: ['Arizona homeowners trust other homeowners. A roofing company with 200 five-star Google reviews showing real project photos wins business from a newer company with 15 reviews every time, even if the newer company is technically more skilled.', 'The review gap between established Arizona contractors and newer ones is closeable — but it requires a systematic approach. Ask every customer immediately after a completed project. Make it easy with a direct text link. Respond to every review. Post project photos to Google Business Profile. Do this consistently for 12 months and the review authority becomes a durable competitive advantage that is very hard for competitors to quickly close.'] }
     ]
-  }
+  },
+  'how-to-choose-website-design-company-scottsdale': {
+    title: 'How to Choose the Right Website Design Company in Scottsdale',
+    category: 'Website Design',
+    date: 'May 4, 2024',
+    description: 'A practical guide for Scottsdale business owners on how to evaluate and choose a website design company — covering what to look for, what to avoid, and what questions to ask before signing anything.',
+    keywords: 'how to choose website design company Scottsdale, website design Scottsdale, best web designer Scottsdale AZ, hire website designer Scottsdale, Scottsdale web design agency',
+    content: [
+      {
+        heading: 'The Scottsdale Web Design Market Is Crowded — And That Is a Problem for Buyers',
+        body: [
+          'If you search for a website design company in Scottsdale, you will find dozens of options — freelancers, boutique agencies, large firms, and offshore teams operating through local addresses. The price range spans from a few hundred dollars to tens of thousands. The quality range spans just as wide.',
+          'Choosing the wrong web designer in Scottsdale does not just mean a mediocre website. It can mean a site with no SEO structure, no conversion strategy, poor mobile performance, and no ongoing support — a site that exists online but does not generate leads, rank on Google, or represent the business the way it should.',
+          <>The goal of this article is to give Scottsdale business owners a clear framework for evaluating web design options before committing. If you are actively looking for <Link to="/services/website-design-scottsdale" className="text-[#7a1c1c] underline underline-offset-2 hover:text-[#0f0f0f] transition-colors">website design in Scottsdale</Link>, what follows should make the evaluation process significantly clearer.</>,
+        ],
+      },
+      {
+        heading: 'What to Look for Before You Even Ask for a Quote',
+        body: [
+          'Before reaching out to any Scottsdale web design company, look at their own website. This is their best sales pitch — it is the one site where they had total creative control and no client constraints. If it loads slowly, looks dated, or fails to clearly explain who they serve and what they do, those limitations will show up in your project too.',
+          'Look for evidence of the specific outcomes you care about. If you need a site that ranks locally, does the designer mention local SEO, page structure, or keyword strategy — or do they only talk about visual design? If you need your site to generate leads, do they mention conversion architecture, call-to-action design, or landing page strategy — or just that their work "looks great"?',
+          'A good Scottsdale web design company should be able to walk you through not just what they will build, but why each decision supports the business outcome you are paying for.',
+        ],
+      },
+      {
+        heading: 'The Questions That Reveal a Designer\'s Real Capabilities',
+        body: [
+          'Ask any potential Scottsdale web design partner these questions before signing a contract:',
+          'Is SEO included in the build, or is it a separate service? A website built without SEO architecture from the start will underperform in local search no matter how well it looks. The page titles, headings, meta descriptions, schema markup, and site speed need to be built correctly from day one.',
+          'Who writes the copy? Many web design firms focus entirely on design and expect the client to provide all the written content. Copy written by someone who does not understand conversion or your target customer will undermine even the best visual design.',
+          'Do you own the website after launch? With some platforms and agencies, the client does not fully own the site files or the design. If you ever want to move to a different host or redesign with another team, you should own your website outright.',
+          <>Beyond the website itself, the right partner should be able to connect your site to a broader local strategy — including <Link to="/services/seo-scottsdale" className="text-[#7a1c1c] underline underline-offset-2 hover:text-[#0f0f0f] transition-colors">SEO services in Scottsdale</Link>, <Link to="/services/local-seo-scottsdale" className="text-[#7a1c1c] underline underline-offset-2 hover:text-[#0f0f0f] transition-colors">local SEO in Scottsdale</Link>, and a <Link to="/services/google-business-profile-optimization-scottsdale" className="text-[#7a1c1c] underline underline-offset-2 hover:text-[#0f0f0f] transition-colors">Google Business Profile optimization in Scottsdale</Link> strategy that supports your organic search presence from launch day.</>,
+        ],
+      },
+      {
+        heading: 'The Red Flags That Are Easy to Miss',
+        body: [
+          'A portfolio full of visually attractive websites is not the same as a portfolio of websites that perform. Ask whether the sites they built are still live. Ask whether those businesses are ranking in local search. If the designer cannot speak to performance outcomes, they are a graphic designer — not a web strategist.',
+          'Be cautious of Scottsdale web design companies that offer unusually low pricing with vague deliverables. "Website starting at $499" often means a template with minimal customization, no SEO, no copywriting, and no strategy. The deliverable at that price point is a site that technically exists — not a site that generates business.',
+          'Watch for over-reliance on website builders that limit performance. Platforms like Wix and Squarespace have meaningful limitations in site speed, SEO control, and long-term scalability. For a Scottsdale business serious about local search rankings, a custom-built or professionally developed site almost always outperforms template platforms.',
+          'Finally, be wary of agencies that do not ask about your business goals before proposing a solution. A web design company that quotes you without understanding your service area, your target customer, your competition, and your growth goals is not building a marketing asset. They are building a template with your logo on it.',
+        ],
+      },
+      {
+        heading: 'Understanding What You Are Actually Paying For',
+        body: [
+          'Website design pricing in Scottsdale generally falls into three practical tiers: budget freelance ($500–$2,500), professional small-agency ($3,000–$8,000), and full-service marketing agency ($8,000–$25,000+).',
+          'At the budget tier, you are mostly paying for visual design and basic setup. SEO, copywriting, conversion strategy, and ongoing support are usually not included and often not considered.',
+          'At the professional small-agency tier, you should expect a full design process, custom or significantly customized layouts, SEO-structured architecture, professional copy or copy guidance, mobile optimization, analytics setup, and meaningful support after launch.',
+          'At the full-service agency tier, you are often getting a broader scope — more pages, custom functionality, integrated marketing strategy, brand development, or a full content and SEO roadmap alongside the build.',
+          <>For most Scottsdale small and mid-sized businesses, the $3,000–$8,000 range covers everything needed for a professional site that ranks and converts. The question is not just how much you spend — it is whether the team you hire understands <Link to="/services/digital-marketing-scottsdale" className="text-[#7a1c1c] underline underline-offset-2 hover:text-[#0f0f0f] transition-colors">digital marketing in Scottsdale</Link> well enough to build a site that actually performs in your specific market.</>,
+        ],
+      },
+      {
+        heading: 'How to Evaluate the Fit Before You Sign',
+        body: [
+          'The best Scottsdale web design companies will want to understand your business before proposing anything. They will ask who your customers are, what makes you different from competitors, what your primary goal for the site is, and what search terms your ideal clients are using to find services like yours.',
+          'If a designer skips those questions and goes straight to showing you templates or quoting a price, they are prioritizing their workflow over your outcomes. That is worth noting.',
+          'Request a brief discovery call before committing. Use it to assess whether they speak fluently about the connection between design and search performance, whether they understand the Scottsdale market specifically, and whether they can articulate how a site they build would actually generate leads for your type of business.',
+          'The right web design partner in Scottsdale is not just a vendor — they are a strategic collaborator. If the conversation feels like a sales pitch rather than a strategy discussion, keep looking.',
+        ],
+      },
+      {
+        heading: 'Final Checklist Before You Hire',
+        body: [
+          'Before signing with any Scottsdale website design company, confirm the following: You will own the website files and domain. SEO is built into the architecture, not added later. Copy is included or there is a clear plan for who writes what. The designer can speak to how the site will perform in local search. Post-launch support is defined. You have seen real examples of comparable work.',
+          <>If you are still evaluating options for <Link to="/services/website-design-scottsdale" className="text-[#7a1c1c] underline underline-offset-2 hover:text-[#0f0f0f] transition-colors">website design in Scottsdale</Link>, RAH Operations builds custom, SEO-structured websites for Scottsdale businesses that need to rank locally, earn trust quickly, and convert visitors into leads. We handle design, copy, development, and local SEO strategy in a single integrated process — not as separate add-ons.</>,
+          'Schedule a free consultation and we will review your current site, your competitive landscape, and exactly what a new site would need to do to deliver measurable results for your Scottsdale business.',
+        ],
+      },
+    ],
+  },
 };
 
 const BlogPost = () => {

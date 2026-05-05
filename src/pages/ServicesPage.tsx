@@ -251,10 +251,22 @@ const ServicesPage = () => {
               <br />
               <span className="text-luxury-red">We Sell Outcomes.</span>
             </h2>
-            <p className="text-neutral-300 text-lg leading-relaxed mb-8">
+            <p className="text-neutral-300 text-lg leading-relaxed mb-6">
               We don't pad retainers or inflate deliverables. Every project we take on is
               structured around a measurable result — more visibility, more leads, or stronger
               financial positioning for your business.
+            </p>
+            <p className="text-neutral-400 text-base leading-relaxed mb-8">
+              Whether you need{' '}
+              <Link to="/services/website-design-scottsdale" className="text-white/70 hover:text-white underline underline-offset-2 transition-colors">Website Design in Scottsdale</Link>,{' '}
+              <Link to="/services/website-design-phoenix" className="text-white/70 hover:text-white underline underline-offset-2 transition-colors">Website Design in Phoenix</Link>,{' '}
+              <Link to="/services/seo-scottsdale" className="text-white/70 hover:text-white underline underline-offset-2 transition-colors">SEO services in Scottsdale</Link>,{' '}
+              <Link to="/services/seo-phoenix" className="text-white/70 hover:text-white underline underline-offset-2 transition-colors">SEO services in Phoenix</Link>,{' '}
+              <Link to="/services/local-seo-scottsdale" className="text-white/70 hover:text-white underline underline-offset-2 transition-colors">Local SEO in Scottsdale</Link>,{' '}
+              <Link to="/services/local-seo-phoenix" className="text-white/70 hover:text-white underline underline-offset-2 transition-colors">Local SEO in Phoenix</Link>,{' '}
+              <Link to="/services/google-business-profile-optimization-scottsdale" className="text-white/70 hover:text-white underline underline-offset-2 transition-colors">Google Business Profile optimization in Scottsdale</Link>, or{' '}
+              <Link to="/services/google-business-profile-optimization-phoenix" className="text-white/70 hover:text-white underline underline-offset-2 transition-colors">Google Business Profile optimization in Phoenix</Link>{' '}
+              — every service is built around measurable outcomes for your specific Arizona market.
             </p>
             <Button to="/about" variant="secondary">About RAH Operations</Button>
           </motion.div>
@@ -271,7 +283,7 @@ const ServicesPage = () => {
               { title: 'Revenue Focused', body: 'Systems built to generate real business results.' },
               { title: 'Built for Scale', body: 'We build infrastructure that grows with you.' },
               { title: 'Local Authority', body: 'Deep expertise in Scottsdale & Phoenix markets.' },
-            ].map((card, i) => (
+            ].map((card) => (
               <div
                 key={card.title}
                 className="border border-white/10 p-6 hover:border-luxury-red/50 transition-colors duration-300"

@@ -63,6 +63,11 @@ const content: ServicePageContent = {
     { title: 'Business Credit Scottsdale', to: '/services/business-credit-scottsdale', desc: 'Once personal credit is stronger, build a separate business credit profile.' },
     { title: 'Business Funding Arizona', to: '/services/business-funding-arizona', desc: 'Better personal credit opens doors to better business funding options.' },
   ],
+  crossLink: {
+    to: '/services/credit-repair-phoenix',
+    label: 'credit repair in Phoenix',
+    context: 'We also help residents across the metro who need',
+  },
   formTitle: 'Schedule a Free Credit Review in Scottsdale',
   formSubtitle: 'Tell us about your credit situation and goals. We\'ll review your report and map a realistic path to improvement.',
 };

@@ -1,8 +1,8 @@
 import ServiceLocationTemplate, { ServicePageContent } from '../../components/templates/ServiceLocationTemplate';
 
 const content: ServicePageContent = {
-  seoTitle: 'Google Business Profile Optimization Scottsdale AZ | RAH Operations',
-  seoDescription: 'Google Business Profile optimization in Scottsdale, AZ. Maximize your Maps visibility, improve local pack rankings, and generate more calls from Scottsdale local searches.',
+  seoTitle: 'Google Business Profile Optimization Scottsdale | More Calls from Maps',
+  seoDescription: 'Google Business Profile optimization in Scottsdale, AZ. Maximize your Maps visibility, improve local pack rankings, and generate more calls from Scottsdale searches.',
   seoKeywords: 'Google Business Profile optimization Scottsdale, Google My Business Scottsdale AZ, GBP optimization Scottsdale, Google Maps Scottsdale, local listing optimization Scottsdale Arizona',
   path: '/services/google-business-profile-optimization-scottsdale',
   heroEyebrow: 'RAH Operations — Scottsdale, AZ',
@@ -54,8 +54,13 @@ const content: ServicePageContent = {
   localBody: [
     'In Scottsdale, Google Business Profile performance directly influences how many calls a local business gets every week. We have seen properly optimized profiles double and triple the call volume for Scottsdale businesses in home services, medical, and professional service categories within 60 to 90 days of full optimization.',
     'The Scottsdale local pack is competitive, but most businesses in it are not maximizing their profiles. A business that takes GBP optimization seriously often outranks competitors with more years in business and more overall reviews — because Google rewards profile completeness, activity, and relevance, not just seniority.',
-    'If your Scottsdale GBP is not generating the call volume it should, start with a free profile review.',
+    'Many Scottsdale businesses searching for Google Business Profile help near me find services that only claim and fill in basic fields — without the ongoing optimization and review management that drives consistent local pack rankings. If your GBP is not generating the call volume it should, start with a free profile review.',
   ],
+  crossLink: {
+    to: '/services/google-business-profile-optimization-phoenix',
+    label: 'Google Business Profile optimization in Phoenix',
+    context: 'We also work with businesses looking for',
+  },
   ctaTitle: 'Turn Your Scottsdale Google Profile Into a Lead Generation Machine.',
   ctaBody: 'Most Scottsdale businesses are leaving local search calls on the table. A fully optimized GBP changes that.',
   relatedServices: [

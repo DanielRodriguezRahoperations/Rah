@@ -63,6 +63,11 @@ const content: ServicePageContent = {
     { title: 'Local SEO Phoenix', to: '/services/local-seo-phoenix', desc: 'Dominate local pack rankings across Phoenix neighborhoods and service areas.' },
     { title: 'Website Design Phoenix', to: '/services/website-design-phoenix', desc: 'A high-converting website is where all your Phoenix marketing investment lands.' },
   ],
+  crossLink: {
+    to: '/services/digital-marketing-scottsdale',
+    label: 'digital marketing in Scottsdale',
+    context: 'We also serve businesses that need',
+  },
   formTitle: 'Let\'s Build a Digital Marketing System for Your Phoenix Business',
   formSubtitle: 'Tell us your revenue goals and current marketing situation. We\'ll show you exactly what it takes to get there.',
 };

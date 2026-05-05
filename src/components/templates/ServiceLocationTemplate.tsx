@@ -24,6 +24,7 @@ export interface ServicePageContent {
   processSteps: { num: string; title: string; desc: string }[];
   localTitle: string;
   localBody: string[];
+  crossLink?: { to: string; label: string; context: string };
   stats: { value: string; label: string }[];
   ctaTitle: string;
   ctaBody: string;
@@ -266,6 +267,18 @@ export default function ServiceLocationTemplate({ content }: { content: ServiceP
                 {p}
               </p>
             ))}
+            {content.crossLink && (
+              <p className="text-neutral-600 font-serif-body text-lg leading-relaxed mt-6">
+                {content.crossLink.context}{' '}
+                <Link
+                  to={content.crossLink.to}
+                  className="text-[#7a1c1c] underline underline-offset-2 hover:text-[#0f0f0f] transition-colors"
+                >
+                  {content.crossLink.label}
+                </Link>
+                .
+              </p>
+            )}
           </motion.div>
         </div>
       </section>

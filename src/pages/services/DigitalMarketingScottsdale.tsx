@@ -63,6 +63,11 @@ const content: ServicePageContent = {
     { title: 'Local SEO Scottsdale', to: '/services/local-seo-scottsdale', desc: 'Local search dominance for Scottsdale service area searches.' },
     { title: 'Website Design Scottsdale', to: '/services/website-design-scottsdale', desc: 'The conversion hub where all your digital marketing sends traffic.' },
   ],
+  crossLink: {
+    to: '/services/digital-marketing-phoenix',
+    label: 'digital marketing in Phoenix',
+    context: 'We also work with business owners looking for',
+  },
   formTitle: 'Get a Digital Marketing Strategy for Your Scottsdale Business',
   formSubtitle: 'Tell us about your business goals and current marketing. We\'ll build a clear, integrated plan.',
 };

@@ -1,8 +1,8 @@
 import ServiceLocationTemplate, { ServicePageContent } from '../../components/templates/ServiceLocationTemplate';
 
 const content: ServicePageContent = {
-  seoTitle: 'Website Design Scottsdale AZ | RAH Operations',
-  seoDescription: 'Professional website design in Scottsdale, AZ. Custom-built websites engineered for local search rankings, credibility, and lead generation. Serving Scottsdale businesses.',
+  seoTitle: 'Website Design Scottsdale | Custom Websites for Local Businesses',
+  seoDescription: 'Need website design in Scottsdale? RAH Operations builds clean, SEO-focused websites for local businesses that want more traffic, leads, and trust.',
   seoKeywords: 'website design Scottsdale, Scottsdale web design, website design Scottsdale AZ, web designer Scottsdale, custom website design Scottsdale Arizona',
   path: '/services/website-design-scottsdale',
   heroEyebrow: 'RAH Operations — Scottsdale, AZ',
@@ -54,8 +54,13 @@ const content: ServicePageContent = {
   localBody: [
     'Scottsdale is a different kind of market. Clients in Old Town Scottsdale, North Scottsdale, Gainey Ranch, and the surrounding corridors have high expectations. They look for polished, professional presentation before they reach out. That standard raises the bar for every local business that wants to compete seriously.',
     'We understand the Scottsdale business environment. Whether you are a medical spa in the McCormick Ranch area, a contractor serving luxury custom homes in DC Ranch, a law firm near the Scottsdale Financial Center, or a consultant building a client base in North Scottsdale — your website needs to meet the visual and functional standards your potential clients expect.',
-    'Our team has worked with Scottsdale-area businesses across multiple industries and we build every website with local relevance in mind: the right messaging, the right structure, and the right signals to show Google that your business belongs at the top of local search results.',
+    'Our team has worked with Scottsdale-area businesses across multiple industries and we build every website with local relevance in mind. If you are searching for website design near me in Scottsdale, the real goal is not just finding a designer — it is finding a team that understands local visibility, conversion strategy, and how Scottsdale customers compare businesses before making contact.',
   ],
+  crossLink: {
+    to: '/services/website-design-phoenix',
+    label: 'website design in Phoenix',
+    context: 'We also serve business owners across the metro who need',
+  },
   ctaTitle: 'Ready for a Website That Actually Works?',
   ctaBody: 'Let\'s talk about what your current site is missing and what a redesigned, SEO-built website could do for your Scottsdale business.',
   relatedServices: [

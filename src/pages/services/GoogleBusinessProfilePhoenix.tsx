@@ -1,8 +1,8 @@
 import ServiceLocationTemplate, { ServicePageContent } from '../../components/templates/ServiceLocationTemplate';
 
 const content: ServicePageContent = {
-  seoTitle: 'Google Business Profile Optimization Phoenix AZ | RAH Operations',
-  seoDescription: 'Google Business Profile optimization in Phoenix, AZ. We help Phoenix businesses rank in the local pack, generate more Map views, and drive more calls from local searches.',
+  seoTitle: 'Google Business Profile Optimization Phoenix | Drive More Local Calls',
+  seoDescription: 'Google Business Profile optimization in Phoenix, AZ. Rank in the local pack, drive more Map views, and generate more calls from Phoenix near-me searches.',
   seoKeywords: 'Google Business Profile optimization Phoenix, Google My Business Phoenix AZ, GBP optimization Phoenix, Google Maps Phoenix, local listing optimization Phoenix Arizona',
   path: '/services/google-business-profile-optimization-phoenix',
   heroEyebrow: 'RAH Operations — Phoenix, AZ',
@@ -54,8 +54,13 @@ const content: ServicePageContent = {
   localBody: [
     'Phoenix\'s business diversity means GBP optimization needs differ by category. A restaurant needs menu items, hours, and regular photo updates. A contractor needs detailed service listings and project photos. A healthcare provider needs telehealth attributes and appointment links. A professional service firm needs accreditations and specialties highlighted.',
     'We optimize Phoenix GBPs with category-specific expertise, ensuring that your profile is not just complete in the generic sense but fully built out for the specific way Phoenix customers search for your type of business.',
-    'If your Phoenix Google Business Profile is not generating the calls it should, start with a free profile audit. We will show you exactly what is missing and what needs to change.',
+    'Business owners searching for Google Business Profile optimization near me or "GBP help Phoenix" often find that the real gap is not just filling in the profile — it is the ongoing management, review generation, and consistent posting that compounds into lasting local pack presence. Start with a free profile audit to see exactly what needs to change.',
   ],
+  crossLink: {
+    to: '/services/google-business-profile-optimization-scottsdale',
+    label: 'Google Business Profile optimization in Scottsdale',
+    context: 'We also serve businesses looking for',
+  },
   ctaTitle: 'Make Your Phoenix Google Profile Your Best-Performing Marketing Channel.',
   ctaBody: 'Fully optimized GBPs generate calls every day without ongoing ad spend. Phoenix customers are already searching — let\'s make sure they find you.',
   relatedServices: [

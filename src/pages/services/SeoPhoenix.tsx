@@ -1,8 +1,8 @@
 import ServiceLocationTemplate, { ServicePageContent } from '../../components/templates/ServiceLocationTemplate';
 
 const content: ServicePageContent = {
-  seoTitle: 'SEO Phoenix AZ | RAH Operations',
-  seoDescription: 'SEO services in Phoenix, AZ. We help Phoenix businesses rank on Google, grow organic search traffic, and generate leads without depending entirely on paid advertising.',
+  seoTitle: 'SEO Phoenix | Organic Search Strategy for Phoenix Businesses',
+  seoDescription: 'SEO services in Phoenix, AZ. We help Phoenix businesses rank on Google, grow organic traffic, and generate consistent leads without depending on paid advertising.',
   seoKeywords: 'SEO Phoenix, SEO services Phoenix AZ, search engine optimization Phoenix, Phoenix SEO company, SEO agency Phoenix Arizona',
   path: '/services/seo-phoenix',
   heroEyebrow: 'RAH Operations — Phoenix, AZ',
@@ -54,8 +54,13 @@ const content: ServicePageContent = {
   localBody: [
     'Phoenix is a sprawling metro and search behavior reflects that. People search by neighborhood: "dentist Arcadia Phoenix," "contractor Ahwatukee," "attorney Downtown Phoenix," "HVAC Glendale AZ." If your SEO strategy does not account for the geographic specificity of how Phoenix customers actually search, you are leaving a significant amount of local search traffic uncaptured.',
     'Our Phoenix SEO work includes neighborhood-specific content where relevant, proper location schema markup, Google Business Profile optimization, and a content strategy built around how Phoenix-area buyers research your type of service.',
-    'If you are ready to stop renting attention from Google and start owning it, request a free SEO audit. We will show you where you stand, where the opportunity is, and what it takes to get there.',
+    'Phoenix business owners searching for an SEO company near me often find large agencies that treat every client the same. We build strategies specific to your category, your service area, and your revenue goals. Request a free SEO audit to see where you stand and what it takes to get to the top of local results.',
   ],
+  crossLink: {
+    to: '/services/seo-scottsdale',
+    label: 'SEO services in Scottsdale',
+    context: 'We also serve businesses looking for',
+  },
   ctaTitle: 'Phoenix Customers Are Searching. Make Sure They Find You.',
   ctaBody: 'Every day without a real SEO strategy is a day your competitors earn the leads you should be getting. Let\'s fix that.',
   relatedServices: [

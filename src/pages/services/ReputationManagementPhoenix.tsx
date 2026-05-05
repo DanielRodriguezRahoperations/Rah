@@ -63,6 +63,11 @@ const content: ServicePageContent = {
     { title: 'Digital Marketing Phoenix', to: '/services/digital-marketing-phoenix', desc: 'Full digital marketing to grow your Phoenix business across all channels.' },
     { title: 'Website Design Phoenix', to: '/services/website-design-phoenix', desc: 'A credible website that reinforces what your reviews already say about you.' },
   ],
+  crossLink: {
+    to: '/services/reputation-management-scottsdale',
+    label: 'reputation management in Scottsdale',
+    context: 'We also serve businesses across the metro who need',
+  },
   formTitle: 'Get a Free Phoenix Reputation Assessment',
   formSubtitle: 'Tell us about your business and what review challenges you are facing. We\'ll show you what customers are currently finding.',
 };
