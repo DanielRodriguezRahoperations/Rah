@@ -447,6 +447,58 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* LOCAL SEO PAGES — homepage internal links for SEO authority */}
+      <section className="section bg-[#f9f7f4]">
+        <div className="container-clean">
+          <motion.div
+            className="mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <p className="eyebrow-red mb-4">Scottsdale & Phoenix</p>
+            <h2 className="text-4xl md:text-5xl font-serif-display font-bold text-slate-dark max-w-3xl leading-tight">
+              Serving Arizona Businesses Across Every Market.
+            </h2>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { title: 'Website Design in Scottsdale', desc: 'Custom sites built for the Scottsdale market.', to: '/services/website-design-scottsdale' },
+              { title: 'SEO in Scottsdale', desc: 'Rank for the searches that drive real leads.', to: '/services/seo-scottsdale' },
+              { title: 'SEO in Phoenix', desc: 'Organic search authority for Phoenix businesses.', to: '/services/seo-phoenix' },
+              { title: 'Local SEO in Scottsdale', desc: 'Dominate Google Maps and the local pack.', to: '/services/local-seo-scottsdale' },
+              { title: 'Local SEO in Phoenix', desc: 'Rank in the Phoenix local pack and Maps.', to: '/services/local-seo-phoenix' },
+              { title: 'Website Design for Small Business', desc: 'Professional websites sized for small business budgets.', to: '/services/website-design-for-small-business-scottsdale' },
+              { title: 'Digital Marketing Scottsdale', desc: 'Integrated marketing built around business growth.', to: '/services/digital-marketing-scottsdale' },
+              { title: 'Google Business Profile Optimization', desc: 'Maximize your Phoenix Maps visibility.', to: '/services/google-business-profile-optimization-phoenix' },
+              { title: 'Credit Repair in Phoenix', desc: 'Restore your credit and unlock better options.', to: '/services/credit-repair-phoenix' },
+            ].map((page, i) => (
+              <motion.div
+                key={page.to}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+              >
+                <Link
+                  to={page.to}
+                  className="group block border border-neutral-200 bg-white p-6 hover:border-[#7a1c1c]/40 hover:shadow-[0_8px_30px_rgba(122,28,28,0.08)] transition-all duration-300"
+                >
+                  <h3 className="font-serif-display font-bold text-slate-dark text-lg mb-2 group-hover:text-[#7a1c1c] transition-colors leading-snug">
+                    {page.title}
+                  </h3>
+                  <p className="text-sm text-neutral-500 leading-relaxed mb-3">{page.desc}</p>
+                  <span className="text-[#7a1c1c] text-xs font-semibold uppercase tracking-widest group-hover:gap-2 transition-all">
+                    Learn More →
+                  </span>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA SECTION - BOLD & DIRECT */}
       <section className="section bg-luxury-red text-white relative overflow-hidden py-24 lg:py-32">
         <div className="absolute inset-0 opacity-10">

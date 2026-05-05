@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronDown, Menu, X } from 'lucide-react';
 
@@ -18,6 +18,15 @@ const Header = () => {
     { to: '/personal-credit-repair', label: 'Personal Credit Repair', eyebrow: 'Credit strategy' },
     { to: '/new-business-setup', label: 'New Business Setup', eyebrow: 'Launch structure' },
     { to: '/notary-services', label: 'Arizona Notary Services', eyebrow: 'Local support' }
+  ];
+
+  const locationLinks = [
+    { to: '/services/website-design-scottsdale', label: 'Website Design Scottsdale' },
+    { to: '/services/website-design-phoenix', label: 'Website Design Phoenix' },
+    { to: '/services/seo-scottsdale', label: 'SEO Scottsdale' },
+    { to: '/services/seo-phoenix', label: 'SEO Phoenix' },
+    { to: '/services/local-seo-scottsdale', label: 'Local SEO Scottsdale' },
+    { to: '/services/local-seo-phoenix', label: 'Local SEO Phoenix' },
   ];
 
   const navLinks = [
@@ -138,24 +147,39 @@ const Header = () => {
                     </Link>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-px bg-neutral-200">
-                    {serviceLinks.map((service) => (
-                      <Link
-                        key={service.to}
-                        to={service.to}
-                        onClick={() => setIsServicesOpen(false)}
-                        className={`group bg-[#fbfaf7] p-5 transition-colors duration-300 hover:bg-white ${
-                          location.pathname === service.to ? 'bg-white' : ''
-                        }`}
-                      >
-                        <span className="block text-[10px] font-medium uppercase tracking-[0.22em] text-neutral-400 group-hover:text-[#7a1c1c]">
-                          {service.eyebrow}
-                        </span>
-                        <span className="mt-2 block text-sm font-semibold leading-snug text-neutral-950">
-                          {service.label}
-                        </span>
-                      </Link>
-                    ))}
+                  <div className="flex flex-col">
+                    <div className="grid grid-cols-2 gap-px bg-neutral-200">
+                      {serviceLinks.map((service) => (
+                        <Link
+                          key={service.to}
+                          to={service.to}
+                          onClick={() => setIsServicesOpen(false)}
+                          className={`group bg-[#fbfaf7] p-5 transition-colors duration-300 hover:bg-white ${
+                            location.pathname === service.to ? 'bg-white' : ''
+                          }`}
+                        >
+                          <span className="block text-[10px] font-medium uppercase tracking-[0.22em] text-neutral-400 group-hover:text-[#7a1c1c]">
+                            {service.eyebrow}
+                          </span>
+                          <span className="mt-2 block text-sm font-semibold leading-snug text-neutral-950">
+                            {service.label}
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-neutral-200 bg-[#f5f3f0] px-5 py-3">
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-neutral-400">Local:</span>
+                      {locationLinks.map((link) => (
+                        <Link
+                          key={link.to}
+                          to={link.to}
+                          onClick={() => setIsServicesOpen(false)}
+                          className="text-[11px] font-medium text-neutral-500 transition-colors duration-200 hover:text-[#7a1c1c]"
+                        >
+                          {link.label}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -257,6 +281,20 @@ const Header = () => {
                 >
                   View All Services
                 </Link>
+
+                <div className="mt-3 border-t border-neutral-100 pt-2">
+                  <p className="px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Local Services</p>
+                  {locationLinks.map((link) => (
+                    <Link
+                      key={link.to}
+                      to={link.to}
+                      onClick={closeAllMenus}
+                      className="block border-b border-neutral-100 px-3 py-2 text-sm text-neutral-500 last:border-0 hover:text-neutral-950"
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
               </div>
             )}
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
@@ -9,6 +8,19 @@ const Footer = () => {
     { to: '/business-credit-and-funding', label: 'Business Credit & Funding' },
     { to: '/personal-credit-repair', label: 'Personal Credit Repair' },
     { to: '/new-business-setup', label: 'New Business Setup' }
+  ];
+
+  const localServices = [
+    { to: '/services/website-design-scottsdale', label: 'Website Design Scottsdale' },
+    { to: '/services/website-design-phoenix', label: 'Website Design Phoenix' },
+    { to: '/services/seo-scottsdale', label: 'SEO Scottsdale' },
+    { to: '/services/seo-phoenix', label: 'SEO Phoenix' },
+    { to: '/services/local-seo-scottsdale', label: 'Local SEO Scottsdale' },
+    { to: '/services/local-seo-phoenix', label: 'Local SEO Phoenix' },
+    { to: '/services/credit-repair-scottsdale', label: 'Credit Repair Scottsdale' },
+    { to: '/services/credit-repair-phoenix', label: 'Credit Repair Phoenix' },
+    { to: '/services/digital-marketing-scottsdale', label: 'Digital Marketing Scottsdale' },
+    { to: '/services/digital-marketing-phoenix', label: 'Digital Marketing Phoenix' },
   ];
 
   const company = [
@@ -25,7 +37,7 @@ const Footer = () => {
   return (
     <footer className="border-t border-neutral-800 bg-neutral-950 text-white">
       <div className="container-clean py-16 lg:py-20">
-        <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr]">
+        <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
             <p className="mb-5 text-[11px] font-medium uppercase tracking-[0.24em] text-neutral-500">
               RAH Operations
@@ -57,6 +69,22 @@ const Footer = () => {
 
             <ul className="space-y-3">
               {services.map((link) => (
+                <li key={link.to}>
+                  <Link to={link.to} className="text-sm text-neutral-400 hover:text-white">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <p className="mb-5 text-[11px] font-medium uppercase tracking-[0.24em] text-neutral-500">
+              Local Services
+            </p>
+
+            <ul className="space-y-3">
+              {localServices.map((link) => (
                 <li key={link.to}>
                   <Link to={link.to} className="text-sm text-neutral-400 hover:text-white">
                     {link.label}
