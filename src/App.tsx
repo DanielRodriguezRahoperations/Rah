@@ -32,6 +32,31 @@ import Tier1CustomsCaseStudy from './pages/case-studies/Tier1CustomsCaseStudy';
 import EverAfterEditCaseStudy from './pages/case-studies/EverAfterEditCaseStudy';
 import EmpireBuildsAzCaseStudy from './pages/case-studies/EmpireBuildsAzCaseStudy';
 
+// SEO Service Location Pages
+import WebsiteDesignScottsdale from './pages/services/WebsiteDesignScottsdale';
+import WebsiteDesignPhoenix from './pages/services/WebsiteDesignPhoenix';
+import WebsiteDevelopmentScottsdale from './pages/services/WebsiteDevelopmentScottsdale';
+import WebsiteDevelopmentPhoenix from './pages/services/WebsiteDevelopmentPhoenix';
+import SeoScottsdale from './pages/services/SeoScottsdale';
+import SeoPhoenix from './pages/services/SeoPhoenix';
+import LocalSeoScottsdale from './pages/services/LocalSeoScottsdale';
+import LocalSeoPhoenix from './pages/services/LocalSeoPhoenix';
+import ReputationManagementScottsdale from './pages/services/ReputationManagementScottsdale';
+import ReputationManagementPhoenix from './pages/services/ReputationManagementPhoenix';
+import BusinessCreditScottsdale from './pages/services/BusinessCreditScottsdale';
+import BusinessCreditPhoenix from './pages/services/BusinessCreditPhoenix';
+import BusinessFundingArizona from './pages/services/BusinessFundingArizona';
+import DigitalMarketingScottsdale from './pages/services/DigitalMarketingScottsdale';
+import DigitalMarketingPhoenix from './pages/services/DigitalMarketingPhoenix';
+import LlcSetupScottsdale from './pages/services/LlcSetupScottsdale';
+import StartABusinessArizona from './pages/services/StartABusinessArizona';
+import CreditRepairScottsdale from './pages/services/CreditRepairScottsdale';
+import CreditRepairPhoenix from './pages/services/CreditRepairPhoenix';
+import GoogleBusinessProfileScottsdale from './pages/services/GoogleBusinessProfileScottsdale';
+import GoogleBusinessProfilePhoenix from './pages/services/GoogleBusinessProfilePhoenix';
+import SeoForContractorsPhoenix from './pages/services/SeoForContractorsPhoenix';
+import WebsiteDesignSmallBusinessScottsdale from './pages/services/WebsiteDesignSmallBusinessScottsdale';
+
 const ScrollToTop = () => {
   const { pathname } = useLocation();
 
@@ -112,6 +137,31 @@ function App() {
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/testimonials" element={<TestimonialsPage />} />
               <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+
+              {/* SEO Service Location Pages */}
+              <Route path="/services/website-design-scottsdale" element={<WebsiteDesignScottsdale />} />
+              <Route path="/services/website-design-phoenix" element={<WebsiteDesignPhoenix />} />
+              <Route path="/services/website-development-scottsdale" element={<WebsiteDevelopmentScottsdale />} />
+              <Route path="/services/website-development-phoenix" element={<WebsiteDevelopmentPhoenix />} />
+              <Route path="/services/seo-scottsdale" element={<SeoScottsdale />} />
+              <Route path="/services/seo-phoenix" element={<SeoPhoenix />} />
+              <Route path="/services/local-seo-scottsdale" element={<LocalSeoScottsdale />} />
+              <Route path="/services/local-seo-phoenix" element={<LocalSeoPhoenix />} />
+              <Route path="/services/reputation-management-scottsdale" element={<ReputationManagementScottsdale />} />
+              <Route path="/services/reputation-management-phoenix" element={<ReputationManagementPhoenix />} />
+              <Route path="/services/business-credit-scottsdale" element={<BusinessCreditScottsdale />} />
+              <Route path="/services/business-credit-phoenix" element={<BusinessCreditPhoenix />} />
+              <Route path="/services/business-funding-arizona" element={<BusinessFundingArizona />} />
+              <Route path="/services/digital-marketing-scottsdale" element={<DigitalMarketingScottsdale />} />
+              <Route path="/services/digital-marketing-phoenix" element={<DigitalMarketingPhoenix />} />
+              <Route path="/services/llc-setup-scottsdale" element={<LlcSetupScottsdale />} />
+              <Route path="/services/start-a-business-arizona" element={<StartABusinessArizona />} />
+              <Route path="/services/credit-repair-scottsdale" element={<CreditRepairScottsdale />} />
+              <Route path="/services/credit-repair-phoenix" element={<CreditRepairPhoenix />} />
+              <Route path="/services/google-business-profile-optimization-scottsdale" element={<GoogleBusinessProfileScottsdale />} />
+              <Route path="/services/google-business-profile-optimization-phoenix" element={<GoogleBusinessProfilePhoenix />} />
+              <Route path="/services/seo-for-contractors-phoenix" element={<SeoForContractorsPhoenix />} />
+              <Route path="/services/website-design-for-small-business-scottsdale" element={<WebsiteDesignSmallBusinessScottsdale />} />
             </Routes>
           </Layout>
         </SEOLayout>

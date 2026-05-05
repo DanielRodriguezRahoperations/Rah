@@ -40,6 +40,87 @@ const BlogPage = () => {
       category: 'Digital Marketing',
       excerpt: 'Traffic alone does not grow a business. Growth comes from visibility, positioning, trust, conversion, and follow-up working as one system.',
       slug: 'what-drives-business-growth-online'
+    },
+    {
+      title: 'How Much Does Website Design Cost in Scottsdale?',
+      displayTitle: 'How Much Does Website Design Cost in Scottsdale?',
+      date: 'Feb 5, 2024',
+      issue: 'No. 005',
+      category: 'Website Design',
+      excerpt: 'An honest breakdown of website design pricing in Scottsdale — what the different tiers actually deliver, what drives cost, and how to avoid paying for the wrong thing.',
+      slug: 'how-much-does-website-design-cost-scottsdale'
+    },
+    {
+      title: 'How to Rank on Google Maps in Phoenix',
+      displayTitle: 'How to Rank on Google Maps in Phoenix',
+      date: 'Feb 12, 2024',
+      issue: 'No. 006',
+      category: 'Local SEO',
+      excerpt: 'Google Maps rankings are where high-intent Phoenix customers make decisions. Here is exactly what moves the needle and what does not.',
+      slug: 'how-to-rank-on-google-maps-phoenix'
+    },
+    {
+      title: 'The Best SEO Strategies for Small Businesses in Arizona',
+      displayTitle: 'The Best SEO Strategies for Small Businesses in Arizona',
+      date: 'Feb 19, 2024',
+      issue: 'No. 007',
+      category: 'SEO',
+      excerpt: 'Most Arizona small businesses are not doing SEO well. That is an opportunity. Here are the five strategies that actually drive local search rankings.',
+      slug: 'best-seo-strategies-small-business-arizona'
+    },
+    {
+      title: 'Why Your Google Business Profile Is Not Ranking',
+      displayTitle: 'Why Your Google Business Profile Is Not Ranking in Phoenix or Scottsdale',
+      date: 'Feb 26, 2024',
+      issue: 'No. 008',
+      category: 'Local SEO',
+      excerpt: 'If your GBP is not showing up in local results, the reasons are almost always identifiable and fixable. Here are the most common culprits.',
+      slug: 'why-google-business-profile-not-ranking'
+    },
+    {
+      title: 'Website vs. Landing Page for Lead Generation',
+      displayTitle: 'Website vs. Landing Page: What Your Arizona Business Actually Needs',
+      date: 'Mar 4, 2024',
+      issue: 'No. 009',
+      category: 'Website Design',
+      excerpt: 'The answer depends entirely on your marketing strategy and traffic source. Here is how to decide which one is right for your Arizona business.',
+      slug: 'website-vs-landing-page-lead-generation'
+    },
+    {
+      title: 'How to Get More Reviews for Your Arizona Business',
+      displayTitle: 'How to Get More Reviews for Your Arizona Business',
+      date: 'Mar 11, 2024',
+      issue: 'No. 010',
+      category: 'Reputation Management',
+      excerpt: 'Reviews influence both your Google rankings and what customers decide when they find you. Here is the systematic approach that generates them consistently.',
+      slug: 'how-to-get-more-reviews-for-your-business'
+    },
+    {
+      title: 'What Is Local SEO and Why It Matters',
+      displayTitle: 'What Is Local SEO and Why It Matters for Arizona Businesses',
+      date: 'Mar 18, 2024',
+      issue: 'No. 011',
+      category: 'Local SEO',
+      excerpt: 'A clear explanation of what local SEO is, how it works, and why it is the most direct path to consistent leads for Arizona service businesses.',
+      slug: 'what-is-local-seo-and-why-it-matters'
+    },
+    {
+      title: 'How to Build Business Credit From Scratch in Arizona',
+      displayTitle: 'How to Build Business Credit From Scratch in Arizona',
+      date: 'Mar 25, 2024',
+      issue: 'No. 012',
+      category: 'Business Credit',
+      excerpt: 'Business credit does not build itself. Here is the step-by-step sequence Arizona business owners need to follow to build a real, independently standing credit profile.',
+      slug: 'how-to-build-business-credit-from-scratch'
+    },
+    {
+      title: 'Digital Marketing for Contractors in Arizona',
+      displayTitle: 'Digital Marketing for Contractors in Arizona: What Actually Works',
+      date: 'Apr 1, 2024',
+      issue: 'No. 013',
+      category: 'Digital Marketing',
+      excerpt: 'Arizona contractors have a digital marketing opportunity most are not capitalizing on. Here is what moves the needle for home services leads in the Phoenix metro.',
+      slug: 'digital-marketing-for-contractors-arizona'
     }
   ];
 
