@@ -69,6 +69,33 @@ const content: ServicePageContent = {
     { title: 'SEO Scottsdale', to: '/services/seo-scottsdale', desc: 'Organic search strategy that complements your local Maps visibility.' },
   ],
   formTitle: 'Get a Free Google Business Profile Review for Your Scottsdale Business',
+  relatedResources: [
+    { to: '/blogs/how-to-improve-google-business-profile-scottsdale', label: 'How to Improve Your Google Business Profile in Scottsdale' },
+    { to: '/blogs/why-google-business-profile-not-ranking', label: 'Why Your Google Business Profile Is Not Ranking in Phoenix or Scottsdale' },
+    { to: '/blogs/how-to-get-more-reviews-for-your-business', label: 'How to Get More Reviews for Your Arizona Business' },
+  ],
+  faq: [
+    {
+      q: 'Why is my Google Business Profile not showing up in Scottsdale searches?',
+      a: 'The most common reasons a GBP does not rank in Scottsdale include: incomplete profile with missing categories or services, inconsistent business information across directories, insufficient reviews compared to competitors, a weak website that does not reinforce local relevance, and competitive keywords where higher-authority profiles are already dominant. A free profile audit will identify which of these factors is suppressing your rankings.',
+    },
+    {
+      q: 'How often should I post on my Google Business Profile?',
+      a: 'Posting weekly or bi-weekly is the standard for a well-managed profile. Posts expire after seven days, so a regular cadence ensures your profile always shows current, active content. Post content does not need to be complex — service highlights, recent projects, and practical tips all perform well and signal an actively managed business.',
+    },
+    {
+      q: 'Do reviews directly affect Google Maps rankings in Scottsdale?',
+      a: 'Yes. Review count, recency, and response rate are direct factors in Google\'s local ranking algorithm. A Scottsdale business that consistently generates new reviews and responds to all of them signals a high-quality, active business — both to Google and to potential customers evaluating the profile before calling.',
+    },
+    {
+      q: 'Can I optimize my own Google Business Profile without an agency?',
+      a: 'Yes, the basic optimization steps — completing all fields, selecting categories, adding photos, and writing a business description — can be done by any business owner. Where professional management adds the most value is in ongoing review strategy, competitive monitoring, post management, and adapting the profile as Google rolls out new features and ranking signal changes.',
+    },
+    {
+      q: 'What is the difference between Google Business Profile optimization and local SEO?',
+      a: 'Google Business Profile optimization focuses specifically on your GBP to improve Maps visibility. Local SEO is a broader strategy that includes the GBP along with website structure, citation building, review generation, and local content development. GBP optimization is a high-leverage component of a complete local SEO strategy, not a standalone alternative to it.',
+    },
+  ],
   formSubtitle: 'Tell us your business name and category. We\'ll audit your profile and show you exactly what is being missed.',
 };
 

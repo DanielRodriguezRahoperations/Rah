@@ -29,6 +29,8 @@ export interface ServicePageContent {
   ctaTitle: string;
   ctaBody: string;
   relatedServices: { title: string; to: string; desc: string }[];
+  relatedResources?: { to: string; label: string }[];
+  faq?: { q: string; a: string }[];
   formTitle: string;
   formSubtitle: string;
 }
@@ -39,7 +41,7 @@ const fade = {
 };
 
 export default function ServiceLocationTemplate({ content }: { content: ServicePageContent }) {
-  const schema = {
+  const serviceSchema = {
     '@context': 'https://schema.org',
     '@type': 'Service',
     name: content.seoTitle,
@@ -59,6 +61,18 @@ export default function ServiceLocationTemplate({ content }: { content: ServiceP
     },
     areaServed: ['Scottsdale, AZ', 'Phoenix, AZ', 'Arizona'],
   };
+
+  const faqSchema = content.faq && content.faq.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: content.faq.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: { '@type': 'Answer', text: item.a },
+    })),
+  } : null;
+
+  const schema = faqSchema ? [serviceSchema, faqSchema] : serviceSchema;
 
   return (
     <>
@@ -283,6 +297,38 @@ export default function ServiceLocationTemplate({ content }: { content: ServiceP
         </div>
       </section>
 
+      {/* RELATED RESOURCES */}
+      {content.relatedResources && content.relatedResources.length > 0 && (
+        <section className="section-tight bg-[#f9f7f4]">
+          <div className="container-clean max-w-4xl">
+            <motion.div
+              variants={fade}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true }}
+            >
+              <p className="text-[#7a1c1c] text-xs uppercase tracking-[0.3em] mb-4">Further Reading</p>
+              <h2 className="text-2xl md:text-3xl font-serif-display font-bold text-[#0f0f0f] mb-8">
+                Related Resources
+              </h2>
+              <ul className="space-y-3">
+                {content.relatedResources.map((res) => (
+                  <li key={res.to} className="flex items-start gap-3">
+                    <span className="text-[#7a1c1c] font-bold mt-1 flex-shrink-0">→</span>
+                    <Link
+                      to={res.to}
+                      className="text-neutral-700 font-serif-body leading-relaxed hover:text-[#7a1c1c] transition-colors underline underline-offset-2"
+                    >
+                      {res.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          </div>
+        </section>
+      )}
+
       {/* RELATED SERVICES */}
       <section className="section bg-[#0f0f0f]">
         <div className="container-clean">
@@ -323,6 +369,46 @@ export default function ServiceLocationTemplate({ content }: { content: ServiceP
           </div>
         </div>
       </section>
+
+      {/* FAQ */}
+      {content.faq && content.faq.length > 0 && (
+        <section className="section bg-white">
+          <div className="container-clean max-w-4xl">
+            <motion.div
+              variants={fade}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true }}
+              className="mb-12"
+            >
+              <p className="text-[#7a1c1c] text-xs uppercase tracking-[0.3em] mb-4">Common Questions</p>
+              <h2 className="text-3xl md:text-4xl font-serif-display font-bold text-[#0f0f0f]">
+                Frequently Asked Questions
+              </h2>
+            </motion.div>
+
+            <div className="space-y-0 divide-y divide-neutral-100">
+              {content.faq.map((item, i) => (
+                <motion.div
+                  key={i}
+                  className="py-8"
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05 }}
+                >
+                  <h3 className="text-lg font-serif-display font-bold text-[#0f0f0f] mb-3 leading-snug">
+                    {item.q}
+                  </h3>
+                  <p className="text-neutral-600 font-serif-body leading-relaxed">
+                    {item.a}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA */}
       <section className="section bg-[#7a1c1c] text-white relative overflow-hidden">

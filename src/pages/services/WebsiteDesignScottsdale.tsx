@@ -68,6 +68,38 @@ const content: ServicePageContent = {
     { title: 'SEO in Scottsdale', to: '/services/seo-scottsdale', desc: 'Full SEO strategy to grow your organic search visibility across competitive Scottsdale keywords.' },
     { title: 'Digital Marketing Scottsdale', to: '/services/digital-marketing-scottsdale', desc: 'Paid ads, social media, and content systems working together to grow your Scottsdale business.' },
   ],
+  relatedResources: [
+    { to: '/blogs/how-much-does-website-design-cost-scottsdale', label: 'How Much Does Website Design Cost in Scottsdale?' },
+    { to: '/blogs/website-design-vs-seo-scottsdale-businesses', label: 'Website Design vs SEO: Which Should Scottsdale Businesses Fix First?' },
+    { to: '/blogs/best-website-features-local-service-businesses-arizona', label: 'Best Website Features for Local Service Businesses in Arizona' },
+    { to: '/blogs/how-to-choose-website-design-company-scottsdale', label: 'How to Choose the Right Website Design Company in Scottsdale' },
+  ],
+  faq: [
+    {
+      q: 'How much does a custom website cost in Scottsdale?',
+      a: 'Professional website design for Scottsdale small businesses typically ranges from $3,000 to $10,000 depending on scope, number of pages, copywriting requirements, and whether the project includes SEO architecture. DIY platforms cost less upfront but carry significant performance and SEO limitations. Our Scottsdale website projects are scoped based on your specific business goals and competitive landscape.',
+    },
+    {
+      q: 'How long does a website design project take?',
+      a: 'Most professional website builds for Scottsdale small businesses take four to eight weeks from kickoff to launch, depending on complexity and how quickly content and approvals are provided. A focused five-page business website moves faster than a multi-service site with custom functionality.',
+    },
+    {
+      q: 'Will my new website rank on Google?',
+      a: 'A professionally built website with proper SEO structure, service-specific pages, local signals, and clean metadata provides a strong foundation for Google rankings. Rankings develop over weeks and months as Google crawls and evaluates the site — a new website does not rank immediately, but a well-structured site ranks significantly faster and higher than a template-built one.',
+    },
+    {
+      q: 'Do you write the website copy, or do I provide it?',
+      a: 'We handle copywriting for all our Scottsdale website projects. Our copy is written around your positioning, your target customer, and the search intent we are optimizing for — not generic filler content that could belong to any business.',
+    },
+    {
+      q: 'What makes a Scottsdale website different from a generic website?',
+      a: 'A website built for the Scottsdale market includes local search signals, content that reflects the Scottsdale competitive landscape, and messaging calibrated for the expectations of Scottsdale customers. Generic templates do not account for local SEO structure or the visual standards Scottsdale clients typically expect before making contact.',
+    },
+    {
+      q: 'What ongoing support do you provide after launch?',
+      a: 'Post-launch we provide performance monitoring, search indexing verification, and ongoing support for updates, content additions, and technical maintenance. Many clients continue with monthly SEO services to build on the foundation the new website establishes.',
+    },
+  ],
   formTitle: 'Get a Free Scottsdale Website Audit',
   formSubtitle: 'Tell us about your business and current website. We\'ll review it and show you exactly what needs to improve.',
 };

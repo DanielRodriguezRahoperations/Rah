@@ -68,6 +68,37 @@ const content: ServicePageContent = {
     { title: 'Website Design Scottsdale', to: '/services/website-design-scottsdale', desc: 'A well-designed website built for SEO performance from the ground up.' },
     { title: 'Digital Marketing Scottsdale', to: '/services/digital-marketing-scottsdale', desc: 'Paid and organic strategies working together to grow your Scottsdale business.' },
   ],
+  relatedResources: [
+    { to: '/blogs/how-much-does-seo-cost-small-business-scottsdale', label: 'How Much Does SEO Cost for a Small Business in Scottsdale?' },
+    { to: '/blogs/website-design-vs-seo-scottsdale-businesses', label: 'Website Design vs SEO: Which Should Scottsdale Businesses Fix First?' },
+    { to: '/blogs/best-seo-strategies-small-business-arizona', label: 'The Best SEO Strategies for Small Businesses in Arizona' },
+  ],
+  faq: [
+    {
+      q: 'How long does SEO take to show results in Scottsdale?',
+      a: 'Meaningful ranking movement for most Scottsdale keywords typically takes four to six months of consistent SEO work. Lower-competition keywords may move faster; highly competitive terms in saturated categories take longer. Sustainable results are built progressively — not overnight.',
+    },
+    {
+      q: 'How much does SEO cost for a Scottsdale small business?',
+      a: 'Professional SEO services for Scottsdale small businesses typically range from $750 to $2,500 per month depending on the competitive landscape, scope of work, and target keywords. Budget-tier providers charging under $300 per month rarely deliver the research, content creation, and link building required to rank for competitive Scottsdale terms.',
+    },
+    {
+      q: 'What is the difference between SEO and local SEO?',
+      a: 'SEO covers organic search rankings broadly — improving where your site appears for any relevant search. Local SEO is specifically focused on location-based searches: appearing in the Google local pack, Maps results, and "near me" queries. Most Scottsdale service businesses benefit from a strategy that addresses both, since local pack and organic results often appear together.',
+    },
+    {
+      q: 'Can you guarantee first-page rankings?',
+      a: 'No legitimate SEO provider can guarantee specific rankings because Google\'s algorithm is not controlled by anyone outside Google. What we commit to is executing the right strategy consistently and showing you measurable ranking improvement over time. If a provider guarantees rankings, ask which specific keywords — they are often committing to low-traffic terms no one is actually searching for.',
+    },
+    {
+      q: 'Do I need a new website to do SEO?',
+      a: 'Not necessarily, but the website needs to be technically sound for SEO to work effectively. If your current site has serious structural problems — no service pages, missing metadata, slow speed — those need to be addressed as part of the SEO process. In some cases a new website is the most efficient path; in others, fixing the existing site is sufficient.',
+    },
+    {
+      q: 'What SEO work happens each month?',
+      a: 'Our monthly Scottsdale SEO work typically includes keyword tracking and competitive monitoring, on-page optimization updates, content creation, link acquisition outreach, Google Business Profile management, and a reporting review to track progress and adjust strategy based on what the data shows.',
+    },
+  ],
   formTitle: 'Get a Free Scottsdale SEO Audit',
   formSubtitle: 'Tell us about your business and the keywords you want to rank for. We\'ll analyze your current visibility and show you the path forward.',
 };

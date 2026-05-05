@@ -130,6 +130,51 @@ const BlogPage = () => {
       category: 'Website Design',
       excerpt: 'A practical guide for Scottsdale business owners on how to evaluate web design options — what to look for, what to avoid, and what questions reveal whether a designer truly understands local performance.',
       slug: 'how-to-choose-website-design-company-scottsdale'
+    },
+    {
+      title: 'How Much Does SEO Cost for a Small Business in Scottsdale?',
+      displayTitle: 'How Much Does SEO Cost for a Small Business in Scottsdale?',
+      date: 'May 5, 2025',
+      issue: 'No. 015',
+      category: 'SEO',
+      excerpt: 'An honest breakdown of what SEO actually costs for Scottsdale small businesses — what different price tiers deliver, what drives pricing, and how to evaluate whether the investment makes sense.',
+      slug: 'how-much-does-seo-cost-small-business-scottsdale'
+    },
+    {
+      title: 'Website Design vs SEO: Which Should Scottsdale Businesses Fix First?',
+      displayTitle: 'Website Design vs SEO: Which Should Scottsdale Businesses Fix First?',
+      date: 'May 5, 2025',
+      issue: 'No. 016',
+      category: 'Website Design',
+      excerpt: 'A practical answer to the most common Scottsdale business dilemma — whether to fix the website or invest in SEO first, and why the answer depends entirely on where your biggest bottleneck is.',
+      slug: 'website-design-vs-seo-scottsdale-businesses'
+    },
+    {
+      title: 'Why Phoenix Businesses Struggle to Rank on Google',
+      displayTitle: 'Why Phoenix Businesses Struggle to Rank on Google',
+      date: 'May 5, 2025',
+      issue: 'No. 017',
+      category: 'SEO',
+      excerpt: 'The five most common reasons Phoenix businesses fail to rank on Google — from website structure problems to weak local SEO foundations — and what to do about each one.',
+      slug: 'why-phoenix-businesses-struggle-to-rank-on-google'
+    },
+    {
+      title: 'How to Improve Your Google Business Profile in Scottsdale',
+      displayTitle: 'How to Improve Your Google Business Profile in Scottsdale',
+      date: 'May 5, 2025',
+      issue: 'No. 018',
+      category: 'Local SEO',
+      excerpt: 'A step-by-step guide to improving your Google Business Profile in Scottsdale — categories, photos, posts, reviews, and the specific optimizations that move local pack rankings.',
+      slug: 'how-to-improve-google-business-profile-scottsdale'
+    },
+    {
+      title: 'Best Website Features for Local Service Businesses in Arizona',
+      displayTitle: 'Best Website Features for Local Service Businesses in Arizona',
+      date: 'May 5, 2025',
+      issue: 'No. 019',
+      category: 'Website Design',
+      excerpt: 'The specific website features Arizona local service businesses need to rank on Google, earn customer trust, and convert visitors into leads — explained without the jargon.',
+      slug: 'best-website-features-local-service-businesses-arizona'
     }
   ];
 

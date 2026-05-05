@@ -68,6 +68,37 @@ const content: ServicePageContent = {
     { title: 'Website Design Phoenix', to: '/services/website-design-phoenix', desc: 'Your SEO foundation starts with a properly built website.' },
     { title: 'Digital Marketing Phoenix', to: '/services/digital-marketing-phoenix', desc: 'Combine organic SEO with paid ads for maximum Phoenix market coverage.' },
   ],
+  relatedResources: [
+    { to: '/blogs/why-phoenix-businesses-struggle-to-rank-on-google', label: 'Why Phoenix Businesses Struggle to Rank on Google' },
+    { to: '/blogs/how-to-rank-on-google-maps-phoenix', label: 'How to Rank on Google Maps in Phoenix' },
+    { to: '/blogs/best-seo-strategies-small-business-arizona', label: 'The Best SEO Strategies for Small Businesses in Arizona' },
+  ],
+  faq: [
+    {
+      q: 'How long does SEO take to show results in Phoenix?',
+      a: 'Phoenix SEO timelines vary by category competitiveness and starting point. Lower-competition keywords in specific neighborhoods may move within 60 to 90 days. Competitive citywide terms typically take four to six months of consistent work. The first 30 to 60 days are focused on technical fixes and foundational work that sets up everything that follows.',
+    },
+    {
+      q: 'How much does SEO cost for a Phoenix business?',
+      a: 'Professional SEO for Phoenix businesses typically starts at $750 to $1,000 per month for a focused local campaign and scales with scope and competitiveness. Full-service monthly campaigns in competitive Phoenix categories commonly run $1,500 to $3,500 per month. Budget options below $400 per month rarely include the content, link building, and strategy required for competitive results in this market.',
+    },
+    {
+      q: 'What is included in your monthly Phoenix SEO service?',
+      a: 'Monthly Phoenix SEO work includes keyword tracking and competitive monitoring, on-page optimization updates, content creation targeting real search intent, local citation management, Google Business Profile optimization, link acquisition outreach, and monthly reporting on ranking movement and organic traffic trends. The specific mix evolves as rankings improve and new opportunities emerge.',
+    },
+    {
+      q: 'Can you help with both Phoenix organic SEO and Google Maps rankings?',
+      a: 'Yes. For most Phoenix service businesses, an integrated strategy covering both organic search and local pack rankings produces the best results. The foundational elements — website structure, content, citations, and Google Business Profile — serve both channels when built correctly.',
+    },
+    {
+      q: 'Why is Phoenix SEO so competitive?',
+      a: 'Phoenix is one of the fastest-growing major cities in the country with one of the highest new business formation rates. Combined with a large established business community, almost every service category has significant SEO competition from businesses that have been investing in rankings for years. Strategy and execution quality matter more in Phoenix than in many smaller Arizona markets.',
+    },
+    {
+      q: 'Do I need a new website before starting SEO?',
+      a: 'Not always, but the website needs to be technically capable of supporting SEO. Sites with major structural issues — missing service pages, broken metadata, very slow load performance — need those problems addressed as part of the process. In some cases a phased approach works best: fix the critical technical issues immediately while planning a full rebuild.',
+    },
+  ],
   formTitle: 'Request a Free Phoenix SEO Audit',
   formSubtitle: 'Tell us your business and the keywords you want to rank for. We\'ll show you exactly where you stand.',
 };

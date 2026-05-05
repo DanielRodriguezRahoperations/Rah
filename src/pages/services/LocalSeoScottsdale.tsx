@@ -69,6 +69,34 @@ const content: ServicePageContent = {
     { title: 'Website Design Scottsdale', to: '/services/website-design-scottsdale', desc: 'A well-built website is the anchor of your local SEO strategy.' },
   ],
   formTitle: 'Get a Free Scottsdale Local SEO Audit',
+  relatedResources: [
+    { to: '/blogs/how-to-improve-google-business-profile-scottsdale', label: 'How to Improve Your Google Business Profile in Scottsdale' },
+    { to: '/blogs/how-much-does-seo-cost-small-business-scottsdale', label: 'How Much Does SEO Cost for a Small Business in Scottsdale?' },
+    { to: '/blogs/what-is-local-seo-and-why-it-matters', label: 'What Is Local SEO and Why It Matters for Arizona Businesses' },
+    { to: '/blogs/local-seo-is-not-optional', label: 'Local SEO Is Not Optional Anymore' },
+  ],
+  faq: [
+    {
+      q: 'What is local SEO and how is it different from regular SEO?',
+      a: 'Local SEO is specifically focused on making a business visible in location-based searches — showing up in the Google local pack, Google Maps, and "near me" queries. Regular SEO covers broader organic search rankings. For most Scottsdale service businesses that serve a local customer base, local SEO is the higher-priority investment since local pack results appear above organic listings for service searches.',
+    },
+    {
+      q: 'How do I get my business into the Google local pack in Scottsdale?',
+      a: 'Local pack rankings in Scottsdale are influenced by three primary factors: relevance (how well your profile matches the search), prominence (reviews, citations, website authority), and proximity (how close the business is to the searcher). Full Google Business Profile optimization, consistent business information across all directories, a strong review profile, and local content on the website all support local pack rankings.',
+    },
+    {
+      q: 'How long does local SEO take to produce results in Scottsdale?',
+      a: 'Initial improvements from Google Business Profile optimization and citation cleanup are often visible within 30 to 60 days. More competitive local pack rankings for high-volume Scottsdale keywords typically take three to six months of consistent work. Local SEO results generally appear faster than broad organic SEO because the signals are more directly tied to business information accuracy.',
+    },
+    {
+      q: 'What is NAP consistency and why does it matter?',
+      a: 'NAP stands for Name, Address, and Phone number. Google cross-references your business information across hundreds of online directories. Inconsistencies — different phone numbers, address formats, or business name variations — create doubt about which information is accurate and weaken local rankings. Auditing and correcting these inconsistencies is a foundational step in every local SEO engagement.',
+    },
+    {
+      q: 'How many reviews do I need to rank in the Scottsdale local pack?',
+      a: 'There is no fixed threshold — review requirements vary by category and competition level. In most Scottsdale service categories, 50 to 100 reviews puts you in a competitive range. More important than a specific number is consistency: businesses that generate new reviews steadily outperform those with a large count of old reviews and no recent activity.',
+    },
+  ],
   formSubtitle: 'We\'ll review your Google Business Profile, local rankings, and citations and tell you exactly what needs to change.',
 };
 

@@ -69,6 +69,37 @@ const content: ServicePageContent = {
     { title: 'Digital Marketing Phoenix', to: '/services/digital-marketing-phoenix', desc: 'Paid ads and organic content working together to grow your Phoenix customer base.' },
   ],
   formTitle: 'Tell Us About Your Phoenix Business',
+  relatedResources: [
+    { to: '/blogs/why-phoenix-businesses-struggle-to-rank-on-google', label: 'Why Phoenix Businesses Struggle to Rank on Google' },
+    { to: '/blogs/best-website-features-local-service-businesses-arizona', label: 'Best Website Features for Local Service Businesses in Arizona' },
+    { to: '/blogs/website-design-vs-seo-scottsdale-businesses', label: 'Website Design vs SEO: Which Should You Fix First?' },
+  ],
+  faq: [
+    {
+      q: 'How long does website design take for a Phoenix business?',
+      a: 'Professional website projects for Phoenix businesses typically take four to eight weeks from kickoff to launch. Simple business sites with five to eight pages move faster; larger sites with custom functionality or e-commerce require more time. The process depends on the scope agreed at kickoff and how quickly your business can provide approvals and any needed content.',
+    },
+    {
+      q: 'How much does a professional website cost for a Phoenix business?',
+      a: 'Professional website design for Phoenix small and mid-sized businesses typically ranges from $3,000 to $10,000 depending on the number of pages, copywriting requirements, custom features, and whether local SEO structure is included. Template builds and DIY platforms cost less but carry real limitations in search performance and visual quality that often become apparent within a year.',
+    },
+    {
+      q: 'Will a new website help my Phoenix business rank on Google?',
+      a: 'A well-built website with proper local SEO structure, service-specific pages, clean metadata, and location-relevant content provides the foundation Google needs to rank a Phoenix business in local searches. A new website does not produce immediate rankings — but a poorly structured website actively limits them, while a properly built one enables them.',
+    },
+    {
+      q: 'Do you build websites for mobile first?',
+      a: 'Yes. The majority of local search in Phoenix happens on mobile devices, so every website we build is designed and tested for mobile performance before desktop. This includes tap-to-call phone numbers, contact forms optimized for mobile input, readable typography without zooming, and fast load performance on cellular connections.',
+    },
+    {
+      q: 'Who writes the content for the website?',
+      a: 'We provide full copywriting for our Phoenix website projects. Copy is written based on discovery research into your business, your Phoenix market, your competitors, and the search terms your ideal customers are using. We do not use generic templates or placeholder text — every page is written to convert the specific customer you are trying to reach.',
+    },
+    {
+      q: 'Can I update my website after it is launched?',
+      a: 'Yes. We build on systems that allow straightforward content updates, and we provide guidance on how to make standard changes yourself. For more significant updates — adding pages, structural changes, or ongoing SEO work — we offer ongoing support options tailored to what your Phoenix business needs.',
+    },
+  ],
   formSubtitle: 'Share what your current website is missing. We\'ll put together a clear plan to fix it.',
 };
 
