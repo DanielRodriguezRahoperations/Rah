@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import SEOHead from '../components/ui/SEOHead';
 import { absoluteUrl } from '../utils/url';
 import Button from '../components/ui/Button';
+import AboutHero from '../components/ui/AboutHero';
 
 const AboutPage = () => {
   return (
@@ -12,30 +13,7 @@ const AboutPage = () => {
         url={absoluteUrl('/about')}
       />
 
-      {/* HERO */}
-      <section className="relative min-h-screen bg-white pt-24 lg:pt-32 pb-20 flex items-center overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.03]">
-          <div className="absolute top-1/4 right-0 w-1/2 h-96 bg-luxury-red rounded-full blur-3xl" />
-        </div>
-
-        <div className="container-clean relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-            className="max-w-4xl"
-          >
-            <p className="eyebrow-red mb-8">About RAH Operations</p>
-            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-serif-display font-bold leading-[0.85] mb-10 text-slate-dark">
-              We Build Websites
-              <span className="block text-luxury-red">That Work.</span>
-            </h1>
-            <p className="text-2xl text-neutral-600 font-serif-body mb-10 leading-relaxed max-w-3xl">
-              RAH Operations was built on a simple belief: your website should be a business asset, not a liability. A system that generates visibility, builds trust, and produces qualified leads.
-            </p>
-          </motion.div>
-        </div>
-      </section>
+      <AboutHero />
 
       {/* THE STORY */}
       <section className="section bg-cream-50">
