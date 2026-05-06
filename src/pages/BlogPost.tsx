@@ -720,6 +720,20 @@ const BlogPost = () => {
         </div>
       </section>
 
+      {/* COVER IMAGE */}
+      <div className="bg-[#1a1a1a]">
+        <div className="container-clean max-w-4xl pb-0">
+          <div className="overflow-hidden border border-white/10">
+            <img
+              src={`/blogs/${slug}.jpg`}
+              alt={post.title}
+              className="w-full aspect-[16/7] object-cover"
+              loading="eager"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* ARTICLE BODY */}
       <section className="bg-[#faf8f4] py-16 lg:py-24">
         <article className="container-clean max-w-3xl">

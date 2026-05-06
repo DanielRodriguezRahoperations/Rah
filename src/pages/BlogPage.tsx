@@ -262,11 +262,16 @@ const BlogPage = () => {
                     </Link>
                   </div>
 
-                  {/* Right: decorative number */}
-                  <div className="hidden lg:flex items-center justify-end">
-                    <span className="text-[8rem] font-serif-display font-bold text-[#1a1a1a]/5 leading-none select-none">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
+                  {/* Right: cover image */}
+                  <div className="hidden lg:block">
+                    <Link to={`/blogs/${post.slug}`} className="block overflow-hidden border border-[#1a1a1a]/10 group-hover:border-[#7a1c1c] transition-colors duration-300">
+                      <img
+                        src={`/blogs/${post.slug}.jpg`}
+                        alt={post.title}
+                        className="w-full aspect-[16/10] object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                        loading="lazy"
+                      />
+                    </Link>
                   </div>
                 </div>
               </motion.article>
