@@ -1,0 +1,9 @@
+{
+  "prompt": "Editorial financial planning photography, 16:9 overhead. On a dark matte surface: a printed SEO pricing comparison sheet with three tier columns — Basic, Professional, Authority — in clean minimal typography. A mechanical pencil circles the middle tier. Beside it: a sleek black calculator, a small Arizona state outline cut from matte paper as a decorative element. Single overhead amber lamp creating a precise pool of warm light on the documents, shadows falling sharply outside. Color palette: #0a0a0a surface, #f5f0e8 document, #7a1c1c underline on preferred tier, #1a1a1a calculator. 60mm lens overhead, f/4, ISO 200. Hyper-realistic paper texture, graphite pencil sheen, calculator button texture. The mood is analytical decision-making. No people, no tech devices beyond calculator. Cinematic editorial realism.",
+  "negative_prompt": "cartoon, CGI, bright studio, people, faces, phone, laptop, neon, colorful, oversaturated, stock photo, flat lighting, money/cash visible, blurry elements",
+  "api_parameters": {
+    "resolution": "1K",
+    "output_format": "jpg",
+    "aspect_ratio": "16:9"
+  }
+}

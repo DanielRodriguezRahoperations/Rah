@@ -1,0 +1,9 @@
+{
+  "prompt": "Close editorial photography, 16:9. Premium iPhone Pro held at a natural angle, screen showing a polished Google Business Profile — 4.9 star rating prominently displayed, professional business exterior photo filled in, complete address and hours, recent review excerpt in clean text. The profile looks complete and authoritative. Background is a softly blurred upscale Scottsdale exterior — sand-toned stucco, desert plants, warm golden light. Shallow depth of field, phone sharp, background painterly. Single natural golden hour backlight. Color palette: warm sand background, screen warm white light, gold #c8963e stars, burgundy #7a1c1c check icon. 90mm lens, f/1.8, ISO 200. Hyper-realistic phone glass, screen reflection subtly visible, realistic hand skin just at bottom edge. The mood is optimized authority.",
+  "negative_prompt": "cartoon, CGI, plastic phone, generic background, stock photo, cold blue light, people faces visible, oversaturated, neon, flat lighting, incorrect profile details, blurry screen",
+  "api_parameters": {
+    "resolution": "1K",
+    "output_format": "jpg",
+    "aspect_ratio": "16:9"
+  }
+}

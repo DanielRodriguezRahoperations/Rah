@@ -1,0 +1,9 @@
+{
+  "prompt": "Dark editorial business meeting photography, 16:9. A premium conference table surface in close detail — dark walnut, grain visible — with an open MacBook Pro showing a web design portfolio across multiple browser tabs. Beside it: a printed proposal document bound in matte black, a business card face-down. No people seated, just the artifacts of a serious agency evaluation. Warm amber pendant light glows from above. Deep shadows at table edges. Color palette: #0a0a0a environment, warm amber #c47a2a light pool, #f5f0e8 proposal paper, #7a1c1c portfolio accent on screen. 85mm lens, f/2.4, ISO 300. Hyper-realistic walnut grain, proposal document paper texture, laptop aluminum. The mood is discernment and high-stakes selection. No people, no clutter. Documentary editorial realism.",
+  "negative_prompt": "cartoon, CGI, people, faces, shaking hands, bright office, neon, colorful, oversaturated, stock photo, flat lighting, plastic, phone, blurry",
+  "api_parameters": {
+    "resolution": "1K",
+    "output_format": "jpg",
+    "aspect_ratio": "16:9"
+  }
+}

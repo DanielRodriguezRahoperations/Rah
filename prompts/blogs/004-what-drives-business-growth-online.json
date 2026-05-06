@@ -1,0 +1,9 @@
+{
+  "prompt": "Cinematic dark editorial flatlay, 16:9 wide. On a near-black matte surface: a printed analytics report with clean bar charts and growth line trending sharply upward, annotated with a burgundy #7a1c1c pen marking a key inflection point. Beside it, an open notebook with handwritten strategic notes in precise clean lettering. A glass of water with ice sits at the edge catching amber light. Single directional warm lamp from the upper left. Deep shadows fill 60% of the frame. Color palette: #0a0a0a background, #f5f0e8 paper, #7a1c1c ink accent. 85mm lens, f/2.2, ISO 350. Hyper-realistic paper texture, visible ink strokes, condensation on glass. The feeling is deliberate, strategic, after-hours. No technology screens, no people, no clutter. Documentary realism. No beautification.",
+  "negative_prompt": "blurry, stock photo, bright office, colorful charts, cartoon, CGI, plastic, people, faces, phone, laptop, neon, flat lighting, overexposed, cold white light",
+  "api_parameters": {
+    "resolution": "1K",
+    "output_format": "jpg",
+    "aspect_ratio": "16:9"
+  }
+}

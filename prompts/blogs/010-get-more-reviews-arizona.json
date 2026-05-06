@@ -1,0 +1,9 @@
+{
+  "prompt": "Intimate editorial close-up, 16:9. A premium iPhone Pro flat on a dark matte desk surface, screen facing up, displaying a 5-star Google review notification — five gold stars visible, review text in clean typography below them. Surrounding the phone on the dark surface: a small handwritten thank-you card on cream paper with a burgundy ink stamp in the corner, and a single espresso cup with crema. Warm amber directional light from upper left. Deep shadows, moody and intimate. Color palette: #0a0a0a surface, warm gold #c8963e star color, #f5f0e8 card, #7a1c1c stamp. 85mm macro lens, f/2.0, ISO 300. Hyper-realistic ceramic cup texture, real paper card with subtle fibres, phone screen pixel clarity. The mood is gratitude and business credibility. No people, no bright backgrounds. Documentary realism.",
+  "negative_prompt": "cartoon, CGI, plastic, bright daylight, oversaturated, people, faces, neon, colorful background, stock photo, flat lighting, blurry elements, generic phone",
+  "api_parameters": {
+    "resolution": "1K",
+    "output_format": "jpg",
+    "aspect_ratio": "16:9"
+  }
+}

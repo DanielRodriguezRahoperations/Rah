@@ -1,0 +1,9 @@
+{
+  "prompt": "Conceptual editorial split photography, 16:9. Two printed A4 sheets side by side on a dark matte slate surface. Left sheet: a clean website wireframe sketch with grids, nav bar, hero section roughed in pencil. Right sheet: an SEO keyword research printout with search volume numbers and ranking positions. A straight-edge ruler placed between them creates a precise dividing line. A single mechanical pencil rests at the top. Warm amber directional light from the right, deep shadows left. Color palette: #0a0a0a surface, #f5f0e8 paper, #7a1c1c small accent circle on the more important sheet (right/SEO). 70mm lens overhead, f/3.5, ISO 250. Hyper-realistic paper texture, pencil graphite strokes, ruler metallic sheen. The mood is strategic prioritization. No people, no screens, no CGI. Pure documentary realism.",
+  "negative_prompt": "cartoon, CGI, people, faces, laptops, phones, neon, bright studio, oversaturated, stock photo, flat lighting, colorful, blurry, digital screens",
+  "api_parameters": {
+    "resolution": "1K",
+    "output_format": "jpg",
+    "aspect_ratio": "16:9"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "prompt": "Cinematic editorial photography, 16:9. A MacBook Pro open on a dark walnut desk at night, screen showing a premium luxury business website — clean serif typography, large editorial photography, deep dark background, one bold burgundy call-to-action button. The surrounding desk is dark with a single pool of warm amber lamp light on the keyboard. Shallow depth of field, foreground slightly blurred. Camera positioned low, slightly angled up at the screen. The website on screen conveys authority and precision. Color palette: charcoal #0e0e0e environment, warm cream #f5f0e8 screen light, burgundy #7a1c1c CTA button visible. 90mm lens, f/1.8, ISO 320. Hyper-realistic, no retouching. Realistic keyboard texture, matte aluminum body with light scratches, screen glow reflecting softly on desk surface. The mood is late-night strategic work. No people, no clutter.",
+  "negative_prompt": "blurry, stock photo, bright daylight, colorful, cartoon, CGI, plastic, overexposed, people, faces, messy desk, neon lights, blue cold tones, flat lighting, lens flare",
+  "api_parameters": {
+    "resolution": "1K",
+    "output_format": "jpg",
+    "aspect_ratio": "16:9"
+  }
+}

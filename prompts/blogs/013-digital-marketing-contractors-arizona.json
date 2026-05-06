@@ -1,0 +1,9 @@
+{
+  "prompt": "Cinematic editorial construction photography, 16:9. A professional-grade construction site in Arizona at golden hour — concrete foundation, steel rebar, desert landscape behind with one large saguaro visible on the horizon. In the foreground on a rough plywood surface: a tablet showing a clean contractor website mockup with a burgundy CTA button. The tablet is protected by a hardcase. Strong directional late-day sun from the right creates warm orange raking light across the raw materials. Color palette: warm amber #c47a2a sunlight, raw concrete #8a8a8a grey, desert terracotta earth, #7a1c1c button accent on screen. 35mm wide lens, f/5.6, ISO 100. Hyper-realistic construction textures — visible rebar rust, concrete grain, dry earth. No people. The mood is serious local business at work. Photorealistic.",
+  "negative_prompt": "cartoon, CGI, stock photo, people, faces, fake construction, plastic, neon, blue cold light, oversaturated, studio, flat lighting, city background, modern office",
+  "api_parameters": {
+    "resolution": "1K",
+    "output_format": "jpg",
+    "aspect_ratio": "16:9"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "prompt": "Dramatic aerial editorial photography of Scottsdale Arizona at dusk, 16:9. Bird's-eye view of a dense urban grid with warm amber and terracotta rooftops, palm trees casting long shadows, desert terrain visible at the edges. Overlaid semi-transparently: three glowing map location pins in burgundy #7a1c1c hovering above different business districts, with faint circular pulse rings around them. The digital overlay feels subtle and editorial — not tech-cartoon. The city itself is the hero. Golden hour light rakes across the grid from the west. Color palette: warm terracotta, deep amber, near-black shadows, burgundy pin accents. Cinematic wide lens, drone perspective, 24mm equivalent, ultra-realistic aerial photography. High detail rooftop textures, visible streets, natural haze in the distance. No people visible. Do not over-saturate. Photorealistic.",
+  "negative_prompt": "cartoon map, flat design, oversaturated, CGI city, plastic, people, faces, neon blue, cold tones, phone mockup, generic stock, low resolution, overexposed sky",
+  "api_parameters": {
+    "resolution": "1K",
+    "output_format": "jpg",
+    "aspect_ratio": "16:9"
+  }
+}

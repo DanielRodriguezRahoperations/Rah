@@ -1,0 +1,9 @@
+{
+  "prompt": "Dramatic wide cityscape photography of Phoenix Arizona skyline at dusk, 16:9. Glass towers reflecting amber and deep orange sunset sky, light rail tracks curving through the frame, desert mountains faintly visible behind the city in haze. The mood is cinematic and authoritative. Overlaid very subtly in the upper third: the ghost of a Google Maps search result card in dark glass — 4.9 stars, a business name, an address — barely visible like a reflection. The city dominates. Color palette: deep amber #c47a2a sky gradient to near-black #0a0a0a foreground, burgundy #7a1c1c subtle map pin. 35mm wide lens, f/8, ISO 100. Tack-sharp cityscape, natural lens vignette. Hyper-realistic. No people. No cartoon. No neon.",
+  "negative_prompt": "cartoon, flat map, stock photo, CGI city, oversaturated, neon, plastic, people, faces, generic, blue cold tone, overexposed sky, lens flare, blurry",
+  "api_parameters": {
+    "resolution": "1K",
+    "output_format": "jpg",
+    "aspect_ratio": "16:9"
+  }
+}

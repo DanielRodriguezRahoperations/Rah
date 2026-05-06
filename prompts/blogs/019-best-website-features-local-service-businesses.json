@@ -1,0 +1,9 @@
+{
+  "prompt": "Editorial technology flatlay, 16:9. Dark slate surface with a MacBook Pro open showing a premium local service business website — clean navigation, clear service sections, bold contact CTA in burgundy #7a1c1c, trust badges row visible. Beside the laptop: a small printed checklist on cream paper with burgundy checkmarks next to each line item. A mechanical pencil rests across the checklist. Narrow warm amber desk lamp light from the upper right, deep shadows everywhere else. Color palette: #0a0a0a surface, warm aluminum laptop body, #f5f0e8 checklist paper, #7a1c1c check marks and screen CTA. 85mm lens, f/2.4, ISO 320. Hyper-realistic laptop body, paper texture, screen glow. The mood is systematic, deliberate, expert. No people. No clutter. Documentary editorial realism.",
+  "negative_prompt": "cartoon, CGI, bright studio, people, faces, phone, tablet only, neon, colorful, oversaturated, stock photo, flat lighting, blurry, generic website on screen",
+  "api_parameters": {
+    "resolution": "1K",
+    "output_format": "jpg",
+    "aspect_ratio": "16:9"
+  }
+}

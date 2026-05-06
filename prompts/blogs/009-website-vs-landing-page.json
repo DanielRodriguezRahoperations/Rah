@@ -1,0 +1,9 @@
+{
+  "prompt": "High-concept editorial split composition, 16:9 wide. Two premium MacBook Pro laptops angled symmetrically on a dark slate surface, each showing a different screen. Left laptop: a multi-page website with navigation, about section, services grid — detailed, editorial, dark-themed. Right laptop: a single-purpose landing page with one large headline, one call-to-action button in burgundy #7a1c1c, stripped of everything else. The two screens create a visual contrast of complexity vs. focus. A thin vertical shadow line divides the composition down the center. Warm amber desk lamp light from above, deep shadows on both sides. 50mm lens, f/2.8, ISO 280. Hyper-realistic aluminum laptop bodies, realistic screen glow, desk surface grain. No people, no clutter. Cinematic editorial. Do not add text overlays. Do not beautify.",
+  "negative_prompt": "cartoon, CGI, plastic, bright studio light, people, faces, colorful, neon, oversaturated, phone, tablet, floating elements, lens flare, stock photo feel, generic screens",
+  "api_parameters": {
+    "resolution": "1K",
+    "output_format": "jpg",
+    "aspect_ratio": "16:9"
+  }
+}

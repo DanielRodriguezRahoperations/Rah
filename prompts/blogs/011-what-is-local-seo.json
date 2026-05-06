@@ -1,0 +1,9 @@
+{
+  "prompt": "Editorial conceptual photography, 16:9. Overhead shot of a printed street map of a downtown neighborhood — warm aged paper, streets visible, district labels — with three small brass location pins placed at strategic intersections, each casting a tiny shadow. Around the map: a magnifying glass resting at the edge reflecting the map below, a mechanical pencil, and a folded notepad. The surface beneath is dark matte wood. Raking warm amber light from the lower left creates strong textural shadows across the map paper. Color palette: #0a0a0a surface, #e8dcc8 aged map paper, warm brass #b8862a pins, #7a1c1c subtle highlight. 60mm lens from directly above, f/4, ISO 200. Tack-sharp map textures, visible paper grain, pin shadow detail. No digital overlays. No people. Cinematic and analytical.",
+  "negative_prompt": "cartoon, CGI, digital map UI, phone screen, neon, oversaturated, stock photo, people, faces, bright studio light, colorful pins, Google Maps UI, flat lay with colorful objects",
+  "api_parameters": {
+    "resolution": "1K",
+    "output_format": "jpg",
+    "aspect_ratio": "16:9"
+  }
+}

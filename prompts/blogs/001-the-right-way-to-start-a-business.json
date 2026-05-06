@@ -1,0 +1,9 @@
+{
+  "prompt": "Editorial dark-luxury business photography, 16:9 wide frame. Overhead flat-lay of a premium wooden desk: open LLC formation documents with official-looking state seal, a matte black fountain pen resting diagonally across the paperwork, a sleek MacBook Pro open showing a clean professional website in dark mode, a small cactus in a concrete pot, and a minimal business card with 'RAH Operations' embossed in burgundy. Deep warm shadows from a single directional desk lamp casting long shadows left. Warm amber-to-burgundy light gradient across the surface. Color palette: near-black #0e0e0e background, aged warm paper #f5f0e8 for documents, burgundy #7a1c1c accent. 85mm lens equivalent, f/2.0, ISO 400. Shot from 30 degrees above. Hyper-realistic documentary style. Visible paper texture, ink sheen on pen nib, subtle desk grain. No artificial lighting glow. Do not beautify or over-saturate. Cinematic editorial realism.",
+  "negative_prompt": "blurry, low resolution, stock photo, cartoon, CGI, plastic surfaces, overexposed, studio white background, people, faces, smartphones, clutter, colorful objects, neon, blue tones, cold white light, lens flare, floating elements",
+  "api_parameters": {
+    "resolution": "1K",
+    "output_format": "jpg",
+    "aspect_ratio": "16:9"
+  }
+}

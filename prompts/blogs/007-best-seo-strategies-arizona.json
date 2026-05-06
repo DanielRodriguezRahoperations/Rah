@@ -1,0 +1,9 @@
+{
+  "prompt": "Cinematic dark editorial composition, 16:9. An open hardcover strategy book with 'Search Authority' embossed on the dark cover, pages spread showing dense text and a clean graph trending upward. On top of the right page, a small saguaro cactus in a black ceramic pot — subtle Arizona reference. Surrounding surface is matte black. Single narrow beam of warm amber light from upper right illuminating only the book and cactus. Deep dramatic shadows. Color palette: #0a0a0a black, #f5f0e8 aged paper, #7a1c1c burgundy accent on graph line. 90mm macro lens, f/2.0, ISO 320. Hyper-realistic paper texture, visible book binding stitching, cactus spines in sharp focus. The mood is intellectual authority. No people, no tech devices, no stock photo feel. Documentary realism.",
+  "negative_prompt": "cartoon, CGI, plastic, bright office, neon, people, faces, phone, laptop, oversaturated, stock photo, cold blue, flat lighting, blurry, low quality",
+  "api_parameters": {
+    "resolution": "1K",
+    "output_format": "jpg",
+    "aspect_ratio": "16:9"
+  }
+}

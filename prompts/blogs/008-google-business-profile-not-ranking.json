@@ -1,0 +1,9 @@
+{
+  "prompt": "Close-up editorial photography, 16:9. A premium iPhone Pro held in a hand — only the hand visible at lower frame edge, matte black case — screen showing a Google Business Profile listing mockup. The listing shows a business with incomplete fields: missing hours shown as question marks, low review count of 3 stars, generic placeholder photo. The screen content conveys neglect and missed opportunity. Background is extremely dark, near-black charcoal. A narrow burgundy #7a1c1c light rim on the right edge of the phone from an off-screen source. Shallow depth of field, background fully blurred. 90mm macro lens, f/1.8, ISO 400. Hyper-realistic phone screen glow, fingerprint smudges on glass, realistic hand skin texture — visible knuckle detail, natural skin tone. No makeup on hand. Cinematic and editorial.",
+  "negative_prompt": "cartoon, CGI, plastic skin, oversaturated, colorful background, neon, studio lighting, face visible, stock hand, generic phone, bright daylight, flat lighting, blurry screen",
+  "api_parameters": {
+    "resolution": "1K",
+    "output_format": "jpg",
+    "aspect_ratio": "16:9"
+  }
+}

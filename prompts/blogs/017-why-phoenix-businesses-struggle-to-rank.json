@@ -1,0 +1,9 @@
+{
+  "prompt": "Moody aerial editorial photography of Phoenix Arizona at dusk, 16:9. Wide drone shot looking down a major arterial road — car light trails as long amber streaks, commercial signage on both sides blurred and indistinct, desert mountains faint silhouette in the far background. The image conveys competition and noise — many businesses, one road. Color palette: deep amber #c47a2a car trails, near-black #0a0a0a sky, warm terracotta building facades, burgundy #7a1c1c one small accent. Long exposure blur on traffic. 24mm wide equivalent aerial, f/11, ISO 50. Hyper-realistic light trail physics, atmospheric haze, building texture. No people visible. The mood is competitive density — the challenge of standing out. No cartoon, no CGI, no flat map.",
+  "negative_prompt": "cartoon, CGI, flat map, oversaturated, neon, stock photo, people, faces, generic city, cold blue tones, flat lighting, blurry overall, daytime bright",
+  "api_parameters": {
+    "resolution": "1K",
+    "output_format": "jpg",
+    "aspect_ratio": "16:9"
+  }
+}

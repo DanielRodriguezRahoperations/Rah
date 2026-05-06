@@ -1,0 +1,9 @@
+{
+  "prompt": "Premium editorial financial photography, 16:9. Dark slate desk surface (#1a1a1a) with a matte black credit card (no brand markings, embossed numbers catching narrow rim light), an Arizona LLC formation certificate on cream #f5f0e8 paper partially folded, and an uncapped fountain pen resting diagonally. Single directed warm amber desk lamp from the right casting long precise shadows. Deep near-black environment. Color palette: #1a1a1a surface, matte black card with subtle sheen, #f5f0e8 document paper, #7a1c1c burgundy accent on official state seal stamp. 85mm macro lens, f/2.2, ISO 350. Hyper-realistic: visible card embossing texture, paper crease lines, pen nib metal lustre. The mood is financial authority and deliberate business formation. No people, no clutter, no colorful objects. Cinematic luxury documentary realism. Do not beautify, do not add logos.",
+  "negative_prompt": "cartoon, CGI, plastic card, bright white background, oversaturated, people, faces, phone, laptop, neon, colorful objects, flat lighting, stock photo, blurry, Visa Mastercard Amex logos, generic finance imagery",
+  "api_parameters": {
+    "resolution": "1K",
+    "output_format": "jpg",
+    "aspect_ratio": "16:9"
+  }
+}

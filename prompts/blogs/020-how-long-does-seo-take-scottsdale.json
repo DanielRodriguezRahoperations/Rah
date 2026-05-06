@@ -1,0 +1,9 @@
+{
+  "prompt": "Editorial timeline photography, 16:9. On a dark matte desk: a printed horizontal timeline chart spanning 6 months with milestone markers — Day 1, Month 1, Month 3, Month 6 — each with a short label below ('Foundation', 'Signals', 'Traction', 'Authority'). A burgundy #7a1c1c line traces the growth curve across the chart. Beside the timeline: an open calendar showing months with key dates circled in burgundy ink. A premium mechanical pencil rests diagonally across the composition. Warm amber directional light from upper left, strong shadows right. Color palette: #0a0a0a surface, #f5f0e8 paper, #7a1c1c accent line and circles, #1a1a1a pencil. 70mm overhead lens, f/3.2, ISO 250. Hyper-realistic paper texture, graphite marks, calendar grid detail. The mood is patience and precision. No people, no laptops, no phones. Documentary realism.",
+  "negative_prompt": "cartoon, CGI, digital UI, phone screen, people, faces, neon, bright studio, oversaturated, stock photo, flat lighting, generic calendar clipart, blurry",
+  "api_parameters": {
+    "resolution": "1K",
+    "output_format": "jpg",
+    "aspect_ratio": "16:9"
+  }
+}
