@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import SEOHead from '../components/ui/SEOHead';
 import { absoluteUrl } from '../utils/url';
 import Button from '../components/ui/Button';
+import CinematicPortfolioHero from '../components/ui/CinematicPortfolioHero';
 
 const CaseStudiesPage = () => {
   const studies = [
@@ -43,32 +44,10 @@ const CaseStudiesPage = () => {
         url={absoluteUrl('/case-studies')}
       />
 
-      {/* HERO */}
-      <section className="relative min-h-screen bg-slate-dark text-white pt-24 lg:pt-32 pb-20 flex items-center overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 left-0 w-full h-1 bg-luxury-red" />
-        </div>
-
-        <div className="container-clean relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-          >
-            <p className="eyebrow-red mb-8">Portfolio</p>
-            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-serif-display font-bold leading-[0.85] mb-10">
-              Websites Built to
-              <span className="block text-luxury-red">Produce Results.</span>
-            </h1>
-            <p className="text-xl text-neutral-300 font-serif-body mb-12 max-w-2xl leading-relaxed">
-              These aren't portfolio pieces. They're business systems that rank, convert, and generate qualified leads.
-            </p>
-          </motion.div>
-        </div>
-      </section>
+      <CinematicPortfolioHero />
 
       {/* CASE STUDIES - FEATURED */}
-      <section className="section bg-white">
+      <section id="work" className="section bg-white">
         <div className="container-clean">
           <div className="space-y-20 lg:space-y-32">
             {studies.map((study, idx) => (
