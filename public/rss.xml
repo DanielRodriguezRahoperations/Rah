@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
   <channel>
     <title>RAH Operations — Business Growth Insights</title>
     <link>https://www.rahoperations.com/blogs</link>
@@ -7,45 +7,60 @@
     <language>en-us</language>
     <atom:link href="https://www.rahoperations.com/rss.xml" rel="self" type="application/rss+xml"/>
     <lastBuildDate>Mon, 05 May 2025 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>https://www.rahoperations.com/blog-cover.png</url>
+      <title>RAH Operations — Business Growth Insights</title>
+      <link>https://www.rahoperations.com/blogs</link>
+    </image>
 
     <item>
       <title>Best Website Features for Local Service Businesses in Arizona</title>
       <link>https://www.rahoperations.com/blogs/best-website-features-local-service-businesses-arizona</link>
       <description>The specific website features Arizona local service businesses need to rank on Google, earn customer trust, and convert visitors into leads — explained without the jargon.</description>
-      <pubDate>Mon, 05 May 2025 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 05 May 2025 05:00:00 +0000</pubDate>
       <guid isPermaLink="true">https://www.rahoperations.com/blogs/best-website-features-local-service-businesses-arizona</guid>
+      <enclosure url="https://www.rahoperations.com/blog-cover.png" length="13184028" type="image/png"/>
+      <media:content url="https://www.rahoperations.com/blog-cover.png" medium="image"/>
     </item>
 
     <item>
       <title>How to Improve Your Google Business Profile in Scottsdale</title>
       <link>https://www.rahoperations.com/blogs/how-to-improve-google-business-profile-scottsdale</link>
       <description>A step-by-step guide to improving your Google Business Profile in Scottsdale — categories, photos, posts, reviews, and the specific optimizations that move local pack rankings.</description>
-      <pubDate>Mon, 05 May 2025 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 05 May 2025 04:00:00 +0000</pubDate>
       <guid isPermaLink="true">https://www.rahoperations.com/blogs/how-to-improve-google-business-profile-scottsdale</guid>
+      <enclosure url="https://www.rahoperations.com/blog-cover.png" length="13184028" type="image/png"/>
+      <media:content url="https://www.rahoperations.com/blog-cover.png" medium="image"/>
     </item>
 
     <item>
       <title>Why Phoenix Businesses Struggle to Rank on Google</title>
       <link>https://www.rahoperations.com/blogs/why-phoenix-businesses-struggle-to-rank-on-google</link>
       <description>The five most common reasons Phoenix businesses fail to rank on Google — from website structure problems to weak local SEO foundations — and what to do about each one.</description>
-      <pubDate>Mon, 05 May 2025 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 05 May 2025 03:00:00 +0000</pubDate>
       <guid isPermaLink="true">https://www.rahoperations.com/blogs/why-phoenix-businesses-struggle-to-rank-on-google</guid>
+      <enclosure url="https://www.rahoperations.com/blog-cover.png" length="13184028" type="image/png"/>
+      <media:content url="https://www.rahoperations.com/blog-cover.png" medium="image"/>
     </item>
 
     <item>
       <title>Website Design vs SEO: Which Should Scottsdale Businesses Fix First?</title>
       <link>https://www.rahoperations.com/blogs/website-design-vs-seo-scottsdale-businesses</link>
       <description>A practical answer to the most common Scottsdale business dilemma — whether to fix the website or invest in SEO first, and why the answer depends entirely on where your biggest bottleneck is.</description>
-      <pubDate>Mon, 05 May 2025 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 05 May 2025 02:00:00 +0000</pubDate>
       <guid isPermaLink="true">https://www.rahoperations.com/blogs/website-design-vs-seo-scottsdale-businesses</guid>
+      <enclosure url="https://www.rahoperations.com/blog-cover.png" length="13184028" type="image/png"/>
+      <media:content url="https://www.rahoperations.com/blog-cover.png" medium="image"/>
     </item>
 
     <item>
       <title>How Much Does SEO Cost for a Small Business in Scottsdale?</title>
       <link>https://www.rahoperations.com/blogs/how-much-does-seo-cost-small-business-scottsdale</link>
       <description>An honest breakdown of what SEO actually costs for Scottsdale small businesses — what different price tiers deliver, what factors drive pricing, and how to evaluate whether the investment makes sense.</description>
-      <pubDate>Mon, 05 May 2025 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 05 May 2025 01:00:00 +0000</pubDate>
       <guid isPermaLink="true">https://www.rahoperations.com/blogs/how-much-does-seo-cost-small-business-scottsdale</guid>
+      <enclosure url="https://www.rahoperations.com/blog-cover.png" length="13184028" type="image/png"/>
+      <media:content url="https://www.rahoperations.com/blog-cover.png" medium="image"/>
     </item>
 
     <item>
@@ -54,6 +69,8 @@
       <description>A practical guide for Scottsdale business owners on how to evaluate web design options — what to look for, what to avoid, and what questions reveal whether a designer truly understands local performance.</description>
       <pubDate>Sat, 04 May 2024 00:00:00 +0000</pubDate>
       <guid isPermaLink="true">https://www.rahoperations.com/blogs/how-to-choose-website-design-company-scottsdale</guid>
+      <enclosure url="https://www.rahoperations.com/blog-cover.png" length="13184028" type="image/png"/>
+      <media:content url="https://www.rahoperations.com/blog-cover.png" medium="image"/>
     </item>
 
     <item>
@@ -62,6 +79,8 @@
       <description>Arizona contractors have a digital marketing opportunity most are not capitalizing on. Here is what moves the needle for home services leads in the Phoenix metro.</description>
       <pubDate>Mon, 01 Apr 2024 00:00:00 +0000</pubDate>
       <guid isPermaLink="true">https://www.rahoperations.com/blogs/digital-marketing-for-contractors-arizona</guid>
+      <enclosure url="https://www.rahoperations.com/blog-cover.png" length="13184028" type="image/png"/>
+      <media:content url="https://www.rahoperations.com/blog-cover.png" medium="image"/>
     </item>
 
     <item>
@@ -70,6 +89,8 @@
       <description>Business credit does not build itself. Here is the step-by-step sequence Arizona business owners need to follow to build a real, independently standing credit profile.</description>
       <pubDate>Mon, 25 Mar 2024 00:00:00 +0000</pubDate>
       <guid isPermaLink="true">https://www.rahoperations.com/blogs/how-to-build-business-credit-from-scratch</guid>
+      <enclosure url="https://www.rahoperations.com/blog-cover.png" length="13184028" type="image/png"/>
+      <media:content url="https://www.rahoperations.com/blog-cover.png" medium="image"/>
     </item>
 
     <item>
@@ -78,6 +99,8 @@
       <description>A clear explanation of what local SEO is, how it works, and why it is the most direct path to consistent leads for Arizona service businesses.</description>
       <pubDate>Mon, 18 Mar 2024 00:00:00 +0000</pubDate>
       <guid isPermaLink="true">https://www.rahoperations.com/blogs/what-is-local-seo-and-why-it-matters</guid>
+      <enclosure url="https://www.rahoperations.com/blog-cover.png" length="13184028" type="image/png"/>
+      <media:content url="https://www.rahoperations.com/blog-cover.png" medium="image"/>
     </item>
 
     <item>
@@ -86,6 +109,8 @@
       <description>Reviews influence both your Google rankings and what customers decide when they find you. Here is the systematic approach that generates them consistently.</description>
       <pubDate>Mon, 11 Mar 2024 00:00:00 +0000</pubDate>
       <guid isPermaLink="true">https://www.rahoperations.com/blogs/how-to-get-more-reviews-for-your-business</guid>
+      <enclosure url="https://www.rahoperations.com/blog-cover.png" length="13184028" type="image/png"/>
+      <media:content url="https://www.rahoperations.com/blog-cover.png" medium="image"/>
     </item>
 
     <item>
@@ -94,6 +119,8 @@
       <description>The answer depends entirely on your marketing strategy and traffic source. Here is how to decide which one is right for your Arizona business.</description>
       <pubDate>Mon, 04 Mar 2024 00:00:00 +0000</pubDate>
       <guid isPermaLink="true">https://www.rahoperations.com/blogs/website-vs-landing-page-lead-generation</guid>
+      <enclosure url="https://www.rahoperations.com/blog-cover.png" length="13184028" type="image/png"/>
+      <media:content url="https://www.rahoperations.com/blog-cover.png" medium="image"/>
     </item>
 
     <item>
@@ -102,6 +129,8 @@
       <description>If your GBP is not showing up in local results, the reasons are almost always identifiable and fixable. Here are the most common culprits.</description>
       <pubDate>Mon, 26 Feb 2024 00:00:00 +0000</pubDate>
       <guid isPermaLink="true">https://www.rahoperations.com/blogs/why-google-business-profile-not-ranking</guid>
+      <enclosure url="https://www.rahoperations.com/blog-cover.png" length="13184028" type="image/png"/>
+      <media:content url="https://www.rahoperations.com/blog-cover.png" medium="image"/>
     </item>
 
     <item>
@@ -110,6 +139,8 @@
       <description>Most Arizona small businesses are not doing SEO well. That is an opportunity. Here are the five strategies that actually drive local search rankings.</description>
       <pubDate>Mon, 19 Feb 2024 00:00:00 +0000</pubDate>
       <guid isPermaLink="true">https://www.rahoperations.com/blogs/best-seo-strategies-small-business-arizona</guid>
+      <enclosure url="https://www.rahoperations.com/blog-cover.png" length="13184028" type="image/png"/>
+      <media:content url="https://www.rahoperations.com/blog-cover.png" medium="image"/>
     </item>
 
     <item>
@@ -118,6 +149,8 @@
       <description>Google Maps rankings are where high-intent Phoenix customers make decisions. Here is exactly what moves the needle and what does not.</description>
       <pubDate>Mon, 12 Feb 2024 00:00:00 +0000</pubDate>
       <guid isPermaLink="true">https://www.rahoperations.com/blogs/how-to-rank-on-google-maps-phoenix</guid>
+      <enclosure url="https://www.rahoperations.com/blog-cover.png" length="13184028" type="image/png"/>
+      <media:content url="https://www.rahoperations.com/blog-cover.png" medium="image"/>
     </item>
 
     <item>
@@ -126,6 +159,8 @@
       <description>An honest breakdown of website design pricing in Scottsdale — what the different tiers actually deliver, what drives cost, and how to avoid paying for the wrong thing.</description>
       <pubDate>Mon, 05 Feb 2024 00:00:00 +0000</pubDate>
       <guid isPermaLink="true">https://www.rahoperations.com/blogs/how-much-does-website-design-cost-scottsdale</guid>
+      <enclosure url="https://www.rahoperations.com/blog-cover.png" length="13184028" type="image/png"/>
+      <media:content url="https://www.rahoperations.com/blog-cover.png" medium="image"/>
     </item>
 
     <item>
@@ -134,6 +169,8 @@
       <description>Traffic alone does not grow a business. Growth comes from visibility, positioning, trust, conversion, and follow-up working as one system.</description>
       <pubDate>Mon, 08 Jan 2024 00:00:00 +0000</pubDate>
       <guid isPermaLink="true">https://www.rahoperations.com/blogs/what-drives-business-growth-online</guid>
+      <enclosure url="https://www.rahoperations.com/blog-cover.png" length="13184028" type="image/png"/>
+      <media:content url="https://www.rahoperations.com/blog-cover.png" medium="image"/>
     </item>
 
     <item>
@@ -142,6 +179,8 @@
       <description>Local SEO is where high-intent customers find businesses. If your Google profile, reviews, service pages, and local signals are weak, competitors get the calls.</description>
       <pubDate>Wed, 10 Jan 2024 00:00:00 +0000</pubDate>
       <guid isPermaLink="true">https://www.rahoperations.com/blogs/local-seo-is-not-optional</guid>
+      <enclosure url="https://www.rahoperations.com/blog-cover.png" length="13184028" type="image/png"/>
+      <media:content url="https://www.rahoperations.com/blog-cover.png" medium="image"/>
     </item>
 
     <item>
@@ -150,6 +189,8 @@
       <description>Most websites look acceptable but do not convert. The problem is usually weak positioning, poor SEO structure, unclear proof, and no real conversion path.</description>
       <pubDate>Fri, 12 Jan 2024 00:00:00 +0000</pubDate>
       <guid isPermaLink="true">https://www.rahoperations.com/blogs/why-websites-fail</guid>
+      <enclosure url="https://www.rahoperations.com/blog-cover.png" length="13184028" type="image/png"/>
+      <media:content url="https://www.rahoperations.com/blog-cover.png" medium="image"/>
     </item>
 
     <item>
@@ -158,6 +199,8 @@
       <description>Starting a business is not about filing paperwork. It is about building the structure, banking, compliance, credit readiness, and digital foundation that support real growth.</description>
       <pubDate>Mon, 15 Jan 2024 00:00:00 +0000</pubDate>
       <guid isPermaLink="true">https://www.rahoperations.com/blogs/the-right-way-to-start-a-business</guid>
+      <enclosure url="https://www.rahoperations.com/blog-cover.png" length="13184028" type="image/png"/>
+      <media:content url="https://www.rahoperations.com/blog-cover.png" medium="image"/>
     </item>
 
   </channel>
