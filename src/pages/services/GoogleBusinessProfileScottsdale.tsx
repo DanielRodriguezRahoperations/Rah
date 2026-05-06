@@ -70,6 +70,7 @@ const content: ServicePageContent = {
   ],
   formTitle: 'Get a Free Google Business Profile Review for Your Scottsdale Business',
   relatedResources: [
+    { to: '/blogs/how-long-does-seo-take-scottsdale-business', label: 'How Long Does SEO Take for a Scottsdale Business?' },
     { to: '/blogs/how-to-improve-google-business-profile-scottsdale', label: 'How to Improve Your Google Business Profile in Scottsdale' },
     { to: '/blogs/why-google-business-profile-not-ranking', label: 'Why Your Google Business Profile Is Not Ranking in Phoenix or Scottsdale' },
     { to: '/blogs/how-to-get-more-reviews-for-your-business', label: 'How to Get More Reviews for Your Arizona Business' },

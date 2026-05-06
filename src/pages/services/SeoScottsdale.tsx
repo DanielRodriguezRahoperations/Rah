@@ -69,6 +69,7 @@ const content: ServicePageContent = {
     { title: 'Digital Marketing Scottsdale', to: '/services/digital-marketing-scottsdale', desc: 'Paid and organic strategies working together to grow your Scottsdale business.' },
   ],
   relatedResources: [
+    { to: '/blogs/how-long-does-seo-take-scottsdale-business', label: 'How Long Does SEO Take for a Scottsdale Business?' },
     { to: '/blogs/how-much-does-seo-cost-small-business-scottsdale', label: 'How Much Does SEO Cost for a Small Business in Scottsdale?' },
     { to: '/blogs/website-design-vs-seo-scottsdale-businesses', label: 'Website Design vs SEO: Which Should Scottsdale Businesses Fix First?' },
     { to: '/blogs/best-seo-strategies-small-business-arizona', label: 'The Best SEO Strategies for Small Businesses in Arizona' },

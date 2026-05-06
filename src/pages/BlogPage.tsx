@@ -175,6 +175,15 @@ const BlogPage = () => {
       category: 'Website Design',
       excerpt: 'The specific website features Arizona local service businesses need to rank on Google, earn customer trust, and convert visitors into leads — explained without the jargon.',
       slug: 'best-website-features-local-service-businesses-arizona'
+    },
+    {
+      title: 'How Long Does SEO Take for a Scottsdale Business?',
+      displayTitle: 'How Long Does SEO Take for a Scottsdale Business?',
+      date: 'May 5, 2025',
+      issue: 'No. 020',
+      category: 'SEO Strategy',
+      excerpt: 'Realistic SEO timelines for Scottsdale businesses — what to expect in the first 30, 60, 90, and 180 days of a professional SEO campaign, and the factors that determine how fast results appear.',
+      slug: 'how-long-does-seo-take-scottsdale-business'
     }
   ];
 

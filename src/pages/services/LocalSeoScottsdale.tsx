@@ -70,6 +70,7 @@ const content: ServicePageContent = {
   ],
   formTitle: 'Get a Free Scottsdale Local SEO Audit',
   relatedResources: [
+    { to: '/blogs/how-long-does-seo-take-scottsdale-business', label: 'How Long Does SEO Take for a Scottsdale Business?' },
     { to: '/blogs/how-to-improve-google-business-profile-scottsdale', label: 'How to Improve Your Google Business Profile in Scottsdale' },
     { to: '/blogs/how-much-does-seo-cost-small-business-scottsdale', label: 'How Much Does SEO Cost for a Small Business in Scottsdale?' },
     { to: '/blogs/what-is-local-seo-and-why-it-matters', label: 'What Is Local SEO and Why It Matters for Arizona Businesses' },
