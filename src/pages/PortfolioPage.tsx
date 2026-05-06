@@ -2,6 +2,7 @@ import React from 'react';
 import SEOHead from '../components/ui/SEOHead';
 import { absoluteUrl } from '../utils/url';
 import Button from '../components/ui/Button';
+import CinematicPortfolioHero from '../components/ui/CinematicPortfolioHero';
 
 interface PortfolioItem {
   title: string;
@@ -101,51 +102,10 @@ const PortfolioPage: React.FC = () => {
         url={absoluteUrl('/portfolio')}
       />
 
-      {/* HERO */}
-      <section className="relative overflow-hidden bg-[#0d0d0d] text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_15%,rgba(122,28,28,0.32),transparent_28%),radial-gradient(circle_at_86%_20%,rgba(255,255,255,0.08),transparent_24%)]" />
-        <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-[#0d0d0d] to-transparent" />
-
-        <div className="container-clean relative py-16 sm:py-20 lg:py-32">
-          <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
-            <div>
-              <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.3em] text-[#d14b4b]">
-                Portfolio / Website Design Work
-              </p>
-
-              <h1 className="mb-7 max-w-4xl text-[3.15rem] leading-[0.92] text-white sm:text-6xl lg:text-7xl xl:text-8xl">
-                Websites Built to Make Businesses Look More Valuable.
-              </h1>
-
-              <p className="max-w-2xl text-base leading-7 text-neutral-300 sm:text-lg sm:leading-8">
-                This is not a gallery of pretty screens. Every project is shaped around trust, service clarity, local search intent, and the path from visitor to inquiry.
-              </p>
-            </div>
-
-            <div className="border border-white/10 bg-white/[0.035] p-5 backdrop-blur-sm sm:p-7 lg:ml-auto lg:max-w-xl">
-              <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.26em] text-neutral-400">
-                Portfolio Standard
-              </p>
-
-              <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
-                {[
-                  ['01', 'Premium first impression'],
-                  ['02', 'Clearer business positioning'],
-                  ['03', 'Stronger conversion structure']
-                ].map((item) => (
-                  <div key={item[0]} className="border-t border-white/10 pt-4">
-                    <p className="mb-1 text-sm font-semibold text-[#d14b4b]">{item[0]}</p>
-                    <p className="text-sm leading-6 text-neutral-300">{item[1]}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <CinematicPortfolioHero />
 
       {/* FEATURED PROJECTS */}
-      <section className="section bg-[#fbfaf7] py-16 sm:py-20 lg:py-32">
+      <section id="work" className="section bg-[#fbfaf7] py-16 sm:py-20 lg:py-32">
         <div className="container-clean">
           <div className="mb-10 grid gap-7 lg:mb-16 lg:grid-cols-[0.82fr_1.18fr] lg:items-end">
             <div>

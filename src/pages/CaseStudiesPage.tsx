@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import SEOHead from '../components/ui/SEOHead';
 import { absoluteUrl } from '../utils/url';
 import Button from '../components/ui/Button';
-import CinematicPortfolioHero from '../components/ui/CinematicPortfolioHero';
+import CinematicCaseStudiesHero from '../components/ui/CinematicCaseStudiesHero';
 
 const CaseStudiesPage = () => {
   const studies = [
@@ -44,7 +44,7 @@ const CaseStudiesPage = () => {
         url={absoluteUrl('/case-studies')}
       />
 
-      <CinematicPortfolioHero />
+      <CinematicCaseStudiesHero />
 
       {/* CASE STUDIES - FEATURED */}
       <section id="work" className="section bg-white">
