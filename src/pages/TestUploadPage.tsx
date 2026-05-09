@@ -16,7 +16,7 @@ const TestUploadPage: React.FC = () => {
     append(`File: ${file.name} (${(file.size / 1024).toFixed(1)} KB, ${file.type || 'unknown type'})`);
 
     const clientId = crypto.randomUUID();
-    const storageName = 'test-file';
+    const storageName = 'dl-front';
     const ext = file.name.split('.').pop()?.toLowerCase() ?? 'bin';
     const urlEndpoint = `/api/upload?clientId=${encodeURIComponent(clientId)}&storageName=${encodeURIComponent(storageName)}&ext=${encodeURIComponent(ext)}`;
 
