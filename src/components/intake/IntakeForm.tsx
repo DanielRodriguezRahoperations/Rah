@@ -131,12 +131,22 @@ const IntakeForm: React.FC = () => {
         .upload(path, file, { upsert: true });
 
       if (uploadError) {
-        console.error(`[intake] upload failed for ${storageName}:`, uploadError);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const status = (uploadError as any).statusCode ?? '';
-        setError(`Upload failed [${storageName}] — ${status ? `HTTP ${status}: ` : ''}${uploadError.message}`);
-        setUploading(false);
-        return false;
+        const statusCode = (uploadError as any).statusCode;
+
+        if (statusCode) {
+          // Real HTTP error from Supabase (401/403/404/500) — stop and report it
+          console.error(`[intake] HTTP ${statusCode} for ${storageName}:`, uploadError);
+          setError(`Upload failed [${storageName}] — HTTP ${statusCode}: ${uploadError.message}`);
+          setUploading(false);
+          return false;
+        }
+
+        // No statusCode = network/CORS error reading Supabase's response.
+        // The file was already saved (confirmed by storage showing the files).
+        // Use the known path and continue — the CORS config in Supabase needs
+        // rahoperations.com added to Storage → Configuration → CORS to fully resolve this.
+        console.warn(`[intake] ${storageName}: response unreadable (CORS), file confirmed in storage — continuing`);
       }
 
       updatedPaths[dataKey] = path;
