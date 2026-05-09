@@ -47,7 +47,7 @@ const PersonalCreditPage = () => {
               We improve it the right way: with strategy, not shortcuts.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button to="/contact" size="lg">Request a Credit Review</Button>
+              <Button to="/credit-repair/intake" size="lg">Start Your Intake →</Button>
               <Button variant="secondary" size="lg" href="tel:+16236408884">(623) 640-8884</Button>
             </div>
           </motion.div>
@@ -195,7 +195,7 @@ const PersonalCreditPage = () => {
               >
                 Everything Required to Repair, Build, and Protect Your Credit.
               </h2>
-              <Button to="/contact">Request a Credit Review</Button>
+              <Button to="/credit-repair/intake">Start Your Intake →</Button>
             </motion.div>
 
             <motion.div
