@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import { formidable } from 'formidable';
+import type { Fields, Files } from 'formidable';
 import { readFileSync, unlinkSync } from 'fs';
 
 export const config = {
@@ -26,11 +27,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     maxFileSize: 15 * 1024 * 1024,
   });
 
-  let fields: Awaited<ReturnType<typeof form.parse>>[0];
-  let files: Awaited<ReturnType<typeof form.parse>>[1];
+  let fields: Fields;
+  let files: Files;
 
   try {
-    [fields, files] = await form.parse(req);
+    const parsed = await (form.parse(req) as Promise<[Fields, Files]>);
+    fields = parsed[0];
+    files = parsed[1];
   } catch (err) {
     console.error('[upload] formidable parse error:', err);
     return res.status(400).json({ error: 'Failed to parse upload' });
