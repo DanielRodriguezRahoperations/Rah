@@ -7,6 +7,9 @@ const VALID_STORAGE_NAMES = new Set([
 ]);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  console.log('[upload] env check — SUPABASE_URL:', process.env.SUPABASE_URL ? `exists, starts with "${process.env.SUPABASE_URL.slice(0, 10)}"` : 'MISSING');
+  console.log('[upload] env check — SUPABASE_SERVICE_ROLE_KEY:', process.env.SUPABASE_SERVICE_ROLE_KEY ? `exists, starts with "${process.env.SUPABASE_SERVICE_ROLE_KEY.slice(0, 10)}"` : 'MISSING');
+
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
