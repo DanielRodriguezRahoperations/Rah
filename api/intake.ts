@@ -74,7 +74,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   });
 
   if (dbError) {
-    console.error('DB insert error:', dbError);
+    console.error('[intake] DB insert failed — message:', dbError.message);
+    console.error('[intake] DB insert failed — code:', dbError.code);
+    console.error('[intake] DB insert failed — details:', dbError.details);
+    console.error('[intake] DB insert failed — hint:', dbError.hint);
+    console.error('[intake] DB insert failed — full error:', JSON.stringify(dbError));
     return res.status(500).json({ error: 'Failed to save intake record' });
   }
 
