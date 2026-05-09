@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase } from '../../lib/supabase';
 import ProgressBar from './ProgressBar';
 import Step1PersonalInfo from './Step1PersonalInfo';
 import Step2Documents from './Step2Documents';
@@ -123,32 +122,30 @@ const IntakeForm: React.FC = () => {
       const file = selectedFiles[fileKey];
       if (!file) continue;
 
-      const ext = file.name.split('.').pop() ?? 'bin';
-      const path = `${clientId}/${storageName}.${ext}`;
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('clientId', clientId);
+      formData.append('storageName', storageName);
 
-      const { error: uploadError } = await supabase.storage
-        .from('intake-documents')
-        .upload(path, file, { upsert: true });
-
-      if (uploadError) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const statusCode = (uploadError as any).statusCode;
-
-        if (statusCode) {
-          // Real HTTP error from Supabase (401/403/404/500) — stop and report it
-          console.error(`[intake] HTTP ${statusCode} for ${storageName}:`, uploadError);
-          setError(`Upload failed [${storageName}] — HTTP ${statusCode}: ${uploadError.message}`);
-          setUploading(false);
-          return false;
-        }
-
-        // No statusCode = network/CORS error reading Supabase's response.
-        // The file was already saved (confirmed by storage showing the files).
-        // Use the known path and continue — the CORS config in Supabase needs
-        // rahoperations.com added to Storage → Configuration → CORS to fully resolve this.
-        console.warn(`[intake] ${storageName}: response unreadable (CORS), file confirmed in storage — continuing`);
+      let res: Response;
+      try {
+        res = await fetch('/api/upload', { method: 'POST', body: formData });
+      } catch (err) {
+        console.error(`[intake] Network error uploading ${storageName}:`, err);
+        setError('Upload failed — please check your connection and try again.');
+        setUploading(false);
+        return false;
       }
 
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        console.error(`[intake] HTTP ${res.status} for ${storageName}:`, body);
+        setError(`Upload failed [${storageName}]: ${body.error ?? 'Server error'}`);
+        setUploading(false);
+        return false;
+      }
+
+      const { path } = await res.json();
       updatedPaths[dataKey] = path;
     }
 
