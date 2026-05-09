@@ -122,30 +122,38 @@ const IntakeForm: React.FC = () => {
       const file = selectedFiles[fileKey];
       if (!file) continue;
 
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('clientId', clientId);
-      formData.append('storageName', storageName);
+      const ext = file.name.split('.').pop()?.toLowerCase() ?? 'bin';
 
-      let res: Response;
-      try {
-        res = await fetch('/api/upload', { method: 'POST', body: formData });
-      } catch (err) {
-        console.error(`[intake] Network error uploading ${storageName}:`, err);
-        setError('Upload failed — please check your connection and try again.');
+      // Step 1: get a short-lived signed upload URL from our server (tiny request, no file data)
+      const urlRes = await fetch(
+        `/api/upload?clientId=${encodeURIComponent(clientId)}&storageName=${encodeURIComponent(storageName)}&ext=${encodeURIComponent(ext)}`
+      ).catch(() => null);
+
+      if (!urlRes || !urlRes.ok) {
+        const body = urlRes ? await urlRes.json().catch(() => ({})) : {};
+        setError(`Upload failed [${storageName}]: ${body.error ?? 'Could not prepare upload'}`);
         setUploading(false);
         return false;
       }
 
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        console.error(`[intake] HTTP ${res.status} for ${storageName}:`, body);
-        setError(`Upload failed [${storageName}]: ${body.error ?? 'Server error'}`);
+      const { signedUrl, path } = await urlRes.json();
+
+      // Step 2: upload the file directly to Supabase via the signed URL.
+      // No Authorization header → not a credentialed request → no CORS issues.
+      // File never passes through Vercel so there's no 4.5 MB body limit.
+      const uploadRes = await fetch(signedUrl, {
+        method: 'PUT',
+        body: file,
+        headers: { 'Content-Type': file.type || 'application/octet-stream' },
+      }).catch(() => null);
+
+      if (!uploadRes || !uploadRes.ok) {
+        console.error(`[intake] Signed upload failed for ${storageName}, status:`, uploadRes?.status);
+        setError(`Upload failed [${storageName}]: file could not be stored. Please try again.`);
         setUploading(false);
         return false;
       }
 
-      const { path } = await res.json();
       updatedPaths[dataKey] = path;
     }
 

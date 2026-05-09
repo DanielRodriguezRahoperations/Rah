@@ -1,16 +1,24 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
-import { formidable } from 'formidable';
-import type { Fields, Files } from 'formidable';
-import { readFileSync, unlinkSync } from 'fs';
 
-export const config = {
-  api: { bodyParser: false },
-};
+const VALID_STORAGE_NAMES = new Set([
+  'dl-front', 'dl-back', 'ss-card', 'utility-bill',
+  'cr-equifax', 'cr-experian', 'cr-transunion',
+]);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'POST') {
+  if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { clientId, storageName, ext } = req.query;
+
+  if (
+    typeof clientId !== 'string' || !clientId ||
+    typeof storageName !== 'string' || !VALID_STORAGE_NAMES.has(storageName) ||
+    typeof ext !== 'string' || !ext
+  ) {
+    return res.status(400).json({ error: 'Invalid parameters' });
   }
 
   const supabaseUrl = process.env.VITE_SUPABASE_URL;
@@ -21,56 +29,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: 'Server configuration error' });
   }
 
-  const form = formidable({
-    uploadDir: '/tmp',
-    keepExtensions: true,
-    maxFileSize: 15 * 1024 * 1024,
-  });
-
-  let fields: Fields;
-  let files: Files;
-
-  try {
-    const parsed = await (form.parse(req) as Promise<[Fields, Files]>);
-    fields = parsed[0];
-    files = parsed[1];
-  } catch (err) {
-    console.error('[upload] formidable parse error:', err);
-    return res.status(400).json({ error: 'Failed to parse upload' });
-  }
-
-  const clientId = Array.isArray(fields.clientId) ? fields.clientId[0] : fields.clientId;
-  const storageName = Array.isArray(fields.storageName) ? fields.storageName[0] : fields.storageName;
-  const fileList = Array.isArray(files.file) ? files.file : files.file ? [files.file] : [];
-  const file = fileList[0];
-
-  if (!clientId || !storageName || !file) {
-    return res.status(400).json({ error: 'Missing required fields' });
-  }
-
-  const ext = file.originalFilename?.split('.').pop()?.toLowerCase() ?? 'bin';
-  const storagePath = `${clientId}/${storageName}.${ext}`;
-  const buffer = readFileSync(file.filepath);
-
-  try {
-    unlinkSync(file.filepath);
-  } catch {
-    // Temp file cleanup is best-effort
-  }
-
   const supabase = createClient(supabaseUrl, serviceKey);
+  const path = `${clientId}/${storageName}.${ext.toLowerCase()}`;
 
-  const { error } = await supabase.storage
+  const { data, error } = await supabase.storage
     .from('intake-documents')
-    .upload(storagePath, buffer, {
-      contentType: file.mimetype ?? 'application/octet-stream',
-      upsert: true,
-    });
+    .createSignedUploadUrl(path, { upsert: true });
 
-  if (error) {
-    console.error(`[upload] Supabase error for ${storageName}:`, error);
-    return res.status(500).json({ error: error.message });
+  if (error || !data) {
+    console.error('[upload] createSignedUploadUrl error:', error);
+    return res.status(500).json({ error: error?.message ?? 'Failed to create upload URL' });
   }
 
-  return res.status(200).json({ path: storagePath });
+  return res.status(200).json({ signedUrl: data.signedUrl, path });
 }
