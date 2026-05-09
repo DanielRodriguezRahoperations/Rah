@@ -27,6 +27,7 @@ import TestimonialsPage from './pages/TestimonialsPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import PortfolioPage from './pages/PortfolioPage';
 import CreditRepairIntakePage from './pages/CreditRepairIntakePage';
+import TestUploadPage from './pages/TestUploadPage';
 
 import CaseStudiesPage from './pages/CaseStudiesPage';
 import Tier1CustomsCaseStudy from './pages/case-studies/Tier1CustomsCaseStudy';
@@ -139,6 +140,7 @@ function App() {
               <Route path="/testimonials" element={<TestimonialsPage />} />
               <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
               <Route path="/credit-repair/intake" element={<CreditRepairIntakePage />} />
+              <Route path="/test-upload" element={<TestUploadPage />} />
 
               {/* SEO Service Location Pages */}
               <Route path="/services/website-design-scottsdale" element={<WebsiteDesignScottsdale />} />
