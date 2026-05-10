@@ -35,6 +35,15 @@ import Tier1CustomsCaseStudy from './pages/case-studies/Tier1CustomsCaseStudy';
 import EverAfterEditCaseStudy from './pages/case-studies/EverAfterEditCaseStudy';
 import EmpireBuildsAzCaseStudy from './pages/case-studies/EmpireBuildsAzCaseStudy';
 
+// Admin pages
+import AdminLoginPage from './pages/admin/AdminLoginPage';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AdminClientDetailPage from './pages/admin/AdminClientDetailPage';
+
+// Portal pages
+import PortalLoginPage from './pages/portal/PortalLoginPage';
+import PortalDashboardPage from './pages/portal/PortalDashboardPage';
+
 // SEO Service Location Pages
 import WebsiteDesignScottsdale from './pages/services/WebsiteDesignScottsdale';
 import WebsiteDesignPhoenix from './pages/services/WebsiteDesignPhoenix';
@@ -143,6 +152,17 @@ function App() {
               <Route path="/credit-repair/intake" element={<CreditRepairIntakePage />} />
               <Route path="/test-upload" element={<TestUploadPage />} />
               <Route path="/test-submit" element={<TestSubmitPage />} />
+
+              {/* Admin (restricted) */}
+              <Route path="/admin" element={<AdminLoginPage />} />
+              <Route path="/admin/login" element={<AdminLoginPage />} />
+              <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+              <Route path="/admin/clients/:clientId" element={<AdminClientDetailPage />} />
+
+              {/* Client Portal */}
+              <Route path="/portal" element={<PortalLoginPage />} />
+              <Route path="/portal/login" element={<PortalLoginPage />} />
+              <Route path="/portal/dashboard" element={<PortalDashboardPage />} />
 
               {/* SEO Service Location Pages */}
               <Route path="/services/website-design-scottsdale" element={<WebsiteDesignScottsdale />} />
