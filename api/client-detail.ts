@@ -92,11 +92,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     })
   );
 
+  // 6. Misc document signed URLs
+  const miscRaw = (client as Record<string, unknown>).doc_misc_files;
+  const miscArr = Array.isArray(miscRaw)
+    ? (miscRaw as Array<{ path: string; filename: string; uploaded_at: string }>)
+    : [];
+  const miscFiles = await Promise.all(
+    miscArr.map(async (m) => {
+      const { data: signed } = await supabase.storage
+        .from('intake-documents')
+        .createSignedUrl(m.path, SIGNED_URL_TTL);
+      return { ...m, signedUrl: signed?.signedUrl ?? null };
+    })
+  );
+
   return res.status(200).json({
     client,
     letters: letters ?? [],
     accounts: accounts ?? [],
     responses: responses ?? [],
     docUrls,
+    miscFiles,
   });
 }

@@ -36,16 +36,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  // Fetch client (sanitized — no SSN-equivalent fields are stored anyway, but explicit)
+  // Fetch client
   const { data: client } = await supabase
     .from('credit_repair_clients')
-    .select('id, full_name, email, phone, address, city, state, zip, status, created_at, goals, timeline')
+    .select('id, full_name, email, phone, address, city, state, zip, status, created_at, goals, timeline, doc_ftc_report, doc_police_report')
     .eq('id', clientId)
     .maybeSingle();
 
   if (!client) {
     return res.status(404).json({ error: 'Client record not found' });
   }
+
+  // Convert doc paths to booleans for the portal view
+  const clientOut = {
+    ...(client as Record<string, unknown>),
+    doc_ftc_report: !!((client as Record<string, unknown>).doc_ftc_report),
+    doc_police_report: !!((client as Record<string, unknown>).doc_police_report),
+  };
 
   // Letters with tracking
   const { data: letters } = await supabase
@@ -54,16 +61,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .eq('client_id', clientId)
     .order('created_at', { ascending: false });
 
-  // Bureau responses (high-level)
+  // Bureau responses with signed download URLs for uploaded files
   const { data: responses } = await supabase
     .from('bureau_responses')
-    .select('id, bureau, response_type, summary, received_at, created_at')
+    .select('id, bureau, response_type, summary, received_at, created_at, file_path')
     .eq('client_id', clientId)
     .order('created_at', { ascending: false });
 
+  const responsesWithUrls = await Promise.all(
+    (responses ?? []).map(async (r) => {
+      const filePath = (r as Record<string, unknown>).file_path as string | null;
+      if (!filePath) return { ...r, signedUrl: null };
+      const { data: signed } = await supabase.storage
+        .from('intake-documents')
+        .createSignedUrl(filePath, 24 * 60 * 60);
+      return { ...r, signedUrl: signed?.signedUrl ?? null };
+    })
+  );
+
   return res.status(200).json({
-    client,
+    client: clientOut,
     letters: letters ?? [],
-    responses: responses ?? [],
+    responses: responsesWithUrls,
   });
 }

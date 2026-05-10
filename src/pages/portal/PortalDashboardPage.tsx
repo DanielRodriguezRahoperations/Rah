@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SEOHead from '../../components/ui/SEOHead';
 import { SITE_CONFIG } from '../../config/site';
+import { uploadFileToSignedUrl } from '../../utils/uploadFile';
 
 const PORTAL_TOKEN_KEY = 'rah_portal_token';
 const PORTAL_CLIENT_KEY = 'rah_portal_client_id';
@@ -26,6 +27,8 @@ interface PortalResponse {
   summary: string | null;
   received_at: string | null;
   created_at: string;
+  file_path?: string | null;
+  signedUrl?: string | null;
 }
 
 interface PortalData {
@@ -38,6 +41,8 @@ interface PortalData {
     created_at: string;
     goals?: string;
     timeline?: string;
+    doc_ftc_report?: boolean;
+    doc_police_report?: boolean;
   };
   letters: PortalLetter[];
   responses: PortalResponse[];
@@ -133,6 +138,7 @@ const PortalDashboardPage = () => {
 
   const { client, letters, responses } = data;
   const currentStageIdx = Math.max(0, STAGES.indexOf(client.status));
+  const portalToken = localStorage.getItem(PORTAL_TOKEN_KEY) ?? '';
 
   return (
     <>
@@ -271,45 +277,20 @@ const PortalDashboardPage = () => {
             )}
           </div>
 
-          {/* Bureau responses */}
-          <div className="bg-white border border-neutral-200 rounded-sm overflow-hidden mb-8 shadow-sm">
-            <div className="px-6 py-5 border-b border-neutral-200">
-              <p className="text-[10px] tracking-[0.3em] uppercase text-luxury-red font-bold mb-1">
-                Bureau & Furnisher Responses
-              </p>
-              <h3 className="font-serif-display text-2xl text-slate-dark">
-                Response Log
-              </h3>
-            </div>
-            {responses.length === 0 ? (
-              <div className="p-10 text-center text-neutral-500 text-sm">
-                No responses received yet. Bureaus typically respond within 30 calendar days; identity-theft blocks within 4 business days.
-              </div>
-            ) : (
-              <div className="divide-y divide-neutral-200">
-                {responses.map((r) => (
-                  <div key={r.id} className="px-6 py-4">
-                    <div className="flex items-start justify-between gap-3 mb-1">
-                      <p className="text-sm font-semibold text-slate-dark capitalize">
-                        {r.bureau}
-                      </p>
-                      <p className="text-xs text-neutral-500">
-                        {r.received_at
-                          ? new Date(r.received_at).toLocaleDateString()
-                          : new Date(r.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <p className="text-xs uppercase tracking-widest text-luxury-red mb-2">
-                      {r.response_type}
-                    </p>
-                    {r.summary && (
-                      <p className="text-sm text-neutral-700 leading-relaxed">{r.summary}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* Upload missing documents */}
+          <PortalDocUpload
+            token={portalToken}
+            hasFtc={!!client.doc_ftc_report}
+            hasPolice={!!client.doc_police_report}
+            onRefresh={() => fetchData(portalToken)}
+          />
+
+          {/* Bureau responses + response upload */}
+          <PortalResponseSection
+            token={portalToken}
+            responses={responses}
+            onRefresh={() => fetchData(portalToken)}
+          />
 
           {/* Help footer */}
           <div className="bg-luxury-red text-white rounded-sm p-6 text-center">
@@ -332,5 +313,345 @@ const PortalDashboardPage = () => {
     </>
   );
 };
+
+// ===================== Sub-components =====================
+
+const PORTAL_DOC_TYPES = [
+  { value: 'ftc-report',    label: 'FTC Identity Theft Report', required: true },
+  { value: 'police-report', label: 'Police Report',              required: false },
+  { value: 'misc',          label: 'Additional Supporting Document', required: false },
+] as const;
+
+type PortalDocType = 'ftc-report' | 'police-report' | 'misc';
+
+function PortalDocUpload({
+  token,
+  hasFtc,
+  hasPolice,
+  onRefresh,
+}: {
+  token: string;
+  hasFtc: boolean;
+  hasPolice: boolean;
+  onRefresh: () => void;
+}) {
+  const [docType, setDocType] = useState<PortalDocType>(!hasFtc ? 'ftc-report' : 'misc');
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const doUpload = async () => {
+    if (!file) return;
+    setUploading(true);
+    setProgress(0);
+    setError('');
+    setSuccess('');
+    try {
+      const ext = file.name.split('.').pop() || 'bin';
+      const urlRes = await fetch(
+        `/api/portal-upload?kind=doc&docType=${docType}&ext=${encodeURIComponent(ext)}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      if (!urlRes.ok) throw new Error((await urlRes.json()).error || 'Could not get upload URL');
+      const { signedUrl, path } = await urlRes.json();
+
+      await uploadFileToSignedUrl(signedUrl, file, setProgress);
+
+      const postRes = await fetch('/api/portal-upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ kind: 'doc', docType, path, filename: file.name }),
+      });
+      if (!postRes.ok) throw new Error((await postRes.json()).error || 'Failed to record upload');
+
+      setSuccess('Document uploaded successfully.');
+      setFile(null);
+      if (fileRef.current) fileRef.current.value = '';
+      onRefresh();
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setUploading(false);
+      setProgress(0);
+    }
+  };
+
+  return (
+    <div className="bg-white border border-neutral-200 rounded-sm p-6 mb-8 shadow-sm">
+      <p className="text-[10px] tracking-[0.3em] uppercase text-luxury-red font-bold mb-1">
+        Missing Documents
+      </p>
+      <h3 className="font-serif-display text-2xl text-slate-dark mb-1">
+        Upload Your Documents
+      </h3>
+      <p className="text-sm text-neutral-500 mb-5">
+        Add any documents that were not submitted during your initial intake.
+      </p>
+
+      {/* Status pills */}
+      <div className="flex flex-wrap gap-3 mb-5">
+        <span className={`px-3 py-1.5 rounded-full text-xs font-semibold ${hasFtc ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+          {hasFtc ? '✓ FTC Report uploaded' : '⚠ FTC Report missing'}
+        </span>
+        <span className={`px-3 py-1.5 rounded-full text-xs font-semibold ${hasPolice ? 'bg-green-100 text-green-700' : 'bg-neutral-100 text-neutral-500'}`}>
+          {hasPolice ? '✓ Police Report uploaded' : 'Police Report (optional)'}
+        </span>
+      </div>
+
+      <div className="grid sm:grid-cols-3 gap-4 mb-4">
+        <div>
+          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-1.5">
+            Document Type
+          </label>
+          <select
+            value={docType}
+            onChange={(e) => setDocType(e.target.value as PortalDocType)}
+            disabled={uploading}
+            className="w-full border border-neutral-300 text-slate-dark px-3 py-2 rounded-sm text-sm focus:outline-none focus:border-luxury-red bg-white"
+          >
+            {PORTAL_DOC_TYPES.map((t) => (
+              <option key={t.value} value={t.value}>{t.label}</option>
+            ))}
+          </select>
+        </div>
+        <div className="sm:col-span-2">
+          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-1.5">
+            File (PDF, JPG, PNG, HEIC)
+          </label>
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png,.heic,.heif"
+            disabled={uploading}
+            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            className="w-full border border-neutral-300 text-slate-dark px-3 py-2 rounded-sm text-sm file:bg-cream-100 file:border-0 file:text-slate-dark file:text-xs file:px-3 file:py-1 file:mr-3 file:rounded-sm file:cursor-pointer"
+          />
+        </div>
+      </div>
+
+      {uploading && (
+        <div className="mb-4">
+          <div className="flex justify-between text-xs text-neutral-400 mb-1">
+            <span>Uploading…</span><span>{progress}%</span>
+          </div>
+          <div className="w-full bg-neutral-200 rounded-full h-1.5">
+            <div className="bg-luxury-red h-1.5 rounded-full transition-all" style={{ width: `${progress}%` }} />
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-sm">{error}</div>
+      )}
+      {success && (
+        <div className="mb-4 bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-3 rounded-sm">{success}</div>
+      )}
+
+      <button
+        onClick={doUpload}
+        disabled={uploading || !file}
+        className="bg-luxury-red hover:bg-luxury-light disabled:opacity-40 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
+      >
+        {uploading ? 'Uploading…' : 'Upload Document'}
+      </button>
+    </div>
+  );
+}
+
+function PortalResponseSection({
+  token,
+  responses,
+  onRefresh,
+}: {
+  token: string;
+  responses: PortalResponse[];
+  onRefresh: () => void;
+}) {
+  const [showForm, setShowForm] = useState(false);
+  const [bureau, setBureau] = useState('');
+  const [receivedAt, setReceivedAt] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const doUpload = async () => {
+    if (!file || !bureau) return;
+    setUploading(true);
+    setProgress(0);
+    setError('');
+    setSuccess('');
+    try {
+      const ext = file.name.split('.').pop() || 'bin';
+      const urlRes = await fetch(
+        `/api/portal-upload?kind=response&ext=${encodeURIComponent(ext)}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      if (!urlRes.ok) throw new Error((await urlRes.json()).error || 'Could not get upload URL');
+      const { signedUrl, path } = await urlRes.json();
+
+      await uploadFileToSignedUrl(signedUrl, file, setProgress);
+
+      const postRes = await fetch('/api/portal-upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ kind: 'response', bureau, receivedAt: receivedAt || null, path, filename: file.name }),
+      });
+      if (!postRes.ok) throw new Error((await postRes.json()).error || 'Failed to record response');
+
+      setSuccess('Response uploaded. Your specialist has been notified.');
+      setBureau('');
+      setReceivedAt('');
+      setFile(null);
+      if (fileRef.current) fileRef.current.value = '';
+      setShowForm(false);
+      onRefresh();
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setUploading(false);
+      setProgress(0);
+    }
+  };
+
+  return (
+    <div className="bg-white border border-neutral-200 rounded-sm overflow-hidden mb-8 shadow-sm">
+      <div className="px-6 py-5 border-b border-neutral-200 flex items-center justify-between gap-4">
+        <div>
+          <p className="text-[10px] tracking-[0.3em] uppercase text-luxury-red font-bold mb-1">
+            Bureau & Furnisher Responses
+          </p>
+          <h3 className="font-serif-display text-2xl text-slate-dark">Response Log</h3>
+        </div>
+        <button
+          onClick={() => { setShowForm((s) => !s); setError(''); setSuccess(''); }}
+          className="text-xs uppercase tracking-widest font-semibold border border-luxury-red text-luxury-red hover:bg-luxury-red hover:text-white px-4 py-2 rounded-sm transition-colors whitespace-nowrap"
+        >
+          {showForm ? 'Cancel' : '+ Upload Response'}
+        </button>
+      </div>
+
+      {/* Upload form */}
+      {showForm && (
+        <div className="px-6 py-5 border-b border-neutral-200 bg-cream-50">
+          <p className="text-sm font-semibold text-slate-dark mb-4">
+            Upload a letter you received from a bureau or furnisher
+          </p>
+          <div className="grid sm:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-1.5">
+                Bureau / Furnisher Name *
+              </label>
+              <input
+                type="text"
+                value={bureau}
+                onChange={(e) => setBureau(e.target.value)}
+                placeholder="e.g. Experian, Capital One…"
+                disabled={uploading}
+                className="w-full border border-neutral-300 text-slate-dark px-3 py-2 rounded-sm text-sm focus:outline-none focus:border-luxury-red bg-white"
+              />
+            </div>
+            <div>
+              <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-1.5">
+                Date Received (optional)
+              </label>
+              <input
+                type="date"
+                value={receivedAt}
+                onChange={(e) => setReceivedAt(e.target.value)}
+                disabled={uploading}
+                className="w-full border border-neutral-300 text-slate-dark px-3 py-2 rounded-sm text-sm focus:outline-none focus:border-luxury-red bg-white"
+              />
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-1.5">
+              Response Document * (PDF, JPG, PNG, HEIC)
+            </label>
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png,.heic,.heif"
+              disabled={uploading}
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              className="w-full border border-neutral-300 text-slate-dark px-3 py-2 rounded-sm text-sm file:bg-cream-100 file:border-0 file:text-slate-dark file:text-xs file:px-3 file:py-1 file:mr-3 file:rounded-sm file:cursor-pointer"
+            />
+          </div>
+
+          {uploading && (
+            <div className="mb-4">
+              <div className="flex justify-between text-xs text-neutral-400 mb-1">
+                <span>Uploading…</span><span>{progress}%</span>
+              </div>
+              <div className="w-full bg-neutral-200 rounded-full h-1.5">
+                <div className="bg-luxury-red h-1.5 rounded-full transition-all" style={{ width: `${progress}%` }} />
+              </div>
+            </div>
+          )}
+
+          {error && (
+            <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-sm">{error}</div>
+          )}
+
+          <button
+            onClick={doUpload}
+            disabled={uploading || !file || !bureau}
+            className="bg-luxury-red hover:bg-luxury-light disabled:opacity-40 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
+          >
+            {uploading ? 'Uploading…' : 'Submit Response'}
+          </button>
+        </div>
+      )}
+
+      {success && (
+        <div className="px-6 py-4 bg-green-50 border-b border-green-200 text-green-700 text-sm">{success}</div>
+      )}
+
+      {/* Response list */}
+      {responses.length === 0 ? (
+        <div className="p-10 text-center text-neutral-500 text-sm">
+          No responses yet. Upload any letters you receive from bureaus or furnishers using the button above.
+          <br />
+          <span className="text-xs text-neutral-400 mt-1 block">Bureaus respond within 30 days; §605B blocks within 4 business days.</span>
+        </div>
+      ) : (
+        <div className="divide-y divide-neutral-200">
+          {responses.map((r) => (
+            <div key={r.id} className="px-6 py-4">
+              <div className="flex items-start justify-between gap-3 mb-1">
+                <p className="text-sm font-semibold text-slate-dark capitalize">{r.bureau}</p>
+                <p className="text-xs text-neutral-500">
+                  {r.received_at
+                    ? new Date(r.received_at).toLocaleDateString()
+                    : new Date(r.created_at).toLocaleDateString()}
+                </p>
+              </div>
+              <p className="text-xs uppercase tracking-widest text-luxury-red mb-2">{r.response_type}</p>
+              {r.summary && (
+                <p className="text-sm text-neutral-700 leading-relaxed mb-2">{r.summary}</p>
+              )}
+              {r.signedUrl && (
+                <a
+                  href={r.signedUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-luxury-red hover:text-luxury-accent font-semibold"
+                >
+                  View document →
+                </a>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default PortalDashboardPage;

@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SEOHead from '../../components/ui/SEOHead';
 import { adminHeaders, clearAdminToken, isAdminAuthenticated } from '../../lib/adminAuth';
 import { BUREAU_ADDRESSES } from '../../lib/letterTemplates';
+import { uploadFileToSignedUrl } from '../../utils/uploadFile';
 
 interface ClientDetail {
   client: Record<string, unknown> & {
@@ -29,6 +30,7 @@ interface ClientDetail {
   accounts: Array<Record<string, unknown> & { id: string; creditor_name: string; account_number: string; balance: string; date_opened: string; account_type: string; account_status: string; bureaus: string[]; selected: boolean }>;
   responses: Array<Record<string, unknown> & { id: string; created_at: string }>;
   docUrls: Record<string, string | null>;
+  miscFiles: Array<{ path: string; filename: string; uploaded_at: string; signedUrl: string | null }>;
 }
 
 const DOC_LABELS: Record<string, string> = {
@@ -188,7 +190,7 @@ const AdminClientDetailPage = () => {
     );
   }
 
-  const { client, letters, accounts, docUrls } = data;
+  const { client, letters, accounts, docUrls, miscFiles } = data;
 
   return (
     <>
@@ -265,7 +267,14 @@ const AdminClientDetailPage = () => {
             transition={{ duration: 0.3 }}
           >
             {tab === 'overview' && <OverviewTab client={client} />}
-            {tab === 'documents' && <DocumentsTab docUrls={docUrls} />}
+            {tab === 'documents' && (
+              <DocumentsTab
+                clientId={client.id}
+                docUrls={docUrls}
+                miscFiles={miscFiles ?? []}
+                onRefresh={loadDetail}
+              />
+            )}
             {tab === 'analyze' && (
               <AnalyzeTab
                 accounts={accounts}
@@ -338,35 +347,197 @@ const Field = ({ label, value, multiline }: { label: string; value: string; mult
 );
 
 // === Documents Tab ===
-const DocumentsTab = ({ docUrls }: { docUrls: Record<string, string | null> }) => (
-  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-    {Object.keys(DOC_LABELS).map((key) => {
-      const url = docUrls[key];
-      return (
-        <div
-          key={key}
-          className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-5"
-        >
-          <p className="text-xs uppercase tracking-widest text-neutral-400 mb-2">
-            {DOC_LABELS[key]}
-          </p>
-          {url ? (
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-luxury-red hover:text-luxury-accent text-sm font-semibold"
-            >
-              View document →
-            </a>
-          ) : (
-            <p className="text-neutral-500 text-sm">Not uploaded</p>
-          )}
-        </div>
+const ADMIN_UPLOAD_TYPES = [
+  { value: 'ftc-report',    label: 'FTC Identity Theft Report' },
+  { value: 'police-report', label: 'Police Report' },
+  { value: 'misc',          label: 'Additional Supporting Document' },
+] as const;
+
+type AdminDocType = 'ftc-report' | 'police-report' | 'misc';
+
+const DocumentsTab = ({
+  clientId,
+  docUrls,
+  miscFiles,
+  onRefresh,
+}: {
+  clientId: string;
+  docUrls: Record<string, string | null>;
+  miscFiles: Array<{ path: string; filename: string; uploaded_at: string; signedUrl: string | null }>;
+  onRefresh: () => void;
+}) => {
+  const [docType, setDocType] = useState<AdminDocType>('ftc-report');
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [uploadError, setUploadError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const doUpload = async () => {
+    if (!file) return;
+    setUploading(true);
+    setProgress(0);
+    setUploadError('');
+    try {
+      const ext = file.name.split('.').pop() || 'bin';
+      const urlRes = await fetch(
+        `/api/admin-upload?clientId=${encodeURIComponent(clientId)}&docType=${docType}&ext=${encodeURIComponent(ext)}`,
+        { headers: adminHeaders() },
       );
-    })}
-  </div>
-);
+      if (!urlRes.ok) throw new Error((await urlRes.json()).error || 'Failed to get upload URL');
+      const { signedUrl, path } = await urlRes.json();
+
+      await uploadFileToSignedUrl(signedUrl, file, setProgress);
+
+      const patchRes = await fetch('/api/admin-upload', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+        body: JSON.stringify({ clientId, docType, path, filename: file.name }),
+      });
+      if (!patchRes.ok) throw new Error((await patchRes.json()).error || 'Failed to record upload');
+
+      setFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      onRefresh();
+    } catch (err) {
+      setUploadError((err as Error).message);
+    } finally {
+      setUploading(false);
+      setProgress(0);
+    }
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Existing intake documents */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {Object.keys(DOC_LABELS).map((key) => {
+          const url = docUrls[key];
+          return (
+            <div key={key} className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-5">
+              <p className="text-xs uppercase tracking-widest text-neutral-400 mb-2">
+                {DOC_LABELS[key]}
+              </p>
+              {url ? (
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-luxury-red hover:text-luxury-accent text-sm font-semibold"
+                >
+                  View document →
+                </a>
+              ) : (
+                <p className="text-neutral-500 text-sm">Not uploaded</p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Admin upload panel */}
+      <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-6">
+        <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold mb-4">
+          Admin Document Upload
+        </h3>
+        <div className="grid sm:grid-cols-3 gap-4 mb-4">
+          <div>
+            <label className="block text-xs uppercase tracking-widest text-neutral-400 mb-2">
+              Document Type
+            </label>
+            <select
+              value={docType}
+              onChange={(e) => setDocType(e.target.value as AdminDocType)}
+              disabled={uploading}
+              className="w-full bg-[#0f0f0f] border border-neutral-800 text-white px-3 py-2 rounded-sm text-sm focus:outline-none focus:border-luxury-red"
+            >
+              {ADMIN_UPLOAD_TYPES.map((t) => (
+                <option key={t.value} value={t.value}>{t.label}</option>
+              ))}
+            </select>
+          </div>
+          <div className="sm:col-span-2">
+            <label className="block text-xs uppercase tracking-widest text-neutral-400 mb-2">
+              File (PDF, JPG, PNG, HEIC)
+            </label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png,.heic,.heif"
+              disabled={uploading}
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              className="w-full bg-[#0f0f0f] border border-neutral-800 text-neutral-300 px-3 py-2 rounded-sm text-sm file:bg-neutral-800 file:border-0 file:text-white file:text-xs file:px-3 file:py-1 file:mr-3 file:rounded-sm file:cursor-pointer"
+            />
+          </div>
+        </div>
+
+        {uploading && (
+          <div className="mb-4">
+            <div className="flex justify-between text-xs text-neutral-400 mb-1">
+              <span>Uploading…</span>
+              <span>{progress}%</span>
+            </div>
+            <div className="w-full bg-neutral-800 rounded-full h-1.5">
+              <div
+                className="bg-luxury-red h-1.5 rounded-full transition-all"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {uploadError && (
+          <div className="mb-4 bg-red-950/50 border border-red-900 text-red-200 text-sm px-4 py-3 rounded-sm">
+            {uploadError}
+          </div>
+        )}
+
+        <button
+          onClick={doUpload}
+          disabled={uploading || !file}
+          className="bg-luxury-red hover:bg-luxury-light disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
+        >
+          {uploading ? 'Uploading…' : 'Upload Document'}
+        </button>
+      </div>
+
+      {/* Additional supporting documents list */}
+      {miscFiles.length > 0 && (
+        <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-neutral-800">
+            <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold">
+              Additional Supporting Documents ({miscFiles.length})
+            </h3>
+          </div>
+          <div className="divide-y divide-neutral-800">
+            {miscFiles.map((f, i) => (
+              <div key={i} className="px-6 py-4 flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm text-white">{f.filename}</p>
+                  <p className="text-xs text-neutral-500 mt-0.5">
+                    {new Date(f.uploaded_at).toLocaleDateString()}
+                  </p>
+                </div>
+                {f.signedUrl ? (
+                  <a
+                    href={f.signedUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-luxury-red hover:text-luxury-accent text-xs uppercase tracking-widest font-semibold whitespace-nowrap"
+                  >
+                    Download →
+                  </a>
+                ) : (
+                  <span className="text-neutral-500 text-xs">Link expired</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // === Analyze Tab ===
 const AnalyzeTab = ({
