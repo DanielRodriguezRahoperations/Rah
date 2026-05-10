@@ -65,15 +65,56 @@ const HomePage = () => {
             className="absolute inset-0 w-full h-full object-cover"
             src="/hero.mp4"
           />
-          <div className="absolute inset-0 bg-slate-dark/30" />
+          <div className="absolute inset-0 bg-slate-dark/55" />
+
+          {/* Video hero content — three user paths visible within 5 seconds */}
+          <motion.div
+            className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-6 z-10"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.4 }}
+          >
+            <p className="text-[10px] sm:text-xs uppercase tracking-[0.35em] mb-5 opacity-50 font-sans">
+              RAH Operations · Scottsdale, AZ
+            </p>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif-display font-bold leading-[1.05] mb-4 max-w-4xl">
+              Websites. Marketing.
+              <span className="block text-luxury-accent">Credit Repair.</span>
+            </h1>
+            <p className="text-sm sm:text-base text-white/65 mb-10 max-w-lg font-serif-body leading-relaxed">
+              Business systems for Arizona companies that are serious about growth.
+            </p>
+
+            {/* Three clear user paths */}
+            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+              <Link
+                to="/credit-repair/intake"
+                className="px-6 py-3 bg-luxury-red text-white text-sm font-medium uppercase tracking-wider hover:bg-luxury-dark transition-colors duration-300 whitespace-nowrap"
+              >
+                Start Your Case
+              </Link>
+              <Link
+                to="/marketing/intake"
+                className="px-6 py-3 bg-white/10 border border-white/30 text-white text-sm font-medium uppercase tracking-wider hover:bg-white/20 transition-colors duration-300 backdrop-blur-sm whitespace-nowrap"
+              >
+                Grow My Business
+              </Link>
+              <Link
+                to="/portal"
+                className="px-6 py-3 text-white/60 text-sm font-medium uppercase tracking-wider hover:text-white transition-colors duration-300 whitespace-nowrap"
+              >
+                Client Portal →
+              </Link>
+            </div>
+          </motion.div>
 
           <motion.div
             className="absolute bottom-10 left-1/2 -translate-x-1/2 text-center text-white z-10"
             animate={{ y: [0, 10, 0] }}
             transition={{ duration: 2.5, repeat: Infinity }}
           >
-            <p className="text-xs uppercase tracking-[0.25em] mb-3 opacity-60">Scroll</p>
-            <div className="w-px h-10 bg-white/40 mx-auto" />
+            <p className="text-xs uppercase tracking-[0.25em] mb-3 opacity-40">Scroll</p>
+            <div className="w-px h-10 bg-white/30 mx-auto" />
           </motion.div>
         </div>
       </div>
@@ -111,21 +152,29 @@ const HomePage = () => {
             </p>
 
             <motion.div
-              className="flex flex-col sm:flex-row gap-4 mb-16"
+              className="flex flex-col sm:flex-row flex-wrap gap-4 mb-16"
               variants={containerVariants}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
             >
               <motion.div variants={itemVariants}>
-                <Button to="/contact" size="lg" className="w-full sm:w-auto">
-                  Start Your Project
+                <Button to="/credit-repair/intake" size="lg" className="w-full sm:w-auto">
+                  Start Your Case
                 </Button>
               </motion.div>
               <motion.div variants={itemVariants}>
-                <Button to="/case-studies" variant="secondary" size="lg" className="w-full sm:w-auto">
-                  See Our Work
+                <Button to="/marketing/intake" variant="secondary" size="lg" className="w-full sm:w-auto">
+                  Grow My Business
                 </Button>
+              </motion.div>
+              <motion.div variants={itemVariants} className="flex items-center">
+                <Link
+                  to="/portal"
+                  className="text-sm text-neutral-500 hover:text-luxury-red transition-colors font-medium underline underline-offset-4"
+                >
+                  Already a client? Access your portal →
+                </Link>
               </motion.div>
             </motion.div>
 

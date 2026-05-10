@@ -96,6 +96,27 @@ const Footer = () => {
               <p>Scottsdale, Arizona</p>
             </div>
 
+            {/* Client portals */}
+            <div className="mb-8 border border-neutral-800 p-4">
+              <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.24em] text-neutral-600">
+                Client Access
+              </p>
+              <div className="space-y-2">
+                <Link
+                  to="/portal"
+                  className="block text-sm text-neutral-400 hover:text-white transition-colors"
+                >
+                  Credit Repair Portal →
+                </Link>
+                <Link
+                  to="/marketing/portal"
+                  className="block text-sm text-neutral-400 hover:text-white transition-colors"
+                >
+                  Marketing Portal →
+                </Link>
+              </div>
+            </div>
+
             {/* Social Icons */}
             <div>
               <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.24em] text-neutral-600">
@@ -122,7 +143,6 @@ const Footer = () => {
             <p className="mb-5 text-[11px] font-medium uppercase tracking-[0.24em] text-neutral-500">
               Services
             </p>
-
             <ul className="space-y-3">
               {services.map((link) => (
                 <li key={link.to}>
@@ -138,7 +158,6 @@ const Footer = () => {
             <p className="mb-5 text-[11px] font-medium uppercase tracking-[0.24em] text-neutral-500">
               Local Services
             </p>
-
             <ul className="space-y-3">
               {localServices.map((link) => (
                 <li key={link.to}>
@@ -154,7 +173,6 @@ const Footer = () => {
             <p className="mb-5 text-[11px] font-medium uppercase tracking-[0.24em] text-neutral-500">
               Company
             </p>
-
             <ul className="space-y-3">
               {company.map((link) => (
                 <li key={link.to}>
@@ -167,6 +185,7 @@ const Footer = () => {
           </div>
         </div>
 
+        {/* Bottom bar */}
         <div className="mt-14 flex flex-col gap-4 border-t border-neutral-800 pt-8 text-sm text-neutral-500 md:flex-row md:items-center md:justify-between">
           <p>© {new Date().getFullYear()} RAH Operations LLC. All rights reserved.</p>
           <div className="flex items-center gap-5">
@@ -182,6 +201,14 @@ const Footer = () => {
                 {s.icon}
               </a>
             ))}
+            {/* Discreet admin link — intentionally small and unbranded */}
+            <Link
+              to="/admin/login"
+              className="text-neutral-700 hover:text-neutral-500 transition-colors duration-300 text-xs"
+              aria-label="Admin"
+            >
+              Admin
+            </Link>
           </div>
         </div>
       </div>
