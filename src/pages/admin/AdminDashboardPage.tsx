@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SEOHead from '../../components/ui/SEOHead';
@@ -33,6 +33,14 @@ const AdminDashboardPage = () => {
   const [error, setError] = useState('');
   const [filter, setFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
+
+  // SMS modal
+  const [smsOpen, setSmsOpen] = useState(false);
+  const [smsName, setSmsName] = useState('');
+  const [smsPhone, setSmsPhone] = useState('');
+  const [smsSending, setSmsSending] = useState(false);
+  const [smsError, setSmsError] = useState('');
+  const [smsSuccess, setSmsSuccess] = useState('');
 
   useEffect(() => {
     if (!isAdminAuthenticated()) {
@@ -69,6 +77,43 @@ const AdminDashboardPage = () => {
     navigate('/admin/login', { replace: true });
   };
 
+  const openSms = () => {
+    setSmsName('');
+    setSmsPhone('');
+    setSmsError('');
+    setSmsSuccess('');
+    setSmsOpen(true);
+  };
+
+  const closeSms = () => {
+    if (smsSending) return;
+    setSmsOpen(false);
+  };
+
+  const handleSendSms = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSmsError('');
+    setSmsSuccess('');
+    setSmsSending(true);
+    try {
+      const res = await fetch('/api/send-sms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+        body: JSON.stringify({ name: smsName, phone: smsPhone }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        setSmsError(json.error || 'Failed to send message');
+      } else {
+        setSmsSuccess(`Text sent to ${smsName} at ${smsPhone}`);
+      }
+    } catch {
+      setSmsError('Network error — check your connection');
+    } finally {
+      setSmsSending(false);
+    }
+  };
+
   const filtered = clients.filter((c) => {
     if (filter !== 'all' && c.status !== filter) return false;
     if (!search) return true;
@@ -85,6 +130,119 @@ const AdminDashboardPage = () => {
   return (
     <>
       <SEOHead title="Admin Dashboard — RAH Operations" description="Restricted area." noIndex={true} />
+
+      {/* SMS Modal */}
+      {smsOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-6"
+          onClick={(e) => e.target === e.currentTarget && closeSms()}
+        >
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
+            className="relative z-10 bg-[#1a1a1a] border border-neutral-800 rounded-sm p-8 w-full max-w-md"
+          >
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <p className="text-[10px] tracking-[0.3em] uppercase text-luxury-red font-bold mb-1">
+                  Send Intake Link
+                </p>
+                <h2 className="font-serif-display text-2xl text-white">Invite by Text</h2>
+              </div>
+              <button
+                onClick={closeSms}
+                disabled={smsSending}
+                className="text-neutral-500 hover:text-white text-xl leading-none mt-1"
+              >
+                ×
+              </button>
+            </div>
+
+            {smsSuccess ? (
+              <div className="space-y-4">
+                <div className="bg-green-950/50 border border-green-900 text-green-200 px-4 py-4 rounded-sm text-sm">
+                  <p className="font-semibold mb-1">Message sent!</p>
+                  <p>{smsSuccess}</p>
+                </div>
+                <div className="bg-[#0f0f0f] border border-neutral-800 rounded-sm px-4 py-3 text-xs text-neutral-400 font-mono leading-relaxed">
+                  &quot;Hi {smsName.trim().split(/\s+/)[0]}, Daniel from RAH Operations here. Ready to start your credit repair journey? Fill out your intake form here: rahoperations.com/credit-repair/intake - Questions? Call (623) 640-8884&quot;
+                </div>
+                <button
+                  onClick={closeSms}
+                  className="w-full bg-luxury-red hover:bg-luxury-light text-white py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
+                >
+                  Done
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSendSms} className="space-y-4">
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-neutral-400 mb-2">
+                    Recipient Name
+                  </label>
+                  <input
+                    type="text"
+                    value={smsName}
+                    onChange={(e) => setSmsName(e.target.value)}
+                    required
+                    disabled={smsSending}
+                    placeholder="Jane Smith"
+                    className="w-full bg-[#0f0f0f] border border-neutral-800 text-white px-4 py-3 rounded-sm text-sm focus:outline-none focus:border-luxury-red"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-neutral-400 mb-2">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={smsPhone}
+                    onChange={(e) => setSmsPhone(e.target.value)}
+                    required
+                    disabled={smsSending}
+                    placeholder="(623) 555-0100"
+                    className="w-full bg-[#0f0f0f] border border-neutral-800 text-white px-4 py-3 rounded-sm text-sm focus:outline-none focus:border-luxury-red"
+                  />
+                </div>
+
+                {/* Preview */}
+                {smsName && (
+                  <div className="bg-[#0f0f0f] border border-neutral-800 rounded-sm px-4 py-3 text-xs text-neutral-400 font-mono leading-relaxed">
+                    &quot;Hi {smsName.trim().split(/\s+/)[0]}, Daniel from RAH Operations here. Ready to start your credit repair journey? Fill out your intake form here: rahoperations.com/credit-repair/intake - Questions? Call (623) 640-8884&quot;
+                  </div>
+                )}
+
+                {smsError && (
+                  <div className="bg-red-950/50 border border-red-900 text-red-200 text-sm px-4 py-3 rounded-sm">
+                    {smsError}
+                  </div>
+                )}
+
+                <div className="flex gap-3 pt-1">
+                  <button
+                    type="button"
+                    onClick={closeSms}
+                    disabled={smsSending}
+                    className="flex-1 border border-neutral-700 text-neutral-400 hover:text-white py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={smsSending || !smsName || !smsPhone}
+                    className="flex-1 bg-luxury-red hover:bg-luxury-light disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
+                  >
+                    {smsSending ? 'Sending…' : 'Send Text'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </motion.div>
+        </div>
+      )}
+
       <section className="min-h-screen bg-[#0f0f0f] pt-24 pb-16 px-6">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
@@ -95,12 +253,20 @@ const AdminDashboardPage = () => {
               </p>
               <h1 className="font-serif-display text-4xl text-white">Credit Repair Clients</h1>
             </div>
-            <button
-              onClick={handleLogout}
-              className="text-xs uppercase tracking-widest text-neutral-400 hover:text-white border border-neutral-800 hover:border-luxury-red px-4 py-2 rounded-sm transition-colors self-start"
-            >
-              Sign Out
-            </button>
+            <div className="flex items-center gap-3 self-start">
+              <button
+                onClick={openSms}
+                className="bg-luxury-red hover:bg-luxury-light text-white px-5 py-2 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
+              >
+                Send Intake Link
+              </button>
+              <button
+                onClick={handleLogout}
+                className="text-xs uppercase tracking-widest text-neutral-400 hover:text-white border border-neutral-800 hover:border-luxury-red px-4 py-2 rounded-sm transition-colors"
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
 
           {/* Filters */}
