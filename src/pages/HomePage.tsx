@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { Fragment, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
@@ -8,13 +8,13 @@ import { absoluteUrl } from '../utils/url';
 // ── Animation variants ────────────────────────────────────────────────────────
 
 const up = {
-  hidden: { opacity: 0, y: 14 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] } },
+  hidden: { opacity: 0, y: 40 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } },
 };
 
 const stagger = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.08, delayChildren: 0.04 } },
+  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.04 } },
 };
 
 // ── Static data ───────────────────────────────────────────────────────────────
@@ -76,14 +76,28 @@ const BULLETS = [
   "Not slow. Most projects live within 7 days.",
 ];
 
+const HERO_WORDS: { text: string; br: boolean }[] = [
+  { text: 'Business', br: false },
+  { text: 'systems', br: false },
+  { text: 'that', br: true },
+  { text: 'actually', br: false },
+  { text: 'work', br: false },
+  { text: 'online.', br: false },
+];
+
 // ── Portfolio card with live iframe preview ───────────────────────────────────
 
 type PortfolioItem = (typeof PORTFOLIO)[number];
 
 const PortfolioCard = ({ domain, name, desc, to, url }: PortfolioItem) => {
   const cardInner = (
-    <div className="group border border-[#1A1A1A] bg-[#0D0D0D] overflow-hidden transition-colors duration-200 hover:border-[#2A2A2A]" style={{ cursor: 'pointer' }}>
-      {/* TOP: live iframe (60%) */}
+    <motion.div
+      className="group border border-[#1A1A1A] bg-[#0D0D0D] overflow-hidden"
+      style={{ cursor: 'pointer' }}
+      whileHover={{ y: -4, boxShadow: '0 20px 60px rgba(0,0,0,0.5)', borderColor: '#383838' }}
+      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {/* TOP: live iframe preview */}
       <div style={{ position: 'relative', height: '252px', overflow: 'hidden' }}>
         <iframe
           src={url}
@@ -98,7 +112,6 @@ const PortfolioCard = ({ domain, name, desc, to, url }: PortfolioItem) => {
             display: 'block',
           }}
         />
-        {/* Gradient fade to card background */}
         <div
           style={{
             position: 'absolute',
@@ -113,8 +126,8 @@ const PortfolioCard = ({ domain, name, desc, to, url }: PortfolioItem) => {
         />
       </div>
 
-      {/* BOTTOM: meta (40%) */}
-      <div className="border-t border-[#1A1A1A] p-5 transition-transform duration-200 group-hover:-translate-y-0.5">
+      {/* BOTTOM: meta */}
+      <div className="border-t border-[#1A1A1A] p-5">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p style={{ fontSize: 14, fontWeight: 600, color: '#E0E0E0' }}>{name}</p>
@@ -144,7 +157,7 @@ const PortfolioCard = ({ domain, name, desc, to, url }: PortfolioItem) => {
           </a>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 
   return (
@@ -154,9 +167,13 @@ const PortfolioCard = ({ domain, name, desc, to, url }: PortfolioItem) => {
   );
 };
 
-// ── Reusable section divider ──────────────────────────────────────────────────
+// ── Dividers ──────────────────────────────────────────────────────────────────
 
 const Div = () => <div className="border-t border-[#1A1A1A]" />;
+
+const GradientDivider = () => (
+  <div style={{ height: 1, background: 'linear-gradient(90deg, transparent, #333333, transparent)' }} />
+);
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -167,14 +184,49 @@ const HomePage = () => {
   return (
     <div
       className="bg-[#0A0A0A] text-[#F5F5F5]"
-      style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
+      style={{ fontFamily: "'Inter', system-ui, sans-serif", position: 'relative', zIndex: 2 }}
     >
-      {/* Load Inter */}
+      {/* Grain texture overlay */}
+      <svg
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          pointerEvents: 'none',
+          zIndex: 99,
+          opacity: 0.04,
+        }}
+      >
+        <filter id="grain-noise">
+          <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+          <feColorMatrix type="saturate" values="0" />
+        </filter>
+        <rect width="100%" height="100%" filter="url(#grain-noise)" />
+      </svg>
+
+      {/* Inter font + orb keyframe animations */}
       <Helmet>
         <link
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
+        <style>{`
+          @keyframes orbFloat1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33%       { transform: translate(30px, -20px) scale(1.05); }
+            66%       { transform: translate(-20px, 15px) scale(0.95); }
+          }
+          @keyframes orbFloat2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33%       { transform: translate(-25px, 30px) scale(1.08); }
+            66%       { transform: translate(20px, -10px) scale(0.92); }
+          }
+          .rah-orb-1 { animation: orbFloat1 12s ease-in-out infinite; }
+          .rah-orb-2 { animation: orbFloat2 16s ease-in-out infinite; }
+        `}</style>
       </Helmet>
 
       <SEOHead
@@ -184,37 +236,76 @@ const HomePage = () => {
       />
 
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
-      <section className="flex min-h-[calc(100svh-72px)] flex-col items-center justify-center px-6 py-24 text-center">
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          animate="visible"
-          className="mx-auto w-full max-w-[680px]"
-        >
+      <section className="relative flex min-h-[calc(100svh-72px)] flex-col items-center justify-center px-6 py-24 text-center overflow-hidden">
+        {/* Ambient gradient orbs */}
+        <div
+          className="rah-orb-1 pointer-events-none absolute"
+          style={{
+            top: '20%',
+            left: '15%',
+            width: 500,
+            height: 500,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(122,28,28,0.12) 0%, transparent 70%)',
+            filter: 'blur(120px)',
+          }}
+        />
+        <div
+          className="rah-orb-2 pointer-events-none absolute"
+          style={{
+            bottom: '20%',
+            right: '10%',
+            width: 400,
+            height: 400,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(60,20,80,0.1) 0%, transparent 70%)',
+            filter: 'blur(120px)',
+          }}
+        />
+
+        <div className="relative mx-auto w-full max-w-[680px]">
+          {/* Eyebrow with letter-spacing animation */}
           <motion.p
-            variants={up}
-            className="mb-7 text-[11px] font-medium uppercase tracking-[0.16em] text-[#555555]"
+            initial={{ opacity: 0, letterSpacing: '0.05em' }}
+            animate={{ opacity: 1, letterSpacing: '0.25em' }}
+            transition={{ duration: 1, delay: 0.3 }}
+            className="mb-7 text-[11px] font-medium uppercase text-[#555555]"
           >
             Scottsdale, AZ
           </motion.p>
 
-          <motion.h1
-            variants={up}
-            className="mb-5 text-[42px] font-bold leading-[1.05] tracking-[-0.03em] text-[#F5F5F5] sm:text-[54px] lg:text-[64px]"
-          >
-            Business systems that
-            <br />
-            actually work online.
-          </motion.h1>
+          {/* Word-by-word hero h1 */}
+          <h1 className="mb-5 text-[42px] font-bold leading-[1.05] tracking-[-0.03em] text-[#F5F5F5] sm:text-[54px] lg:text-[64px]">
+            {HERO_WORDS.map(({ text, br }, i) => (
+              <Fragment key={i}>
+                <motion.span
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.4 + i * 0.07, ease: [0.16, 1, 0.3, 1] }}
+                  style={{ display: 'inline-block' }}
+                >
+                  {text}
+                </motion.span>
+                {br ? <br /> : ' '}
+              </Fragment>
+            ))}
+          </h1>
 
           <motion.p
-            variants={up}
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.85, ease: [0.16, 1, 0.3, 1] }}
             className="mx-auto mb-10 max-w-[440px] text-[16px] leading-relaxed text-[#888888] sm:text-[17px]"
           >
             Websites, marketing automation, and client systems for Arizona businesses ready to grow.
           </motion.p>
 
-          <motion.div variants={up} className="flex flex-col items-center gap-4">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 1.0, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col items-center gap-4"
+          >
             <Link
               to="/website-intake"
               className="inline-block rounded bg-[#7A1C1C] px-7 py-3 text-[13px] font-semibold text-white tracking-[0.02em] transition-opacity duration-200 hover:opacity-80"
@@ -229,25 +320,31 @@ const HomePage = () => {
               See our work ↓
             </button>
           </motion.div>
-        </motion.div>
+        </div>
       </section>
 
       {/* ── CLIENT NAMES ──────────────────────────────────────────────────── */}
-      <Div />
+      <GradientDivider />
       <div className="px-6 py-6">
-        <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-x-8 gap-y-3 sm:gap-x-12">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1, delayChildren: 1.2 } } }}
+          className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-x-8 gap-y-3 sm:gap-x-12"
+        >
           {CLIENTS.map((c, i) => (
-            <span
+            <motion.span
               key={c}
-              className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#888888] opacity-35 select-none"
+              variants={{ hidden: { opacity: 0 }, visible: { opacity: 0.35 } }}
+              className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#888888] select-none cursor-default transition-all duration-300 hover:opacity-100 hover:text-[#F5F5F5]"
             >
               {i > 0 && (
                 <span className="mr-8 opacity-40">·</span>
               )}
               {c}
-            </span>
+            </motion.span>
           ))}
-        </div>
+        </motion.div>
       </div>
 
       {/* ── WHAT WE BUILD ─────────────────────────────────────────────────── */}
@@ -257,7 +354,7 @@ const HomePage = () => {
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: '-60px' }}
+            viewport={{ once: true, margin: '-80px' }}
             variants={stagger}
           >
             <motion.p variants={up} className="mb-3 text-[11px] font-medium uppercase tracking-[0.14em] text-[#555555]">
@@ -272,11 +369,17 @@ const HomePage = () => {
                 <motion.div
                   key={s.n}
                   variants={up}
-                  className="flex flex-col gap-5 bg-[#0D0D0D] p-8 lg:p-10"
+                  className="group relative flex flex-col gap-5 bg-[#0D0D0D] p-8 lg:p-10 overflow-hidden"
+                  whileHover={{ backgroundColor: '#111111' }}
+                  transition={{ duration: 0.3 }}
                 >
-                  <span className="text-[11px] font-medium tracking-[0.1em] text-[#444444]">{s.n}</span>
-                  <h3 className="text-[15px] font-semibold leading-snug text-[#F5F5F5]">{s.title}</h3>
-                  <p className="text-[13px] leading-relaxed text-[#888888]">{s.desc}</p>
+                  <div
+                    className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                    style={{ background: 'radial-gradient(circle at 50% 0%, rgba(122,28,28,0.08), transparent 70%)' }}
+                  />
+                  <span className="relative text-[11px] font-medium tracking-[0.1em] text-[#444444]">{s.n}</span>
+                  <h3 className="relative text-[15px] font-semibold leading-snug text-[#F5F5F5]">{s.title}</h3>
+                  <p className="relative text-[13px] leading-relaxed text-[#888888]">{s.desc}</p>
                 </motion.div>
               ))}
             </motion.div>
@@ -296,7 +399,7 @@ const HomePage = () => {
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: '-60px' }}
+            viewport={{ once: true, margin: '-80px' }}
             variants={stagger}
           >
             <motion.p variants={up} className="mb-3 text-[11px] font-medium uppercase tracking-[0.14em] text-[#555555]">
@@ -322,7 +425,7 @@ const HomePage = () => {
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: '-60px' }}
+            viewport={{ once: true, margin: '-80px' }}
             variants={stagger}
             className="grid items-start gap-12 lg:grid-cols-2 lg:gap-20"
           >

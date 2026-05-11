@@ -44,7 +44,7 @@ const Header = () => {
   };
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 12);
+    const handleScroll = () => setScrolled(window.scrollY > 60);
     handleScroll();
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -67,6 +67,7 @@ const Header = () => {
     closeAllMenus();
   }, [location.pathname]);
 
+  const isHomePage = location.pathname === '/';
   const isActiveRoute = (path: string) => location.pathname === path;
   const isServicesActive = () =>
     location.pathname === '/services' || serviceLinks.some((l) => location.pathname === l.to);
@@ -82,12 +83,14 @@ const Header = () => {
 
   return (
     <header
-      style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
-      className={`sticky top-0 z-50 border-b border-[#1A1A1A] transition-all duration-300 ${
-        scrolled
-          ? 'bg-[#0A0A0A]/98 shadow-[0_1px_0_#1A1A1A] backdrop-blur-xl'
-          : 'bg-[#0A0A0A]/95 backdrop-blur-xl'
-      }`}
+      className="sticky top-0 z-50 transition-all duration-400"
+      style={{
+        fontFamily: "'Inter', system-ui, sans-serif",
+        backgroundColor: scrolled || !isHomePage ? 'rgba(10,10,10,0.92)' : 'transparent',
+        backdropFilter: scrolled || !isHomePage ? 'blur(12px)' : 'none',
+        borderBottom: scrolled || !isHomePage ? '1px solid #1A1A1A' : '1px solid transparent',
+        transition: 'background-color 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease',
+      }}
     >
       <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
         <div className={`flex items-center justify-between transition-all duration-300 ${scrolled ? 'h-[64px]' : 'h-[72px]'}`}>
