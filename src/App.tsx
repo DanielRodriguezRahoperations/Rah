@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Outlet, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Outlet, useLocation, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 
 import SEOHead from './components/ui/SEOHead';
@@ -134,6 +134,9 @@ function App() {
           <PerformanceMonitor />
           <ScrollToTop />
           <Routes>
+              {/* /blog → /blogs redirect */}
+              <Route path="/blog" element={<Navigate to="/blogs" replace />} />
+
               {/* Admin — no public nav/footer */}
               <Route path="/admin" element={<AdminLoginPage />} />
               <Route path="/admin/login" element={<AdminLoginPage />} />
