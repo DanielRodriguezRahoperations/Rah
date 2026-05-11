@@ -32,10 +32,8 @@ const Header = () => {
   ];
 
   const navLinks = [
-    { to: '/portfolio', label: 'Portfolio' },
-    { to: '/case-studies', label: 'Case Studies' },
+    { to: '/portfolio', label: 'Work' },
     { to: '/about', label: 'About' },
-    { to: '/blogs', label: 'Insights' },
     { to: '/contact', label: 'Contact' }
   ];
 

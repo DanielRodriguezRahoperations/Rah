@@ -1,610 +1,408 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SEOHead from '../components/ui/SEOHead';
 import { absoluteUrl } from '../utils/url';
-import Button from '../components/ui/Button';
+
+const PORTFOLIO = [
+  {
+    name: 'Tier 1 Customs',
+    domain: 'tier1customs.com',
+    desc: 'Custom automotive website with gallery and inquiry system',
+    image: '/t1.png',
+    to: '/case-studies/tier-1-customs',
+  },
+  {
+    name: 'The Ever After Edit',
+    domain: 'everaftereditfl.com',
+    desc: 'Luxury wedding signage brand with booking and portfolio',
+    image: '/ee.png',
+    to: '/case-studies/ever-after-edit',
+  },
+  {
+    name: 'Empire Builds AZ',
+    domain: 'empirebuildsaz.com',
+    desc: 'Custom home builder with project showcase and lead capture',
+    image: '/emp.png',
+    to: '/case-studies/empire-builds-az',
+  },
+  {
+    name: 'Daniel Rodriguez',
+    domain: 'danielrodriguez.org',
+    desc: 'Personal brand and author site with blog and content system',
+    image: null,
+    to: null,
+  },
+];
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.33, 0.66, 0.66, 1] } },
+};
+
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } },
+};
 
 const HomePage = () => {
-  const [scrollY, setScrollY] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {});
+    }
   }, []);
-
-  const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
-  const videoOpacity = Math.max(0, 1 - scrollY / vh);
-  const contentOpacity = Math.min(1, Math.max(0, (scrollY - vh * 0.4) / (vh * 0.4)));
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 0.2 }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8, ease: [0.33, 0.66, 0.66, 1] }
-    }
-  };
 
   return (
     <>
       <SEOHead
-        title="Website Design Scottsdale | High-Converting Websites That Generate Leads"
-        description="Website design, website development, and SEO in Scottsdale and Phoenix. RAH Operations builds premium websites designed to rank locally, convert visitors, and generate leads."
+        title="Website Design Scottsdale | Business Systems That Generate Leads — RAH Operations"
+        description="RAH Operations builds websites, marketing automation, and business systems for Arizona companies. Custom React sites, AI content, client portals — delivered in days, not months."
         url={absoluteUrl('/')}
       />
 
-      {/* VIDEO HERO — sticky approach works on iOS + all devices */}
-      <div style={{ height: '100svh', position: 'relative', overflow: 'hidden' }}>
-        <div
-          style={{
-            position: 'sticky',
-            top: 0,
-            height: '100svh',
-            opacity: videoOpacity,
-            pointerEvents: videoOpacity < 0.05 ? 'none' : 'auto',
-          }}
-        >
-          <video
-            ref={videoRef}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-            src="/hero.mp4"
-          />
-          <div className="absolute inset-0 bg-slate-dark/55" />
+      {/* ── SECTION 1: HERO ─────────────────────────────────────────── */}
+      <section className="relative h-screen min-h-[600px] overflow-hidden">
+        {/* Video background */}
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 h-full w-full object-cover"
+          src="/hero.mp4"
+        />
 
-          {/* Video hero content — three user paths visible within 5 seconds */}
+        {/* Dark gradient overlay — ensures text is fully readable */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-dark/60 via-slate-dark/70 to-slate-dark/90" />
+
+        {/* Hero content sits above gradient */}
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center text-white">
           <motion.div
-            className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-6 z-10"
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 36 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.4 }}
+            transition={{ duration: 1.1, ease: [0.33, 0.66, 0.66, 1] }}
+            className="max-w-5xl"
           >
-            <p className="text-[10px] sm:text-xs uppercase tracking-[0.35em] mb-5 opacity-50 font-sans">
+            <p className="mb-6 text-[10px] uppercase tracking-[0.42em] text-white/45 font-sans">
               RAH Operations · Scottsdale, AZ
             </p>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif-display font-bold leading-[1.05] mb-4 max-w-4xl">
-              Websites. Marketing.
-              <span className="block text-luxury-accent">Credit Repair.</span>
+
+            <h1 className="mb-6 font-serif-display text-5xl font-bold leading-[1.02] sm:text-6xl md:text-7xl lg:text-[80px]">
+              Your Business Should Run
+              <span className="block text-luxury-accent">This Well Online.</span>
             </h1>
-            <p className="text-sm sm:text-base text-white/65 mb-10 max-w-lg font-serif-body leading-relaxed">
-              Business systems for Arizona companies that are serious about growth.
+
+            <p className="mx-auto mb-10 max-w-2xl font-serif-body text-lg leading-relaxed text-white/68 sm:text-xl">
+              RAH Operations builds websites, marketing systems, and business automation
+              for Arizona companies ready to grow.
             </p>
 
-            {/* Three clear user paths */}
-            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
-                to="/credit-repair/intake"
-                className="px-6 py-3 bg-luxury-red text-white text-sm font-medium uppercase tracking-wider hover:bg-luxury-dark transition-colors duration-300 whitespace-nowrap"
+                to="/website-intake"
+                className="inline-block border border-luxury-red bg-luxury-red px-8 py-4 text-sm font-semibold uppercase tracking-widest text-white transition-all duration-300 hover:border-luxury-dark hover:bg-luxury-dark"
               >
-                Start Your Case
+                Build My Website
               </Link>
               <Link
                 to="/marketing/intake"
-                className="px-6 py-3 bg-white/10 border border-white/30 text-white text-sm font-medium uppercase tracking-wider hover:bg-white/20 transition-colors duration-300 backdrop-blur-sm whitespace-nowrap"
+                className="inline-block border border-white/35 bg-white/8 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-white backdrop-blur-sm transition-all duration-300 hover:border-white/60 hover:bg-white/15"
               >
                 Grow My Business
               </Link>
+            </div>
+
+            <p className="mt-7 text-sm text-white/42">
               <Link
-                to="/portal"
-                className="px-6 py-3 text-white/60 text-sm font-medium uppercase tracking-wider hover:text-white transition-colors duration-300 whitespace-nowrap"
+                to="/credit-repair/intake"
+                className="underline underline-offset-4 transition-colors hover:text-white/70"
               >
-                Client Portal →
+                Credit repair services also available →
               </Link>
-            </div>
-          </motion.div>
-
-          <motion.div
-            className="absolute bottom-10 left-1/2 -translate-x-1/2 text-center text-white z-10"
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2.5, repeat: Infinity }}
-          >
-            <p className="text-xs uppercase tracking-[0.25em] mb-3 opacity-40">Scroll</p>
-            <div className="w-px h-10 bg-white/30 mx-auto" />
-          </motion.div>
-        </div>
-      </div>
-
-      {/* SITE CONTENT — fades in as video fades out */}
-      <div
-        className="relative z-10"
-        style={{ opacity: contentOpacity }}
-      >
-
-      {/* HERO TEXT — first content section after video */}
-      <section className="relative bg-gradient-to-br from-slate-dark via-cream-50 to-cream-100 overflow-hidden pt-24 lg:pt-32 pb-20 lg:pb-32">
-        <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-gradient-to-bl from-luxury-red/5 to-transparent rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-gradient-to-tr from-luxury-red/3 to-transparent rounded-full blur-3xl" />
-
-        <div className="container-clean relative z-10">
-          <motion.div
-            className="max-w-5xl"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, ease: [0.33, 0.66, 0.66, 1] }}
-          >
-            <div className="mb-8 inline-block">
-              <p className="eyebrow-red">Website Design • SEO • Scottsdale</p>
-            </div>
-
-            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-serif-display font-bold leading-[0.95] mb-10 text-slate-dark">
-              Your Website Should Prove You're Worth Contacting.
-              <span className="block text-luxury-red mt-4">Before you say anything.</span>
-            </h1>
-
-            <p className="text-lg md:text-xl text-neutral-600 max-w-2xl mb-12 font-serif-body leading-relaxed">
-              RAH Operations builds premium websites that work harder than copy, design, or hope. Strategy, visual direction, SEO structure, and conversion architecture all working together.
-            </p>
-
-            <motion.div
-              className="flex flex-col sm:flex-row flex-wrap gap-4 mb-16"
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-              <motion.div variants={itemVariants}>
-                <Button to="/credit-repair/intake" size="lg" className="w-full sm:w-auto">
-                  Start Your Case
-                </Button>
-              </motion.div>
-              <motion.div variants={itemVariants}>
-                <Button to="/marketing/intake" variant="secondary" size="lg" className="w-full sm:w-auto">
-                  Grow My Business
-                </Button>
-              </motion.div>
-              <motion.div variants={itemVariants} className="flex items-center">
-                <Link
-                  to="/portal"
-                  className="text-sm text-neutral-500 hover:text-luxury-red transition-colors font-medium underline underline-offset-4"
-                >
-                  Already a client? Access your portal →
-                </Link>
-              </motion.div>
-            </motion.div>
-
-            <motion.div
-              className="grid grid-cols-2 md:grid-cols-3 gap-8 pt-12 border-t border-neutral-300"
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-              {[
-                { number: '50+', label: 'Premium Websites' },
-                { number: '89%', label: 'Lead Growth Average' },
-                { number: '#1', label: 'Local Search Rankings' }
-              ].map((stat) => (
-                <motion.div key={stat.label} variants={itemVariants}>
-                  <p className="text-3xl md:text-4xl font-serif-display font-bold text-luxury-red mb-2">
-                    {stat.number}
-                  </p>
-                  <p className="text-sm text-neutral-600 uppercase tracking-wider">
-                    {stat.label}
-                  </p>
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* PROBLEM SECTION - ASYMMETRIC LAYOUT */}
-      <section className="section bg-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-cream-100 to-transparent" />
-        
-        <div className="container-clean relative z-10">
-          <div className="grid lg:grid-cols-[1fr_1.2fr] gap-12 lg:gap-20 items-start">
-            {/* Text Side */}
-            <motion.div
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-            >
-              <p className="eyebrow-red mb-6">The Reality</p>
-              <h2 className="text-5xl md:text-6xl font-serif-display font-bold mb-8 text-slate-dark">
-                Most Business Websites Create Doubt.
-              </h2>
-              <p className="text-lg text-neutral-600 mb-8 font-serif-body leading-relaxed">
-                They're not ugly. They're unclear. They don't build urgency. They don't prove authority. They let visitors walk away and choose your competitor instead.
-              </p>
-
-              {/* Problem List */}
-              <ul className="space-y-4">
-                {[
-                  'Weak first impression → low perceived value',
-                  'Unclear offer → wasted traffic',
-                  'No conversion logic → forgotten in browser tab',
-                  'Poor mobile experience → bounce immediately'
-                ].map((problem) => (
-                  <li key={problem} className="flex gap-4">
-                    <span className="text-luxury-red text-2xl leading-none mt-1">—</span>
-                    <span className="text-neutral-700">{problem}</span>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-
-            {/* Image Side - Offset */}
-            <motion.div
-              className="relative lg:mt-20"
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.1 }}
-              viewport={{ once: true }}
-            >
-              <div className="relative">
-                <div className="absolute -inset-6 bg-luxury-red/5 -rotate-3" />
-                <div className="relative bg-white border-4 border-slate-dark p-2">
-                  <img
-                    src="/theproblem.png"
-                    alt="Generic website problem"
-                    className="w-full h-auto"
-                  />
-                </div>
-                <div className="absolute -bottom-6 -right-4 sm:-bottom-8 sm:-right-8 bg-luxury-red text-white p-4 sm:p-6 font-serif-display">
-                  <p className="text-sm font-bold uppercase">The Cost</p>
-                  <p className="text-4xl font-bold">87%</p>
-                  <p className="text-xs">lost visitors</p>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* RAH APPROACH - NUMBERED BRUTALIST */}
-      <section className="section bg-slate-dark text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-10 left-10 w-96 h-96 bg-luxury-red/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-10 right-10 w-96 h-96 bg-luxury-red/10 rounded-full blur-3xl" />
-        </div>
-
-        <div className="container-clean relative z-10">
-          <motion.div
-            className="mb-20"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <p className="eyebrow-red mb-6">Our Method</p>
-            <h2 className="text-5xl md:text-6xl font-serif-display font-bold text-white mb-6">
-              We Don't Design Websites.
-              <span className="block text-luxury-red">We Build Lead Generation Systems.</span>
-            </h2>
-            <p className="text-xl text-neutral-300 font-serif-body max-w-2xl">
-              Every element has a job. Every section moves closer to business outcomes.
             </p>
           </motion.div>
+        </div>
 
-          {/* Numbered Steps - Brutalist Grid */}
-          <div className="grid lg:grid-cols-2 gap-8">
+        {/* Scroll cue */}
+        <motion.div
+          className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 text-center text-white"
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <p className="mb-2 text-[9px] uppercase tracking-[0.3em] text-white/35">Scroll</p>
+          <div className="mx-auto h-8 w-px bg-white/22" />
+        </motion.div>
+      </section>
+
+      {/* ── SECTION 2: WHAT WE ACTUALLY BUILD ───────────────────────── */}
+      <section className="bg-neutral-950 py-24 lg:py-32">
+        <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-80px' }}
+            variants={stagger}
+            className="mb-16"
+          >
+            <motion.p variants={fadeUp} className="mb-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-luxury-accent">
+              What We Actually Build
+            </motion.p>
+            <motion.h2 variants={fadeUp} className="max-w-2xl font-serif-display text-4xl font-bold leading-tight text-white md:text-5xl">
+              Not templates. Not retainers.
+              <span className="block text-neutral-400"> Real systems.</span>
+            </motion.h2>
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-60px' }}
+            variants={stagger}
+            className="grid gap-px bg-neutral-800 sm:grid-cols-3"
+          >
             {[
               {
                 number: '01',
-                title: 'Strategic Positioning',
-                description: 'We start with your market, your customer psychology, and what makes you genuinely different. No generic playbook.'
+                title: 'Websites That Convert',
+                body: 'Custom React sites with intake forms, booking systems, and client portals built in. Every site is engineered to rank locally and move visitors toward a decision. Not templates — built from your business up.',
               },
               {
                 number: '02',
-                title: 'Visual Identity System',
-                description: 'Build a custom design language that communicates premium quality and establishes immediate trust.'
+                title: 'Marketing On Autopilot',
+                body: 'AI-generated content, scheduled posts, and Google Business management — done for you every month. Your brand stays active and consistent without you lifting a finger.',
               },
               {
                 number: '03',
-                title: 'SEO Architecture',
-                description: 'Structure every page around actual search intent, keywords, and local visibility signals.'
+                title: 'Systems That Scale',
+                body: 'Credit repair automation, CRM, document management, and automated client emails. The backend infrastructure most businesses never build — delivered in one week.',
               },
-              {
-                number: '04',
-                title: 'Conversion Engineering',
-                description: 'Map the journey from curiosity to action. Eliminate friction. Guide toward decision.'
-              }
-            ].map((step, index) => (
+            ].map((item, i) => (
               <motion.div
-                key={step.number}
-                className="relative border-l-4 border-luxury-red pl-8 py-6"
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
+                key={item.number}
+                variants={fadeUp}
+                className="group flex flex-col bg-neutral-950 p-10 transition-colors duration-300 hover:bg-[#0f0f0f] lg:p-12"
               >
-                <p className="text-6xl font-serif-display font-bold text-luxury-red/20 mb-2">
-                  {step.number}
+                <p className="mb-6 font-serif-display text-5xl font-bold text-luxury-red/20 transition-colors duration-300 group-hover:text-luxury-red/35">
+                  {item.number}
                 </p>
-                <h3 className="text-2xl font-serif-display font-bold mb-3 -mt-8 relative z-10">
-                  {step.title}
+                <h3 className="mb-4 font-serif-display text-2xl font-bold text-white">
+                  {item.title}
                 </h3>
-                <p className="text-neutral-300 font-serif-body">
-                  {step.description}
+                <p className="font-serif-body text-base leading-relaxed text-neutral-400">
+                  {item.body}
                 </p>
               </motion.div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* PROOF - CASE STUDIES GRID */}
-      <section className="section bg-white">
-        <div className="container-clean">
-          <motion.div
-            className="mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <p className="eyebrow-red mb-6">Featured Work</p>
-            <h2 className="text-5xl md:text-6xl font-serif-display font-bold text-slate-dark">
-              Websites That Perform.
-            </h2>
           </motion.div>
 
-          {/* Case Study Cards */}
-          <div className="grid lg:grid-cols-3 gap-8">
-            {[
-              {
-                name: 'Tier 1 Customs',
-                category: 'Automotive',
-                image: '/t1.png',
-                link: '/case-studies/tier-1-customs',
-                stat: '+340%'
-              },
-              {
-                name: 'The Ever After Edit',
-                category: 'Luxury Wedding',
-                image: '/ee.png',
-                link: '/case-studies/ever-after-edit',
-                stat: '+89%'
-              },
-              {
-                name: 'Empire Builds AZ',
-                category: 'Construction',
-                image: '/emp.png',
-                link: '/case-studies/empire-builds-az',
-                stat: '+156%'
-              }
-            ].map((study, index) => (
-              <motion.article
-                key={study.name}
-                className="group relative overflow-hidden"
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <Link to={study.link} className="block overflow-hidden bg-neutral-200 aspect-square relative">
-                  <img
-                    src={study.image}
-                    alt={study.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-dark/80 via-transparent to-transparent" />
-                  
-                  {/* Overlay Content */}
-                  <div className="absolute inset-0 p-6 flex flex-col justify-between">
-                    <p className="eyebrow-red">{study.category}</p>
-                    <div>
-                      <h3 className="text-2xl font-serif-display font-bold text-white mb-2">
-                        {study.name}
-                      </h3>
-                      <p className="text-4xl font-serif-display font-bold text-luxury-red">
-                        {study.stat}
-                      </p>
-                      <p className="text-sm text-neutral-300 mt-1">Lead growth</p>
-                    </div>
-                  </div>
-                </Link>
-              </motion.article>
-            ))}
-          </div>
-
           <motion.div
-            className="mt-12 text-center"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="mt-10 border-t border-neutral-800 pt-8"
           >
-            <Button to="/case-studies" variant="outline" size="lg">
-              View All Work
-            </Button>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* SERVICES SHOWCASE - ASYMMETRIC */}
-      <section className="section bg-gradient-to-b from-cream-100 to-white">
-        <div className="container-clean">
-          <motion.div
-            className="mb-16"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-          >
-            <p className="eyebrow-red mb-6">What We Offer</p>
-            <h2 className="text-5xl md:text-6xl font-serif-display font-bold text-slate-dark max-w-4xl">
-              One Website Can Serve Many Strategic Goals.
-            </h2>
-          </motion.div>
-
-          <div className="grid lg:grid-cols-2 gap-12 items-stretch">
-            {[
-              {
-                title: 'Website Design & Development',
-                description: 'Premium custom websites built to look established, communicate clearly, and convert visitors into real inquiries.',
-                link: '/website-design-and-seo',
-                highlight: true
-              },
-              {
-                title: 'Local SEO & Strategy',
-                description: 'Strategic page structure and content designed around real customer search behavior and local visibility.',
-                link: '/website-design-and-seo'
-              },
-              {
-                title: 'Digital Marketing',
-                description: 'Campaign strategy, content direction, and paid optimization to extend reach and authority.',
-                link: '/digital-marketing'
-              },
-              {
-                title: 'Reputation Management',
-                description: 'Build trust signals, manage online presence, and establish authority before customers contact you.',
-                link: '/reputation-management'
-              }
-            ].map((service, index) => (
-              <motion.article
-                key={service.title}
-                className={`${service.highlight ? 'lg:row-span-2' : ''} border-3 border-slate-dark p-8 lg:p-12 flex flex-col justify-between group hover:bg-luxury-red hover:text-white hover:border-luxury-red transition-all duration-300`}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <div>
-                  <h3 className={`text-3xl ${service.highlight ? 'lg:text-4xl' : ''} font-serif-display font-bold mb-4`}>
-                    {service.title}
-                  </h3>
-                  <p className={`${service.highlight ? 'text-lg' : ''} font-serif-body leading-relaxed mb-8`}>
-                    {service.description}
-                  </p>
-                </div>
-                <Button
-                  to={service.link}
-                  variant={service.highlight ? 'primary' : 'text'}
-                  className="w-fit group-hover:text-white"
-                >
-                  Learn More →
-                </Button>
-              </motion.article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* LOCAL SEO PAGES — homepage internal links for SEO authority */}
-      <section className="section bg-[#f9f7f4]">
-        <div className="container-clean">
-          <motion.div
-            className="mb-12"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <p className="eyebrow-red mb-4">Scottsdale & Phoenix</p>
-            <h2 className="text-4xl md:text-5xl font-serif-display font-bold text-slate-dark max-w-3xl leading-tight">
-              Serving Arizona Businesses Across Every Market.
-            </h2>
-          </motion.div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[
-              { title: 'Website Design in Scottsdale', desc: 'Custom sites built for the Scottsdale market.', to: '/services/website-design-scottsdale' },
-              { title: 'SEO in Scottsdale', desc: 'Rank for the searches that drive real leads.', to: '/services/seo-scottsdale' },
-              { title: 'SEO in Phoenix', desc: 'Organic search authority for Phoenix businesses.', to: '/services/seo-phoenix' },
-              { title: 'Local SEO in Scottsdale', desc: 'Dominate Google Maps and the local pack.', to: '/services/local-seo-scottsdale' },
-              { title: 'Local SEO in Phoenix', desc: 'Rank in the Phoenix local pack and Maps.', to: '/services/local-seo-phoenix' },
-              { title: 'Website Design for Small Business', desc: 'Professional websites sized for small business budgets.', to: '/services/website-design-for-small-business-scottsdale' },
-              { title: 'Digital Marketing Scottsdale', desc: 'Integrated marketing built around business growth.', to: '/services/digital-marketing-scottsdale' },
-              { title: 'Google Business Profile Optimization', desc: 'Maximize your Phoenix Maps visibility.', to: '/services/google-business-profile-optimization-phoenix' },
-              { title: 'Credit Repair in Phoenix', desc: 'Restore your credit and unlock better options.', to: '/services/credit-repair-phoenix' },
-            ].map((page, i) => (
-              <motion.div
-                key={page.to}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-              >
-                <Link
-                  to={page.to}
-                  className="group block border border-neutral-200 bg-white p-6 hover:border-[#7a1c1c]/40 hover:shadow-[0_8px_30px_rgba(122,28,28,0.08)] transition-all duration-300"
-                >
-                  <h3 className="font-serif-display font-bold text-slate-dark text-lg mb-2 group-hover:text-[#7a1c1c] transition-colors leading-snug">
-                    {page.title}
-                  </h3>
-                  <p className="text-sm text-neutral-500 leading-relaxed mb-3">{page.desc}</p>
-                  <span className="text-[#7a1c1c] text-xs font-semibold uppercase tracking-widest group-hover:gap-2 transition-all">
-                    Learn More →
-                  </span>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA SECTION - BOLD & DIRECT */}
-      <section className="section bg-luxury-red text-white relative overflow-hidden py-24 lg:py-32">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.1)_25%,rgba(255,255,255,0.1)_50%,transparent_50%,transparent_75%,rgba(255,255,255,0.1)_75%,rgba(255,255,255,0.1))] bg-[length:40px_40px]" />
-        </div>
-
-        <div className="container-narrow relative z-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-5xl md:text-7xl font-serif-display font-bold mb-8">
-              Ready to Look More Valuable Online?
-            </h2>
-            <p className="text-xl font-serif-body mb-12 max-w-2xl mx-auto leading-relaxed opacity-90">
-              Let's talk about your business, your market, and what a real premium website could do for your leads and authority.
+            <p className="font-serif-body text-base text-neutral-500">
+              One week of work with RAH replaces what most agencies charge{' '}
+              <span className="text-white">$30,000–$50,000</span> to build over 3 months.
             </p>
-            <Button to="/contact" variant="primary" size="lg" className="bg-white text-luxury-red hover:bg-cream-50">
-              Start Your Project Today
-            </Button>
           </motion.div>
         </div>
       </section>
 
-      {/* FOOTER TRUST SECTION */}
-      <section className="section bg-slate-dark text-white py-16 lg:py-20">
-        <div className="container-clean">
+      {/* ── SECTION 3: PORTFOLIO ─────────────────────────────────────── */}
+      <section className="bg-[#f9f7f4] py-24 lg:py-32">
+        <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
           <motion.div
-            className="grid md:grid-cols-3 gap-12"
-            variants={containerVariants}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: '-80px' }}
+            variants={stagger}
+            className="mb-16"
+          >
+            <motion.p variants={fadeUp} className="mb-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-luxury-red">
+              Our Work
+            </motion.p>
+            <motion.h2 variants={fadeUp} className="font-serif-display text-4xl font-bold text-slate-dark md:text-5xl">
+              Sites We've Built.
+            </motion.h2>
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-60px' }}
+            variants={stagger}
+            className="grid gap-6 sm:grid-cols-2"
+          >
+            {PORTFOLIO.map((site) => {
+              const Card = (
+                <motion.article
+                  key={site.domain}
+                  variants={fadeUp}
+                  className="group relative overflow-hidden bg-white"
+                >
+                  {site.image ? (
+                    <div className="relative aspect-[16/10] overflow-hidden bg-neutral-200">
+                      <img
+                        src={site.image}
+                        alt={site.name}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-dark/70 via-transparent to-transparent" />
+                    </div>
+                  ) : (
+                    <div className="relative flex aspect-[16/10] items-center justify-center bg-slate-dark">
+                      <p className="font-serif-display text-2xl font-bold text-white/20">{site.domain}</p>
+                    </div>
+                  )}
+
+                  <div className="flex items-end justify-between p-6">
+                    <div>
+                      <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-luxury-red">
+                        {site.domain}
+                      </p>
+                      <h3 className="font-serif-display text-xl font-bold text-slate-dark">{site.name}</h3>
+                      <p className="mt-1 text-sm text-neutral-500">{site.desc}</p>
+                    </div>
+                    {site.to && (
+                      <span className="ml-4 shrink-0 text-sm font-semibold text-neutral-400 transition-colors group-hover:text-luxury-red">
+                        View →
+                      </span>
+                    )}
+                  </div>
+                </motion.article>
+              );
+
+              return site.to ? (
+                <Link key={site.domain} to={site.to} className="block">
+                  {Card}
+                </Link>
+              ) : (
+                <div key={site.domain}>{Card}</div>
+              );
+            })}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── SECTION 4: THE RAH DIFFERENCE ───────────────────────────── */}
+      <section className="bg-slate-dark py-24 lg:py-32">
+        <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-80px' }}
+            variants={stagger}
+            className="mb-16"
+          >
+            <motion.p variants={fadeUp} className="mb-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-luxury-accent">
+              The RAH Difference
+            </motion.p>
+            <motion.h2 variants={fadeUp} className="max-w-2xl font-serif-display text-4xl font-bold leading-tight text-white md:text-5xl">
+              Most agencies build websites.
+              <span className="block text-luxury-red"> We build systems.</span>
+            </motion.h2>
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-60px' }}
+            variants={stagger}
+            className="grid gap-8 md:grid-cols-3"
           >
             {[
-              { label: 'Industries Served', value: '8+' },
-              { label: 'Websites Launched', value: '50+' },
-              { label: 'Average Lead Growth', value: '+87%' }
-            ].map((stat) => (
+              {
+                label: 'Built in days, not months',
+                body: 'Real sites delivered in 7 days or less. No discovery calls that drag on for weeks. You see a working product fast.',
+              },
+              {
+                label: 'Everything connected',
+                body: "Your intake form, your emails, your portal, your content — one system that talks to itself. No patchwork of tools that don't sync.",
+              },
+              {
+                label: 'You stay in control',
+                body: "Admin dashboard, client portal, real-time updates. You never have to call us to know what's happening with your business.",
+              },
+            ].map((item, i) => (
               <motion.div
-                key={stat.label}
-                className="text-center border-t border-luxury-red/30 pt-6"
-                variants={itemVariants}
+                key={item.label}
+                variants={fadeUp}
+                className="border-l-2 border-luxury-red pl-8 py-2"
               >
-                <p className="text-5xl font-serif-display font-bold text-luxury-red mb-2">
-                  {stat.value}
+                <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.28em] text-luxury-red">
+                  {String(i + 1).padStart(2, '0')}
                 </p>
-                <p className="text-neutral-400 uppercase tracking-wider text-sm">
-                  {stat.label}
+                <h3 className="mb-3 font-serif-display text-2xl font-bold text-white">
+                  {item.label}
+                </h3>
+                <p className="font-serif-body text-base leading-relaxed text-neutral-400">
+                  {item.body}
                 </p>
               </motion.div>
             ))}
           </motion.div>
         </div>
       </section>
-      </div>{/* end content fade-in wrapper */}
+
+      {/* ── SECTION 5: TWO-PATH CTA ──────────────────────────────────── */}
+      <section className="grid sm:grid-cols-2">
+        {/* Left — Website */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="flex flex-col items-start justify-center bg-neutral-950 px-10 py-20 lg:px-16 lg:py-28"
+        >
+          <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.32em] text-luxury-accent">
+            Need a website?
+          </p>
+          <h2 className="mb-5 font-serif-display text-3xl font-bold leading-snug text-white lg:text-4xl">
+            A premium site,
+            <br />delivered this week.
+          </h2>
+          <p className="mb-8 font-serif-body text-base leading-relaxed text-neutral-400">
+            Custom React build with SEO, intake forms, and everything your business needs to look credible and convert visitors.
+          </p>
+          <Link
+            to="/website-intake"
+            className="border border-luxury-red bg-luxury-red px-7 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-white transition-all duration-300 hover:border-luxury-dark hover:bg-luxury-dark"
+          >
+            Start Your Project
+          </Link>
+        </motion.div>
+
+        {/* Right — Marketing */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.1 }}
+          className="flex flex-col items-start justify-center bg-[#111111] px-10 py-20 lg:px-16 lg:py-28"
+        >
+          <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.32em] text-luxury-accent">
+            Need more clients?
+          </p>
+          <h2 className="mb-5 font-serif-display text-3xl font-bold leading-snug text-white lg:text-4xl">
+            Marketing that runs
+            <br />without you.
+          </h2>
+          <p className="mb-8 font-serif-body text-base leading-relaxed text-neutral-400">
+            AI-powered content, scheduled posts, Google Business management, and a client portal — all handled monthly so you can focus on the work.
+          </p>
+          <Link
+            to="/marketing/intake"
+            className="border border-neutral-600 px-7 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-white transition-all duration-300 hover:border-white hover:bg-white hover:text-slate-dark"
+          >
+            Grow My Business
+          </Link>
+        </motion.div>
+      </section>
     </>
   );
 };
