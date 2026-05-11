@@ -40,10 +40,14 @@ import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminClientDetailPage from './pages/admin/AdminClientDetailPage';
 import MarketingClientDetailPage from './pages/admin/MarketingClientDetailPage';
+import WebsiteClientDetailPage from './pages/admin/WebsiteClientDetailPage';
 
 // Credit repair portal pages
 import PortalLoginPage from './pages/portal/PortalLoginPage';
 import PortalDashboardPage from './pages/portal/PortalDashboardPage';
+
+// Website intake page
+import WebsiteIntakePage from './pages/WebsiteIntakePage';
 
 // Marketing pages
 import MarketingIntakePage from './pages/marketing/MarketingIntakePage';
@@ -138,11 +142,15 @@ function App() {
               <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
               <Route path="/admin/clients/:clientId" element={<AdminClientDetailPage />} />
               <Route path="/admin/marketing/:clientId" element={<MarketingClientDetailPage />} />
+              <Route path="/admin/website/:clientId" element={<WebsiteClientDetailPage />} />
 
               {/* Credit Repair Portal — no public nav/footer */}
               <Route path="/portal" element={<PortalLoginPage />} />
               <Route path="/portal/login" element={<PortalLoginPage />} />
               <Route path="/portal/dashboard" element={<PortalDashboardPage />} />
+
+              {/* Website intake — no public nav/footer */}
+              <Route path="/website-intake" element={<WebsiteIntakePage />} />
 
               {/* Marketing pages — no public nav/footer */}
               <Route path="/marketing/intake" element={<MarketingIntakePage />} />

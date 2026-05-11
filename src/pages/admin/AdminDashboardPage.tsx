@@ -30,6 +30,18 @@ interface MarketingClient {
   created_at: string;
 }
 
+interface WebsiteClient {
+  id: string;
+  name: string;
+  email: string;
+  business_name: string;
+  industry: string;
+  budget: string;
+  timeline: string;
+  status: string;
+  created_at: string;
+}
+
 // ─── Status color maps ────────────────────────────────────────────────────────
 
 const STATUS_COLORS: Record<string, string> = {
@@ -50,11 +62,18 @@ const MKTG_STATUS_COLORS: Record<string, string> = {
   complete: 'bg-neutral-800 text-neutral-300 border-neutral-700',
 };
 
+const WEB_STATUS_COLORS: Record<string, string> = {
+  new: 'bg-blue-950/50 text-blue-300 border-blue-900',
+  in_progress: 'bg-amber-950/50 text-amber-300 border-amber-900',
+  complete: 'bg-green-950/50 text-green-300 border-green-900',
+  cancelled: 'bg-neutral-800 text-neutral-300 border-neutral-700',
+};
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const AdminDashboardPage = () => {
   const navigate = useNavigate();
-  const [mainTab, setMainTab] = useState<'credit-repair' | 'marketing'>('credit-repair');
+  const [mainTab, setMainTab] = useState<'credit-repair' | 'marketing' | 'website'>('credit-repair');
 
   // Credit repair state
   const [clients, setClients] = useState<Client[]>([]);
@@ -69,6 +88,13 @@ const AdminDashboardPage = () => {
   const [mktgError, setMktgError] = useState('');
   const [mktgSearch, setMktgSearch] = useState('');
   const [mktgFilter, setMktgFilter] = useState('all');
+
+  // Website state
+  const [webClients, setWebClients] = useState<WebsiteClient[]>([]);
+  const [webLoading, setWebLoading] = useState(false);
+  const [webError, setWebError] = useState('');
+  const [webSearch, setWebSearch] = useState('');
+  const [webFilter, setWebFilter] = useState('all');
 
   // SMS modal
   const [smsOpen, setSmsOpen] = useState(false);
@@ -90,6 +116,9 @@ const AdminDashboardPage = () => {
   useEffect(() => {
     if (mainTab === 'marketing' && mktgClients.length === 0 && !mktgLoading) {
       fetchMarketingClients();
+    }
+    if (mainTab === 'website' && webClients.length === 0 && !webLoading) {
+      fetchWebsiteClients();
     }
   }, [mainTab]);
 
@@ -135,6 +164,29 @@ const AdminDashboardPage = () => {
       setMktgError('Network error');
     } finally {
       setMktgLoading(false);
+    }
+  };
+
+  const fetchWebsiteClients = async () => {
+    setWebLoading(true);
+    setWebError('');
+    try {
+      const res = await fetch('/api/website-clients', { headers: adminHeaders() });
+      if (res.status === 401) {
+        clearAdminToken();
+        navigate('/admin/login', { replace: true });
+        return;
+      }
+      const json = await res.json();
+      if (!res.ok) {
+        setWebError(json.error || 'Failed to load website clients');
+      } else {
+        setWebClients(json.clients || []);
+      }
+    } catch {
+      setWebError('Network error');
+    } finally {
+      setWebLoading(false);
     }
   };
 
@@ -202,8 +254,20 @@ const AdminDashboardPage = () => {
     );
   });
 
+  const filteredWeb = webClients.filter((c) => {
+    if (webFilter !== 'all' && c.status !== webFilter) return false;
+    if (!webSearch) return true;
+    const q = webSearch.toLowerCase();
+    return (
+      c.name?.toLowerCase().includes(q) ||
+      c.business_name?.toLowerCase().includes(q) ||
+      c.email?.toLowerCase().includes(q)
+    );
+  });
+
   const statusOptions = ['all', 'intake', 'analyzing', 'letters_drafted', 'letters_mailed', 'awaiting_response', 'in_progress', 'resolved', 'closed'];
   const mktgStatusOptions = ['all', 'lead', 'active', 'paused', 'complete'];
+  const webStatusOptions = ['all', 'new', 'in_progress', 'complete', 'cancelled'];
 
   return (
     <>
@@ -325,7 +389,7 @@ const AdminDashboardPage = () => {
                 Admin Dashboard
               </p>
               <h1 className="font-serif-display text-4xl text-white">
-                {mainTab === 'credit-repair' ? 'Credit Repair Clients' : 'Marketing Clients'}
+                {mainTab === 'credit-repair' ? 'Credit Repair Clients' : mainTab === 'marketing' ? 'Marketing Clients' : 'Website Clients'}
               </h1>
             </div>
             <div className="flex items-center gap-3 self-start">
@@ -347,6 +411,16 @@ const AdminDashboardPage = () => {
                   Marketing Intake Form →
                 </a>
               )}
+              {mainTab === 'website' && (
+                <a
+                  href="/website-intake"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-luxury-red hover:bg-luxury-light text-white px-5 py-2 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
+                >
+                  Website Intake Form →
+                </a>
+              )}
               <button
                 onClick={handleLogout}
                 className="text-xs uppercase tracking-widest text-neutral-400 hover:text-white border border-neutral-800 hover:border-luxury-red px-4 py-2 rounded-sm transition-colors"
@@ -358,7 +432,7 @@ const AdminDashboardPage = () => {
 
           {/* Main tabs */}
           <div className="flex border-b border-neutral-800 mb-6">
-            {(['credit-repair', 'marketing'] as const).map((tab) => (
+            {(['credit-repair', 'marketing', 'website'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setMainTab(tab)}
@@ -368,7 +442,7 @@ const AdminDashboardPage = () => {
                     : 'border-transparent text-neutral-500 hover:text-neutral-300'
                 }`}
               >
-                {tab === 'credit-repair' ? 'Credit Repair' : 'Marketing'}
+                {tab === 'credit-repair' ? 'Credit Repair' : tab === 'marketing' ? 'Marketing' : 'Website'}
                 {tab === 'credit-repair' && clients.length > 0 && (
                   <span className="ml-2 text-[10px] bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded-sm">
                     {clients.length}
@@ -377,6 +451,11 @@ const AdminDashboardPage = () => {
                 {tab === 'marketing' && mktgClients.length > 0 && (
                   <span className="ml-2 text-[10px] bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded-sm">
                     {mktgClients.length}
+                  </span>
+                )}
+                {tab === 'website' && webClients.length > 0 && (
+                  <span className="ml-2 text-[10px] bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded-sm">
+                    {webClients.length}
                   </span>
                 )}
               </button>
@@ -583,6 +662,100 @@ const AdminDashboardPage = () => {
               {!mktgLoading && mktgClients.length > 0 && (
                 <div className="mt-6 text-xs text-neutral-500 text-right">
                   Showing {filteredMktg.length} of {mktgClients.length} clients
+                </div>
+              )}
+            </>
+          )}
+
+          {/* ── Website Tab ── */}
+          {mainTab === 'website' && (
+            <>
+              <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-4 mb-6 flex flex-col md:flex-row gap-3">
+                <input
+                  type="text"
+                  value={webSearch}
+                  onChange={(e) => setWebSearch(e.target.value)}
+                  placeholder="Search by name, business, or email…"
+                  className="flex-1 bg-[#0f0f0f] border border-neutral-800 text-white px-3 py-2 rounded-sm text-sm focus:outline-none focus:border-luxury-red"
+                />
+                <select
+                  value={webFilter}
+                  onChange={(e) => setWebFilter(e.target.value)}
+                  className="bg-[#0f0f0f] border border-neutral-800 text-white px-3 py-2 rounded-sm text-sm focus:outline-none focus:border-luxury-red"
+                >
+                  {webStatusOptions.map((s) => (
+                    <option key={s} value={s}>{s === 'all' ? 'All Statuses' : s.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}</option>
+                  ))}
+                </select>
+                <button
+                  onClick={fetchWebsiteClients}
+                  className="bg-luxury-red hover:bg-luxury-light text-white px-4 py-2 rounded-sm text-sm uppercase tracking-widest transition-colors"
+                >
+                  Refresh
+                </button>
+              </div>
+
+              {webLoading ? (
+                <div className="text-center py-20 text-neutral-500">Loading website clients…</div>
+              ) : webError ? (
+                <div className="bg-red-950/50 border border-red-900 text-red-200 text-sm px-4 py-3 rounded-sm">{webError}</div>
+              ) : filteredWeb.length === 0 ? (
+                <div className="text-center py-20 text-neutral-500">
+                  {webClients.length === 0 ? 'No website clients yet.' : 'No clients match your filters.'}
+                </div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden"
+                >
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-[#0f0f0f] border-b border-neutral-800">
+                        <tr className="text-left text-xs uppercase tracking-widest text-neutral-400">
+                          <th className="px-5 py-4">Business</th>
+                          <th className="px-5 py-4">Owner</th>
+                          <th className="px-5 py-4">Budget</th>
+                          <th className="px-5 py-4">Status</th>
+                          <th className="px-5 py-4">Date</th>
+                          <th className="px-5 py-4 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredWeb.map((c) => (
+                          <tr key={c.id} className="border-b border-neutral-800/60 hover:bg-[#0f0f0f]/60 transition-colors">
+                            <td className="px-5 py-4">
+                              <p className="text-white font-medium">{c.business_name}</p>
+                              <p className="text-neutral-500 text-xs mt-0.5">{c.industry}</p>
+                            </td>
+                            <td className="px-5 py-4">
+                              <p className="text-neutral-300">{c.name}</p>
+                              <p className="text-neutral-500 text-xs mt-0.5">{c.email}</p>
+                            </td>
+                            <td className="px-5 py-4 text-neutral-300 text-xs">{c.budget || '—'}</td>
+                            <td className="px-5 py-4">
+                              <span className={`inline-block text-[10px] uppercase tracking-widest px-2 py-1 rounded-sm border ${WEB_STATUS_COLORS[c.status] || WEB_STATUS_COLORS.new}`}>
+                                {c.status.replace(/_/g, ' ')}
+                              </span>
+                            </td>
+                            <td className="px-5 py-4 text-neutral-400 text-xs">{new Date(c.created_at).toLocaleDateString()}</td>
+                            <td className="px-5 py-4 text-right">
+                              <Link to={`/admin/website/${c.id}`} className="text-luxury-red hover:text-luxury-accent text-xs uppercase tracking-widest font-semibold">
+                                View →
+                              </Link>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </motion.div>
+              )}
+
+              {!webLoading && webClients.length > 0 && (
+                <div className="mt-6 text-xs text-neutral-500 text-right">
+                  Showing {filteredWeb.length} of {webClients.length} clients
                 </div>
               )}
             </>
