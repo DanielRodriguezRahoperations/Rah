@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
@@ -43,24 +43,28 @@ const PORTFOLIO = [
     name: 'Tier 1 Customs',
     desc: 'Custom automotive brand website',
     to: '/case-studies/tier-1-customs',
+    url: 'https://www.tier1customs.com',
   },
   {
     domain: 'everaftereditfl.com',
     name: 'The Ever After Edit',
     desc: 'Luxury wedding signage brand',
     to: '/case-studies/ever-after-edit',
+    url: 'https://www.everaftereditfl.com',
   },
   {
     domain: 'empirebuildsaz.com',
     name: 'Empire Builds AZ',
     desc: 'Custom home builder, Arizona',
     to: '/case-studies/empire-builds-az',
+    url: 'https://www.empirebuildsaz.com',
   },
   {
     domain: 'danielrodriguez.org',
     name: 'Daniel Rodriguez',
     desc: 'Personal brand and author site',
     to: null,
+    url: 'https://www.danielrodriguez.org',
   },
 ];
 
@@ -71,6 +75,198 @@ const BULLETS = [
   'Not just a website. Intake forms, portals, and automation included.',
   "Not slow. Most projects live within 7 days.",
 ];
+
+// ── Portfolio card with live iframe preview ───────────────────────────────────
+
+type PortfolioItem = (typeof PORTFOLIO)[number];
+
+const PortfolioCard = ({ domain, name, desc, to, url }: PortfolioItem) => {
+  const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
+  const [hovered, setHovered] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  // Hard timeout — fires if onLoad never arrives (XFO blocks, slow network, etc.)
+  useEffect(() => {
+    timerRef.current = setTimeout(() => {
+      setStatus((s) => (s === 'loading' ? 'error' : s));
+    }, 9000);
+    return () => clearTimeout(timerRef.current);
+  }, []);
+
+  const handleLoad = () => {
+    clearTimeout(timerRef.current);
+    // Cross-origin iframes always throw SecurityError on contentDocument access —
+    // that confirms something actually rendered. Accessible + empty body = XFO block.
+    try {
+      const doc = iframeRef.current?.contentDocument;
+      if (doc && (!doc.body || doc.body.innerHTML.trim() === '')) {
+        setStatus('error');
+      } else {
+        setStatus('loaded');
+      }
+    } catch {
+      // SecurityError = cross-origin content rendered successfully
+      setStatus('loaded');
+    }
+  };
+
+  const handleError = () => {
+    clearTimeout(timerRef.current);
+    setStatus('error');
+  };
+
+  const isError = status === 'error';
+
+  const cardInner = (
+    <motion.div
+      animate={{ borderColor: isError ? ['#1A1A1A', '#2D1818', '#1A1A1A'] : hovered ? '#2A2A2A' : '#1A1A1A' }}
+      transition={isError ? { duration: 2.5, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.15 }}
+      className="border bg-[#0D0D0D] overflow-hidden"
+      style={{ cursor: 'pointer' }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* ── TOP: iframe preview (60% height) ── */}
+      <div className="relative overflow-hidden" style={{ height: '252px' }}>
+        {isError ? (
+          /* Fallback — XFO block or network error */
+          <div className="flex h-full flex-col items-center justify-center gap-5 px-8">
+            <span style={{ fontSize: 13, fontWeight: 500, color: '#555555' }}>{domain}</span>
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                fontSize: 11,
+                fontWeight: 500,
+                color: '#666666',
+                border: '1px solid #2A2A2A',
+                padding: '7px 18px',
+                textDecoration: 'none',
+                transition: 'border-color 0.15s, color 0.15s',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLAnchorElement).style.borderColor = '#444444';
+                (e.currentTarget as HTMLAnchorElement).style.color = '#F5F5F5';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLAnchorElement).style.borderColor = '#2A2A2A';
+                (e.currentTarget as HTMLAnchorElement).style.color = '#666666';
+              }}
+            >
+              View Live Site →
+            </a>
+          </div>
+        ) : (
+          <>
+            {/* Loading hint */}
+            {status === 'loading' && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <span style={{ fontSize: 10, letterSpacing: '0.16em', color: '#252525', textTransform: 'uppercase' }}>
+                  Loading preview…
+                </span>
+              </div>
+            )}
+
+            {/* iframe — pointer-events toggled by hover */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                overflow: 'hidden',
+                pointerEvents: hovered ? 'auto' : 'none',
+              }}
+            >
+              <iframe
+                ref={iframeRef}
+                src={url}
+                title={name}
+                onLoad={handleLoad}
+                onError={handleError}
+                style={{
+                  width: '1440px',
+                  height: '900px',
+                  transform: 'scale(0.35)',
+                  transformOrigin: 'top left',
+                  border: 'none',
+                  opacity: status === 'loaded' ? 1 : 0,
+                  transition: 'opacity 0.5s ease',
+                }}
+              />
+            </div>
+
+            {/* Bottom gradient fade into card background */}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: '80px',
+                background: 'linear-gradient(to bottom, transparent, #0D0D0D)',
+                pointerEvents: 'none',
+                zIndex: 1,
+              }}
+            />
+          </>
+        )}
+      </div>
+
+      {/* ── BOTTOM: meta (40% height) ── */}
+      <div
+        className="border-t border-[#1A1A1A] p-5"
+        style={{
+          transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
+          transition: 'transform 0.2s ease',
+        }}
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#E0E0E0' }}>{name}</p>
+            <p style={{ marginTop: 3, fontSize: 12, color: '#666666' }}>{desc}</p>
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              style={{ display: 'block', marginTop: 8, fontSize: 11, color: '#333333', textDecoration: 'none' }}
+              onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = '#666666')}
+              onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = '#333333')}
+            >
+              {domain}
+            </a>
+          </div>
+          {/* External link arrow */}
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            style={{ flexShrink: 0, fontSize: 16, color: '#333333', textDecoration: 'none', marginTop: 2 }}
+            onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = '#888888')}
+            onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = '#333333')}
+          >
+            ↗
+          </a>
+        </div>
+      </div>
+    </motion.div>
+  );
+
+  return (
+    <motion.div variants={up}>
+      {to ? (
+        <Link to={to} className="block">
+          {cardInner}
+        </Link>
+      ) : (
+        cardInner
+      )}
+    </motion.div>
+  );
+};
 
 // ── Reusable section divider ──────────────────────────────────────────────────
 
@@ -225,43 +421,9 @@ const HomePage = () => {
             </motion.h2>
 
             <motion.div variants={stagger} className="grid gap-3 sm:grid-cols-2">
-              {PORTFOLIO.map((p) => {
-                const card = (
-                  <div className="group border border-[#1A1A1A] bg-[#0D0D0D] overflow-hidden transition-colors duration-200 hover:border-[#2A2A2A]">
-                    {/* Typography placeholder */}
-                    <div className="flex h-[160px] items-center justify-center border-b border-[#1A1A1A] px-8">
-                      <span className="text-center text-[15px] font-medium tracking-tight text-[#2E2E2E] transition-colors duration-200 group-hover:text-[#444444]">
-                        {p.domain}
-                      </span>
-                    </div>
-                    {/* Meta */}
-                    <div className="flex items-start justify-between p-6">
-                      <div>
-                        <p className="text-[14px] font-semibold text-[#E0E0E0]">{p.name}</p>
-                        <p className="mt-1 text-[12px] text-[#666666]">{p.desc}</p>
-                        <p className="mt-2 text-[11px] text-[#3A3A3A]">{p.domain}</p>
-                      </div>
-                      {p.to && (
-                        <span className="ml-4 mt-0.5 shrink-0 text-[13px] text-[#444444] transition-colors duration-200 group-hover:text-[#888888]">
-                          →
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                );
-
-                return (
-                  <motion.div key={p.domain} variants={up}>
-                    {p.to ? (
-                      <Link to={p.to} className="block">
-                        {card}
-                      </Link>
-                    ) : (
-                      <div>{card}</div>
-                    )}
-                  </motion.div>
-                );
-              })}
+              {PORTFOLIO.map((p) => (
+                <PortfolioCard key={p.domain} {...p} />
+              ))}
             </motion.div>
           </motion.div>
         </div>
