@@ -2,45 +2,20 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronDown, Menu, X } from 'lucide-react';
 
+type DropdownKey = 'webdesign' | 'marketing' | 'business' | 'portal' | null;
+
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isServicesOpen, setIsServicesOpen] = useState(false);
-  const [isPortalOpen, setIsPortalOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<DropdownKey>(null);
+  const [mobileExpandedSections, setMobileExpandedSections] = useState<Set<string>>(new Set());
   const [scrolled, setScrolled] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const portalRef = useRef<HTMLDivElement>(null);
+  const dropdownRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const location = useLocation();
-
-  const serviceLinks = [
-    { to: '/website-design-and-seo', label: 'Website Design & SEO', eyebrow: 'Search-ready websites' },
-    { to: '/digital-marketing', label: 'Digital Marketing', eyebrow: 'Growth strategy' },
-    { to: '/social-media-management', label: 'Social Media Management', eyebrow: 'Brand visibility' },
-    { to: '/reputation-management', label: 'Reputation Management', eyebrow: 'Trust building' },
-    { to: '/business-credit-and-funding', label: 'Business Credit & Funding', eyebrow: 'Capital readiness' },
-    { to: '/personal-credit-repair', label: 'Personal Credit Repair', eyebrow: 'Credit strategy' },
-    { to: '/new-business-setup', label: 'New Business Setup', eyebrow: 'Launch structure' },
-    { to: '/notary-services', label: 'Arizona Notary Services', eyebrow: 'Local support' },
-  ];
-
-  const locationLinks = [
-    { to: '/services/website-design-scottsdale', label: 'Website Design Scottsdale' },
-    { to: '/services/website-design-phoenix', label: 'Website Design Phoenix' },
-    { to: '/services/seo-scottsdale', label: 'SEO Scottsdale' },
-    { to: '/services/seo-phoenix', label: 'SEO Phoenix' },
-    { to: '/services/local-seo-scottsdale', label: 'Local SEO Scottsdale' },
-    { to: '/services/local-seo-phoenix', label: 'Local SEO Phoenix' },
-  ];
-
-  const navLinks = [
-    { to: '/portfolio', label: 'Work' },
-    { to: '/about', label: 'About' },
-    { to: '/contact', label: 'Contact' },
-  ];
 
   const closeAllMenus = () => {
     setIsMenuOpen(false);
-    setIsServicesOpen(false);
-    setIsPortalOpen(false);
+    setOpenDropdown(null);
+    setMobileExpandedSections(new Set());
   };
 
   useEffect(() => {
@@ -52,12 +27,10 @@ const Header = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsServicesOpen(false);
-      }
-      if (portalRef.current && !portalRef.current.contains(event.target as Node)) {
-        setIsPortalOpen(false);
-      }
+      const isInAnyDropdown = Object.values(dropdownRefs.current).some(
+        (ref) => ref && ref.contains(event.target as Node),
+      );
+      if (!isInAnyDropdown) setOpenDropdown(null);
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -68,18 +41,32 @@ const Header = () => {
   }, [location.pathname]);
 
   const isHomePage = location.pathname === '/';
-  const isActiveRoute = (path: string) => location.pathname === path;
-  const isServicesActive = () =>
-    location.pathname === '/services' || serviceLinks.some((l) => location.pathname === l.to);
-  const isPortalActive = () =>
-    ['/portal', '/portal/dashboard', '/marketing/portal', '/marketing/portal/dashboard'].includes(
-      location.pathname,
-    );
 
   const navCls = (active: boolean) =>
     `relative px-1 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] transition-colors duration-200 ${
       active ? 'text-[#F5F5F5]' : 'text-[#666666] hover:text-[#F5F5F5]'
     }`;
+
+  const toggle = (key: DropdownKey) =>
+    setOpenDropdown((prev) => (prev === key ? null : key));
+
+  const dropdownCls = (visible: boolean) =>
+    `absolute top-full mt-4 border border-[#222222] bg-[#0D0D0D] shadow-[0_24px_60px_rgba(0,0,0,0.6)] transition-all duration-200 ${
+      visible ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-2 opacity-0'
+    }`;
+
+  const isPortalActive = ['/portal', '/portal/dashboard', '/marketing/portal', '/marketing/portal/dashboard'].includes(location.pathname);
+  const isWebDesignActive = ['/website-design-and-seo', '/services/website-design-scottsdale', '/services/website-design-phoenix', '/services/seo-scottsdale', '/services/seo-phoenix'].includes(location.pathname);
+  const isMarketingActive = ['/digital-marketing', '/social-media-management', '/reputation-management', '/services/google-business-profile-optimization-scottsdale'].includes(location.pathname);
+  const isBusinessActive = ['/services', '/business-credit-and-funding', '/llc-setup', '/new-business-setup', '/notary-services'].includes(location.pathname);
+
+  const toggleMobileSection = (key: string) => {
+    setMobileExpandedSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) { next.delete(key); } else { next.add(key); }
+      return next;
+    });
+  };
 
   return (
     <header
@@ -107,120 +94,177 @@ const Header = () => {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden items-center gap-5 lg:flex">
-            {/* Services dropdown */}
-            <div className="relative" ref={dropdownRef}>
+          <nav className="hidden items-center gap-4 lg:flex">
+
+            {/* Website Design & SEO dropdown */}
+            <div
+              className="relative"
+              ref={(el) => { dropdownRefs.current.webdesign = el; }}
+            >
               <button
                 type="button"
-                onClick={() => setIsServicesOpen((o) => !o)}
-                onMouseEnter={() => setIsServicesOpen(true)}
-                className={`${navCls(isServicesActive())} flex items-center gap-1`}
-                aria-expanded={isServicesOpen}
-                aria-haspopup="true"
+                onClick={() => toggle('webdesign')}
+                onMouseEnter={() => setOpenDropdown('webdesign')}
+                className={`${navCls(isWebDesignActive)} flex items-center gap-1`}
+                aria-expanded={openDropdown === 'webdesign'}
               >
-                Services
-                <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${isServicesOpen ? 'rotate-180' : ''}`} />
-                <span className={`absolute bottom-0 left-0 h-px bg-[#F5F5F5] transition-all duration-200 ${isServicesActive() ? 'w-full' : 'w-0'}`} />
+                Website Design & SEO
+                <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${openDropdown === 'webdesign' ? 'rotate-180' : ''}`} />
+                <span className={`absolute bottom-0 left-0 h-px bg-[#F5F5F5] transition-all duration-200 ${isWebDesignActive ? 'w-full' : 'w-0'}`} />
               </button>
-
               <div
-                onMouseLeave={() => setIsServicesOpen(false)}
-                className={`absolute left-1/2 top-full mt-4 w-[720px] -translate-x-1/2 overflow-hidden border border-[#222222] bg-[#0D0D0D] shadow-[0_24px_60px_rgba(0,0,0,0.6)] transition-all duration-200 ${
-                  isServicesOpen ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-2 opacity-0'
-                }`}
+                onMouseLeave={() => setOpenDropdown(null)}
+                className={`${dropdownCls(openDropdown === 'webdesign')} w-64 left-0`}
               >
-                <div className="grid grid-cols-[0.75fr_1.65fr]">
-                  {/* Left panel */}
-                  <div className="relative overflow-hidden bg-[#111111] p-8">
-                    <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-[#7A1C1C]/15 blur-3xl" />
-                    <p className="relative text-[10px] font-semibold uppercase tracking-[0.28em] text-[#7A1C1C]">Services</p>
-                    <p className="relative mt-4 text-[22px] font-semibold leading-snug text-[#F5F5F5]">
-                      Business infrastructure built for growth.
-                    </p>
-                    <p className="relative mt-4 text-[13px] leading-relaxed text-[#888888]">
-                      Websites, SEO, reputation, credit, and more — built around your goals.
-                    </p>
-                    <Link
-                      to="/services"
-                      onClick={() => setIsServicesOpen(false)}
-                      className="relative mt-8 inline-flex border border-[#333333] px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#888888] transition-colors duration-200 hover:border-[#888888] hover:text-[#F5F5F5]"
-                    >
-                      All Services
-                    </Link>
-                  </div>
-
-                  {/* Right panel */}
-                  <div className="flex flex-col">
-                    <div className="grid grid-cols-2 gap-px bg-[#222222]">
-                      {serviceLinks.map((svc) => (
-                        <Link
-                          key={svc.to}
-                          to={svc.to}
-                          onClick={() => setIsServicesOpen(false)}
-                          className={`group bg-[#0D0D0D] p-5 transition-colors duration-200 hover:bg-[#161616] ${location.pathname === svc.to ? 'bg-[#161616]' : ''}`}
-                        >
-                          <span className="block text-[10px] font-medium uppercase tracking-[0.22em] text-[#555555] group-hover:text-[#7A1C1C]">
-                            {svc.eyebrow}
-                          </span>
-                          <span className="mt-2 block text-[13px] font-semibold leading-snug text-[#CCCCCC]">
-                            {svc.label}
-                          </span>
-                        </Link>
-                      ))}
-                    </div>
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-[#222222] bg-[#0A0A0A] px-5 py-3">
-                      <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#444444]">Local:</span>
-                      {locationLinks.map((link) => (
-                        <Link
-                          key={link.to}
-                          to={link.to}
-                          onClick={() => setIsServicesOpen(false)}
-                          className="text-[11px] font-medium text-[#666666] transition-colors duration-200 hover:text-[#F5F5F5]"
-                        >
-                          {link.label}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                {[
+                  { to: '/website-design-and-seo', label: 'Website Design & SEO', eyebrow: 'All locations' },
+                  { to: '/services/website-design-scottsdale', label: 'Website Design Scottsdale', eyebrow: 'Scottsdale' },
+                  { to: '/services/website-design-phoenix', label: 'Website Design Phoenix', eyebrow: 'Phoenix' },
+                  { to: '/services/seo-scottsdale', label: 'SEO Scottsdale', eyebrow: 'Scottsdale' },
+                  { to: '/services/seo-phoenix', label: 'SEO Phoenix', eyebrow: 'Phoenix' },
+                ].map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setOpenDropdown(null)}
+                    className="flex flex-col border-b border-[#1A1A1A] last:border-b-0 px-5 py-3.5 transition-colors hover:bg-[#161616]"
+                  >
+                    <span className="text-[9px] font-medium uppercase tracking-[0.24em] text-[#555555] mb-1">{item.eyebrow}</span>
+                    <span className="text-[13px] font-semibold text-[#CCCCCC]">{item.label}</span>
+                  </Link>
+                ))}
               </div>
             </div>
 
-            {/* Standard nav links */}
-            {navLinks.map((link) => (
-              <Link key={link.to} to={link.to} className={navCls(isActiveRoute(link.to))}>
-                {link.label}
-                <span className={`absolute bottom-0 left-0 h-px bg-[#F5F5F5] transition-all duration-200 ${isActiveRoute(link.to) ? 'w-full' : 'w-0'}`} />
-              </Link>
-            ))}
-          </nav>
-
-          {/* Desktop CTA cluster */}
-          <div className="hidden shrink-0 items-center gap-2.5 lg:flex">
-            {/* Client Portal dropdown */}
-            <div className="relative" ref={portalRef}>
+            {/* Digital Marketing dropdown */}
+            <div
+              className="relative"
+              ref={(el) => { dropdownRefs.current.marketing = el; }}
+            >
               <button
                 type="button"
-                onClick={() => setIsPortalOpen((o) => !o)}
+                onClick={() => toggle('marketing')}
+                onMouseEnter={() => setOpenDropdown('marketing')}
+                className={`${navCls(isMarketingActive)} flex items-center gap-1`}
+                aria-expanded={openDropdown === 'marketing'}
+              >
+                Digital Marketing
+                <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${openDropdown === 'marketing' ? 'rotate-180' : ''}`} />
+                <span className={`absolute bottom-0 left-0 h-px bg-[#F5F5F5] transition-all duration-200 ${isMarketingActive ? 'w-full' : 'w-0'}`} />
+              </button>
+              <div
+                onMouseLeave={() => setOpenDropdown(null)}
+                className={`${dropdownCls(openDropdown === 'marketing')} w-64 left-0`}
+              >
+                {[
+                  { to: '/digital-marketing', label: 'Digital Marketing', eyebrow: 'Overview' },
+                  { to: '/social-media-management', label: 'Social Media Management', eyebrow: 'Brand visibility' },
+                  { to: '/reputation-management', label: 'Reputation Management', eyebrow: 'Trust building' },
+                  { to: '/services/google-business-profile-optimization-scottsdale', label: 'Google Business Profile', eyebrow: 'Local presence' },
+                ].map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setOpenDropdown(null)}
+                    className="flex flex-col border-b border-[#1A1A1A] last:border-b-0 px-5 py-3.5 transition-colors hover:bg-[#161616]"
+                  >
+                    <span className="text-[9px] font-medium uppercase tracking-[0.24em] text-[#555555] mb-1">{item.eyebrow}</span>
+                    <span className="text-[13px] font-semibold text-[#CCCCCC]">{item.label}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Credit Repair — direct link */}
+            <Link
+              to="/personal-credit-repair"
+              className={navCls(location.pathname === '/personal-credit-repair')}
+            >
+              Credit Repair
+              <span className={`absolute bottom-0 left-0 h-px bg-[#F5F5F5] transition-all duration-200 ${location.pathname === '/personal-credit-repair' ? 'w-full' : 'w-0'}`} />
+            </Link>
+
+            {/* Business Services dropdown */}
+            <div
+              className="relative"
+              ref={(el) => { dropdownRefs.current.business = el; }}
+            >
+              <button
+                type="button"
+                onClick={() => toggle('business')}
+                onMouseEnter={() => setOpenDropdown('business')}
+                className={`${navCls(isBusinessActive)} flex items-center gap-1`}
+                aria-expanded={openDropdown === 'business'}
+              >
+                Business Services
+                <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${openDropdown === 'business' ? 'rotate-180' : ''}`} />
+                <span className={`absolute bottom-0 left-0 h-px bg-[#F5F5F5] transition-all duration-200 ${isBusinessActive ? 'w-full' : 'w-0'}`} />
+              </button>
+              <div
+                onMouseLeave={() => setOpenDropdown(null)}
+                className={`${dropdownCls(openDropdown === 'business')} w-64 left-0`}
+              >
+                {[
+                  { to: '/services', label: 'All Services', eyebrow: 'Overview' },
+                  { to: '/business-credit-and-funding', label: 'Business Credit & Funding', eyebrow: 'Capital readiness' },
+                  { to: '/llc-setup', label: 'LLC Setup & Formation', eyebrow: 'Entity structure' },
+                  { to: '/new-business-setup', label: 'New Business Setup', eyebrow: 'Launch structure' },
+                  { to: '/notary-services', label: 'Notary Services', eyebrow: 'Local support' },
+                ].map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setOpenDropdown(null)}
+                    className="flex flex-col border-b border-[#1A1A1A] last:border-b-0 px-5 py-3.5 transition-colors hover:bg-[#161616]"
+                  >
+                    <span className="text-[9px] font-medium uppercase tracking-[0.24em] text-[#555555] mb-1">{item.eyebrow}</span>
+                    <span className="text-[13px] font-semibold text-[#CCCCCC]">{item.label}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Work */}
+            <Link to="/portfolio" className={navCls(location.pathname === '/portfolio')}>
+              Work
+              <span className={`absolute bottom-0 left-0 h-px bg-[#F5F5F5] transition-all duration-200 ${location.pathname === '/portfolio' ? 'w-full' : 'w-0'}`} />
+            </Link>
+
+            {/* About */}
+            <Link to="/about" className={navCls(location.pathname === '/about')}>
+              About
+              <span className={`absolute bottom-0 left-0 h-px bg-[#F5F5F5] transition-all duration-200 ${location.pathname === '/about' ? 'w-full' : 'w-0'}`} />
+            </Link>
+          </nav>
+
+          {/* Desktop right cluster */}
+          <div className="hidden shrink-0 items-center gap-2.5 lg:flex">
+            {/* Client Portal dropdown */}
+            <div
+              className="relative"
+              ref={(el) => { dropdownRefs.current.portal = el; }}
+            >
+              <button
+                type="button"
+                onClick={() => toggle('portal')}
                 className={`flex items-center gap-1 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.22em] transition-colors duration-200 border ${
-                  isPortalActive()
+                  isPortalActive
                     ? 'border-[#555555] text-[#F5F5F5]'
                     : 'border-[#2A2A2A] text-[#666666] hover:border-[#444444] hover:text-[#F5F5F5]'
                 }`}
-                aria-expanded={isPortalOpen}
+                aria-expanded={openDropdown === 'portal'}
               >
                 Client Portal
-                <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${isPortalOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${openDropdown === 'portal' ? 'rotate-180' : ''}`} />
               </button>
-
               <div
                 className={`absolute right-0 top-full mt-2 w-48 border border-[#222222] bg-[#111111] shadow-[0_16px_40px_rgba(0,0,0,0.5)] transition-all duration-200 ${
-                  isPortalOpen ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-1 opacity-0'
+                  openDropdown === 'portal' ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-1 opacity-0'
                 }`}
               >
                 <Link
                   to="/portal"
-                  onClick={() => setIsPortalOpen(false)}
+                  onClick={() => setOpenDropdown(null)}
                   className="flex flex-col border-b border-[#222222] px-5 py-4 transition-colors hover:bg-[#1A1A1A]"
                 >
                   <span className="mb-1 text-[9px] font-medium uppercase tracking-[0.24em] text-[#555555]">Credit Repair</span>
@@ -228,7 +272,7 @@ const Header = () => {
                 </Link>
                 <Link
                   to="/marketing/portal"
-                  onClick={() => setIsPortalOpen(false)}
+                  onClick={() => setOpenDropdown(null)}
                   className="flex flex-col px-5 py-4 transition-colors hover:bg-[#1A1A1A]"
                 >
                   <span className="mb-1 text-[9px] font-medium uppercase tracking-[0.24em] text-[#555555]">Marketing</span>
@@ -237,12 +281,12 @@ const Header = () => {
               </div>
             </div>
 
-            {/* Single CTA */}
+            {/* Get Started CTA */}
             <Link
-              to="/services"
+              to="/get-started"
               className="border border-[#7A1C1C] bg-[#7A1C1C] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-white transition-opacity duration-200 hover:opacity-80 whitespace-nowrap"
             >
-              Start Your Case
+              Get Started
             </Link>
           </div>
 
@@ -250,7 +294,7 @@ const Header = () => {
           <button
             type="button"
             className="inline-flex h-10 w-10 items-center justify-center border border-[#2A2A2A] bg-[#111111] text-[#888888] transition-colors duration-200 hover:bg-[#1A1A1A] hover:text-[#F5F5F5] lg:hidden"
-            onClick={() => { setIsMenuOpen((o) => !o); setIsServicesOpen(false); setIsPortalOpen(false); }}
+            onClick={() => { setIsMenuOpen((o) => !o); setOpenDropdown(null); }}
             aria-label="Toggle navigation menu"
             aria-expanded={isMenuOpen}
           >
@@ -275,74 +319,97 @@ const Header = () => {
           </div>
 
           <div className="space-y-0">
-            {/* Services */}
+            {/* Website Design & SEO mobile */}
             <button
               type="button"
-              onClick={() => setIsServicesOpen((o) => !o)}
-              className={`flex w-full items-center justify-between border-b border-[#1A1A1A] py-4 text-left text-[12px] font-semibold uppercase tracking-[0.18em] transition-colors ${
-                isServicesActive() ? 'text-[#F5F5F5]' : 'text-[#666666]'
-              }`}
-              aria-expanded={isServicesOpen}
+              onClick={() => toggleMobileSection('webdesign')}
+              className="flex w-full items-center justify-between border-b border-[#1A1A1A] py-4 text-left text-[12px] font-semibold uppercase tracking-[0.18em] text-[#666666] transition-colors"
             >
-              Services
-              <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isServicesOpen ? 'rotate-180' : ''}`} />
+              Website Design & SEO
+              <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${mobileExpandedSections.has('webdesign') ? 'rotate-180' : ''}`} />
             </button>
-
-            {isServicesOpen && (
+            {mobileExpandedSections.has('webdesign') && (
               <div className="border-b border-[#1A1A1A] bg-[#111111]">
-                {serviceLinks.map((svc) => (
-                  <Link
-                    key={svc.to}
-                    to={svc.to}
-                    onClick={closeAllMenus}
-                    className={`block border-b border-[#1A1A1A] px-4 py-3 last:border-b-0 ${
-                      location.pathname === svc.to ? 'text-[#F5F5F5]' : 'text-[#888888]'
-                    }`}
-                  >
-                    <span className="block text-[10px] uppercase tracking-[0.2em] text-[#444444]">{svc.eyebrow}</span>
-                    <span className="mt-1 block text-[13px]">{svc.label}</span>
+                {[
+                  { to: '/website-design-and-seo', label: 'Website Design & SEO' },
+                  { to: '/services/website-design-scottsdale', label: 'Website Design Scottsdale' },
+                  { to: '/services/website-design-phoenix', label: 'Website Design Phoenix' },
+                  { to: '/services/seo-scottsdale', label: 'SEO Scottsdale' },
+                  { to: '/services/seo-phoenix', label: 'SEO Phoenix' },
+                ].map((item) => (
+                  <Link key={item.to} to={item.to} onClick={closeAllMenus} className="block border-b border-[#1A1A1A] px-4 py-3 last:border-b-0 text-[13px] text-[#888888]">
+                    {item.label}
                   </Link>
                 ))}
-                <Link
-                  to="/services"
-                  onClick={closeAllMenus}
-                  className="block border border-[#333333] m-3 px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-[#888888]"
-                >
-                  View All Services
-                </Link>
               </div>
             )}
 
-            {navLinks.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                onClick={closeAllMenus}
-                className={`block border-b border-[#1A1A1A] py-4 text-[12px] font-semibold uppercase tracking-[0.18em] transition-colors ${
-                  isActiveRoute(link.to) ? 'text-[#F5F5F5]' : 'text-[#666666]'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {/* Digital Marketing mobile */}
+            <button
+              type="button"
+              onClick={() => toggleMobileSection('marketing')}
+              className="flex w-full items-center justify-between border-b border-[#1A1A1A] py-4 text-left text-[12px] font-semibold uppercase tracking-[0.18em] text-[#666666] transition-colors"
+            >
+              Digital Marketing
+              <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${mobileExpandedSections.has('marketing') ? 'rotate-180' : ''}`} />
+            </button>
+            {mobileExpandedSections.has('marketing') && (
+              <div className="border-b border-[#1A1A1A] bg-[#111111]">
+                {[
+                  { to: '/digital-marketing', label: 'Digital Marketing' },
+                  { to: '/social-media-management', label: 'Social Media Management' },
+                  { to: '/reputation-management', label: 'Reputation Management' },
+                  { to: '/services/google-business-profile-optimization-scottsdale', label: 'Google Business Profile' },
+                ].map((item) => (
+                  <Link key={item.to} to={item.to} onClick={closeAllMenus} className="block border-b border-[#1A1A1A] px-4 py-3 last:border-b-0 text-[13px] text-[#888888]">
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {/* Credit Repair mobile — direct */}
+            <Link
+              to="/personal-credit-repair"
+              onClick={closeAllMenus}
+              className="block border-b border-[#1A1A1A] py-4 text-[12px] font-semibold uppercase tracking-[0.18em] text-[#666666]"
+            >
+              Credit Repair
+            </Link>
+
+            {/* Business Services mobile */}
+            <button
+              type="button"
+              onClick={() => toggleMobileSection('business')}
+              className="flex w-full items-center justify-between border-b border-[#1A1A1A] py-4 text-left text-[12px] font-semibold uppercase tracking-[0.18em] text-[#666666] transition-colors"
+            >
+              Business Services
+              <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${mobileExpandedSections.has('business') ? 'rotate-180' : ''}`} />
+            </button>
+            {mobileExpandedSections.has('business') && (
+              <div className="border-b border-[#1A1A1A] bg-[#111111]">
+                {[
+                  { to: '/services', label: 'All Services' },
+                  { to: '/business-credit-and-funding', label: 'Business Credit & Funding' },
+                  { to: '/llc-setup', label: 'LLC Setup & Formation' },
+                  { to: '/new-business-setup', label: 'New Business Setup' },
+                  { to: '/notary-services', label: 'Notary Services' },
+                ].map((item) => (
+                  <Link key={item.to} to={item.to} onClick={closeAllMenus} className="block border-b border-[#1A1A1A] px-4 py-3 last:border-b-0 text-[13px] text-[#888888]">
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            <Link to="/portfolio" onClick={closeAllMenus} className="block border-b border-[#1A1A1A] py-4 text-[12px] font-semibold uppercase tracking-[0.18em] text-[#666666]">Work</Link>
+            <Link to="/about" onClick={closeAllMenus} className="block border-b border-[#1A1A1A] py-4 text-[12px] font-semibold uppercase tracking-[0.18em] text-[#666666]">About</Link>
 
             {/* Client portals */}
             <div className="border-b border-[#1A1A1A] py-2">
               <p className="py-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-[#444444]">Client Portals</p>
-              <Link
-                to="/portal"
-                onClick={closeAllMenus}
-                className="block py-2.5 text-[13px] font-semibold text-[#888888] transition-colors hover:text-[#F5F5F5]"
-              >
-                Credit Repair Portal →
-              </Link>
-              <Link
-                to="/marketing/portal"
-                onClick={closeAllMenus}
-                className="block py-2.5 text-[13px] font-semibold text-[#888888] transition-colors hover:text-[#F5F5F5]"
-              >
-                Marketing Portal →
-              </Link>
+              <Link to="/portal" onClick={closeAllMenus} className="block py-2.5 text-[13px] font-semibold text-[#888888] transition-colors hover:text-[#F5F5F5]">Credit Repair Portal →</Link>
+              <Link to="/marketing/portal" onClick={closeAllMenus} className="block py-2.5 text-[13px] font-semibold text-[#888888] transition-colors hover:text-[#F5F5F5]">Marketing Portal →</Link>
             </div>
           </div>
 
@@ -356,11 +423,11 @@ const Header = () => {
               (623) 640-8884
             </a>
             <Link
-              to="/services"
+              to="/get-started"
               onClick={closeAllMenus}
               className="bg-[#7A1C1C] px-5 py-4 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-white"
             >
-              Start Your Case
+              Get Started
             </Link>
           </div>
         </div>
