@@ -239,7 +239,7 @@ const Header = () => {
 
             {/* Single CTA */}
             <Link
-              to="/credit-repair/intake"
+              to="/services"
               className="border border-[#7A1C1C] bg-[#7A1C1C] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-white transition-opacity duration-200 hover:opacity-80 whitespace-nowrap"
             >
               Start Your Case
@@ -356,7 +356,7 @@ const Header = () => {
               (623) 640-8884
             </a>
             <Link
-              to="/credit-repair/intake"
+              to="/services"
               onClick={closeAllMenus}
               className="bg-[#7A1C1C] px-5 py-4 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-white"
             >

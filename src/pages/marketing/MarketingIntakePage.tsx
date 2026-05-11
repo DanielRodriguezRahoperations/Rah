@@ -2,11 +2,12 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import SEOHead from '../../components/ui/SEOHead';
 import MarketingIntakeForm from '../../components/marketing-intake/MarketingIntakeForm';
+import Layout from '../../components/layout/Layout';
 import { SITE_CONFIG } from '../../config/site';
 
 const MarketingIntakePage: React.FC = () => {
   return (
-    <>
+    <Layout>
       <SEOHead
         title="Marketing Services Intake — RAH Operations"
         description="Get started with RAH Operations digital marketing services. Tell us about your business and goals."
@@ -82,7 +83,7 @@ const MarketingIntakePage: React.FC = () => {
           </p>
         </div>
       </section>
-    </>
+    </Layout>
   );
 };
 

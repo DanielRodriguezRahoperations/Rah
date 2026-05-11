@@ -27,8 +27,6 @@ import TestimonialsPage from './pages/TestimonialsPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import PortfolioPage from './pages/PortfolioPage';
 import CreditRepairIntakePage from './pages/CreditRepairIntakePage';
-import TestUploadPage from './pages/TestUploadPage';
-import TestSubmitPage from './pages/TestSubmitPage';
 
 import CaseStudiesPage from './pages/CaseStudiesPage';
 import Tier1CustomsCaseStudy from './pages/case-studies/Tier1CustomsCaseStudy';
@@ -149,11 +147,10 @@ function App() {
               <Route path="/portal/login" element={<PortalLoginPage />} />
               <Route path="/portal/dashboard" element={<PortalDashboardPage />} />
 
-              {/* Website intake — no public nav/footer */}
+              {/* Intake forms — with public nav/footer via Layout in component */}
               <Route path="/website-intake" element={<WebsiteIntakePage />} />
-
-              {/* Marketing pages — no public nav/footer */}
               <Route path="/marketing/intake" element={<MarketingIntakePage />} />
+              <Route path="/credit-repair/intake" element={<CreditRepairIntakePage />} />
               <Route path="/marketing/portal" element={<MarketingPortalLoginPage />} />
               <Route path="/marketing/portal/login" element={<MarketingPortalLoginPage />} />
               <Route path="/marketing/portal/dashboard" element={<MarketingPortalDashboardPage />} />
@@ -182,9 +179,7 @@ function App() {
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/testimonials" element={<TestimonialsPage />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-                <Route path="/credit-repair/intake" element={<CreditRepairIntakePage />} />
-                <Route path="/test-upload" element={<TestUploadPage />} />
-                <Route path="/test-submit" element={<TestSubmitPage />} />
+
                 <Route path="/services/website-design-scottsdale" element={<WebsiteDesignScottsdale />} />
                 <Route path="/services/website-design-phoenix" element={<WebsiteDesignPhoenix />} />
                 <Route path="/services/website-development-scottsdale" element={<WebsiteDevelopmentScottsdale />} />

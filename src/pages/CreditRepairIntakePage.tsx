@@ -1,12 +1,13 @@
 import { motion } from 'framer-motion';
 import SEOHead from '../components/ui/SEOHead';
 import IntakeForm from '../components/intake/IntakeForm';
+import Layout from '../components/layout/Layout';
 import { absoluteUrl } from '../utils/url';
 import { SITE_CONFIG } from '../config/site';
 
 const CreditRepairIntakePage = () => {
   return (
-    <>
+    <Layout>
       <SEOHead
         title="Credit Repair Intake — RAH Operations"
         description="Start your credit repair journey with RAH Operations. Complete our secure client intake form to begin your personalized credit improvement plan in Scottsdale and Phoenix, AZ."
@@ -100,7 +101,7 @@ const CreditRepairIntakePage = () => {
           </motion.div>
         </div>
       </section>
-    </>
+    </Layout>
   );
 };
 

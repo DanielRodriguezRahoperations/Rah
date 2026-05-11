@@ -2,10 +2,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import SEOHead from '../components/ui/SEOHead';
 import WebsiteIntakeForm from '../components/website-intake/WebsiteIntakeForm';
+import Layout from '../components/layout/Layout';
 import { SITE_CONFIG } from '../config/site';
 
 const WebsiteIntakePage: React.FC = () => (
-  <>
+  <Layout>
     <SEOHead
       title="Website Design Intake — RAH Operations"
       description="Tell us about your business and vision. We'll build your custom React website and have it live within 7 days."
@@ -79,7 +80,7 @@ const WebsiteIntakePage: React.FC = () => (
         </p>
       </div>
     </section>
-  </>
+  </Layout>
 );
 
 export default WebsiteIntakePage;

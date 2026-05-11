@@ -55,6 +55,11 @@ npm run build    # Build to dist/
 npm run preview  # Preview built dist/ locally
 ```
 
+## Deleted Pages
+- `src/pages/TestSubmitPage.tsx` — deleted (was a dev tool for testing /api/intake)
+- `src/pages/TestUploadPage.tsx` — deleted (was a dev tool for testing /api/upload)
+- Routes `/test-submit` and `/test-upload` have been removed from App.tsx
+
 ## Known Issues
 - `dist/` folder was accidentally committed to git. To fix:
   ```bash

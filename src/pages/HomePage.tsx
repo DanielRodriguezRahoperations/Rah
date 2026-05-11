@@ -802,7 +802,7 @@ const HomePage = () => {
             transition={{ duration: 0.7, delay: 1.0, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col items-center gap-4"
           >
-            <Link to="/website-intake" className="inline-block rounded bg-[#7A1C1C] px-7 py-3 text-[13px] font-semibold text-white tracking-[0.02em] transition-opacity duration-200 hover:opacity-80">
+            <Link to="/services" className="inline-block rounded bg-[#7A1C1C] px-7 py-3 text-[13px] font-semibold text-white tracking-[0.02em] transition-opacity duration-200 hover:opacity-80">
               Start a Project
             </Link>
             <button type="button" onClick={scrollToWork} className="border-0 bg-transparent p-0 text-[13px] font-medium text-[#555555] cursor-pointer transition-colors duration-200 hover:text-[#F5F5F5]">
@@ -1054,7 +1054,7 @@ const HomePage = () => {
               React-based, SEO-ready, with your intake form and client portal already connected.
             </motion.p>
             <motion.div variants={up}>
-              <Link to="/website-intake" className="inline-block rounded bg-[#7A1C1C] px-6 py-2.5 text-[12px] font-semibold text-white tracking-[0.02em] transition-opacity duration-200 hover:opacity-80">
+              <Link to="/services" className="inline-block rounded bg-[#7A1C1C] px-6 py-2.5 text-[12px] font-semibold text-white tracking-[0.02em] transition-opacity duration-200 hover:opacity-80">
                 Start a Project
               </Link>
             </motion.div>

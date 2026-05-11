@@ -297,6 +297,71 @@ const ServicesPage = () => {
         </div>
       </section>
 
+      {/* INTAKE CTA CARDS */}
+      <section className="section bg-cream-50">
+        <div className="container-clean">
+          <motion.p
+            className="eyebrow-red mb-6 text-center"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+          >
+            Ready to Get Started?
+          </motion.p>
+          <motion.h2
+            className="font-serif-display font-bold text-slate-dark text-center mb-12"
+            style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)' }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+          >
+            Choose Your Starting Point
+          </motion.h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                title: 'Website Design',
+                body: 'Custom React websites built in 7 days. Intake forms, client portals, and SEO included.',
+                cta: 'Start a Website Project',
+                href: '/website-intake',
+              },
+              {
+                title: 'Digital Marketing',
+                body: 'Done-for-you social media, SEO, and Google Business. AI-powered content monthly.',
+                cta: 'Grow My Business',
+                href: '/marketing/intake',
+              },
+              {
+                title: 'Credit Repair',
+                body: 'FCRA-compliant dispute letters, client portal, and certified mail tracking. Fully automated.',
+                cta: 'Start My Case',
+                href: '/credit-repair/intake',
+              },
+            ].map((card, i) => (
+              <motion.div
+                key={card.title}
+                className="bg-white border border-neutral-200 p-8 flex flex-col"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+              >
+                <div className="w-8 h-1 bg-luxury-red mb-5" />
+                <h3 className="font-serif-display font-bold text-slate-dark text-xl mb-3">{card.title}</h3>
+                <p className="text-neutral-500 text-sm leading-relaxed flex-grow mb-6">{card.body}</p>
+                <Link
+                  to={card.href}
+                  className="inline-block bg-luxury-red text-white text-xs font-semibold uppercase tracking-[0.15em] px-6 py-3 text-center hover:bg-luxury-dark transition-colors duration-200"
+                >
+                  {card.cta}
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="section bg-luxury-red overflow-hidden relative">
         <div className="absolute inset-0 pointer-events-none opacity-10">

@@ -175,6 +175,24 @@
 
   <!-- ===== UTILITY ===== -->
   <url>
+    <loc>https://www.rahoperations.com/website-intake</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://www.rahoperations.com/marketing/intake</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://www.rahoperations.com/credit-repair/intake</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://www.rahoperations.com/contact</loc>
     <lastmod>2026-05-03</lastmod>
     <changefreq>monthly</changefreq>
