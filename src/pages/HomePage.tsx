@@ -90,6 +90,8 @@ const HERO_WORDS: { text: string; br: boolean }[] = [
 type PortfolioItem = (typeof PORTFOLIO)[number];
 
 const PortfolioCard = ({ domain, name, desc, to, url }: PortfolioItem) => {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
   const cardInner = (
     <motion.div
       className="group border border-[#1A1A1A] bg-[#0D0D0D] overflow-hidden"
@@ -98,8 +100,16 @@ const PortfolioCard = ({ domain, name, desc, to, url }: PortfolioItem) => {
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
     >
       {/* TOP: live iframe preview */}
-      <div style={{ position: 'relative', height: '252px', overflow: 'hidden' }}>
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        style={{ position: 'relative', height: '252px', overflow: 'hidden', background: '#111111' }}
+      >
         <iframe
+          key={url}
+          ref={iframeRef}
           src={url}
           title={name}
           loading="eager"
@@ -110,6 +120,12 @@ const PortfolioCard = ({ domain, name, desc, to, url }: PortfolioItem) => {
             transformOrigin: 'top left',
             border: 'none',
             display: 'block',
+            opacity: 0,
+            transition: 'opacity 0.3s ease',
+          }}
+          onLoad={() => {
+            const el = iframeRef.current;
+            if (el) el.style.opacity = '1';
           }}
         />
         <div
@@ -124,7 +140,7 @@ const PortfolioCard = ({ domain, name, desc, to, url }: PortfolioItem) => {
             zIndex: 1,
           }}
         />
-      </div>
+      </motion.div>
 
       {/* BOTTOM: meta */}
       <div className="border-t border-[#1A1A1A] p-5">
