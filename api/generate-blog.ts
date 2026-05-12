@@ -454,10 +454,6 @@ Return a JSON object with these exact fields:
 - excerpt: 2-3 sentence excerpt for blog listing page
 - content: Full HTML string. Requirements: opening paragraph with primary keyword in first 100 words; 5-6 H2 sections at 150-250 words each; internal links to /website-design-and-seo, /digital-marketing, /social-media-management, /personal-credit-repair, /business-credit-and-funding, /website-intake, /marketing/intake, /credit-repair/intake using single-quoted href attributes; FAQ section with 3 questions; closing CTA paragraph with link to most relevant intake form; 1200-1600 words total`,
           },
-          {
-            role: 'assistant',
-            content: '{',
-          },
         ],
       }),
     });
@@ -466,12 +462,10 @@ Return a JSON object with these exact fields:
       throw new Error(`Claude API error: ${r.status} — ${err.slice(0, 300)}`);
     }
     const data = await r.json() as { content: Array<{ type: string; text: string }> };
-    // Restore the prefilled '{' that the API strips from the assistant turn
-    return '{' + (data.content[0]?.text ?? '');
+    return data.content[0]?.text ?? '';
   };
 
   const parseClaude = (rawText: string): ClaudePost => {
-    // Strip code fences if present despite the prefill
     let clean = rawText.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
     try {
       return JSON.parse(clean) as ClaudePost;
