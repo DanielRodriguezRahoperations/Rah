@@ -5,17 +5,18 @@ import { Helmet } from 'react-helmet-async';
 import SEOHead from '../components/ui/SEOHead';
 import { absoluteUrl } from '../utils/url';
 
+// Computed once at module load (CSR only — no SSR in this app)
+const IS_MOBILE = typeof window !== 'undefined' && window.innerWidth < 768;
+
 // ── Animation variants ────────────────────────────────────────────────────────
 
-const up = {
-  hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } },
-};
+const up = IS_MOBILE
+  ? { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.3 } } }
+  : { hidden: { opacity: 0, y: 40 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } };
 
-const stagger = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.04 } },
-};
+const stagger = IS_MOBILE
+  ? { hidden: {}, visible: {} }
+  : { hidden: {}, visible: { transition: { staggerChildren: 0.1, delayChildren: 0.04 } } };
 
 // ── Static data ───────────────────────────────────────────────────────────────
 
@@ -109,13 +110,14 @@ const BentoCard = ({ title, description, children }: BentoCardProps) => (
 // ── Card 1: Intake Form Animated Mockup ──────────────────────────────────────
 
 const IntakeFormMockup = () => {
-  const [businessName, setBusinessName] = useState('');
-  const [email, setEmail] = useState('');
-  const [services, setServices] = useState('');
+  const [businessName, setBusinessName] = useState(IS_MOBILE ? 'Acme Landscaping' : '');
+  const [email, setEmail] = useState(IS_MOBILE ? 'owner@acme.com' : '');
+  const [services, setServices] = useState(IS_MOBILE ? 'Social Media + Website' : '');
   const [glowing, setGlowing] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [success, setSuccess] = useState(IS_MOBILE);
 
   useEffect(() => {
+    if (IS_MOBILE) return;
     let active = true;
     const sleep = (ms: number) => new Promise<void>((res) => setTimeout(res, ms));
     const BN = 'Acme Landscaping';
@@ -197,10 +199,11 @@ const IntakeFormMockup = () => {
 
 const ContentGenMockup = () => {
   const CAPTION = `Scottsdale businesses — your competitors are already showing up on Google. Here's exactly how to outrank them in 90 days. 👇 Full strategy at rahoperations.com`;
-  const [text, setText] = useState('');
+  const [text, setText] = useState(IS_MOBILE ? CAPTION : '');
   const [fading, setFading] = useState(false);
 
   useEffect(() => {
+    if (IS_MOBILE) return;
     let active = true;
     const sleep = (ms: number) => new Promise<void>((res) => setTimeout(res, ms));
 
@@ -270,6 +273,7 @@ const CalendarMockup = () => {
   const keyRef = useRef(10);
 
   useEffect(() => {
+    if (IS_MOBILE) return;
     const iv = setInterval(() => {
       setDots((prev) => {
         const occupied = new Set(prev.map((d) => `${d.row},${d.col}`));
@@ -317,6 +321,7 @@ const ClientPortalMockup = () => {
   const [pending, setPending] = useState(3);
 
   useEffect(() => {
+    if (IS_MOBILE) return;
     const iv = setInterval(() => setPending((p) => (p > 0 ? p - 1 : 3)), 1000);
     return () => clearInterval(iv);
   }, []);
@@ -375,6 +380,7 @@ const EmailListMockup = () => {
   const poolIdx = useRef(0);
 
   useEffect(() => {
+    if (IS_MOBILE) return;
     const iv = setInterval(() => {
       const tmpl = NEW_EMAIL_POOL[poolIdx.current % NEW_EMAIL_POOL.length];
       poolIdx.current++;
@@ -417,9 +423,10 @@ const TIMELINE_STEPS = [
 ];
 
 const TimelineMockup = () => {
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(IS_MOBILE ? 1 : 0);
 
   useEffect(() => {
+    if (IS_MOBILE) return;
     const DURATION = 4000;
     const PAUSE = 1000;
     let raf: number;
@@ -444,6 +451,21 @@ const TimelineMockup = () => {
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, []);
+
+  if (IS_MOBILE) {
+    return (
+      <div style={{ padding: '10px 0 4px' }}>
+        {TIMELINE_STEPS.map((step, i) => (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', borderBottom: i < TIMELINE_STEPS.length - 1 ? '1px solid #1e1e1e' : 'none' }}>
+            <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#7A1C1C', flexShrink: 0 }} />
+            <span style={{ fontSize: 10, color: '#555', minWidth: 56 }}>{step.day}</span>
+            <span style={{ fontSize: 10, color: '#CCC', flex: 1 }}>{step.label.replace('\n', ' ')}</span>
+            <span style={{ fontSize: 10, color: '#22c55e' }}>✓</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div style={{ overflowX: 'auto', paddingBottom: 4 }}>
@@ -497,11 +519,11 @@ const CODE_LINES: CodeLine[] = [
 ];
 
 const CodeEditorMockup = () => {
-  const [visibleLines, setVisibleLines] = useState(0);
+  const [visibleLines, setVisibleLines] = useState(IS_MOBILE ? CODE_LINES.length : 0);
   const [inView, setInView] = useState(false);
 
   useEffect(() => {
-    if (!inView) return;
+    if (IS_MOBILE || !inView) return;
     let active = true;
     const sleep = (ms: number) => new Promise<void>((res) => setTimeout(res, ms));
 
@@ -558,13 +580,13 @@ const SVG_FILL_D = `${SVG_PATH_D} L 270 76 L 0 76 Z`;
 const PATH_LENGTH = 310;
 
 const AnalyticsMockup = () => {
-  const [counts, setCounts] = useState({ visitors: 0, lighthouse: 0, clients: 0 });
-  const [lineDrawn, setLineDrawn] = useState(false);
+  const TARGETS = { visitors: 2847, lighthouse: 94, clients: 12 };
+  const [counts, setCounts] = useState(IS_MOBILE ? TARGETS : { visitors: 0, lighthouse: 0, clients: 0 });
+  const [lineDrawn, setLineDrawn] = useState(IS_MOBILE);
   const [inView, setInView] = useState(false);
 
   useEffect(() => {
-    if (!inView) return;
-    const TARGETS = { visitors: 2847, lighthouse: 94, clients: 12 };
+    if (IS_MOBILE || !inView) return;
     const DURATION = 2200;
     const start = Date.now();
     let raf: number;
@@ -634,6 +656,28 @@ type PortfolioItem = (typeof PORTFOLIO)[number];
 
 const PortfolioCard = ({ domain, name, desc, to, url }: PortfolioItem) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  if (IS_MOBILE) {
+    const mobileCard = (
+      <div className="border border-[#1A1A1A] bg-[#0D0D0D] overflow-hidden" style={{ borderRadius: 8 }}>
+        <div style={{ padding: '18px 20px' }}>
+          <p style={{ fontSize: 14, fontWeight: 600, color: '#E0E0E0', marginBottom: 5 }}>{name}</p>
+          <p style={{ fontSize: 12, color: '#666666', marginBottom: 12 }}>{desc}</p>
+          <a href={url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}
+            style={{ display: 'block', fontSize: 11, color: '#444444', marginBottom: 14, textDecoration: 'none' }}
+          >{domain}</a>
+          <a href={url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}
+            style={{ display: 'inline-block', padding: '7px 16px', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6, fontSize: 12, color: '#E0E0E0', textDecoration: 'none' }}
+          >View Site →</a>
+        </div>
+      </div>
+    );
+    return (
+      <motion.div variants={up}>
+        {to ? <Link to={to} className="block">{mobileCard}</Link> : mobileCard}
+      </motion.div>
+    );
+  }
 
   const cardInner = (
     <motion.div
