@@ -1,6 +1,4 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 
 export const maxDuration = 10;
 
@@ -48,16 +46,32 @@ function parseBlogPagePosts(source: string): BlogPostMeta[] {
   return entries;
 }
 
-export default function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
   if (!validateAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
 
+  const githubToken = process.env.GITHUB_TOKEN;
+  const githubRepo = process.env.GITHUB_REPO;
+  const githubBranch = process.env.GITHUB_BRANCH || 'main';
+
+  if (!githubToken || !githubRepo) {
+    return res.status(500).json({ error: 'Missing GITHUB_TOKEN or GITHUB_REPO' });
+  }
+
   try {
-    const blogPagePath = join(process.cwd(), 'src', 'pages', 'BlogPage.tsx');
-    const source = readFileSync(blogPagePath, 'utf8');
+    const apiUrl = `https://api.github.com/repos/${githubRepo}/contents/src/pages/BlogPage.tsx?ref=${githubBranch}`;
+    const ghRes = await fetch(apiUrl, {
+      headers: { Authorization: `Bearer ${githubToken}`, Accept: 'application/vnd.github.v3+json' },
+    });
+    if (!ghRes.ok) {
+      const err = await ghRes.text();
+      return res.status(500).json({ error: `GitHub API error ${ghRes.status}: ${err.slice(0, 200)}` });
+    }
+    const data = await ghRes.json() as { content: string; encoding: string };
+    const source = Buffer.from(data.content, 'base64').toString('utf8');
     const posts = parseBlogPagePosts(source);
     return res.status(200).json({ posts });
   } catch (err) {
-    return res.status(500).json({ error: `Failed to read blog posts: ${err instanceof Error ? err.message : String(err)}` });
+    return res.status(500).json({ error: `Failed to fetch blog posts: ${err instanceof Error ? err.message : String(err)}` });
   }
 }
