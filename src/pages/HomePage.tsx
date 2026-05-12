@@ -15,7 +15,7 @@ const up = IS_MOBILE
   : { hidden: { opacity: 0, y: 40 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } };
 
 const stagger = IS_MOBILE
-  ? { hidden: {}, visible: {} }
+  ? { hidden: {}, visible: { transition: { staggerChildren: 0.06 } } }
   : { hidden: {}, visible: { transition: { staggerChildren: 0.1, delayChildren: 0.04 } } };
 
 // ── Static data ───────────────────────────────────────────────────────────────
@@ -239,7 +239,7 @@ const ContentGenMockup = () => {
       </div>
       <div style={{ background: '#141414', border: '1px solid #1e1e1e', borderRadius: 6, padding: '10px 12px', fontSize: 11, color: '#CCC', lineHeight: 1.65, minHeight: 82, opacity: fading ? 0 : 1, transition: 'opacity 0.5s ease' }}>
         {text}
-        {text.length > 0 && text.length < CAPTION.length && (
+        {(IS_MOBILE || (text.length > 0 && text.length < CAPTION.length)) && (
           <span style={{ animation: 'blink 1s step-end infinite', color: '#7A1C1C' }}>|</span>
         )}
       </div>
@@ -305,7 +305,7 @@ const CalendarMockup = () => {
           return (
             <div key={idx} style={{ height: 20, borderRadius: 3, background: row === 1 ? '#1a1a1a' : '#141414', border: `1px solid ${row === 1 ? '#222' : '#181818'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {dot && (
-                <div key={dot.key} style={{ width: 6, height: 6, borderRadius: '50%', background: dot.color, animation: 'popIn 0.3s ease' }} />
+                <div key={dot.key} style={{ width: 6, height: 6, borderRadius: '50%', background: dot.color, animation: `popIn 0.3s ease ${IS_MOBILE ? `${dot.key * 0.06}s` : ''} both` }} />
               )}
             </div>
           );
@@ -390,6 +390,23 @@ const EmailListMockup = () => {
     return () => clearInterval(iv);
   }, []);
 
+  if (IS_MOBILE) {
+    return (
+      <div style={{ background: '#0f0f0f', borderRadius: 8, padding: 14, marginTop: 8, overflow: 'hidden' }}>
+        {emails.map((em, i) => (
+          <div
+            key={em.id}
+            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 0', borderBottom: '1px solid #1a1a1a', animation: `fadeInUp 0.3s ease ${i * 0.07}s both` }}
+          >
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: em.dot, flexShrink: 0 }} />
+            <span style={{ fontSize: 11, color: '#888', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{em.subject}</span>
+            <span style={{ fontSize: 9, color: '#333', flexShrink: 0 }}>{em.time}</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div style={{ background: '#0f0f0f', borderRadius: 8, padding: 14, marginTop: 8, overflow: 'hidden' }}>
       <AnimatePresence mode="popLayout" initial={false}>
@@ -456,7 +473,7 @@ const TimelineMockup = () => {
     return (
       <div style={{ padding: '10px 0 4px' }}>
         {TIMELINE_STEPS.map((step, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', borderBottom: i < TIMELINE_STEPS.length - 1 ? '1px solid #1e1e1e' : 'none' }}>
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', borderBottom: i < TIMELINE_STEPS.length - 1 ? '1px solid #1e1e1e' : 'none', animation: `fadeInUp 0.3s ease ${i * 0.07}s both` }}>
             <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#7A1C1C', flexShrink: 0 }} />
             <span style={{ fontSize: 10, color: '#555', minWidth: 56 }}>{step.day}</span>
             <span style={{ fontSize: 10, color: '#CCC', flex: 1 }}>{step.label.replace('\n', ' ')}</span>
