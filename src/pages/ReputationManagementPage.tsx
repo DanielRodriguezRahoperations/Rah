@@ -35,7 +35,7 @@ const ReputationManagementPage = () => {
               Every search result, every review, every mention shapes how customers judge your business before you say a word. We make sure that picture is accurate, strong, and working in your favor.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button to="/contact" size="lg" className="bg-[#a8c5a0] border-[#a8c5a0] text-[#0f1f0f] hover:bg-[#8fb087]">
+              <Button to="/marketing/intake" size="lg" className="bg-[#a8c5a0] border-[#a8c5a0] text-[#0f1f0f] hover:bg-[#8fb087]">
                 Begin Assessment
               </Button>
               <Button to="tel:+16236408884" variant="outline" size="lg" className="border-[#f5f0e8]/30 text-[#f5f0e8] hover:border-[#a8c5a0] hover:text-[#a8c5a0]">
@@ -215,7 +215,7 @@ const ReputationManagementPage = () => {
             <p className="text-xl font-serif-body text-neutral-600 mb-12 max-w-2xl mx-auto leading-relaxed">
               Make sure it's working for you. Let's assess where you stand and build a system that earns trust consistently.
             </p>
-            <Button to="/contact" size="lg" className="bg-[#1a2e1a] border-[#1a2e1a] text-[#f5f0e8] hover:bg-[#0f1f0f]">
+            <Button to="/marketing/intake" size="lg" className="bg-[#1a2e1a] border-[#1a2e1a] text-[#f5f0e8] hover:bg-[#0f1f0f]">
               Begin the Assessment
             </Button>
           </motion.div>

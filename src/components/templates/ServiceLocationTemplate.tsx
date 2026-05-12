@@ -14,6 +14,7 @@ export interface ServicePageContent {
   heroH1: string;
   heroSubtitle: string;
   heroCta: string;
+  heroCtaTo?: string;
   problemTitle: string;
   problemBody: string[];
   painPoints: string[];
@@ -121,7 +122,7 @@ export default function ServiceLocationTemplate({ content }: { content: ServiceP
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <Button to="/contact" size="lg">{content.heroCta}</Button>
+            <Button to={content.heroCtaTo ?? '/contact'} size="lg">{content.heroCta}</Button>
             <Button to="tel:+16236408884" variant="dark" size="lg">(623) 640-8884</Button>
           </motion.div>
 
@@ -427,7 +428,7 @@ export default function ServiceLocationTemplate({ content }: { content: ServiceP
               {content.ctaBody}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button to="/contact" size="lg" className="bg-white text-[#7a1c1c] hover:bg-[#f5f0e8] border-white">
+              <Button to={content.heroCtaTo ?? '/contact'} size="lg" className="bg-white text-[#7a1c1c] hover:bg-[#f5f0e8] border-white">
                 {content.heroCta}
               </Button>
               <Button to="tel:+16236408884" variant="outline" size="lg" className="border-white text-white hover:bg-white/10">

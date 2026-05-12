@@ -278,7 +278,7 @@ const BusinessCreditPage = () => {
       </section>
 
       {/* BENTO SHOWCASE */}
-      <section style={{ background: '#0A0A0A', padding: '80px 0' }}>
+      <section className="py-12 sm:py-20 overflow-x-hidden" style={{ background: '#0A0A0A' }}>
         <div className="container-clean">
           <motion.div
             className="text-center mb-12"

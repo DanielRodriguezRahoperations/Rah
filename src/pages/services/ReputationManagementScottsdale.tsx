@@ -9,6 +9,7 @@ const content: ServicePageContent = {
   heroH1: 'Reputation Management in Scottsdale. Because What They Find Before They Call Determines Everything.',
   heroSubtitle: 'Scottsdale customers research before they buy. A strong, well-managed online reputation is the difference between being the obvious choice and being passed over. We build and protect the digital trust signals that close deals before the first conversation.',
   heroCta: 'Start My Reputation Audit',
+  heroCtaTo: '/marketing/intake',
   stats: [
     { value: '93%', label: 'Consumers Read Reviews Before Buying' },
     { value: '4.1★', label: 'Avg. Star Rating That Earns Maximum Trust' },

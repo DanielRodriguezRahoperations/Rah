@@ -96,88 +96,20 @@ const Header = () => {
           {/* Desktop nav */}
           <nav className="hidden items-center gap-4 lg:flex">
 
-            {/* Website Design & SEO dropdown */}
-            <div
-              className="relative"
-              ref={(el) => { dropdownRefs.current.webdesign = el; }}
-            >
-              <button
-                type="button"
-                onClick={() => toggle('webdesign')}
-                onMouseEnter={() => setOpenDropdown('webdesign')}
-                className={`${navCls(isWebDesignActive)} flex items-center gap-1`}
-                aria-expanded={openDropdown === 'webdesign'}
-              >
-                Website Design & SEO
-                <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${openDropdown === 'webdesign' ? 'rotate-180' : ''}`} />
-                <span className={`absolute bottom-0 left-0 h-px bg-[#F5F5F5] transition-all duration-200 ${isWebDesignActive ? 'w-full' : 'w-0'}`} />
-              </button>
-              <div
-                onMouseLeave={() => setOpenDropdown(null)}
-                className={`${dropdownCls(openDropdown === 'webdesign')} w-64 left-0`}
-              >
-                {[
-                  { to: '/website-design-and-seo', label: 'Website Design & SEO', eyebrow: 'Overview' },
-                  { to: '/website-design-and-seo', label: 'Web Design', eyebrow: 'Service' },
-                  { to: '/website-design-and-seo#seo', label: 'SEO Services', eyebrow: 'Service' },
-                ].map((item) => (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    onClick={() => setOpenDropdown(null)}
-                    className="flex flex-col border-b border-[#1A1A1A] last:border-b-0 px-5 py-3.5 transition-colors hover:bg-[#161616]"
-                  >
-                    <span className="text-[9px] font-medium uppercase tracking-[0.24em] text-[#555555] mb-1">{item.eyebrow}</span>
-                    <span className="text-[13px] font-semibold text-[#CCCCCC]">{item.label}</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
+            {/* Website Design & SEO — direct link */}
+            <Link to="/website-design-and-seo" className={navCls(isWebDesignActive)}>
+              Website Design & SEO
+              <span className={`absolute bottom-0 left-0 h-px bg-[#F5F5F5] transition-all duration-200 ${isWebDesignActive ? 'w-full' : 'w-0'}`} />
+            </Link>
 
-            {/* Digital Marketing dropdown */}
-            <div
-              className="relative"
-              ref={(el) => { dropdownRefs.current.marketing = el; }}
-            >
-              <button
-                type="button"
-                onClick={() => toggle('marketing')}
-                onMouseEnter={() => setOpenDropdown('marketing')}
-                className={`${navCls(isMarketingActive)} flex items-center gap-1`}
-                aria-expanded={openDropdown === 'marketing'}
-              >
-                Digital Marketing
-                <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${openDropdown === 'marketing' ? 'rotate-180' : ''}`} />
-                <span className={`absolute bottom-0 left-0 h-px bg-[#F5F5F5] transition-all duration-200 ${isMarketingActive ? 'w-full' : 'w-0'}`} />
-              </button>
-              <div
-                onMouseLeave={() => setOpenDropdown(null)}
-                className={`${dropdownCls(openDropdown === 'marketing')} w-64 left-0`}
-              >
-                {[
-                  { to: '/digital-marketing', label: 'Digital Marketing', eyebrow: 'Overview' },
-                  { to: '/social-media-management', label: 'Social Media Management', eyebrow: 'Brand visibility' },
-                  { to: '/reputation-management', label: 'Reputation Management', eyebrow: 'Trust building' },
-                  { to: '/services/google-business-profile-optimization-scottsdale', label: 'Google Business Profile', eyebrow: 'Local presence' },
-                ].map((item) => (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    onClick={() => setOpenDropdown(null)}
-                    className="flex flex-col border-b border-[#1A1A1A] last:border-b-0 px-5 py-3.5 transition-colors hover:bg-[#161616]"
-                  >
-                    <span className="text-[9px] font-medium uppercase tracking-[0.24em] text-[#555555] mb-1">{item.eyebrow}</span>
-                    <span className="text-[13px] font-semibold text-[#CCCCCC]">{item.label}</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
+            {/* Digital Marketing — direct link */}
+            <Link to="/digital-marketing" className={navCls(isMarketingActive)}>
+              Digital Marketing
+              <span className={`absolute bottom-0 left-0 h-px bg-[#F5F5F5] transition-all duration-200 ${isMarketingActive ? 'w-full' : 'w-0'}`} />
+            </Link>
 
             {/* Credit Repair — direct link */}
-            <Link
-              to="/personal-credit-repair"
-              className={navCls(location.pathname === '/personal-credit-repair')}
-            >
+            <Link to="/personal-credit-repair" className={navCls(location.pathname === '/personal-credit-repair')}>
               Credit Repair
               <span className={`absolute bottom-0 left-0 h-px bg-[#F5F5F5] transition-all duration-200 ${location.pathname === '/personal-credit-repair' ? 'w-full' : 'w-0'}`} />
             </Link>
@@ -203,11 +135,11 @@ const Header = () => {
                 className={`${dropdownCls(openDropdown === 'business')} w-64 left-0`}
               >
                 {[
-                  { to: '/services', label: 'All Services', eyebrow: 'Overview' },
-                  { to: '/business-credit-and-funding', label: 'Business Credit & Funding', eyebrow: 'Capital readiness' },
-                  { to: '/llc-setup', label: 'LLC Setup & Formation', eyebrow: 'Entity structure' },
-                  { to: '/new-business-setup', label: 'New Business Setup', eyebrow: 'Launch structure' },
-                  { to: '/notary-services', label: 'Notary Services', eyebrow: 'Local support' },
+                  { to: '/services', label: 'All Business Services', eyebrow: 'Overview' },
+                  { to: '/business-credit-and-funding', label: 'Business Credit & Funding', eyebrow: 'Capital Readiness' },
+                  { to: '/llc-setup', label: 'LLC Setup & Formation', eyebrow: 'Entity Structure' },
+                  { to: '/new-business-setup', label: 'New Business Setup', eyebrow: 'Launch Structure' },
+                  { to: '/notary-services', label: 'Notary Services', eyebrow: 'Local Support' },
                 ].map((item) => (
                   <Link
                     key={item.to}
@@ -328,59 +260,18 @@ const Header = () => {
           </div>
 
           <div className="space-y-0">
-            {/* Website Design & SEO mobile */}
-            <button
-              type="button"
-              onClick={() => toggleMobileSection('webdesign')}
-              className="flex w-full items-center justify-between border-b border-[#1A1A1A] py-4 text-left text-[12px] font-semibold uppercase tracking-[0.18em] text-[#666666] transition-colors"
-            >
+            {/* Website Design & SEO — direct */}
+            <Link to="/website-design-and-seo" onClick={closeAllMenus} className="block border-b border-[#1A1A1A] py-4 text-[12px] font-semibold uppercase tracking-[0.18em] text-[#666666]">
               Website Design & SEO
-              <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${mobileExpandedSections.has('webdesign') ? 'rotate-180' : ''}`} />
-            </button>
-            {mobileExpandedSections.has('webdesign') && (
-              <div className="border-b border-[#1A1A1A] bg-[#111111]">
-                {[
-                  { to: '/website-design-and-seo', label: 'Website Design & SEO' },
-                  { to: '/website-design-and-seo', label: 'Web Design' },
-                  { to: '/website-design-and-seo#seo', label: 'SEO Services' },
-                ].map((item) => (
-                  <Link key={item.to} to={item.to} onClick={closeAllMenus} className="block border-b border-[#1A1A1A] px-4 py-3 last:border-b-0 text-[13px] text-[#888888]">
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            )}
+            </Link>
 
-            {/* Digital Marketing mobile */}
-            <button
-              type="button"
-              onClick={() => toggleMobileSection('marketing')}
-              className="flex w-full items-center justify-between border-b border-[#1A1A1A] py-4 text-left text-[12px] font-semibold uppercase tracking-[0.18em] text-[#666666] transition-colors"
-            >
+            {/* Digital Marketing — direct */}
+            <Link to="/digital-marketing" onClick={closeAllMenus} className="block border-b border-[#1A1A1A] py-4 text-[12px] font-semibold uppercase tracking-[0.18em] text-[#666666]">
               Digital Marketing
-              <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${mobileExpandedSections.has('marketing') ? 'rotate-180' : ''}`} />
-            </button>
-            {mobileExpandedSections.has('marketing') && (
-              <div className="border-b border-[#1A1A1A] bg-[#111111]">
-                {[
-                  { to: '/digital-marketing', label: 'Digital Marketing' },
-                  { to: '/social-media-management', label: 'Social Media Management' },
-                  { to: '/reputation-management', label: 'Reputation Management' },
-                  { to: '/services/google-business-profile-optimization-scottsdale', label: 'Google Business Profile' },
-                ].map((item) => (
-                  <Link key={item.to} to={item.to} onClick={closeAllMenus} className="block border-b border-[#1A1A1A] px-4 py-3 last:border-b-0 text-[13px] text-[#888888]">
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            )}
+            </Link>
 
-            {/* Credit Repair mobile — direct */}
-            <Link
-              to="/personal-credit-repair"
-              onClick={closeAllMenus}
-              className="block border-b border-[#1A1A1A] py-4 text-[12px] font-semibold uppercase tracking-[0.18em] text-[#666666]"
-            >
+            {/* Credit Repair — direct */}
+            <Link to="/personal-credit-repair" onClick={closeAllMenus} className="block border-b border-[#1A1A1A] py-4 text-[12px] font-semibold uppercase tracking-[0.18em] text-[#666666]">
               Credit Repair
             </Link>
 
@@ -396,7 +287,7 @@ const Header = () => {
             {mobileExpandedSections.has('business') && (
               <div className="border-b border-[#1A1A1A] bg-[#111111]">
                 {[
-                  { to: '/services', label: 'All Services' },
+                  { to: '/services', label: 'All Business Services' },
                   { to: '/business-credit-and-funding', label: 'Business Credit & Funding' },
                   { to: '/llc-setup', label: 'LLC Setup & Formation' },
                   { to: '/new-business-setup', label: 'New Business Setup' },

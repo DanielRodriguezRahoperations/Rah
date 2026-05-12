@@ -45,7 +45,7 @@ const SocialMediaManagementPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.3 }}
           >
-            <Button to="/contact" size="lg" className="bg-[#ff4c00] border-[#ff4c00] text-white hover:bg-[#e03d00]">
+            <Button to="/marketing/intake" size="lg" className="bg-[#ff4c00] border-[#ff4c00] text-white hover:bg-[#e03d00]">
               Build Your Presence
             </Button>
             <Button to="/portfolio" variant="outline" size="lg" className="border-white/30 text-white hover:border-[#ff4c00] hover:text-[#ff4c00]">
@@ -55,7 +55,7 @@ const SocialMediaManagementPage = () => {
 
           {/* Stats row */}
           <motion.div
-            className="mt-20 grid grid-cols-3 gap-8 border-t border-white/10 pt-10"
+            className="mt-20 grid grid-cols-1 sm:grid-cols-3 gap-8 border-t border-white/10 pt-10"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.5 }}
@@ -191,7 +191,7 @@ const SocialMediaManagementPage = () => {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.12 }}
               >
-                <p className="text-6xl font-serif-display font-bold text-[#ff4c00]/20 mb-4 leading-none">{step.num}</p>
+                <p className="text-3xl sm:text-6xl font-serif-display font-bold text-[#ff4c00]/20 mb-4 leading-none">{step.num}</p>
                 <h3 className="text-2xl font-serif-display font-bold text-[#0a0a0a] mb-3">{step.title}</h3>
                 <p className="text-neutral-600 font-serif-body leading-relaxed">{step.desc}</p>
               </motion.div>
@@ -215,7 +215,7 @@ const SocialMediaManagementPage = () => {
             <p className="text-xl font-serif-body mb-12 max-w-2xl mx-auto opacity-90 leading-relaxed">
               Let's replace the random posting with a system that actually works for your brand.
             </p>
-            <Button to="/contact" size="lg" className="bg-white text-[#ff4c00] hover:bg-[#fff5f0] border-white">
+            <Button to="/marketing/intake" size="lg" className="bg-white text-[#ff4c00] hover:bg-[#fff5f0] border-white">
               Start the Conversation
             </Button>
           </motion.div>

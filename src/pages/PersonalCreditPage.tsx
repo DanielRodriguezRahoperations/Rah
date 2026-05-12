@@ -263,7 +263,7 @@ const PersonalCreditPage = () => {
               We improve it the right way: with strategy, not shortcuts.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button to="/credit-repair/intake" size="lg">Start Your Intake →</Button>
+              <Button to="/credit-repair/intake" size="lg">Start My Case →</Button>
               <Button variant="secondary" size="lg" href="tel:+16236408884">(623) 640-8884</Button>
             </div>
           </motion.div>
@@ -332,7 +332,7 @@ const PersonalCreditPage = () => {
       </section>
 
       {/* BENTO SHOWCASE */}
-      <section style={{ background: '#0A0A0A', padding: '80px 0' }}>
+      <section className="py-12 sm:py-20 overflow-x-hidden" style={{ background: '#0A0A0A' }}>
         <div className="container-clean">
           <motion.div
             className="text-center mb-12"
@@ -448,7 +448,7 @@ const PersonalCreditPage = () => {
               ].map((row) => (
                 <div
                   key={row.before}
-                  className="grid grid-cols-2 gap-4 border-b border-white/10 py-5"
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-b border-white/10 py-5"
                 >
                   <div className="flex gap-3 items-start">
                     <span className="text-luxury-red/50 mt-0.5 text-sm">✕</span>
@@ -482,7 +482,7 @@ const PersonalCreditPage = () => {
               >
                 Everything Required to Repair, Build, and Protect Your Credit.
               </h2>
-              <Button to="/credit-repair/intake">Start Your Intake →</Button>
+              <Button to="/credit-repair/intake">Start My Case →</Button>
             </motion.div>
 
             <motion.div

@@ -9,6 +9,7 @@ const content: ServicePageContent = {
   heroH1: 'Reputation Management in Phoenix. Build the Trust That Turns Searches Into Revenue.',
   heroSubtitle: 'In a city with five million people and thousands of competing businesses, your online reputation is often the deciding factor. We help Phoenix businesses build and maintain the review profiles, trust signals, and digital credibility that wins customers at scale.',
   heroCta: 'Get a Reputation Assessment',
+  heroCtaTo: '/marketing/intake',
   stats: [
     { value: '89%', label: 'Consumers Check Reviews Before Deciding' },
     { value: '33%', label: 'Customers Will Not Use a Business Under 4 Stars' },

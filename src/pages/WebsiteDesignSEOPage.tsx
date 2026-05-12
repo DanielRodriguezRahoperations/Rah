@@ -323,7 +323,7 @@ const WebsiteDesignSEOPage = () => {
               We build high-performance websites engineered for search visibility, authority, and conversion. Every design choice, every word, every structure is built around one goal: turning visitors into qualified leads.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button to="/contact" size="lg">Schedule Audit</Button>
+              <Button to="/website-audit" size="lg">Schedule Audit</Button>
               <Button to="/case-studies" variant="secondary" size="lg">See Results</Button>
             </div>
           </motion.div>
@@ -495,7 +495,7 @@ const WebsiteDesignSEOPage = () => {
               { n: '05', t: 'Launch & Optimize', d: 'Measure, test, and continuously improve performance.' }
             ].map((step, i) => (
               <motion.div key={step.n} className={`grid lg:grid-cols-[0.2fr_0.8fr] gap-8 items-start py-8 border-t border-neutral-200 ${i === 0 ? 'pt-0' : ''}`} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
-                <p className="text-6xl font-serif-display font-bold text-luxury-red/20">{step.n}</p>
+                <p className="text-3xl sm:text-6xl font-serif-display font-bold text-luxury-red/20">{step.n}</p>
                 <div>
                   <h3 className="text-2xl font-serif-display font-bold mb-4 -mt-6 relative z-10 text-slate-dark">{step.t}</h3>
                   <p className="text-lg text-neutral-600 font-serif-body">{step.d}</p>
@@ -517,7 +517,7 @@ const WebsiteDesignSEOPage = () => {
               { num: '50+', lab: 'Websites Built' }
             ].map((s) => (
               <motion.div key={s.lab} variants={itemVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-                <p className="text-5xl font-serif-display font-bold mb-3">{s.num}</p>
+                <p className="text-3xl sm:text-5xl font-serif-display font-bold mb-3">{s.num}</p>
                 <p className="text-white/80 font-serif-body">{s.lab}</p>
               </motion.div>
             ))}

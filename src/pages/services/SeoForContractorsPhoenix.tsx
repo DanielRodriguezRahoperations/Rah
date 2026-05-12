@@ -9,6 +9,7 @@ const content: ServicePageContent = {
   heroH1: 'SEO for Phoenix Contractors. Rank Higher, Generate More Leads, Depend Less on Referrals.',
   heroSubtitle: 'Referrals are great when they come in. But they are not predictable. SEO gives Phoenix contractors a consistent, compounding lead source — people actively searching for the service, ready to get a quote. We build and manage contractor SEO systems that deliver.',
   heroCta: 'Get a Contractor SEO Audit',
+  heroCtaTo: '/website-audit',
   stats: [
     { value: '97%', label: 'Homeowners Research Contractors Online Before Hiring' },
     { value: '4×', label: 'More Contractor Leads From SEO vs Yellow Pages' },

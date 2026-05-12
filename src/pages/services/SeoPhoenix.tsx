@@ -9,6 +9,7 @@ const content: ServicePageContent = {
   heroH1: 'SEO in Phoenix That Builds Traffic You Own — Not Traffic You Rent.',
   heroSubtitle: 'Phoenix businesses spending thousands on ads each month are renting visibility. SEO builds something better: a search presence that compounds, earns trust, and generates leads long after the initial investment is made.',
   heroCta: 'Request an SEO Audit',
+  heroCtaTo: '/website-audit',
   stats: [
     { value: '#1', label: 'Google Spot Gets 31% of Clicks' },
     { value: '200+', label: 'Ranking Factors Google Evaluates' },

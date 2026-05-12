@@ -9,6 +9,7 @@ const content: ServicePageContent = {
   heroH1: 'Website Design in Scottsdale That Earns Trust Before the First Call.',
   heroSubtitle: 'Scottsdale businesses compete in one of Arizona\'s most saturated markets. A generic website does not cut it here. We build custom websites that match the expectations of Scottsdale customers — polished, fast, and built to convert serious leads.',
   heroCta: 'Get a Free Website Audit',
+  heroCtaTo: '/website-audit',
   stats: [
     { value: '94%', label: 'First Impressions Are Design-Driven' },
     { value: '3s', label: 'Avg. User Abandons After 3 Seconds' },

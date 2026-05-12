@@ -9,6 +9,7 @@ const content: ServicePageContent = {
   heroH1: 'Digital Marketing in Scottsdale That Grows Revenue, Not Just Traffic.',
   heroSubtitle: 'Scottsdale businesses need marketing that converts. We build integrated digital marketing systems — SEO, paid ads, content, and social — that work together to drive consistent, qualified leads for businesses competing in the Scottsdale market.',
   heroCta: 'Get a Marketing Strategy',
+  heroCtaTo: '/marketing/intake',
   stats: [
     { value: '4.5×', label: 'ROI From Integrated Digital Marketing' },
     { value: '80%', label: 'Buyers Research Online Before Purchasing' },

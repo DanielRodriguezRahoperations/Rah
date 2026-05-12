@@ -140,7 +140,7 @@ const ServicesPage = () => {
 
           {/* Stat strip */}
           <motion.div
-            className="grid grid-cols-3 gap-8 mt-20 pt-10 border-t border-white/10"
+            className="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-20 pt-10 border-t border-white/10"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.7 }}
@@ -151,7 +151,7 @@ const ServicesPage = () => {
               { n: 'AZ', suffix: '', label: 'Scottsdale & Phoenix' },
             ].map((s) => (
               <div key={s.label}>
-                <p className="text-5xl md:text-6xl font-serif-display font-bold text-luxury-red leading-none">
+                <p className="text-3xl sm:text-5xl md:text-6xl font-serif-display font-bold text-luxury-red leading-none">
                   {s.n}<span className="text-3xl">{s.suffix}</span>
                 </p>
                 <p className="text-xs uppercase tracking-widest text-white/40 mt-3">{s.label}</p>
@@ -272,7 +272,7 @@ const ServicesPage = () => {
           </motion.div>
 
           <motion.div
-            className="grid grid-cols-2 gap-4"
+            className="grid grid-cols-1 sm:grid-cols-2 gap-4"
             initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}

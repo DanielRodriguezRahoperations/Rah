@@ -9,6 +9,7 @@ const content: ServicePageContent = {
   heroH1: 'Google Business Profile Optimization in Scottsdale. Your Most Powerful Free Marketing Tool — Used Correctly.',
   heroSubtitle: 'Your Google Business Profile is often the first thing a Scottsdale customer sees when they search for your service. An unoptimized profile means lower rankings, fewer calls, and missed opportunities every single day.',
   heroCta: 'Optimize My Google Profile',
+  heroCtaTo: '/marketing/intake',
   stats: [
     { value: '5×', label: 'More Views With Fully Optimized GBP' },
     { value: '70%', label: 'Customers Visit After Finding Business on Maps' },

@@ -9,6 +9,7 @@ const content: ServicePageContent = {
   heroH1: 'Digital Marketing in Phoenix Built to Compete in One of America\'s Fastest-Growing Markets.',
   heroSubtitle: 'Phoenix is growing faster than almost any other major city. Competition for customers is intensifying in every category. We help Phoenix businesses build digital marketing systems that cut through the noise, capture high-intent buyers, and generate the leads their revenue goals require.',
   heroCta: 'Build My Marketing System',
+  heroCtaTo: '/marketing/intake',
   stats: [
     { value: '5×', label: 'Growth Rate of Digital Ad Spend in Phoenix Market' },
     { value: '76%', label: 'Phoenix Consumers Research Services Online First' },

@@ -780,7 +780,7 @@ const HomePage = () => {
             WEBSITE · MARKETING · CREDIT REPAIR
           </motion.p>
 
-          <h1 className="mb-5 text-[42px] font-bold leading-[1.05] tracking-[-0.03em] text-[#F5F5F5] sm:text-[54px] lg:text-[64px]">
+          <h1 className="mb-5 font-bold leading-[1.05] tracking-[-0.03em] text-[#F5F5F5]" style={{ fontSize: 'clamp(32px, 8vw, 64px)' }}>
             {HERO_WORDS.map(({ text, br }, i) => (
               <Fragment key={i}>
                 <motion.span
@@ -854,7 +854,7 @@ const HomePage = () => {
             <motion.span
               key={c}
               variants={{ hidden: { opacity: 0 }, visible: { opacity: 0.35 } }}
-              className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#888888] select-none cursor-default transition-all duration-300 hover:opacity-100 hover:text-[#F5F5F5]"
+              className="text-[10px] font-medium uppercase tracking-[0.12em] text-[#888888] select-none cursor-default transition-all duration-300 hover:opacity-100 hover:text-[#F5F5F5]"
             >
               {i > 0 && <span className="mr-8 opacity-40">·</span>}
               {c}

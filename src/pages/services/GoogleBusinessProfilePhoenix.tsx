@@ -9,6 +9,7 @@ const content: ServicePageContent = {
   heroH1: 'Google Business Profile Optimization in Phoenix. More Visibility. More Calls. Zero Ad Spend.',
   heroSubtitle: 'Every day Phoenix customers search for businesses like yours on Google Maps. Whether your profile shows up and what they see when it does determines whether they call you or the competitor ranked above you. We optimize Phoenix GBPs to win both of those battles.',
   heroCta: 'Optimize My Profile',
+  heroCtaTo: '/marketing/intake',
   stats: [
     { value: '86%', label: 'Consumers Use Google Maps to Find Local Businesses' },
     { value: '29%', label: 'More Conversions With Optimized Business Profile' },

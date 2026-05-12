@@ -9,6 +9,7 @@ const content: ServicePageContent = {
   heroH1: 'SEO in Scottsdale That Turns Search Traffic Into Qualified Business Leads.',
   heroSubtitle: 'If your Scottsdale business is not appearing when potential clients search for your service, you are invisible to some of your best leads. We build and execute SEO strategies that move Scottsdale businesses up the rankings and keep them there.',
   heroCta: 'Get an SEO Audit',
+  heroCtaTo: '/website-audit',
   stats: [
     { value: '68%', label: 'Online Experiences Start with Search' },
     { value: '75%', label: 'Users Never Scroll Past Page One' },

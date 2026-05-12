@@ -268,7 +268,7 @@ const DigitalMarketingPage = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button to="/contact" size="lg">Strategy Call</Button>
+              <Button to="/marketing/intake" size="lg">Strategy Call</Button>
               <Button to="/case-studies" variant="secondary" size="lg">See Results</Button>
             </div>
           </motion.div>
@@ -444,7 +444,7 @@ const DigitalMarketingPage = () => {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
-                <p className="text-6xl font-serif-display font-bold text-luxury-red/30 flex-shrink-0 w-20">{step.n}</p>
+                <p className="text-3xl sm:text-6xl font-serif-display font-bold text-luxury-red/30 flex-shrink-0 w-14 sm:w-20">{step.n}</p>
                 <div>
                   <h3 className="text-2xl font-serif-display font-bold mb-3">{step.t}</h3>
                   <p className="text-neutral-300 font-serif-body">{step.d}</p>
@@ -466,7 +466,7 @@ const DigitalMarketingPage = () => {
               { n: '86%', l: 'Conversion Lift' }
             ].map((r) => (
               <div key={r.l} className="text-center border-t border-white/20 pt-6">
-                <p className="text-5xl font-serif-display font-bold mb-2">{r.n}</p>
+                <p className="text-3xl sm:text-5xl font-serif-display font-bold mb-2">{r.n}</p>
                 <p className="text-white/80 uppercase tracking-wider text-sm">{r.l}</p>
               </div>
             ))}
@@ -539,7 +539,7 @@ const DigitalMarketingPage = () => {
             <p className="text-xl text-neutral-600 font-serif-body mb-12 max-w-2xl mx-auto">
               Let's talk about your business goals and build a marketing strategy that actually produces results.
             </p>
-            <Button to="/contact" size="lg">Schedule Strategy Call</Button>
+            <Button to="/marketing/intake" size="lg">Schedule Strategy Call</Button>
           </motion.div>
         </div>
       </section>
