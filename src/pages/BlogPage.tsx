@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Credit Repair Services Scottsdale | RAH Operations",
+      displayTitle: "Credit Repair Services in Scottsdale: Rebuild Your Score and Unlock Real Financial Opportunities",
+      date: "May 12, 2026",
+      pubDate: "Tue, 12 May 2026 21:26:30 GMT",
+      issue: 'No. 027',
+      category: "Credit Repair",
+      excerpt: "Your credit score controls more of your life than most people realize — from the interest rate on your car loan to whether a landlord approves your application. RAH Operations provides professional credit repair services in Scottsdale designed to remove inaccurate negative items, strengthen your credit profile, and help you qualify for the financing you deserve. If a poor credit score has been holding you back, it's time to do something about it.",
+      slug: 'credit-repair-services-scottsdale'
+    },
+    {
       title: "Reputation Management Scottsdale | RAH Operations",
       displayTitle: "Reputation Management in Scottsdale: How to Protect and Build Your Brand Online",
       date: "May 12, 2026",
