@@ -222,6 +222,14 @@ const Header = () => {
               </div>
             </div>
 
+            {/* Book a Call */}
+            <Link
+              to="/book-a-call"
+              className="border border-[#2A2A2A] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#CCCCCC] transition-colors duration-200 hover:border-luxury-red hover:text-white whitespace-nowrap"
+            >
+              Book a Call
+            </Link>
+
             {/* Get Started CTA */}
             <Link
               to="/get-started"
@@ -321,6 +329,13 @@ const Header = () => {
             >
               (623) 640-8884
             </a>
+            <Link
+              to="/book-a-call"
+              onClick={closeAllMenus}
+              className="border border-luxury-red px-5 py-4 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-white"
+            >
+              Book a Free Call
+            </Link>
             <Link
               to="/get-started"
               onClick={closeAllMenus}

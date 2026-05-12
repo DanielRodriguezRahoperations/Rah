@@ -48,6 +48,7 @@ import PortalDashboardPage from './pages/portal/PortalDashboardPage';
 import WebsiteIntakePage from './pages/WebsiteIntakePage';
 import GetStartedPage from './pages/GetStartedPage';
 import WebsiteAuditPage from './pages/WebsiteAuditPage';
+import BookACallPage from './pages/BookACallPage';
 
 // Marketing pages
 import MarketingIntakePage from './pages/marketing/MarketingIntakePage';
@@ -167,6 +168,7 @@ function App() {
               <Route element={<Layout><Outlet /></Layout>}>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/website-audit" element={<WebsiteAuditPage />} />
+                <Route path="/book-a-call" element={<BookACallPage />} />
                 <Route path="/services" element={<ServicesPage />} />
                 <Route path="/website-design-and-seo" element={<WebsiteDesignSEOPage />} />
                 <Route path="/business-credit-and-funding" element={<BusinessCreditPage />} />
