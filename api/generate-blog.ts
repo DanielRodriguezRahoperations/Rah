@@ -614,19 +614,24 @@ Return a JSON object with these exact fields:
       const imagePrompt = buildImagePrompt(slug, post.category);
       console.log(`[generate-blog] image prompt: ${imagePrompt}`);
       imageBuffer = await generateKieImage(kieKey, imagePrompt);
+      // ── DEBUG: image buffer from Kie.ai ──────────────────────────────────────
       if (imageBuffer) {
+        console.log(`[DEBUG:image] Kie.ai returned buffer — size: ${imageBuffer.length} bytes (${(imageBuffer.length / 1024).toFixed(1)} KB)`);
         try {
+          const rawSize = imageBuffer.length;
           imageBuffer = await compositeOverlay(imageBuffer, post.displayTitle, post.category);
-          console.log(`[generate-blog] brand overlay composited`);
+          console.log(`[DEBUG:image] compositeOverlay succeeded — before: ${(rawSize / 1024).toFixed(1)} KB, after: ${(imageBuffer.length / 1024).toFixed(1)} KB`);
         } catch (overlayErr) {
-          console.error('Overlay composite failed (using raw image):', overlayErr instanceof Error ? overlayErr.message : String(overlayErr));
+          console.error('[DEBUG:image] compositeOverlay FAILED (using raw image):', overlayErr instanceof Error ? overlayErr.message : String(overlayErr));
         }
+      } else {
+        console.warn('[DEBUG:image] Kie.ai returned null — will use fallback image');
       }
     } catch (imgErr) {
-      console.error('Kie.ai threw:', imgErr instanceof Error ? imgErr.message : String(imgErr));
+      console.error('[DEBUG:image] Kie.ai threw:', imgErr instanceof Error ? imgErr.message : String(imgErr));
     }
   } else {
-    console.warn('KIE_API_KEY not set — skipping image generation');
+    console.warn('[DEBUG:image] KIE_API_KEY not set — skipping image generation');
   }
 
   // ── STEP 4: build file changes ───────────────────────────────────────────────
@@ -696,10 +701,15 @@ Return a JSON object with these exact fields:
         const existing = await getGitHubFile(githubToken, githubRepo, imgPath);
         existingImgSha = existing.sha;
       } catch (_) { /* file doesn't exist yet */ }
+      console.log(`[DEBUG:image] pushing ${(imageBuffer.length / 1024).toFixed(1)} KB to GitHub: ${imgPath}`);
       await putGitHubBinary(githubToken, githubRepo, githubBranch, imgPath, imageBuffer, existingImgSha, `Add blog hero image: ${slug}`);
       imageUploaded = true;
+      const githubRawUrl = `https://raw.githubusercontent.com/${githubRepo}/${githubBranch}/${imgPath}`;
+      const productionUrl  = `https://www.rahoperations.com/blogs/${slug}.jpg`;
+      console.log(`[DEBUG:image] GitHub raw URL: ${githubRawUrl}`);
+      console.log(`[DEBUG:image] Production image URL: ${productionUrl}`);
     } catch (imgPushErr) {
-      console.error('Failed to push blog image to GitHub:', imgPushErr instanceof Error ? imgPushErr.message : String(imgPushErr));
+      console.error('[DEBUG:image] push to GitHub FAILED:', imgPushErr instanceof Error ? imgPushErr.message : String(imgPushErr));
     }
   }
 
@@ -742,21 +752,32 @@ Return a JSON object with these exact fields:
       description: extractRssDescription(post.content),
     };
 
+    // ── DEBUG: RSS inputs ─────────────────────────────────────────────────────
+    console.log(`[DEBUG:rss] pubDateUTC value: "${pubDateUTC}"`);
+    console.log(`[DEBUG:rss] newPost.slug: ${newPost.slug}`);
+    console.log(`[DEBUG:rss] newPost.pubDate: "${newPost.pubDate}"`);
+    console.log(`[DEBUG:rss] enclosure URL will be: https://www.rahoperations.com/blogs/${slug}.jpg`);
+
     // Parse the rest of the feed from the updated source, excluding the new slug
     // (in case parseBlogPagePosts did happen to pick it up).
     const existingPosts = parseBlogPagePosts(updatedBlogPage).filter((p) => p.slug !== slug);
+    console.log(`[DEBUG:rss] existingPosts parsed from BlogPage: ${existingPosts.length}`);
 
     const feedPosts = [newPost, ...existingPosts];
+    console.log(`[DEBUG:rss] total feedPosts: ${feedPosts.length}`);
     if (feedPosts.length > 0) {
       const rssXml = buildRSS(feedPosts);
+      console.log(`[DEBUG:rss] generated rss.xml — ${rssXml.length} chars`);
+      console.log(`[DEBUG:rss] rss.xml first item preview:\n${rssXml.slice(rssXml.indexOf('<item>'), rssXml.indexOf('</item>') + 7)}`);
       let rssSha: string | null = null;
       try {
         const existingRss = await getGitHubFile(githubToken, githubRepo, 'public/rss.xml');
         rssSha = existingRss.sha;
       } catch (_) { /* rss.xml doesn't exist yet — will be created */ }
       await putGitHubBinary(githubToken, githubRepo, githubBranch, 'public/rss.xml', Buffer.from(rssXml, 'utf8'), rssSha, `Regenerate rss.xml: add ${slug}`);
+      console.log(`[DEBUG:rss] rss.xml pushed to GitHub successfully`);
     } else {
-      console.warn('RSS: no posts parsed from BlogPage.tsx — skipping rss.xml update');
+      console.warn('[DEBUG:rss] no posts parsed from BlogPage.tsx — skipping rss.xml update');
     }
   } catch (rssErr) {
     console.error('RSS generation failed:', rssErr instanceof Error ? rssErr.message : String(rssErr));
