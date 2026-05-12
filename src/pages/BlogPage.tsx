@@ -6,6 +6,15 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Reputation Management Scottsdale | RAH Operations",
+      displayTitle: "Reputation Management in Scottsdale: How to Protect and Build Your Brand Online",
+      date: "May 12, 2026",
+      issue: 'No. 030',
+      category: "Digital Marketing",
+      excerpt: "Your online reputation is your most valuable business asset in today's digital-first world. Whether you're dealing with negative reviews, outdated information, or a brand image that doesn't match your quality, reputation management in Scottsdale is a critical investment. RAH Operations helps local businesses take control of their narrative and turn their online presence into a competitive advantage.",
+      slug: 'reputation-management-scottsdale'
+    },
+    {
       title: "Business Credit Building Arizona: Complete Guide 2024",
       displayTitle: "Business Credit Building in Arizona: How to Fund Your Growth the Right Way",
       date: "May 12, 2026",
