@@ -170,13 +170,29 @@ Return ONLY a JSON object with these exact fields:
   const claudeData = await claudeRes.json() as { content: Array<{ type: string; text: string }> };
   const rawText = claudeData.content[0]?.text ?? '';
 
+  // Strip markdown code fences if present
+  let cleanText = rawText.trim();
+  if (cleanText.startsWith('```json')) {
+    cleanText = cleanText.slice(7);
+  }
+  if (cleanText.startsWith('```')) {
+    cleanText = cleanText.slice(3);
+  }
+  if (cleanText.endsWith('```')) {
+    cleanText = cleanText.slice(0, -3);
+  }
+  cleanText = cleanText.trim();
+
+  // Parse the cleaned JSON
   let post: ClaudePost;
   try {
-    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('No JSON found in Claude response');
-    post = JSON.parse(jsonMatch[0]) as ClaudePost;
-  } catch (e) {
-    return res.status(500).json({ error: 'Failed to parse Claude JSON', raw: rawText.slice(0, 500) });
+    post = JSON.parse(cleanText) as ClaudePost;
+  } catch (parseErr) {
+    console.error('Raw Claude response:', rawText.slice(0, 500));
+    return res.status(500).json({
+      error: 'Failed to parse Claude JSON',
+      raw: rawText.slice(0, 200)
+    });
   }
 
   // ── STEP 3: generate image via Kie.ai ───────────────────────────────────────
