@@ -6,6 +6,15 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Credit Repair Services Scottsdale | RAH Operations",
+      displayTitle: "Credit Repair Services in Scottsdale: How to Fix Your Credit and Take Control of Your Financial Future",
+      date: "May 12, 2026",
+      issue: 'No. 025',
+      category: "Credit Repair",
+      excerpt: "Bad credit can cost you thousands in higher interest rates, denied loans, and missed opportunities. RAH Operations offers professional credit repair services in Scottsdale designed to help individuals and businesses dispute inaccuracies, rebuild their credit profiles, and access the funding they deserve.",
+      slug: 'credit-repair-services-scottsdale'
+    },
+    {
       title: "Digital Marketing Agency Phoenix AZ | RAH Operations",
       displayTitle: "Why Phoenix Businesses Are Choosing a Local Digital Marketing Agency to Dominate Their Market",
       date: "May 12, 2026",
