@@ -185,6 +185,41 @@ interface BlogPostMeta {
   excerpt: string;
   slug: string;
   date: string;
+  description?: string; // rich body content for RSS; overrides excerpt when present
+}
+
+function extractRssDescription(html: string): string {
+  const text = html
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&[a-z#0-9]+;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const MIN = 750;
+  const MAX = 1000;
+
+  if (text.length <= MIN) return text;
+
+  const slice = text.slice(0, MAX);
+
+  // Find the last sentence boundary (followed by whitespace) that is >= MIN chars in
+  const sentenceRe = /[.!?](?=\s)/g;
+  let m: RegExpExecArray | null;
+  let bestEnd = -1;
+  while ((m = sentenceRe.exec(slice)) !== null) {
+    if (m.index + 1 >= MIN) bestEnd = m.index + 1;
+  }
+  if (bestEnd > 0) return text.slice(0, bestEnd).trim();
+
+  // No boundary >= MIN — take the last one anywhere before MAX
+  sentenceRe.lastIndex = 0;
+  while ((m = sentenceRe.exec(slice)) !== null) bestEnd = m.index + 1;
+  if (bestEnd > 400) return text.slice(0, bestEnd).trim();
+
+  // Last resort: word boundary near MIN
+  const atMin = text.slice(0, MIN);
+  const lastSpace = atMin.lastIndexOf(' ');
+  return lastSpace > 600 ? atMin.slice(0, lastSpace) : atMin;
 }
 
 function parseBlogPagePosts(source: string): BlogPostMeta[] {
@@ -219,7 +254,7 @@ function buildRSS(posts: BlogPostMeta[]): string {
     <title><![CDATA[${p.title}]]></title>
     <link>https://www.rahoperations.com/blogs/${p.slug}</link>
     <guid isPermaLink="true">https://www.rahoperations.com/blogs/${p.slug}</guid>
-    <description><![CDATA[${p.excerpt}]]></description>
+    <description><![CDATA[${p.description ?? p.excerpt}]]></description>
     <pubDate>${toRFC822(p.date)}</pubDate>
     <enclosure url="https://www.rahoperations.com/blogs/${p.slug}.jpg" length="0" type="image/jpeg"/>
   </item>`).join('\n');
@@ -439,6 +474,11 @@ Return ONLY a JSON object with these exact fields:
   // ── STEP 6: regenerate rss.xml ──────────────────────────────────────────────
   try {
     const allPosts = parseBlogPagePosts(updatedBlogPage);
+    // Inject rich body content as the RSS description for the newly published post
+    const newPostIdx = allPosts.findIndex((p) => p.slug === slug);
+    if (newPostIdx >= 0) {
+      allPosts[newPostIdx].description = extractRssDescription(post.content);
+    }
     if (allPosts.length > 0) {
       const rssXml = buildRSS(allPosts);
       let rssSha: string | null = null;
