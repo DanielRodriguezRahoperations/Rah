@@ -71,12 +71,21 @@ const PORTFOLIO = [
 const CLIENTS = ['Tier 1 Customs', 'Ever After Edit', 'Empire Builds AZ', 'Daniel Rodriguez'];
 
 const HERO_WORDS: { text: string; br: boolean }[] = [
-  { text: 'Business', br: false },
-  { text: 'systems', br: false },
-  { text: 'that', br: true },
-  { text: 'actually', br: false },
-  { text: 'work', br: false },
-  { text: 'online.', br: false },
+  { text: 'We', br: false },
+  { text: 'build', br: false },
+  { text: 'your', br: false },
+  { text: 'website,', br: false },
+  { text: 'run', br: false },
+  { text: 'your', br: false },
+  { text: 'marketing,', br: true },
+  { text: 'and', br: false },
+  { text: 'grow', br: false },
+  { text: 'your', br: false },
+  { text: 'presence.', br: false },
+  { text: 'You', br: false },
+  { text: 'run', br: false },
+  { text: 'your', br: false },
+  { text: 'business.', br: false },
 ];
 
 // ── Bento card wrapper ────────────────────────────────────────────────────────
@@ -187,7 +196,7 @@ const IntakeFormMockup = () => {
 // ── Card 2: AI Content Generator ─────────────────────────────────────────────
 
 const ContentGenMockup = () => {
-  const CAPTION = `Stop letting inconsistency confuse you. If he wanted to show up, he would. Your standards aren't the problem. — Available now on Amazon →`;
+  const CAPTION = `Scottsdale businesses — your competitors are already showing up on Google. Here's exactly how to outrank them in 90 days. 👇 Full strategy at rahoperations.com`;
   const [text, setText] = useState('');
   const [fading, setFading] = useState(false);
 
@@ -751,8 +760,8 @@ const HomePage = () => {
       </Helmet>
 
       <SEOHead
-        title="Website Design Scottsdale | Business Systems — RAH Operations"
-        description="RAH Operations builds websites, marketing automation, and client systems for Arizona businesses. Custom React sites with intake forms, portals, and AI content. Delivered fast."
+        title="RAH Operations — Website Design, Marketing & Credit Repair"
+        description="Website built in 7 days. Social media posted daily. Credit repair handled. Full online presence for Arizona businesses — done for you."
         url={absoluteUrl('/')}
       />
 
@@ -768,7 +777,7 @@ const HomePage = () => {
             transition={{ duration: 1, delay: 0.3 }}
             className="mb-7 text-[11px] font-medium uppercase text-[#555555]"
           >
-            Scottsdale, AZ
+            WEBSITE · MARKETING · CREDIT REPAIR
           </motion.p>
 
           <h1 className="mb-5 text-[42px] font-bold leading-[1.05] tracking-[-0.03em] text-[#F5F5F5] sm:text-[54px] lg:text-[64px]">
@@ -791,9 +800,9 @@ const HomePage = () => {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.85, ease: [0.16, 1, 0.3, 1] }}
-            className="mx-auto mb-10 max-w-[440px] text-[16px] leading-relaxed text-[#888888] sm:text-[17px]"
+            className="mx-auto mb-10 max-w-[500px] text-[16px] leading-relaxed text-[#888888] sm:text-[17px]"
           >
-            Websites, marketing automation, and client systems for Arizona businesses ready to grow.
+            Website live in 7 days. Social media posting daily. Clients finding you on Google. All done for you — from Scottsdale to anywhere.
           </motion.p>
 
           <motion.div
@@ -811,6 +820,26 @@ const HomePage = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* ── WHAT YOU GET STRIP ────────────────────────────────────────────── */}
+      <div style={{ background: '#0d0d0d', borderTop: '1px solid #1a1a1a', borderBottom: '1px solid #1a1a1a' }}>
+        <div className="mx-auto max-w-4xl px-6 py-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+            {([
+              { icon: '🌐', title: 'Custom Website', sub: 'Live in 7 days' },
+              { icon: '📱', title: 'Social Media', sub: 'Posted daily, automatically' },
+              { icon: '📍', title: 'Google & SEO', sub: 'Found by local customers' },
+              { icon: '💳', title: 'Credit Repair', sub: 'All 3 bureaus handled' },
+            ] as const).map((item) => (
+              <div key={item.title} className="text-center">
+                <div className="text-2xl mb-2">{item.icon}</div>
+                <p className="text-[13px] font-semibold text-[#E0E0E0] mb-1">{item.title}</p>
+                <p className="text-[11px] text-[#555555]">{item.sub}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* ── CLIENT NAMES ──────────────────────────────────────────────────── */}
       <GradientDivider />
@@ -834,41 +863,6 @@ const HomePage = () => {
         </motion.div>
       </div>
 
-      {/* ── WHAT WE BUILD ─────────────────────────────────────────────────── */}
-      <Div />
-      <section className="px-6 py-20 lg:py-28">
-        <div className="mx-auto max-w-6xl">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={stagger}>
-            <motion.p variants={up} className="mb-3 text-[11px] font-medium uppercase tracking-[0.14em] text-[#555555]">
-              What We Build
-            </motion.p>
-            <motion.h2 variants={up} className="mb-14 max-w-sm text-[26px] font-semibold tracking-[-0.02em] text-[#F5F5F5]">
-              Everything your business needs to run online.
-            </motion.h2>
-
-            <motion.div variants={stagger} className="grid gap-px bg-[#1A1A1A] sm:grid-cols-3">
-              {SERVICES.map((s) => (
-                <motion.div
-                  key={s.n} variants={up}
-                  className="group relative flex flex-col gap-5 bg-[#0D0D0D] p-8 lg:p-10 overflow-hidden"
-                  whileHover={{ backgroundColor: '#111111' }} transition={{ duration: 0.3 }}
-                >
-                  <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: 'radial-gradient(circle at 50% 0%, rgba(122,28,28,0.08), transparent 70%)' }} />
-                  <span className="relative text-[11px] font-medium tracking-[0.1em] text-[#444444]">{s.n}</span>
-                  <h3 className="relative text-[15px] font-semibold leading-snug text-[#F5F5F5]">{s.title}</h3>
-                  <p className="relative text-[13px] leading-relaxed text-[#888888]">{s.desc}</p>
-                </motion.div>
-              ))}
-            </motion.div>
-
-            <motion.p variants={up} className="mt-8 text-[13px] text-[#555555]">
-              One week of work with RAH replaces what most agencies charge{' '}
-              <span className="text-[#888888]">$30,000–$50,000</span> to build over 3 months.
-            </motion.p>
-          </motion.div>
-        </div>
-      </section>
-
       {/* ── THE SYSTEM — BENTO GRID ───────────────────────────────────────── */}
       <Div />
       <section className="px-6 py-20 lg:py-28">
@@ -881,13 +875,13 @@ const HomePage = () => {
             className="mb-12"
           >
             <motion.p variants={up} className="mb-3 text-[11px] font-medium uppercase tracking-[0.14em] text-[#555555]">
-              The System
+              WEBSITE · MARKETING · CREDIT REPAIR
             </motion.p>
             <motion.h2 variants={up} className="mb-4 text-[26px] font-semibold tracking-[-0.02em] text-[#F5F5F5]">
-              Everything running. All connected.
+              One company. Your entire online presence.
             </motion.h2>
-            <motion.p variants={up} className="max-w-[420px] text-[14px] leading-relaxed text-[#888888]">
-              Most businesses run on spreadsheets and phone calls. RAH builds the backend that replaces all of it.
+            <motion.p variants={up} className="max-w-[480px] text-[14px] leading-relaxed text-[#888888]">
+              Most businesses need 4–5 vendors to do what RAH does in one place. Website. Social media. SEO. Credit repair. All connected. All automated.
             </motion.p>
           </motion.div>
 
@@ -945,6 +939,60 @@ const HomePage = () => {
                 <TimelineMockup />
               </BentoCard>
             </motion.div>
+          </motion.div>
+
+          {/* Built different */}
+          <motion.div
+            initial="hidden" whileInView="visible"
+            viewport={{ once: true, margin: '-60px' }}
+            variants={stagger}
+            className="mt-10 grid gap-3 sm:grid-cols-3"
+          >
+            {([
+              'Not 4 vendors. One company handles everything — website, marketing, credit, and systems.',
+              'Not slow. Most agencies take 3 months. RAH delivers in 7 days.',
+              'Not hands-off. Content posted, rankings monitored, results delivered — every month.',
+            ] as const).map((text, i) => (
+              <motion.div key={i} variants={up} style={{ background: '#0d0d0d', border: '1px solid #1a1a1a', borderRadius: 10, padding: '16px 18px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                <span style={{ color: '#7A1C1C', fontSize: 14, fontWeight: 700, flexShrink: 0, lineHeight: 1.5 }}>✕</span>
+                <p style={{ fontSize: 13, color: '#888888', lineHeight: 1.6 }}>{text}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── WHAT WE BUILD ─────────────────────────────────────────────────── */}
+      <Div />
+      <section className="px-6 py-20 lg:py-28">
+        <div className="mx-auto max-w-6xl">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={stagger}>
+            <motion.p variants={up} className="mb-3 text-[11px] font-medium uppercase tracking-[0.14em] text-[#555555]">
+              What We Build
+            </motion.p>
+            <motion.h2 variants={up} className="mb-14 max-w-sm text-[26px] font-semibold tracking-[-0.02em] text-[#F5F5F5]">
+              Everything your business needs to run online.
+            </motion.h2>
+
+            <motion.div variants={stagger} className="grid gap-px bg-[#1A1A1A] sm:grid-cols-3">
+              {SERVICES.map((s) => (
+                <motion.div
+                  key={s.n} variants={up}
+                  className="group relative flex flex-col gap-5 bg-[#0D0D0D] p-8 lg:p-10 overflow-hidden"
+                  whileHover={{ backgroundColor: '#111111' }} transition={{ duration: 0.3 }}
+                >
+                  <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: 'radial-gradient(circle at 50% 0%, rgba(122,28,28,0.08), transparent 70%)' }} />
+                  <span className="relative text-[11px] font-medium tracking-[0.1em] text-[#444444]">{s.n}</span>
+                  <h3 className="relative text-[15px] font-semibold leading-snug text-[#F5F5F5]">{s.title}</h3>
+                  <p className="relative text-[13px] leading-relaxed text-[#888888]">{s.desc}</p>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            <motion.p variants={up} className="mt-8 text-[13px] text-[#555555]">
+              One week of work with RAH replaces what most agencies charge{' '}
+              <span className="text-[#888888]">$30,000–$50,000</span> to build over 3 months.
+            </motion.p>
           </motion.div>
         </div>
       </section>
@@ -1081,6 +1129,11 @@ const HomePage = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* ── ADDRESS ───────────────────────────────────────────────────────── */}
+      <div className="border-t border-[#1A1A1A] px-6 py-5 text-center">
+        <p className="text-[11px] text-[#333333]">RAH Operations — 6301 E Pinnacle Vista Dr, Scottsdale, AZ 85266</p>
+      </div>
     </div>
   );
 };
