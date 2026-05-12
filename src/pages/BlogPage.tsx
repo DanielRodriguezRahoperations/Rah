@@ -6,6 +6,15 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Website Design Company Scottsdale AZ | RAH Operations",
+      displayTitle: "Why Scottsdale Businesses Choose RAH Operations as Their Website Design Company",
+      date: "May 12, 2026",
+      issue: 'No. 021',
+      category: "Website Design",
+      excerpt: "Your website is your most powerful sales tool — but only if it's built to convert. RAH Operations is a Scottsdale-based website design company that combines stunning design with proven SEO strategy to help Arizona businesses grow online. Discover what sets us apart.",
+      slug: 'website-design-company-scottsdale-az'
+    },
+    {
       title: 'The Right Way to Start a Business',
       displayTitle: 'The Right Way to Start a Business (And Why Most People Get It Wrong)',
       date: 'Jan 15, 2024',
