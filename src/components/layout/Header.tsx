@@ -222,14 +222,6 @@ const Header = () => {
               </div>
             </div>
 
-            {/* Book a Call */}
-            <Link
-              to="/book-a-call"
-              className="border border-[#2A2A2A] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#CCCCCC] transition-colors duration-200 hover:border-luxury-red hover:text-white whitespace-nowrap"
-            >
-              Book a Call
-            </Link>
-
             {/* Get Started CTA */}
             <Link
               to="/get-started"
