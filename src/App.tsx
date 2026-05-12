@@ -46,6 +46,7 @@ import PortalDashboardPage from './pages/portal/PortalDashboardPage';
 
 // Website intake page
 import WebsiteIntakePage from './pages/WebsiteIntakePage';
+import GetStartedPage from './pages/GetStartedPage';
 
 // Marketing pages
 import MarketingIntakePage from './pages/marketing/MarketingIntakePage';
@@ -149,6 +150,9 @@ function App() {
               <Route path="/portal" element={<PortalLoginPage />} />
               <Route path="/portal/login" element={<PortalLoginPage />} />
               <Route path="/portal/dashboard" element={<PortalDashboardPage />} />
+
+              {/* Get Started page — Layout in component */}
+              <Route path="/get-started" element={<GetStartedPage />} />
 
               {/* Intake forms — with public nav/footer via Layout in component */}
               <Route path="/website-intake" element={<WebsiteIntakePage />} />
