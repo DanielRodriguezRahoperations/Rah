@@ -1,0 +1,284 @@
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+
+export const maxDuration = 90;
+
+function validateAdmin(req: VercelRequest): boolean {
+  const expected = `Bearer ${Buffer.from(process.env.ADMIN_PASSWORD ?? '').toString('base64')}`;
+  return req.headers.authorization === expected;
+}
+
+const TOPICS = [
+  'website-design-company-scottsdale-az',
+  'affordable-seo-services-scottsdale',
+  'social-media-management-scottsdale',
+  'digital-marketing-agency-phoenix-az',
+  'credit-repair-services-scottsdale',
+  'best-website-designer-near-me-scottsdale',
+  'local-seo-services-phoenix-az',
+  'google-business-profile-management-scottsdale',
+  'business-credit-building-arizona',
+  'reputation-management-scottsdale',
+  'llc-setup-arizona',
+  'new-business-setup-scottsdale',
+  'website-redesign-scottsdale',
+  'ecommerce-website-design-phoenix',
+  'wordpress-vs-custom-website-scottsdale',
+  'how-to-get-more-customers-online-scottsdale',
+  'social-media-marketing-phoenix-az',
+  'instagram-marketing-scottsdale-business',
+  'facebook-advertising-phoenix-az',
+  'content-marketing-strategy-scottsdale',
+  'website-maintenance-scottsdale',
+  'mobile-website-design-scottsdale',
+  'landing-page-design-scottsdale',
+  'email-marketing-scottsdale-business',
+  'online-reputation-management-phoenix',
+  'yelp-review-management-scottsdale',
+  'google-ads-management-scottsdale',
+  'video-marketing-scottsdale-business',
+  'brand-identity-design-scottsdale',
+  'website-speed-optimization-scottsdale',
+  'chatbot-integration-scottsdale-website',
+  'crm-setup-small-business-arizona',
+  'business-automation-tools-scottsdale',
+  'notary-services-scottsdale-az',
+  'apostille-services-arizona',
+  'personal-credit-repair-phoenix-az',
+  'remove-collections-credit-report-arizona',
+  'business-credit-cards-no-personal-guarantee',
+  'how-to-build-business-credit-fast-arizona',
+  'startup-business-services-scottsdale',
+];
+
+async function getGitHubFile(token: string, repo: string, path: string): Promise<{ content: string; sha: string }> {
+  const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+    headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json' },
+  });
+  if (!res.ok) throw new Error(`GitHub GET ${path} → ${res.status}`);
+  const data = await res.json() as { content: string; sha: string };
+  return { content: Buffer.from(data.content, 'base64').toString('utf8'), sha: data.sha };
+}
+
+async function putGitHubFile(token: string, repo: string, branch: string, path: string, content: string, sha: string, message: string) {
+  const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', Accept: 'application/vnd.github.v3+json' },
+    body: JSON.stringify({ message, content: Buffer.from(content).toString('base64'), sha, branch }),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`GitHub PUT ${path} → ${res.status}: ${err}`);
+  }
+}
+
+async function putGitHubBinary(token: string, repo: string, branch: string, path: string, data: Buffer, sha: string | null, message: string) {
+  const body: Record<string, unknown> = { message, content: data.toString('base64'), branch };
+  if (sha) body.sha = sha;
+  const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', Accept: 'application/vnd.github.v3+json' },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`GitHub PUT binary ${path} → ${res.status}: ${err}`);
+  }
+}
+
+function formatDate(d: Date): string {
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function formatDateISO(d: Date): string {
+  return d.toISOString().split('T')[0];
+}
+
+interface ClaudePost {
+  title: string;
+  displayTitle: string;
+  metaDescription: string;
+  category: string;
+  excerpt: string;
+  content: string;
+  imagePrompt: string;
+}
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (!validateAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
+
+  const githubToken = process.env.GITHUB_TOKEN;
+  const githubRepo = process.env.GITHUB_REPO;
+  const githubBranch = process.env.GITHUB_BRANCH || 'main';
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  const kieKey = process.env.KIE_API_KEY;
+
+  if (!githubToken || !githubRepo || !anthropicKey) {
+    return res.status(500).json({ error: 'Missing GITHUB_TOKEN, GITHUB_REPO, or ANTHROPIC_API_KEY' });
+  }
+
+  // ── STEP 1: pick next unpublished topic ──────────────────────────────────────
+  const { content: blogPageRaw } = await getGitHubFile(githubToken, githubRepo, 'src/pages/BlogPage.tsx');
+  const existingSlugs = new Set<string>();
+  const slugMatches = blogPageRaw.matchAll(/slug:\s*['"]([^'"]+)['"]/g);
+  for (const m of slugMatches) existingSlugs.add(m[1]);
+
+  const slug = TOPICS.find((t) => !existingSlugs.has(t));
+  if (!slug) return res.status(200).json({ success: false, message: 'All 40 topics already published.' });
+
+  const keyword = slug.replace(/-/g, ' ');
+  const today = new Date();
+
+  // ── STEP 2: call Claude API ─────────────────────────────────────────────────
+  const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'x-api-key': anthropicKey,
+      'anthropic-version': '2023-06-01',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4000,
+      system: 'You are an expert SEO content writer for RAH Operations, a Scottsdale AZ digital agency offering website design, SEO, digital marketing, social media management, and credit repair. Write blog posts that rank on Google for local Arizona searches. Always write in a confident, helpful, expert tone. Never use filler content.',
+      messages: [
+        {
+          role: 'user',
+          content: `Write a complete SEO blog post targeting the keyword: ${keyword}.
+
+Return ONLY a JSON object with these exact fields:
+{
+  "title": "SEO title 50-60 chars with keyword",
+  "displayTitle": "Full engaging headline",
+  "metaDescription": "150-160 char meta description with CTA",
+  "category": "one of: Website Design, SEO, Digital Marketing, Social Media, Credit Repair, Business Services",
+  "excerpt": "2-3 sentence excerpt for blog listing page",
+  "content": "Full HTML blog post content with these requirements: Opening paragraph with primary keyword in first 100 words. 5-6 H2 sections with 150-250 words each. Internal links using <a href='/website-design-and-seo'>anchor text</a> format. Link to these pages naturally throughout: /website-design-and-seo, /digital-marketing, /social-media-management, /personal-credit-repair, /business-credit-and-funding, /website-intake, /marketing/intake, /credit-repair/intake. FAQ section with 3 questions. Closing CTA paragraph linking to most relevant intake form. 1200-1600 words total",
+  "imagePrompt": "Detailed image generation prompt for a professional blog hero image. Style: clean, modern, professional Arizona business context. No text in image. Horizontal format 1200x630."
+}`,
+        },
+      ],
+    }),
+  });
+
+  if (!claudeRes.ok) {
+    const err = await claudeRes.text();
+    return res.status(500).json({ error: `Claude API error: ${claudeRes.status}`, detail: err });
+  }
+
+  const claudeData = await claudeRes.json() as { content: Array<{ type: string; text: string }> };
+  const rawText = claudeData.content[0]?.text ?? '';
+
+  let post: ClaudePost;
+  try {
+    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('No JSON found in Claude response');
+    post = JSON.parse(jsonMatch[0]) as ClaudePost;
+  } catch (e) {
+    return res.status(500).json({ error: 'Failed to parse Claude JSON', raw: rawText.slice(0, 500) });
+  }
+
+  // ── STEP 3: generate image via Kie.ai ───────────────────────────────────────
+  let imageBuffer: Buffer | null = null;
+  let imageShaExisting: string | null = null;
+
+  if (kieKey) {
+    try {
+      const imgRes = await fetch('https://api.kie.ai/v1/images/generations', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${kieKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: post.imagePrompt, n: 1, size: '1792x1024' }),
+      });
+      if (imgRes.ok) {
+        const imgData = await imgRes.json() as { data?: Array<{ url?: string; b64_json?: string }> };
+        const item = imgData.data?.[0];
+        if (item?.b64_json) {
+          imageBuffer = Buffer.from(item.b64_json, 'base64');
+        } else if (item?.url) {
+          const download = await fetch(item.url);
+          if (download.ok) {
+            const ab = await download.arrayBuffer();
+            imageBuffer = Buffer.from(ab);
+          }
+        }
+      }
+    } catch (_) {
+      // Image generation is non-fatal; continue without image
+    }
+  }
+
+  // ── STEP 4: build file changes ───────────────────────────────────────────────
+  const dateDisplay = formatDate(today);
+  const dateISO = formatDateISO(today);
+
+  // Count existing posts to determine issue number
+  const issueCount = (blogPageRaw.match(/slug:/g) || []).length + 1;
+  const issueNum = String(issueCount).padStart(3, '0');
+
+  const newPostEntry = `    {
+      title: ${JSON.stringify(post.title)},
+      displayTitle: ${JSON.stringify(post.displayTitle)},
+      date: ${JSON.stringify(dateDisplay)},
+      issue: 'No. ${issueNum}',
+      category: ${JSON.stringify(post.category)},
+      excerpt: ${JSON.stringify(post.excerpt)},
+      slug: '${slug}'
+    },`;
+
+  const updatedBlogPage = blogPageRaw.replace(
+    /const posts = \[/,
+    `const posts = [\n${newPostEntry}`,
+  );
+
+  // BlogPost.tsx — inject into generated posts record
+  const { content: blogPostRaw, sha: blogPostSha } = await getGitHubFile(githubToken, githubRepo, 'src/pages/BlogPost.tsx');
+
+  const generatedEntry = `  '${slug}': {
+    title: ${JSON.stringify(post.title)},
+    displayTitle: ${JSON.stringify(post.displayTitle)},
+    metaDescription: ${JSON.stringify(post.metaDescription)},
+    category: ${JSON.stringify(post.category)},
+    date: ${JSON.stringify(dateDisplay)},
+    content: ${JSON.stringify(post.content)},
+  },`;
+
+  const updatedBlogPost = blogPostRaw.replace(
+    /\/\/ GENERATED_POSTS_START\nconst generatedBlogPosts[^=]+=\s*\{/,
+    `// GENERATED_POSTS_START\nconst generatedBlogPosts: Record<string, GeneratedBlogPost> = {\n${generatedEntry}`,
+  );
+
+  // Sitemap
+  const { content: sitemapRaw, sha: sitemapSha } = await getGitHubFile(githubToken, githubRepo, 'public/sitemap.xml');
+  const sitemapEntry = `  <url><loc>https://www.rahoperations.com/blogs/${slug}</loc><lastmod>${dateISO}</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>`;
+  const updatedSitemap = sitemapRaw.replace(
+    /(\s*<!-- ===== TIER 4: BLOG & CONTENT ===== -->)/,
+    `\n${sitemapEntry}$1`,
+  );
+
+  // ── STEP 5: push to GitHub ───────────────────────────────────────────────────
+  const { sha: blogPageSha } = await getGitHubFile(githubToken, githubRepo, 'src/pages/BlogPage.tsx');
+  await putGitHubFile(githubToken, githubRepo, githubBranch, 'src/pages/BlogPage.tsx', updatedBlogPage, blogPageSha, `Add blog post: ${slug}`);
+  await putGitHubFile(githubToken, githubRepo, githubBranch, 'src/pages/BlogPost.tsx', updatedBlogPost, blogPostSha, `Add generated blog post data: ${slug}`);
+  await putGitHubFile(githubToken, githubRepo, githubBranch, 'public/sitemap.xml', updatedSitemap, sitemapSha, `Sitemap: add /blogs/${slug}`);
+
+  if (imageBuffer) {
+    try {
+      const imgPath = `public/blogs/${slug}.jpg`;
+      let existingImgSha: string | null = imageShaExisting;
+      try {
+        const existing = await getGitHubFile(githubToken, githubRepo, imgPath);
+        existingImgSha = existing.sha;
+      } catch (_) { /* file doesn't exist yet */ }
+      await putGitHubBinary(githubToken, githubRepo, githubBranch, imgPath, imageBuffer, existingImgSha, `Add blog hero image: ${slug}`);
+    } catch (_) { /* non-fatal */ }
+  }
+
+  // ── STEP 6: return success ───────────────────────────────────────────────────
+  return res.status(200).json({
+    success: true,
+    slug,
+    title: post.title,
+    url: `https://www.rahoperations.com/blogs/${slug}`,
+    message: 'Blog published. Vercel deploying. Make.com will post to GMB and Instagram within 15 minutes.',
+  });
+}

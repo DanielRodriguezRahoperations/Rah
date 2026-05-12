@@ -10,6 +10,20 @@ type BlogSection = {
   body: React.ReactNode[];
 };
 
+type GeneratedBlogPost = {
+  title: string;
+  displayTitle: string;
+  metaDescription: string;
+  category: string;
+  date: string;
+  content: string;
+};
+
+// GENERATED_POSTS_START
+const generatedBlogPosts: Record<string, GeneratedBlogPost> = {
+};
+// GENERATED_POSTS_END
+
 type BlogPostData = {
   title: string;
   category: string;
@@ -665,8 +679,9 @@ const blogPosts: Record<string, BlogPostData> = {
 const BlogPost = () => {
   const { slug } = useParams();
   const post = slug ? blogPosts[slug] : null;
+  const generatedPost = slug ? generatedBlogPosts[slug] : null;
 
-  if (!post) {
+  if (!post && !generatedPost) {
     return (
       <>
         <SEOHead
@@ -686,13 +701,106 @@ const BlogPost = () => {
     );
   }
 
+  if (generatedPost) {
+    const schemaMarkup = {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: generatedPost.displayTitle,
+      image: `https://www.rahoperations.com/blogs/${slug}.jpg`,
+      author: { '@type': 'Person', name: 'Daniel Rodriguez' },
+      publisher: { '@type': 'Organization', name: 'RAH Operations', logo: { '@type': 'ImageObject', url: 'https://www.rahoperations.com/newlogo.png' } },
+      datePublished: generatedPost.date,
+      description: generatedPost.metaDescription,
+    };
+    return (
+      <>
+        <SEOHead
+          title={`${generatedPost.title} | RAH Operations`}
+          description={generatedPost.metaDescription}
+          url={absoluteUrl(`/blogs/${slug}`)}
+        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaMarkup) }} />
+
+        <section className="bg-[#1a1a1a] pt-32 pb-16">
+          <div className="container-clean max-w-4xl">
+            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+              <div className="flex items-center gap-4 mb-10">
+                <span className="text-[#7a1c1c] text-xs uppercase tracking-[0.3em]">{generatedPost.category}</span>
+                <span className="w-px h-4 bg-white/20" />
+                <span className="text-white/40 text-xs">{generatedPost.date}</span>
+              </div>
+              <h1 className="text-[clamp(2.5rem,7vw,5.5rem)] font-serif-display font-bold text-white leading-[0.95] mb-8">
+                {generatedPost.displayTitle}
+              </h1>
+              <p className="text-xl text-white/60 font-serif-body leading-relaxed max-w-3xl">{generatedPost.metaDescription}</p>
+              <p className="mt-6 text-sm text-white/40">By <span className="text-white/60 font-semibold">Daniel Rodriguez</span> — RAH Operations</p>
+            </motion.div>
+          </div>
+        </section>
+
+        <div className="bg-[#1a1a1a]">
+          <div className="container-clean max-w-4xl pb-0">
+            <div className="overflow-hidden border border-white/10">
+              <img src={`/blogs/${slug}.jpg`} alt={generatedPost.title} className="w-full aspect-[16/7] object-cover" loading="eager" />
+            </div>
+          </div>
+        </div>
+
+        <section className="bg-[#faf8f4] py-16 lg:py-24">
+          <article className="container-clean max-w-3xl">
+            <motion.div
+              className="prose prose-lg max-w-none prose-headings:font-serif-display prose-headings:font-bold prose-headings:text-[#1a1a1a] prose-p:text-neutral-700 prose-p:font-serif-body prose-p:leading-relaxed prose-a:text-[#7a1c1c] prose-a:no-underline hover:prose-a:underline prose-h2:border-l-4 prose-h2:border-[#7a1c1c] prose-h2:pl-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              dangerouslySetInnerHTML={{ __html: generatedPost.content }}
+            />
+
+            <div className="mt-16 grid gap-4 border-y-2 border-[#1a1a1a]/10 py-10 md:grid-cols-3">
+              {[
+                { to: '/website-design-and-seo', label: 'Website Design & SEO' },
+                { to: '/digital-marketing', label: 'Digital Marketing' },
+                { to: '/business-credit-and-funding', label: 'Business Credit & Funding' },
+              ].map((link) => (
+                <Link key={link.to} to={link.to} className="group border border-neutral-200 bg-white p-5 hover:border-[#7a1c1c] transition-colors">
+                  <span className="block text-[10px] font-semibold uppercase tracking-[0.22em] text-neutral-400 mb-2">Service</span>
+                  <span className="block font-semibold text-[#1a1a1a] group-hover:text-[#7a1c1c] transition-colors">{link.label}</span>
+                </Link>
+              ))}
+            </div>
+
+            <div className="mt-8 flex items-center justify-between">
+              <Link to="/blogs" className="text-sm font-semibold uppercase tracking-widest text-[#1a1a1a] border-b-2 border-[#1a1a1a] pb-0.5 hover:text-[#7a1c1c] hover:border-[#7a1c1c] transition-colors">
+                ← Back to Insights
+              </Link>
+            </div>
+          </article>
+        </section>
+
+        <section className="section bg-[#1a1a1a] text-white">
+          <div className="container-clean text-center">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+              <p className="text-[#7a1c1c] text-xs uppercase tracking-[0.3em] mb-6">Build the System</p>
+              <h2 className="text-4xl md:text-5xl font-serif-display font-bold mb-6 leading-tight">Your Website Should Do More Than Sit Online.</h2>
+              <p className="text-lg text-white/60 font-serif-body max-w-2xl mx-auto mb-10 leading-relaxed">RAH Operations builds websites, SEO structure, and digital systems designed to help serious businesses look credible, rank locally, and convert more leads.</p>
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Button to="/contact">Start a Project</Button>
+                <Button to="/case-studies" variant="secondary">View Case Studies</Button>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      </>
+    );
+  }
+
   return (
     <>
       <SEOHead
-        title={`${post.title} | RAH Operations`}
-        description={post.description}
+        title={`${post!.title} | RAH Operations`}
+        description={post!.description}
         url={absoluteUrl(`/blogs/${slug}`)}
-        keywords={post.keywords}
+        keywords={post!.keywords}
       />
 
       {/* ARTICLE HEADER — long-form magazine aesthetic */}
@@ -704,17 +812,17 @@ const BlogPost = () => {
             transition={{ duration: 0.8 }}
           >
             <div className="flex items-center gap-4 mb-10">
-              <span className="text-[#7a1c1c] text-xs uppercase tracking-[0.3em]">{post.category}</span>
+              <span className="text-[#7a1c1c] text-xs uppercase tracking-[0.3em]">{post!.category}</span>
               <span className="w-px h-4 bg-white/20" />
-              <span className="text-white/40 text-xs">{post.date}</span>
+              <span className="text-white/40 text-xs">{post!.date}</span>
             </div>
 
             <h1 className="text-[clamp(2.5rem,7vw,5.5rem)] font-serif-display font-bold text-white leading-[0.95] mb-8">
-              {post.title}
+              {post!.title}
             </h1>
 
             <p className="text-xl text-white/60 font-serif-body leading-relaxed max-w-3xl">
-              {post.description}
+              {post!.description}
             </p>
           </motion.div>
         </div>
@@ -726,7 +834,7 @@ const BlogPost = () => {
           <div className="overflow-hidden border border-white/10">
             <img
               src={`/blogs/${slug}.jpg`}
-              alt={post.title}
+              alt={post!.title}
               className="w-full aspect-[16/7] object-cover"
               loading="eager"
             />
@@ -743,7 +851,7 @@ const BlogPost = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            {post.content.map((section, index) => (
+            {post!.content.map((section, index) => (
               <div key={index}>
                 <h2 className="text-2xl md:text-3xl font-serif-display font-bold text-[#1a1a1a] mb-6 leading-tight border-l-4 border-[#7a1c1c] pl-6">
                   {section.heading}

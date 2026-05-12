@@ -104,6 +104,11 @@ const AdminDashboardPage = () => {
   const [smsError, setSmsError] = useState('');
   const [smsSuccess, setSmsSuccess] = useState('');
 
+  // Blog generation
+  const [blogGenerating, setBlogGenerating] = useState(false);
+  const [blogResult, setBlogResult] = useState<{ title: string; url: string } | null>(null);
+  const [blogError, setBlogError] = useState('');
+
   useEffect(() => {
     if (!isAdminAuthenticated()) {
       navigate('/admin/login', { replace: true });
@@ -229,6 +234,30 @@ const AdminDashboardPage = () => {
       setSmsError('Network error — check your connection');
     } finally {
       setSmsSending(false);
+    }
+  };
+
+  const handleGenerateBlog = async () => {
+    setBlogGenerating(true);
+    setBlogResult(null);
+    setBlogError('');
+    try {
+      const res = await fetch('/api/generate-blog', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        setBlogError(json.error || 'Blog generation failed');
+      } else if (json.success === false) {
+        setBlogError(json.message || 'No topics remaining');
+      } else {
+        setBlogResult({ title: json.title, url: json.url });
+      }
+    } catch {
+      setBlogError('Network error — check your connection');
+    } finally {
+      setBlogGenerating(false);
     }
   };
 
@@ -392,7 +421,21 @@ const AdminDashboardPage = () => {
                 {mainTab === 'credit-repair' ? 'Credit Repair Clients' : mainTab === 'marketing' ? 'Marketing Clients' : 'Website Clients'}
               </h1>
             </div>
-            <div className="flex items-center gap-3 self-start">
+            <div className="flex items-center gap-3 self-start flex-wrap">
+              <button
+                onClick={handleGenerateBlog}
+                disabled={blogGenerating}
+                className="bg-[#1a3a1a] hover:bg-[#224422] border border-green-900 disabled:opacity-50 disabled:cursor-not-allowed text-green-300 px-5 py-2 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors flex items-center gap-2"
+              >
+                {blogGenerating && (
+                  <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                )}
+                {blogGenerating ? 'Generating…' : 'Generate Blog Post'}
+              </button>
+
               {mainTab === 'credit-repair' && (
                 <button
                   onClick={openSms}
@@ -429,6 +472,30 @@ const AdminDashboardPage = () => {
               </button>
             </div>
           </div>
+
+          {/* Blog generation result */}
+          {blogResult && (
+            <div className="bg-green-950/50 border border-green-900 text-green-200 px-5 py-4 rounded-sm mb-6 flex items-start justify-between gap-4">
+              <div>
+                <p className="font-semibold text-sm mb-1">
+                  ✓ {blogResult.title} published! Live in ~60 seconds.
+                </p>
+                <p className="text-xs text-green-400">GMB + Instagram will post within 15 minutes.</p>
+              </div>
+              <div className="flex items-center gap-3 shrink-0">
+                <a href={blogResult.url} target="_blank" rel="noopener noreferrer" className="text-xs underline underline-offset-2 hover:text-white">
+                  View Post →
+                </a>
+                <button onClick={() => setBlogResult(null)} className="text-green-600 hover:text-white text-lg leading-none">×</button>
+              </div>
+            </div>
+          )}
+          {blogError && (
+            <div className="bg-red-950/50 border border-red-900 text-red-200 text-sm px-5 py-3 rounded-sm mb-6 flex items-center justify-between">
+              <span>{blogError}</span>
+              <button onClick={() => setBlogError('')} className="text-red-600 hover:text-white text-lg leading-none ml-4">×</button>
+            </div>
+          )}
 
           {/* Main tabs */}
           <div className="flex border-b border-neutral-800 mb-6">
