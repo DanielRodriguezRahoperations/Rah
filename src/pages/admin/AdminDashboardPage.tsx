@@ -42,6 +42,15 @@ interface WebsiteClient {
   created_at: string;
 }
 
+interface BlogPost {
+  title: string;
+  displayTitle: string;
+  date: string;
+  issue: string;
+  category: string;
+  slug: string;
+}
+
 interface AuditLead {
   id: string;
   domain: string;
@@ -108,7 +117,7 @@ function auditGrade(score: number | null): string {
 
 const AdminDashboardPage = () => {
   const navigate = useNavigate();
-  const [mainTab, setMainTab] = useState<'credit-repair' | 'marketing' | 'website' | 'audits'>('credit-repair');
+  const [mainTab, setMainTab] = useState<'credit-repair' | 'marketing' | 'website' | 'audits' | 'blog'>('credit-repair');
 
   // Credit repair state
   const [clients, setClients] = useState<Client[]>([]);
@@ -147,6 +156,12 @@ const AdminDashboardPage = () => {
   const [smsError, setSmsError] = useState('');
   const [smsSuccess, setSmsSuccess] = useState('');
 
+  // Blog posts tab state
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [blogPostsLoading, setBlogPostsLoading] = useState(false);
+  const [blogPostsError, setBlogPostsError] = useState('');
+  const [fixImageState, setFixImageState] = useState<Record<string, 'idle' | 'loading' | 'ok' | 'err'>>({});
+
   // Blog generation
   const [blogGenerating, setBlogGenerating] = useState(false);
   const [blogResult, setBlogResult] = useState<{ title: string; url: string } | null>(null);
@@ -171,7 +186,39 @@ const AdminDashboardPage = () => {
     if (mainTab === 'audits' && auditLeads.length === 0 && !auditLoading) {
       fetchAuditLeads();
     }
+    if (mainTab === 'blog' && blogPosts.length === 0 && !blogPostsLoading) {
+      fetchBlogPosts();
+    }
   }, [mainTab]);
+
+  const fetchBlogPosts = async () => {
+    setBlogPostsLoading(true);
+    setBlogPostsError('');
+    try {
+      const res = await fetch('/api/blog-posts', { headers: adminHeaders() });
+      if (res.status === 401) { clearAdminToken(); navigate('/admin/login', { replace: true }); return; }
+      const json = await res.json();
+      if (!res.ok) { setBlogPostsError(json.error || 'Failed to load blog posts'); }
+      else { setBlogPosts(json.posts || []); }
+    } catch { setBlogPostsError('Network error'); }
+    finally { setBlogPostsLoading(false); }
+  };
+
+  const handleFixImage = async (slug: string) => {
+    setFixImageState((prev) => ({ ...prev, [slug]: 'loading' }));
+    try {
+      const res = await fetch('/api/fix-blog-image', {
+        method: 'POST',
+        headers: { ...adminHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Failed');
+      setFixImageState((prev) => ({ ...prev, [slug]: 'ok' }));
+    } catch {
+      setFixImageState((prev) => ({ ...prev, [slug]: 'err' }));
+    }
+  };
 
   const fetchClients = async () => {
     setLoading(true);
@@ -591,7 +638,7 @@ const AdminDashboardPage = () => {
 
           {/* Main tabs */}
           <div className="flex border-b border-neutral-800 mb-6 overflow-x-auto">
-            {(['credit-repair', 'marketing', 'website', 'audits'] as const).map((tab) => (
+            {(['credit-repair', 'marketing', 'website', 'audits', 'blog'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setMainTab(tab)}
@@ -601,7 +648,7 @@ const AdminDashboardPage = () => {
                     : 'border-transparent text-neutral-500 hover:text-neutral-300'
                 }`}
               >
-                {tab === 'credit-repair' ? 'Credit Repair' : tab === 'marketing' ? 'Marketing' : tab === 'website' ? 'Website' : 'Audits'}
+                {tab === 'credit-repair' ? 'Credit Repair' : tab === 'marketing' ? 'Marketing' : tab === 'website' ? 'Website' : tab === 'audits' ? 'Audits' : 'Blog'}
                 {tab === 'credit-repair' && clients.length > 0 && (
                   <span className="ml-2 text-[10px] bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded-sm">{clients.length}</span>
                 )}
@@ -613,6 +660,9 @@ const AdminDashboardPage = () => {
                 )}
                 {tab === 'audits' && auditLeads.length > 0 && (
                   <span className="ml-2 text-[10px] bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded-sm">{auditLeads.length}</span>
+                )}
+                {tab === 'blog' && blogPosts.length > 0 && (
+                  <span className="ml-2 text-[10px] bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded-sm">{blogPosts.length}</span>
                 )}
               </button>
             ))}
@@ -1025,6 +1075,106 @@ const AdminDashboardPage = () => {
               {!auditLoading && auditLeads.length > 0 && (
                 <div className="mt-6 text-xs text-neutral-500 text-right">
                   Showing {filteredAudits.length} of {auditLeads.length} leads
+                </div>
+              )}
+            </>
+          )}
+
+          {/* ── Blog Tab ── */}
+          {mainTab === 'blog' && (
+            <>
+              <div className="flex items-center justify-between mb-6">
+                <p className="text-sm text-neutral-400">{blogPosts.length} published post{blogPosts.length !== 1 ? 's' : ''}</p>
+                <button
+                  onClick={fetchBlogPosts}
+                  className="bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded-sm text-xs uppercase tracking-widest transition-colors"
+                >
+                  Refresh
+                </button>
+              </div>
+
+              {blogPostsLoading ? (
+                <div className="text-center py-20 text-neutral-500">Loading posts…</div>
+              ) : blogPostsError ? (
+                <div className="bg-red-950/50 border border-red-900 text-red-200 text-sm px-4 py-3 rounded-sm">{blogPostsError}</div>
+              ) : blogPosts.length === 0 ? (
+                <div className="text-center py-20 text-neutral-500">No posts found.</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-neutral-800 text-neutral-500 text-xs uppercase tracking-widest">
+                        <th className="text-left py-3 px-4 font-medium">Issue</th>
+                        <th className="text-left py-3 px-4 font-medium">Title</th>
+                        <th className="text-left py-3 px-4 font-medium">Category</th>
+                        <th className="text-left py-3 px-4 font-medium">Date</th>
+                        <th className="text-right py-3 px-4 font-medium">Image</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {blogPosts.map((post) => {
+                        const state = fixImageState[post.slug] ?? 'idle';
+                        return (
+                          <tr key={post.slug} className="border-b border-neutral-800/50 hover:bg-neutral-800/20 transition-colors">
+                            <td className="py-3 px-4 text-neutral-500 text-xs whitespace-nowrap">{post.issue}</td>
+                            <td className="py-3 px-4 text-white max-w-xs">
+                              <a
+                                href={`/blog/${post.slug}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:text-luxury-accent transition-colors line-clamp-2"
+                              >
+                                {post.displayTitle || post.title}
+                              </a>
+                            </td>
+                            <td className="py-3 px-4 text-neutral-400 whitespace-nowrap">{post.category}</td>
+                            <td className="py-3 px-4 text-neutral-500 whitespace-nowrap text-xs">{post.date}</td>
+                            <td className="py-3 px-4 text-right whitespace-nowrap">
+                              {state === 'idle' && (
+                                <button
+                                  onClick={() => handleFixImage(post.slug)}
+                                  className="text-xs px-3 py-1.5 rounded-sm border border-neutral-700 text-neutral-300 hover:border-luxury-red hover:text-white transition-colors"
+                                >
+                                  Fix Image
+                                </button>
+                              )}
+                              {state === 'loading' && (
+                                <span className="text-xs text-neutral-400 inline-flex items-center gap-1.5">
+                                  <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                                  </svg>
+                                  Generating…
+                                </span>
+                              )}
+                              {state === 'ok' && (
+                                <span className="text-xs text-green-400 inline-flex items-center gap-1">
+                                  ✓ Fixed
+                                  <button
+                                    onClick={() => setFixImageState((p) => ({ ...p, [post.slug]: 'idle' }))}
+                                    className="ml-1 text-neutral-500 hover:text-white"
+                                  >
+                                    ×
+                                  </button>
+                                </span>
+                              )}
+                              {state === 'err' && (
+                                <span className="text-xs text-red-400 inline-flex items-center gap-1">
+                                  ✗ Failed
+                                  <button
+                                    onClick={() => setFixImageState((p) => ({ ...p, [post.slug]: 'idle' }))}
+                                    className="ml-1 text-neutral-500 hover:text-white"
+                                  >
+                                    Retry
+                                  </button>
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </>
