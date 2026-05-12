@@ -6,6 +6,15 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Local SEO Services Phoenix AZ | RAH Operations",
+      displayTitle: "Local SEO Services in Phoenix AZ: How to Dominate Google Search in Your Own Backyard",
+      date: "May 12, 2026",
+      issue: 'No. 027',
+      category: "SEO",
+      excerpt: "If your Phoenix business isn't showing up on the first page of Google, you're losing customers to competitors every single day. Local SEO services in Phoenix AZ give you the visibility, authority, and traffic you need to grow. RAH Operations specializes in helping Arizona businesses dominate local search results.",
+      slug: 'local-seo-services-phoenix-az'
+    },
+    {
       title: "Best Website Designer Near Me Scottsdale | RAH Ops",
       displayTitle: "The Best Website Designer Near You in Scottsdale, AZ (And Why It Matters More Than You Think)",
       date: "May 12, 2026",
