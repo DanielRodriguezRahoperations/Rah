@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import sharp from 'sharp';
 
 export const maxDuration = 90;
 
@@ -313,6 +314,80 @@ function buildImagePrompt(slug: string, category: string): string {
   return `Centered composition, subject centered in frame filling 60-70% of the image, ${scene}, warm golden Arizona light, sharp focus, clean uncluttered background, premium lifestyle photography, aspirational, photorealistic, Instagram-optimized, no text, no logos, no watermarks`;
 }
 
+// ── Brand overlay compositor ──────────────────────────────────────────────────
+// Composites RAH logo, category label, and headline onto the Ideogram image
+// using an SVG layer via sharp. Outputs JPEG at 90% quality.
+async function compositeOverlay(imageBuffer: Buffer, displayTitle: string, category: string): Promise<Buffer> {
+  const meta = await sharp(imageBuffer).metadata();
+  const W = meta.width ?? 1024;
+  const H = meta.height ?? 1024;
+
+  // Split the title into at most 2 lines on word boundaries
+  const MAX_CHARS = Math.floor(W / 19);
+  const words = displayTitle.split(' ');
+  let line1 = '';
+  const line2Words: string[] = [];
+  let overflow = false;
+  for (const word of words) {
+    if (!overflow && (line1 + (line1 ? ' ' : '') + word).length <= MAX_CHARS) {
+      line1 += (line1 ? ' ' : '') + word;
+    } else {
+      overflow = true;
+      line2Words.push(word);
+    }
+  }
+  let line2 = line2Words.join(' ');
+  if (line2.length > MAX_CHARS) line2 = line2.slice(0, MAX_CHARS - 1) + '…';
+
+  const pad        = Math.round(W * 0.038);
+  const logoSz     = Math.round(W * 0.034);
+  const catSz      = Math.round(W * 0.018);
+  const headSz     = Math.round(W * 0.036);
+  const catY       = H - pad - (line2 ? headSz * 2.6 : headSz * 1.5) - catSz * 1.2;
+  const line1Y     = catY + catSz * 2.4;
+  const line2Y     = line1Y + headSz * 1.28;
+
+  const esc = (s: string) =>
+    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+  const svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="vg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#0A0A0A" stop-opacity="0"/>
+      <stop offset="48%"  stop-color="#0A0A0A" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#0A0A0A" stop-opacity="0.88"/>
+    </linearGradient>
+    <linearGradient id="tg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#0A0A0A" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="#0A0A0A" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <!-- Bottom vignette for text legibility -->
+  <rect width="${W}" height="${H}" fill="url(#vg)"/>
+  <!-- Top vignette for logo legibility -->
+  <rect width="${W}" height="${Math.round(H * 0.22)}" fill="url(#tg)"/>
+  <!-- RAH wordmark -->
+  <text x="${pad}" y="${pad + logoSz}" font-family="Arial, Helvetica, sans-serif"
+        font-size="${logoSz}" font-weight="bold" fill="#C8B99A"
+        letter-spacing="${Math.round(logoSz * 0.24)}">RAH</text>
+  <!-- Category label -->
+  <text x="${pad}" y="${catY}" font-family="Arial, Helvetica, sans-serif"
+        font-size="${catSz}" font-weight="bold" fill="#8B1E1E"
+        letter-spacing="${Math.round(catSz * 0.18)}">${esc(category.toUpperCase())}</text>
+  <!-- Headline line 1 -->
+  <text x="${pad}" y="${line1Y}" font-family="Arial, Helvetica, sans-serif"
+        font-size="${headSz}" font-weight="bold" fill="#C8B99A">${esc(line1)}</text>
+  ${line2 ? `<!-- Headline line 2 -->
+  <text x="${pad}" y="${line2Y}" font-family="Arial, Helvetica, sans-serif"
+        font-size="${headSz}" font-weight="bold" fill="#C8B99A">${esc(line2)}</text>` : ''}
+</svg>`;
+
+  return sharp(imageBuffer)
+    .composite([{ input: Buffer.from(svg), blend: 'over' }])
+    .jpeg({ quality: 90 })
+    .toBuffer();
+}
+
 // ── RSS helpers ───────────────────────────────────────────────────────────────
 
 interface BlogPostMeta {
@@ -539,6 +614,14 @@ Return a JSON object with these exact fields:
       const imagePrompt = buildImagePrompt(slug, post.category);
       console.log(`[generate-blog] image prompt: ${imagePrompt}`);
       imageBuffer = await generateKieImage(kieKey, imagePrompt);
+      if (imageBuffer) {
+        try {
+          imageBuffer = await compositeOverlay(imageBuffer, post.displayTitle, post.category);
+          console.log(`[generate-blog] brand overlay composited`);
+        } catch (overlayErr) {
+          console.error('Overlay composite failed (using raw image):', overlayErr instanceof Error ? overlayErr.message : String(overlayErr));
+        }
+      }
     } catch (imgErr) {
       console.error('Kie.ai threw:', imgErr instanceof Error ? imgErr.message : String(imgErr));
     }
@@ -625,13 +708,18 @@ Return a JSON object with these exact fields:
     try {
       const fallbackRes = await fetch(FALLBACK_IMG);
       if (fallbackRes.ok) {
-        const ab = await fallbackRes.arrayBuffer();
+        let fallbackBuf = Buffer.from(await fallbackRes.arrayBuffer());
+        try {
+          fallbackBuf = await compositeOverlay(fallbackBuf, post.displayTitle, post.category);
+        } catch (overlayErr) {
+          console.error('Overlay on fallback failed (using raw fallback):', overlayErr instanceof Error ? overlayErr.message : String(overlayErr));
+        }
         let existingImgSha: string | null = null;
         try {
           const existing = await getGitHubFile(githubToken, githubRepo, imgPath);
           existingImgSha = existing.sha;
         } catch (_) { /* file doesn't exist yet */ }
-        await putGitHubBinary(githubToken, githubRepo, githubBranch, imgPath, Buffer.from(ab), existingImgSha, `Add fallback hero image: ${slug}`);
+        await putGitHubBinary(githubToken, githubRepo, githubBranch, imgPath, fallbackBuf, existingImgSha, `Add fallback hero image: ${slug}`);
         console.log(`Kie.ai image unavailable — used fallback for ${slug}`);
       } else {
         console.error(`Could not fetch fallback image: ${fallbackRes.status}`);
