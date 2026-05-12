@@ -6,6 +6,15 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Business Credit Building Arizona: Complete Guide 2024",
+      displayTitle: "Business Credit Building in Arizona: How to Fund Your Growth the Right Way",
+      date: "May 12, 2026",
+      issue: 'No. 029',
+      category: "Credit Repair",
+      excerpt: "Building business credit in Arizona is one of the most powerful moves a small business owner can make—yet most skip it entirely. This guide walks you through every step, from setting up your business foundation to accessing real funding. RAH Operations helps Arizona businesses build the credit profile they need to grow.",
+      slug: 'business-credit-building-arizona'
+    },
+    {
       title: "Google Business Profile Management Scottsdale AZ",
       displayTitle: "Google Business Profile Management in Scottsdale: The Complete Guide to Dominating Local Search",
       date: "May 12, 2026",
