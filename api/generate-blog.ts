@@ -94,77 +94,113 @@ function formatDateISO(d: Date): string {
 }
 
 async function generateKieImage(apiKey: string, prompt: string): Promise<Buffer | null> {
-  // Submit generation task
-  const submitRes = await fetch('https://api.kie.ai/api/v1/jobs/createTask', {
+  const submitUrl = 'https://api.kie.ai/api/v1/jobs/createTask';
+  const submitBody = {
+    model: 'flux-2/pro-text-to-image',
+    input: { prompt, aspect_ratio: '16:9', resolution: '1K', nsfw_checker: false },
+  };
+
+  console.log(`[kie] POST ${submitUrl}`);
+  console.log(`[kie] submit body: ${JSON.stringify(submitBody)}`);
+  console.log(`[kie] api key present: ${!!apiKey}, key prefix: ${apiKey.slice(0, 8)}...`);
+
+  const submitRes = await fetch(submitUrl, {
     method: 'POST',
     headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'flux-2/pro-text-to-image',
-      input: { prompt, aspect_ratio: '16:9', resolution: '1K', nsfw_checker: false },
-    }),
+    body: JSON.stringify(submitBody),
   });
 
+  const submitRaw = await submitRes.text();
+  console.log(`[kie] submit response status: ${submitRes.status}`);
+  console.log(`[kie] submit response body: ${submitRaw.slice(0, 500)}`);
+
   if (!submitRes.ok) {
-    const err = await submitRes.text();
-    console.error(`Kie.ai submit error: ${submitRes.status} — ${err.slice(0, 300)}`);
+    console.error(`[kie] FALLBACK: submit HTTP error ${submitRes.status}`);
     return null;
   }
 
-  const submitData = await submitRes.json() as { code: number; data?: { taskId?: string } };
+  let submitData: { code: number; data?: { taskId?: string } };
+  try {
+    submitData = JSON.parse(submitRaw);
+  } catch {
+    console.error(`[kie] FALLBACK: submit response is not valid JSON`);
+    return null;
+  }
+
   const taskId = submitData.data?.taskId;
   if (!taskId) {
-    console.error('Kie.ai submit returned no taskId:', JSON.stringify(submitData).slice(0, 200));
+    console.error(`[kie] FALLBACK: no taskId in submit response. code=${submitData.code}, data=${JSON.stringify(submitData.data)}`);
     return null;
   }
 
-  console.log(`Kie.ai task submitted: ${taskId}`);
+  console.log(`[kie] task created: ${taskId}`);
 
-  // Poll every 3 seconds, up to 10 attempts
   const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
   for (let attempt = 1; attempt <= 10; attempt++) {
     await sleep(3000);
 
-    const pollRes = await fetch(
-      `https://api.kie.ai/api/v1/jobs/recordInfo?taskId=${encodeURIComponent(taskId)}`,
-      { headers: { Authorization: `Bearer ${apiKey}` } },
-    );
+    const pollUrl = `https://api.kie.ai/api/v1/jobs/recordInfo?taskId=${encodeURIComponent(taskId)}`;
+    console.log(`[kie] poll attempt ${attempt}: GET ${pollUrl}`);
+
+    const pollRes = await fetch(pollUrl, { headers: { Authorization: `Bearer ${apiKey}` } });
+    const pollRaw = await pollRes.text();
+    console.log(`[kie] poll ${attempt} status: ${pollRes.status}, body: ${pollRaw.slice(0, 400)}`);
 
     if (!pollRes.ok) {
-      console.error(`Kie.ai poll error attempt ${attempt}: ${pollRes.status}`);
+      console.error(`[kie] poll ${attempt}: HTTP error ${pollRes.status}`);
       continue;
     }
 
-    const pollData = await pollRes.json() as {
-      code: number;
-      data?: { state?: string; resultJson?: string; failMsg?: string };
-    };
+    let pollData: { code: number; data?: { state?: string; resultJson?: string; failMsg?: string } };
+    try {
+      pollData = JSON.parse(pollRaw);
+    } catch {
+      console.error(`[kie] poll ${attempt}: response is not valid JSON`);
+      continue;
+    }
+
     const state = pollData.data?.state;
-    console.log(`Kie.ai poll attempt ${attempt}: state=${state}`);
+    console.log(`[kie] poll ${attempt}: state=${state}, failMsg=${pollData.data?.failMsg ?? 'none'}`);
 
     if (state === 'success') {
       const resultJson = pollData.data?.resultJson;
-      if (!resultJson) { console.error('Kie.ai success but no resultJson'); return null; }
+      if (!resultJson) {
+        console.error(`[kie] FALLBACK: state=success but resultJson is empty`);
+        return null;
+      }
+      console.log(`[kie] resultJson: ${resultJson.slice(0, 300)}`);
       let urls: string[];
       try {
         urls = (JSON.parse(resultJson) as { resultUrls: string[] }).resultUrls;
       } catch {
-        console.error('Kie.ai resultJson parse failed:', resultJson.slice(0, 200));
+        console.error(`[kie] FALLBACK: resultJson parse failed: ${resultJson.slice(0, 200)}`);
         return null;
       }
-      if (!urls?.[0]) { console.error('Kie.ai resultUrls empty'); return null; }
+      if (!urls?.[0]) {
+        console.error(`[kie] FALLBACK: resultUrls is empty`);
+        return null;
+      }
+      console.log(`[kie] downloading image from: ${urls[0]}`);
       const dl = await fetch(urls[0]);
-      if (!dl.ok) { console.error(`Kie.ai image download failed: ${dl.status}`); return null; }
-      return Buffer.from(await dl.arrayBuffer());
+      console.log(`[kie] image download status: ${dl.status}`);
+      if (!dl.ok) {
+        console.error(`[kie] FALLBACK: image download failed with status ${dl.status}`);
+        return null;
+      }
+      const buf = Buffer.from(await dl.arrayBuffer());
+      console.log(`[kie] image downloaded successfully — ${buf.length} bytes`);
+      return buf;
     }
 
     if (state === 'fail') {
-      console.error(`Kie.ai task failed: ${pollData.data?.failMsg ?? 'unknown'}`);
+      console.error(`[kie] FALLBACK: task failed. failMsg=${pollData.data?.failMsg ?? 'unknown'}`);
       return null;
     }
-    // state is waiting / queuing / generating — keep polling
+
+    console.log(`[kie] poll ${attempt}: state="${state}" — continuing to poll`);
   }
 
-  console.error(`Kie.ai timed out after 10 attempts (taskId: ${taskId})`);
+  console.error(`[kie] FALLBACK: timed out after 10 polls (30s) — taskId=${taskId}`);
   return null;
 }
 
