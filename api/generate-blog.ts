@@ -300,22 +300,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const keyword = slug.replace(/-/g, ' ');
   const today = new Date();
 
-  // ── STEP 2: call Claude API ─────────────────────────────────────────────────
-  const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'x-api-key': anthropicKey,
-      'anthropic-version': '2023-06-01',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 4000,
-      system: 'You are an expert SEO content writer for RAH Operations, a Scottsdale AZ digital agency offering website design, SEO, digital marketing, social media management, and credit repair. Write blog posts that rank on Google for local Arizona searches. Always write in a confident, helpful, expert tone. Never use filler content.',
-      messages: [
-        {
-          role: 'user',
-          content: `Write a complete SEO blog post targeting the keyword: ${keyword}.
+  // ── STEP 2: call Claude API (with one retry on parse failure) ──────────────
+  const callClaude = async (): Promise<string> => {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': anthropicKey,
+        'anthropic-version': '2023-06-01',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 4000,
+        system: 'You are an expert SEO content writer for RAH Operations, a Scottsdale AZ digital agency offering website design, SEO, digital marketing, social media management, and credit repair. Write blog posts that rank on Google for local Arizona searches. Always write in a confident, helpful, expert tone. Never use filler content.',
+        messages: [
+          {
+            role: 'user',
+            content: `Write a complete SEO blog post targeting the keyword: ${keyword}.
 
 Return ONLY a JSON object with these exact fields:
 {
@@ -327,42 +328,60 @@ Return ONLY a JSON object with these exact fields:
   "content": "Full HTML blog post content with these requirements: Opening paragraph with primary keyword in first 100 words. 5-6 H2 sections with 150-250 words each. Internal links using <a href='/website-design-and-seo'>anchor text</a> format. Link to these pages naturally throughout: /website-design-and-seo, /digital-marketing, /social-media-management, /personal-credit-repair, /business-credit-and-funding, /website-intake, /marketing/intake, /credit-repair/intake. FAQ section with 3 questions. Closing CTA paragraph linking to most relevant intake form. 1200-1600 words total",
   "imagePrompt": "Detailed image generation prompt for a professional blog hero image. Style: clean, modern, professional Arizona business context. No text in image. Horizontal format 1200x630."
 }`,
-        },
-      ],
-    }),
-  });
-
-  if (!claudeRes.ok) {
-    const err = await claudeRes.text();
-    return res.status(500).json({ error: `Claude API error: ${claudeRes.status}`, detail: err });
-  }
-
-  const claudeData = await claudeRes.json() as { content: Array<{ type: string; text: string }> };
-  const rawText = claudeData.content[0]?.text ?? '';
-
-  // Strip markdown code fences if present
-  let cleanText = rawText.trim();
-  if (cleanText.startsWith('```json')) {
-    cleanText = cleanText.slice(7);
-  }
-  if (cleanText.startsWith('```')) {
-    cleanText = cleanText.slice(3);
-  }
-  if (cleanText.endsWith('```')) {
-    cleanText = cleanText.slice(0, -3);
-  }
-  cleanText = cleanText.trim();
-
-  // Parse the cleaned JSON
-  let post: ClaudePost;
-  try {
-    post = JSON.parse(cleanText) as ClaudePost;
-  } catch (parseErr) {
-    console.error('Raw Claude response:', rawText.slice(0, 500));
-    return res.status(500).json({
-      error: 'Failed to parse Claude JSON',
-      raw: rawText.slice(0, 200)
+          },
+        ],
+      }),
     });
+    if (!r.ok) {
+      const err = await r.text();
+      throw new Error(`Claude API error: ${r.status} — ${err.slice(0, 300)}`);
+    }
+    const data = await r.json() as { content: Array<{ type: string; text: string }> };
+    return data.content[0]?.text ?? '';
+  };
+
+  const parseClaude = (rawText: string): ClaudePost => {
+    // Strip any opening/closing code fences (```json, ```, with or without trailing newline)
+    const clean = rawText.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
+    return JSON.parse(clean) as ClaudePost;
+  };
+
+  let post: ClaudePost;
+
+  let rawText1: string;
+  try {
+    rawText1 = await callClaude();
+  } catch (err) {
+    return res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
+  }
+  console.log(`[generate-blog] Claude attempt 1 — ${rawText1.length} chars:`, rawText1.slice(0, 1000));
+
+  try {
+    post = parseClaude(rawText1);
+  } catch (parseErr1) {
+    console.error('[generate-blog] Parse attempt 1 failed:', parseErr1 instanceof Error ? parseErr1.message : String(parseErr1));
+    console.log('[generate-blog] Retrying Claude API call...');
+
+    let rawText2: string;
+    try {
+      rawText2 = await callClaude();
+    } catch (err) {
+      return res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
+    }
+    console.log(`[generate-blog] Claude attempt 2 — ${rawText2.length} chars:`, rawText2.slice(0, 1000));
+
+    try {
+      post = parseClaude(rawText2);
+    } catch (parseErr2) {
+      console.error('[generate-blog] Parse attempt 2 failed:', parseErr2 instanceof Error ? parseErr2.message : String(parseErr2));
+      return res.status(500).json({
+        error: 'Failed to parse Claude JSON after 2 attempts',
+        attempt1_length: rawText1.length,
+        attempt1_preview: rawText1.slice(0, 600),
+        attempt2_length: rawText2.length,
+        attempt2_preview: rawText2.slice(0, 600),
+      });
+    }
   }
 
   // ── STEP 3: generate image via Kie.ai ───────────────────────────────────────
