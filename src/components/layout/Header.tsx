@@ -43,7 +43,7 @@ const Header = () => {
   const isHomePage = location.pathname === '/';
 
   const navCls = (active: boolean) =>
-    `relative px-1 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] transition-colors duration-200 ${
+    `relative px-1 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] whitespace-nowrap transition-colors duration-200 ${
       active ? 'text-[#F5F5F5]' : 'text-[#666666] hover:text-[#F5F5F5]'
     }`;
 
@@ -98,7 +98,7 @@ const Header = () => {
 
             {/* Website Design & SEO — direct link */}
             <Link to="/website-design-and-seo" className={navCls(isWebDesignActive)}>
-              Website Design & SEO
+              Web Design & SEO
               <span className={`absolute bottom-0 left-0 h-px bg-[#F5F5F5] transition-all duration-200 ${isWebDesignActive ? 'w-full' : 'w-0'}`} />
             </Link>
 
@@ -169,11 +169,11 @@ const Header = () => {
             {/* Free Audit accent link */}
             <Link
               to="/website-audit"
-              className={`relative px-1 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] transition-colors duration-200 ${
+              className={`relative px-1 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] whitespace-nowrap transition-colors duration-200 ${
                 location.pathname === '/website-audit' ? 'text-luxury-accent' : 'text-luxury-light hover:text-luxury-accent'
               }`}
             >
-              Free Audit →
+              Audit →
               <span className={`absolute bottom-0 left-0 h-px bg-luxury-accent transition-all duration-200 ${location.pathname === '/website-audit' ? 'w-full' : 'w-0'}`} />
             </Link>
           </nav>
