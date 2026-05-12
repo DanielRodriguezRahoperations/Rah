@@ -6,6 +6,15 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Social Media Management Scottsdale | RAH Operations",
+      displayTitle: "Social Media Management in Scottsdale: How Local Businesses Are Winning Online in 2025",
+      date: "May 12, 2026",
+      issue: 'No. 023',
+      category: "Social Media",
+      excerpt: "Scottsdale businesses are leaving revenue on the table by ignoring social media — or worse, managing it inconsistently. RAH Operations delivers professional social media management built specifically for the Arizona market, turning followers into loyal customers and likes into real revenue.",
+      slug: 'social-media-management-scottsdale'
+    },
+    {
       title: "Affordable SEO Services Scottsdale | RAH Operations",
       displayTitle: "Affordable SEO Services in Scottsdale: What You Actually Get — and Why It Matters",
       date: "May 12, 2026",
