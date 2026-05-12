@@ -93,6 +93,81 @@ function formatDateISO(d: Date): string {
   return d.toISOString().split('T')[0];
 }
 
+async function generateKieImage(apiKey: string, prompt: string): Promise<Buffer | null> {
+  // Submit generation task
+  const submitRes = await fetch('https://api.kie.ai/api/v1/jobs/createTask', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'flux-2/pro-text-to-image',
+      input: { prompt, aspect_ratio: '16:9', resolution: '1K', nsfw_checker: false },
+    }),
+  });
+
+  if (!submitRes.ok) {
+    const err = await submitRes.text();
+    console.error(`Kie.ai submit error: ${submitRes.status} — ${err.slice(0, 300)}`);
+    return null;
+  }
+
+  const submitData = await submitRes.json() as { code: number; data?: { taskId?: string } };
+  const taskId = submitData.data?.taskId;
+  if (!taskId) {
+    console.error('Kie.ai submit returned no taskId:', JSON.stringify(submitData).slice(0, 200));
+    return null;
+  }
+
+  console.log(`Kie.ai task submitted: ${taskId}`);
+
+  // Poll every 3 seconds, up to 10 attempts
+  const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+  for (let attempt = 1; attempt <= 10; attempt++) {
+    await sleep(3000);
+
+    const pollRes = await fetch(
+      `https://api.kie.ai/api/v1/jobs/recordInfo?taskId=${encodeURIComponent(taskId)}`,
+      { headers: { Authorization: `Bearer ${apiKey}` } },
+    );
+
+    if (!pollRes.ok) {
+      console.error(`Kie.ai poll error attempt ${attempt}: ${pollRes.status}`);
+      continue;
+    }
+
+    const pollData = await pollRes.json() as {
+      code: number;
+      data?: { state?: string; resultJson?: string; failMsg?: string };
+    };
+    const state = pollData.data?.state;
+    console.log(`Kie.ai poll attempt ${attempt}: state=${state}`);
+
+    if (state === 'success') {
+      const resultJson = pollData.data?.resultJson;
+      if (!resultJson) { console.error('Kie.ai success but no resultJson'); return null; }
+      let urls: string[];
+      try {
+        urls = (JSON.parse(resultJson) as { resultUrls: string[] }).resultUrls;
+      } catch {
+        console.error('Kie.ai resultJson parse failed:', resultJson.slice(0, 200));
+        return null;
+      }
+      if (!urls?.[0]) { console.error('Kie.ai resultUrls empty'); return null; }
+      const dl = await fetch(urls[0]);
+      if (!dl.ok) { console.error(`Kie.ai image download failed: ${dl.status}`); return null; }
+      return Buffer.from(await dl.arrayBuffer());
+    }
+
+    if (state === 'fail') {
+      console.error(`Kie.ai task failed: ${pollData.data?.failMsg ?? 'unknown'}`);
+      return null;
+    }
+    // state is waiting / queuing / generating — keep polling
+  }
+
+  console.error(`Kie.ai timed out after 10 attempts (taskId: ${taskId})`);
+  return null;
+}
+
 interface ClaudePost {
   title: string;
   displayTitle: string;
@@ -256,36 +331,12 @@ Return ONLY a JSON object with these exact fields:
   }
 
   // ── STEP 3: generate image via Kie.ai ───────────────────────────────────────
-  let imageBuffer: Buffer | null = null;
   const FALLBACK_IMG = `https://raw.githubusercontent.com/${githubRepo}/${githubBranch}/public/blogs/how-to-improve-google-business-profile-scottsdale.jpg`;
+  let imageBuffer: Buffer | null = null;
 
   if (kieKey) {
     try {
-      const imgRes = await fetch('https://api.kie.ai/v1/images/generations', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${kieKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: post.imagePrompt, n: 1, size: '1792x1024' }),
-      });
-      if (imgRes.ok) {
-        const imgData = await imgRes.json() as { data?: Array<{ url?: string; b64_json?: string }> };
-        const item = imgData.data?.[0];
-        if (item?.b64_json) {
-          imageBuffer = Buffer.from(item.b64_json, 'base64');
-        } else if (item?.url) {
-          const download = await fetch(item.url);
-          if (download.ok) {
-            const ab = await download.arrayBuffer();
-            imageBuffer = Buffer.from(ab);
-          } else {
-            console.error(`Kie.ai image download failed: ${download.status} ${download.statusText}`);
-          }
-        } else {
-          console.error('Kie.ai returned no url or b64_json:', JSON.stringify(imgData).slice(0, 300));
-        }
-      } else {
-        const errBody = await imgRes.text();
-        console.error(`Kie.ai API error: ${imgRes.status} ${imgRes.statusText} — ${errBody.slice(0, 400)}`);
-      }
+      imageBuffer = await generateKieImage(kieKey, post.imagePrompt);
     } catch (imgErr) {
       console.error('Kie.ai threw:', imgErr instanceof Error ? imgErr.message : String(imgErr));
     }

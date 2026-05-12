@@ -7,6 +7,78 @@ function validateAdmin(req: VercelRequest): boolean {
   return req.headers.authorization === expected;
 }
 
+async function generateKieImage(apiKey: string, prompt: string): Promise<Buffer | null> {
+  const submitRes = await fetch('https://api.kie.ai/api/v1/jobs/createTask', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'flux-2/pro-text-to-image',
+      input: { prompt, aspect_ratio: '16:9', resolution: '1K', nsfw_checker: false },
+    }),
+  });
+
+  if (!submitRes.ok) {
+    const err = await submitRes.text();
+    console.error(`Kie.ai submit error: ${submitRes.status} — ${err.slice(0, 300)}`);
+    return null;
+  }
+
+  const submitData = await submitRes.json() as { code: number; data?: { taskId?: string } };
+  const taskId = submitData.data?.taskId;
+  if (!taskId) {
+    console.error('Kie.ai submit returned no taskId:', JSON.stringify(submitData).slice(0, 200));
+    return null;
+  }
+
+  console.log(`Kie.ai task submitted: ${taskId}`);
+
+  const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+  for (let attempt = 1; attempt <= 10; attempt++) {
+    await sleep(3000);
+
+    const pollRes = await fetch(
+      `https://api.kie.ai/api/v1/jobs/recordInfo?taskId=${encodeURIComponent(taskId)}`,
+      { headers: { Authorization: `Bearer ${apiKey}` } },
+    );
+
+    if (!pollRes.ok) {
+      console.error(`Kie.ai poll error attempt ${attempt}: ${pollRes.status}`);
+      continue;
+    }
+
+    const pollData = await pollRes.json() as {
+      code: number;
+      data?: { state?: string; resultJson?: string; failMsg?: string };
+    };
+    const state = pollData.data?.state;
+    console.log(`Kie.ai poll attempt ${attempt}: state=${state}`);
+
+    if (state === 'success') {
+      const resultJson = pollData.data?.resultJson;
+      if (!resultJson) { console.error('Kie.ai success but no resultJson'); return null; }
+      let urls: string[];
+      try {
+        urls = (JSON.parse(resultJson) as { resultUrls: string[] }).resultUrls;
+      } catch {
+        console.error('Kie.ai resultJson parse failed:', resultJson.slice(0, 200));
+        return null;
+      }
+      if (!urls?.[0]) { console.error('Kie.ai resultUrls empty'); return null; }
+      const dl = await fetch(urls[0]);
+      if (!dl.ok) { console.error(`Kie.ai image download failed: ${dl.status}`); return null; }
+      return Buffer.from(await dl.arrayBuffer());
+    }
+
+    if (state === 'fail') {
+      console.error(`Kie.ai task failed: ${pollData.data?.failMsg ?? 'unknown'}`);
+      return null;
+    }
+  }
+
+  console.error(`Kie.ai timed out after 10 attempts (taskId: ${taskId})`);
+  return null;
+}
+
 async function getGitHubFileSha(token: string, repo: string, path: string): Promise<string | null> {
   const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
     headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json' },
@@ -52,34 +124,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // ── Attempt Kie.ai image generation ─────────────────────────────────────────
   let imageBuffer: Buffer | null = null;
+  let usedKie = false;
 
   if (kieKey) {
     try {
-      const prompt = `Professional hero image for a blog post about "${keyword}". Clean, modern, Arizona business context. No text in image. Horizontal format 1200x630.`;
-      const imgRes = await fetch('https://api.kie.ai/v1/images/generations', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${kieKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, n: 1, size: '1792x1024' }),
-      });
-      if (imgRes.ok) {
-        const imgData = await imgRes.json() as { data?: Array<{ url?: string; b64_json?: string }> };
-        const item = imgData.data?.[0];
-        if (item?.b64_json) {
-          imageBuffer = Buffer.from(item.b64_json, 'base64');
-        } else if (item?.url) {
-          const download = await fetch(item.url);
-          if (download.ok) {
-            imageBuffer = Buffer.from(await download.arrayBuffer());
-          } else {
-            console.error(`Kie.ai download failed: ${download.status}`);
-          }
-        } else {
-          console.error('Kie.ai returned no url or b64_json:', JSON.stringify(imgData).slice(0, 200));
-        }
-      } else {
-        const errBody = await imgRes.text();
-        console.error(`Kie.ai error: ${imgRes.status} — ${errBody.slice(0, 300)}`);
-      }
+      const prompt = `Professional hero image for a blog post about "${keyword}". Clean, modern, Arizona business context. No text in image. Horizontal 16:9 format.`;
+      imageBuffer = await generateKieImage(kieKey, prompt);
+      if (imageBuffer) usedKie = true;
     } catch (err) {
       console.error('Kie.ai threw:', err instanceof Error ? err.message : String(err));
     }
@@ -110,7 +161,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     success: true,
     slug,
     path: imgPath,
-    source: imageBuffer ? (kieKey ? 'kie.ai' : 'fallback') : 'fallback',
+    source: usedKie ? 'kie.ai' : 'fallback',
     message: `Image pushed to ${imgPath}. Vercel will redeploy shortly.`,
   });
 }
