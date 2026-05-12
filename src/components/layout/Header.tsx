@@ -56,7 +56,7 @@ const Header = () => {
     }`;
 
   const isPortalActive = ['/portal', '/portal/dashboard', '/marketing/portal', '/marketing/portal/dashboard'].includes(location.pathname);
-  const isWebDesignActive = ['/website-design-and-seo', '/services/website-design-scottsdale', '/services/website-design-phoenix', '/services/seo-scottsdale', '/services/seo-phoenix'].includes(location.pathname);
+  const isWebDesignActive = location.pathname === '/website-design-and-seo';
   const isMarketingActive = ['/digital-marketing', '/social-media-management', '/reputation-management', '/services/google-business-profile-optimization-scottsdale'].includes(location.pathname);
   const isBusinessActive = ['/services', '/business-credit-and-funding', '/llc-setup', '/new-business-setup', '/notary-services'].includes(location.pathname);
 
@@ -117,11 +117,9 @@ const Header = () => {
                 className={`${dropdownCls(openDropdown === 'webdesign')} w-64 left-0`}
               >
                 {[
-                  { to: '/website-design-and-seo', label: 'Website Design & SEO', eyebrow: 'All locations' },
-                  { to: '/services/website-design-scottsdale', label: 'Website Design Scottsdale', eyebrow: 'Scottsdale' },
-                  { to: '/services/website-design-phoenix', label: 'Website Design Phoenix', eyebrow: 'Phoenix' },
-                  { to: '/services/seo-scottsdale', label: 'SEO Scottsdale', eyebrow: 'Scottsdale' },
-                  { to: '/services/seo-phoenix', label: 'SEO Phoenix', eyebrow: 'Phoenix' },
+                  { to: '/website-design-and-seo', label: 'Website Design & SEO', eyebrow: 'Overview' },
+                  { to: '/website-design-and-seo', label: 'Web Design', eyebrow: 'Service' },
+                  { to: '/website-design-and-seo#seo', label: 'SEO Services', eyebrow: 'Service' },
                 ].map((item) => (
                   <Link
                     key={item.to}
@@ -332,10 +330,8 @@ const Header = () => {
               <div className="border-b border-[#1A1A1A] bg-[#111111]">
                 {[
                   { to: '/website-design-and-seo', label: 'Website Design & SEO' },
-                  { to: '/services/website-design-scottsdale', label: 'Website Design Scottsdale' },
-                  { to: '/services/website-design-phoenix', label: 'Website Design Phoenix' },
-                  { to: '/services/seo-scottsdale', label: 'SEO Scottsdale' },
-                  { to: '/services/seo-phoenix', label: 'SEO Phoenix' },
+                  { to: '/website-design-and-seo', label: 'Web Design' },
+                  { to: '/website-design-and-seo#seo', label: 'SEO Services' },
                 ].map((item) => (
                   <Link key={item.to} to={item.to} onClick={closeAllMenus} className="block border-b border-[#1A1A1A] px-4 py-3 last:border-b-0 text-[13px] text-[#888888]">
                     {item.label}
