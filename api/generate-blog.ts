@@ -263,18 +263,24 @@ function parseBlogPagePosts(source: string): BlogPostMeta[] {
   const match = source.match(/const posts\s*=\s*\[([\s\S]*?)\n\s*\];/);
   if (!match) return posts;
 
+  // Matches a field value in either single or double quotes
+  const field = (key: string, entry: string): string => {
+    // Double-quoted (handles escaped quotes inside)
+    const dq = entry.match(new RegExp(`\\b${key}:\\s*"((?:[^"\\\\]|\\\\.)*)"`));
+    if (dq) return dq[1].replace(/\\"/g, '"');
+    // Single-quoted
+    const sq = entry.match(new RegExp(`\\b${key}:\\s*'([^']*)'`));
+    if (sq) return sq[1];
+    return '';
+  };
+
   for (const entry of match[1].split(/(?=\n\s*\{)/)) {
-    const titleM   = entry.match(/\btitle:\s*"((?:[^"\\]|\\.)*)"/);
-    const excerptM = entry.match(/\bexcerpt:\s*"((?:[^"\\]|\\.)*)"/);
-    const slugM    = entry.match(/\bslug:\s*['"]([^'"]+)['"]/);
-    const dateM    = entry.match(/\bdate:\s*"([^"]+)"/);
-    if (titleM && excerptM && slugM && dateM) {
-      posts.push({
-        title:   titleM[1].replace(/\\"/g, '"'),
-        excerpt: excerptM[1].replace(/\\"/g, '"'),
-        slug:    slugM[1],
-        date:    dateM[1],
-      });
+    const slug = field('slug', entry);
+    const title = field('title', entry);
+    const excerpt = field('excerpt', entry);
+    const date = field('date', entry);
+    if (slug && title && date) {
+      posts.push({ title, excerpt, slug, date });
     }
   }
   return posts;
