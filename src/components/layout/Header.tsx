@@ -43,7 +43,7 @@ const Header = () => {
   const isHomePage = location.pathname === '/';
 
   const navCls = (active: boolean) =>
-    `relative px-1 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] transition-colors duration-200 ${
+    `relative px-1 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] transition-colors duration-200 ${
       active ? 'text-[#F5F5F5]' : 'text-[#666666] hover:text-[#F5F5F5]'
     }`;
 
@@ -94,7 +94,7 @@ const Header = () => {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden items-center gap-4 lg:flex">
+          <nav className="hidden items-center gap-2 lg:flex">
 
             {/* Website Design & SEO — direct link */}
             <Link to="/website-design-and-seo" className={navCls(isWebDesignActive)}>
@@ -169,7 +169,7 @@ const Header = () => {
             {/* Free Audit accent link */}
             <Link
               to="/website-audit"
-              className={`relative px-1 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] transition-colors duration-200 ${
+              className={`relative px-1 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] transition-colors duration-200 ${
                 location.pathname === '/website-audit' ? 'text-luxury-accent' : 'text-luxury-light hover:text-luxury-accent'
               }`}
             >
@@ -188,7 +188,7 @@ const Header = () => {
               <button
                 type="button"
                 onClick={() => toggle('portal')}
-                className={`flex items-center gap-1 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.22em] transition-colors duration-200 border ${
+                className={`flex items-center gap-1 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] transition-colors duration-200 border ${
                   isPortalActive
                     ? 'border-[#555555] text-[#F5F5F5]'
                     : 'border-[#2A2A2A] text-[#666666] hover:border-[#444444] hover:text-[#F5F5F5]'
@@ -225,7 +225,7 @@ const Header = () => {
             {/* Get Started CTA */}
             <Link
               to="/get-started"
-              className="border border-[#7A1C1C] bg-[#7A1C1C] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-white transition-opacity duration-200 hover:opacity-80 whitespace-nowrap"
+              className="border border-[#7A1C1C] bg-[#7A1C1C] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-white transition-opacity duration-200 hover:opacity-80 whitespace-nowrap"
             >
               Get Started
             </Link>

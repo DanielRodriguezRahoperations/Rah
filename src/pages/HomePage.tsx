@@ -715,7 +715,7 @@ const PortfolioCard = ({ domain, name, desc, to, url }: PortfolioItem) => {
           ref={iframeRef}
           src={url}
           title={name}
-          loading="eager"
+          loading="lazy"
           style={{ width: '1440px', height: '900px', transform: 'scale(0.35)', transformOrigin: 'top left', border: 'none', display: 'block', opacity: 0, transition: 'opacity 0.3s ease' }}
           onLoad={() => { const el = iframeRef.current; if (el) el.style.opacity = '1'; }}
         />
@@ -828,14 +828,19 @@ const HomePage = () => {
 
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
       <section className="relative flex min-h-[calc(100svh-72px)] flex-col items-center justify-center px-6 py-24 text-center overflow-hidden">
-        <div className="rah-orb-1 pointer-events-none absolute" style={{ top: '20%', left: '15%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(122,28,28,0.12) 0%, transparent 70%)', filter: 'blur(120px)' }} />
-        <div className="rah-orb-2 pointer-events-none absolute" style={{ bottom: '20%', right: '10%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(60,20,80,0.1) 0%, transparent 70%)', filter: 'blur(120px)' }} />
+        {/* Blur orbs are GPU-intensive — skip on mobile */}
+        {!IS_MOBILE && (
+          <>
+            <div className="rah-orb-1 pointer-events-none absolute" style={{ top: '20%', left: '15%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(122,28,28,0.12) 0%, transparent 70%)', filter: 'blur(120px)' }} />
+            <div className="rah-orb-2 pointer-events-none absolute" style={{ bottom: '20%', right: '10%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(60,20,80,0.1) 0%, transparent 70%)', filter: 'blur(120px)' }} />
+          </>
+        )}
 
         <div className="relative mx-auto w-full max-w-[680px]">
           <motion.p
-            initial={{ opacity: 0, letterSpacing: '0.05em' }}
+            initial={{ opacity: 0, letterSpacing: IS_MOBILE ? '0.25em' : '0.05em' }}
             animate={{ opacity: 1, letterSpacing: '0.25em' }}
-            transition={{ duration: 1, delay: 0.3 }}
+            transition={{ duration: IS_MOBILE ? 0.3 : 1, delay: IS_MOBILE ? 0 : 0.3 }}
             className="mb-7 text-[11px] font-medium uppercase text-[#555555]"
           >
             WEBSITE · MARKETING · CREDIT REPAIR
@@ -845,9 +850,9 @@ const HomePage = () => {
             {HERO_WORDS.map(({ text, br }, i) => (
               <Fragment key={i}>
                 <motion.span
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: IS_MOBILE ? 0 : 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.4 + i * 0.07, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: IS_MOBILE ? 0.3 : 0.5, delay: IS_MOBILE ? 0 : 0.4 + i * 0.07, ease: [0.16, 1, 0.3, 1] }}
                   style={{ display: 'inline-block' }}
                 >
                   {text}
@@ -858,18 +863,18 @@ const HomePage = () => {
           </h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: IS_MOBILE ? 0 : 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.85, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: IS_MOBILE ? 0.3 : 0.7, delay: IS_MOBILE ? 0 : 0.85, ease: [0.16, 1, 0.3, 1] }}
             className="mx-auto mb-10 max-w-[500px] text-[16px] leading-relaxed text-[#888888] sm:text-[17px]"
           >
             Website live in 7 days. Social media posting daily. Clients finding you on Google. All done for you — from Scottsdale to anywhere.
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: IS_MOBILE ? 0 : 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 1.0, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: IS_MOBILE ? 0.3 : 0.7, delay: IS_MOBILE ? 0 : 1.0, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col items-center gap-4"
           >
             <Link to="/services" className="inline-block rounded bg-[#7A1C1C] px-7 py-3 text-[13px] font-semibold text-white tracking-[0.02em] transition-opacity duration-200 hover:opacity-80">

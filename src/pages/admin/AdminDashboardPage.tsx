@@ -1119,7 +1119,7 @@ const AdminDashboardPage = () => {
                             <td className="py-3 px-4 text-neutral-500 text-xs whitespace-nowrap">{post.issue}</td>
                             <td className="py-3 px-4 text-white max-w-xs">
                               <a
-                                href={`/blog/${post.slug}`}
+                                href={`/blogs/${post.slug}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="hover:text-luxury-accent transition-colors line-clamp-2"
