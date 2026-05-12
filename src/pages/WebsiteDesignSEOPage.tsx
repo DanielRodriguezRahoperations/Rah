@@ -391,6 +391,29 @@ const WebsiteDesignSEOPage = () => {
         </div>
       </section>
 
+      {/* AUDIT BANNER */}
+      <section style={{ background: '#111111', borderTop: '1px solid #1e1e1e', borderBottom: '1px solid #1e1e1e', padding: '48px 24px' }}>
+        <div className="container-clean text-center" style={{ maxWidth: 640 }}>
+          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.22em', color: '#9d3f3f', textTransform: 'uppercase', marginBottom: 10 }}>
+            FREE TOOL
+          </p>
+          <h3 style={{ fontSize: 'clamp(1.3rem, 2.8vw, 1.9rem)', fontWeight: 700, color: '#F5F5F5', fontFamily: 'Playfair Display, serif', lineHeight: 1.2, marginBottom: 10 }}>
+            See how your current site stacks up.
+          </h3>
+          <p style={{ fontSize: 14, color: '#666666', lineHeight: 1.65, marginBottom: 24 }}>
+            Free audit — instant results. SSL, SEO, mobile, speed, and more.
+          </p>
+          <Link
+            to="/website-audit"
+            style={{ display: 'inline-block', background: '#7A1C1C', color: '#fff', padding: '11px 28px', fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', textDecoration: 'none', transition: 'background 0.2s' }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = '#9d3f3f')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = '#7A1C1C')}
+          >
+            Get Free Audit →
+          </Link>
+        </div>
+      </section>
+
       {/* PROBLEM */}
       <section className="section bg-slate-dark text-white">
         <div className="container-clean">

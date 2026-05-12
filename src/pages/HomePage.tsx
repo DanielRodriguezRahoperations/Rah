@@ -1084,6 +1084,30 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* ── AUDIT BANNER ──────────────────────────────────────────────────── */}
+      <section style={{ background: '#111111', borderTop: '1px solid #222222', borderBottom: '1px solid #222222', padding: '56px 24px' }}>
+        <div className="mx-auto max-w-3xl text-center">
+          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.22em', color: '#9d3f3f', textTransform: 'uppercase', marginBottom: 14 }}>
+            FREE FOR ANY BUSINESS
+          </p>
+          <h2 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.4rem)', fontWeight: 700, color: '#F5F5F5', fontFamily: 'Playfair Display, serif', lineHeight: 1.15, marginBottom: 14 }}>
+            How does your website score?
+          </h2>
+          <p style={{ fontSize: 15, color: '#666666', lineHeight: 1.7, maxWidth: 480, margin: '0 auto 28px' }}>
+            Get an instant audit — SEO, speed, mobile, and Google presence.
+            Takes 30 seconds. No credit card.
+          </p>
+          <Link
+            to="/website-audit"
+            style={{ display: 'inline-block', background: '#7A1C1C', color: '#fff', padding: '12px 32px', fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', textDecoration: 'none', transition: 'background 0.2s' }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = '#9d3f3f')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = '#7A1C1C')}
+          >
+            Run Free Audit →
+          </Link>
+        </div>
+      </section>
+
       {/* ── SPLIT CTA ─────────────────────────────────────────────────────── */}
       <Div />
       <section>

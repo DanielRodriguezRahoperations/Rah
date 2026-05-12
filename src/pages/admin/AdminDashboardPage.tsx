@@ -42,6 +42,18 @@ interface WebsiteClient {
   created_at: string;
 }
 
+interface AuditLead {
+  id: string;
+  domain: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  audit_score: number | null;
+  audit_results: { grade?: string } | null;
+  status: string;
+  created_at: string;
+}
+
 // ─── Status color maps ────────────────────────────────────────────────────────
 
 const STATUS_COLORS: Record<string, string> = {
@@ -69,11 +81,34 @@ const WEB_STATUS_COLORS: Record<string, string> = {
   cancelled: 'bg-neutral-800 text-neutral-300 border-neutral-700',
 };
 
+const AUDIT_STATUS_COLORS: Record<string, string> = {
+  new: 'bg-blue-950/50 text-blue-300 border-blue-900',
+  contacted: 'bg-amber-950/50 text-amber-300 border-amber-900',
+  converted: 'bg-green-950/50 text-green-300 border-green-900',
+  closed: 'bg-neutral-800 text-neutral-300 border-neutral-700',
+};
+
 // ─── Component ────────────────────────────────────────────────────────────────
+
+function auditScoreColor(score: number | null): string {
+  if (score === null) return 'text-neutral-500';
+  if (score >= 75) return 'text-green-400';
+  if (score >= 60) return 'text-amber-400';
+  return 'text-red-400';
+}
+
+function auditGrade(score: number | null): string {
+  if (score === null) return '—';
+  if (score >= 90) return 'A';
+  if (score >= 75) return 'B';
+  if (score >= 60) return 'C';
+  if (score >= 40) return 'D';
+  return 'F';
+}
 
 const AdminDashboardPage = () => {
   const navigate = useNavigate();
-  const [mainTab, setMainTab] = useState<'credit-repair' | 'marketing' | 'website'>('credit-repair');
+  const [mainTab, setMainTab] = useState<'credit-repair' | 'marketing' | 'website' | 'audits'>('credit-repair');
 
   // Credit repair state
   const [clients, setClients] = useState<Client[]>([]);
@@ -95,6 +130,14 @@ const AdminDashboardPage = () => {
   const [webError, setWebError] = useState('');
   const [webSearch, setWebSearch] = useState('');
   const [webFilter, setWebFilter] = useState('all');
+
+  // Audit leads state
+  const [auditLeads, setAuditLeads] = useState<AuditLead[]>([]);
+  const [auditLoading, setAuditLoading] = useState(false);
+  const [auditError, setAuditError] = useState('');
+  const [auditSearch, setAuditSearch] = useState('');
+  const [auditFilter, setAuditFilter] = useState('all');
+  const [auditUpdating, setAuditUpdating] = useState<string | null>(null);
 
   // SMS modal
   const [smsOpen, setSmsOpen] = useState(false);
@@ -124,6 +167,9 @@ const AdminDashboardPage = () => {
     }
     if (mainTab === 'website' && webClients.length === 0 && !webLoading) {
       fetchWebsiteClients();
+    }
+    if (mainTab === 'audits' && auditLeads.length === 0 && !auditLoading) {
+      fetchAuditLeads();
     }
   }, [mainTab]);
 
@@ -193,6 +239,32 @@ const AdminDashboardPage = () => {
     } finally {
       setWebLoading(false);
     }
+  };
+
+  const fetchAuditLeads = async () => {
+    setAuditLoading(true);
+    setAuditError('');
+    try {
+      const res = await fetch('/api/audit-leads', { headers: adminHeaders() });
+      if (res.status === 401) { clearAdminToken(); navigate('/admin/login', { replace: true }); return; }
+      const json = await res.json();
+      if (!res.ok) { setAuditError(json.error || 'Failed to load audit leads'); }
+      else { setAuditLeads(json.leads || []); }
+    } catch { setAuditError('Network error'); }
+    finally { setAuditLoading(false); }
+  };
+
+  const handleAuditStatusChange = async (leadId: string, status: string) => {
+    setAuditUpdating(leadId);
+    try {
+      await fetch('/api/audit-update-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+        body: JSON.stringify({ leadId, status }),
+      });
+      setAuditLeads((prev) => prev.map((l) => l.id === leadId ? { ...l, status } : l));
+    } catch { /* silent */ }
+    finally { setAuditUpdating(null); }
   };
 
   const handleLogout = () => {
@@ -294,9 +366,21 @@ const AdminDashboardPage = () => {
     );
   });
 
+  const filteredAudits = auditLeads.filter((l) => {
+    if (auditFilter !== 'all' && l.status !== auditFilter) return false;
+    if (!auditSearch) return true;
+    const q = auditSearch.toLowerCase();
+    return (
+      l.domain?.toLowerCase().includes(q) ||
+      l.name?.toLowerCase().includes(q) ||
+      l.email?.toLowerCase().includes(q)
+    );
+  });
+
   const statusOptions = ['all', 'intake', 'analyzing', 'letters_drafted', 'letters_mailed', 'awaiting_response', 'in_progress', 'resolved', 'closed'];
   const mktgStatusOptions = ['all', 'lead', 'active', 'paused', 'complete'];
   const webStatusOptions = ['all', 'new', 'in_progress', 'complete', 'cancelled'];
+  const auditStatusOptions = ['all', 'new', 'contacted', 'converted', 'closed'];
 
   return (
     <>
@@ -418,7 +502,7 @@ const AdminDashboardPage = () => {
                 Admin Dashboard
               </p>
               <h1 className="font-serif-display text-4xl text-white">
-                {mainTab === 'credit-repair' ? 'Credit Repair Clients' : mainTab === 'marketing' ? 'Marketing Clients' : 'Website Clients'}
+                {mainTab === 'credit-repair' ? 'Credit Repair Clients' : mainTab === 'marketing' ? 'Marketing Clients' : mainTab === 'website' ? 'Website Clients' : 'Audit Leads'}
               </h1>
             </div>
             <div className="flex items-center gap-3 self-start flex-wrap">
@@ -464,6 +548,14 @@ const AdminDashboardPage = () => {
                   Website Intake Form →
                 </a>
               )}
+              {mainTab === 'audits' && (
+                <button
+                  onClick={fetchAuditLeads}
+                  className="bg-luxury-red hover:bg-luxury-light text-white px-5 py-2 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
+                >
+                  Refresh
+                </button>
+              )}
               <button
                 onClick={handleLogout}
                 className="text-xs uppercase tracking-widest text-neutral-400 hover:text-white border border-neutral-800 hover:border-luxury-red px-4 py-2 rounded-sm transition-colors"
@@ -498,32 +590,29 @@ const AdminDashboardPage = () => {
           )}
 
           {/* Main tabs */}
-          <div className="flex border-b border-neutral-800 mb-6">
-            {(['credit-repair', 'marketing', 'website'] as const).map((tab) => (
+          <div className="flex border-b border-neutral-800 mb-6 overflow-x-auto">
+            {(['credit-repair', 'marketing', 'website', 'audits'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setMainTab(tab)}
-                className={`px-6 py-3 text-xs uppercase tracking-widest font-semibold transition-colors border-b-2 -mb-px ${
+                className={`px-6 py-3 text-xs uppercase tracking-widest font-semibold transition-colors border-b-2 -mb-px whitespace-nowrap ${
                   mainTab === tab
                     ? 'border-luxury-red text-white'
                     : 'border-transparent text-neutral-500 hover:text-neutral-300'
                 }`}
               >
-                {tab === 'credit-repair' ? 'Credit Repair' : tab === 'marketing' ? 'Marketing' : 'Website'}
+                {tab === 'credit-repair' ? 'Credit Repair' : tab === 'marketing' ? 'Marketing' : tab === 'website' ? 'Website' : 'Audits'}
                 {tab === 'credit-repair' && clients.length > 0 && (
-                  <span className="ml-2 text-[10px] bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded-sm">
-                    {clients.length}
-                  </span>
+                  <span className="ml-2 text-[10px] bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded-sm">{clients.length}</span>
                 )}
                 {tab === 'marketing' && mktgClients.length > 0 && (
-                  <span className="ml-2 text-[10px] bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded-sm">
-                    {mktgClients.length}
-                  </span>
+                  <span className="ml-2 text-[10px] bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded-sm">{mktgClients.length}</span>
                 )}
                 {tab === 'website' && webClients.length > 0 && (
-                  <span className="ml-2 text-[10px] bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded-sm">
-                    {webClients.length}
-                  </span>
+                  <span className="ml-2 text-[10px] bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded-sm">{webClients.length}</span>
+                )}
+                {tab === 'audits' && auditLeads.length > 0 && (
+                  <span className="ml-2 text-[10px] bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded-sm">{auditLeads.length}</span>
                 )}
               </button>
             ))}
@@ -823,6 +912,119 @@ const AdminDashboardPage = () => {
               {!webLoading && webClients.length > 0 && (
                 <div className="mt-6 text-xs text-neutral-500 text-right">
                   Showing {filteredWeb.length} of {webClients.length} clients
+                </div>
+              )}
+            </>
+          )}
+
+          {/* ── Audits Tab ── */}
+          {mainTab === 'audits' && (
+            <>
+              <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-4 mb-6 flex flex-col md:flex-row gap-3">
+                <input
+                  type="text"
+                  value={auditSearch}
+                  onChange={(e) => setAuditSearch(e.target.value)}
+                  placeholder="Search by domain, name, or email…"
+                  className="flex-1 bg-[#0f0f0f] border border-neutral-800 text-white px-3 py-2 rounded-sm text-sm focus:outline-none focus:border-luxury-red"
+                />
+                <select
+                  value={auditFilter}
+                  onChange={(e) => setAuditFilter(e.target.value)}
+                  className="bg-[#0f0f0f] border border-neutral-800 text-white px-3 py-2 rounded-sm text-sm focus:outline-none focus:border-luxury-red"
+                >
+                  {auditStatusOptions.map((s) => (
+                    <option key={s} value={s}>{s === 'all' ? 'All Statuses' : s.charAt(0).toUpperCase() + s.slice(1)}</option>
+                  ))}
+                </select>
+                <button
+                  onClick={fetchAuditLeads}
+                  className="bg-luxury-red hover:bg-luxury-light text-white px-4 py-2 rounded-sm text-sm uppercase tracking-widest transition-colors"
+                >
+                  Refresh
+                </button>
+              </div>
+
+              {auditLoading ? (
+                <div className="text-center py-20 text-neutral-500">Loading audit leads…</div>
+              ) : auditError ? (
+                <div className="bg-red-950/50 border border-red-900 text-red-200 text-sm px-4 py-3 rounded-sm">{auditError}</div>
+              ) : filteredAudits.length === 0 ? (
+                <div className="text-center py-20 text-neutral-500">
+                  {auditLeads.length === 0 ? 'No audit leads yet.' : 'No leads match your filters.'}
+                </div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden"
+                >
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-[#0f0f0f] border-b border-neutral-800">
+                        <tr className="text-left text-xs uppercase tracking-widest text-neutral-400">
+                          <th className="px-5 py-4">Domain</th>
+                          <th className="px-5 py-4">Name</th>
+                          <th className="px-5 py-4">Email</th>
+                          <th className="px-5 py-4">Score / Grade</th>
+                          <th className="px-5 py-4">Status</th>
+                          <th className="px-5 py-4">Date</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredAudits.map((l) => {
+                          const grade = auditGrade(l.audit_score);
+                          return (
+                            <tr key={l.id} className="border-b border-neutral-800/60 hover:bg-[#0f0f0f]/60 transition-colors">
+                              <td className="px-5 py-4 text-white font-medium">{l.domain}</td>
+                              <td className="px-5 py-4 text-neutral-300">{l.name}</td>
+                              <td className="px-5 py-4 text-neutral-300">{l.email}</td>
+                              <td className="px-5 py-4">
+                                {l.audit_score !== null ? (
+                                  <div className="flex items-center gap-2">
+                                    <span className={`font-mono font-bold text-sm ${auditScoreColor(l.audit_score)}`}>
+                                      {l.audit_score}
+                                    </span>
+                                    <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-sm border ${
+                                      grade === 'A' || grade === 'B'
+                                        ? 'bg-green-950/50 text-green-300 border-green-900'
+                                        : grade === 'C'
+                                        ? 'bg-amber-950/50 text-amber-300 border-amber-900'
+                                        : 'bg-red-950/50 text-red-300 border-red-900'
+                                    }`}>
+                                      {grade}
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <span className="text-neutral-600 text-xs">—</span>
+                                )}
+                              </td>
+                              <td className="px-5 py-4">
+                                <select
+                                  value={l.status}
+                                  disabled={auditUpdating === l.id}
+                                  onChange={(e) => handleAuditStatusChange(l.id, e.target.value)}
+                                  className={`bg-transparent text-[10px] uppercase tracking-widest font-semibold px-2 py-1 rounded-sm border focus:outline-none focus:border-luxury-red cursor-pointer ${AUDIT_STATUS_COLORS[l.status] || AUDIT_STATUS_COLORS.new}`}
+                                >
+                                  {auditStatusOptions.filter(s => s !== 'all').map((s) => (
+                                    <option key={s} value={s} className="bg-[#1a1a1a] text-white">{s}</option>
+                                  ))}
+                                </select>
+                              </td>
+                              <td className="px-5 py-4 text-neutral-400 text-xs">{new Date(l.created_at).toLocaleDateString()}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </motion.div>
+              )}
+
+              {!auditLoading && auditLeads.length > 0 && (
+                <div className="mt-6 text-xs text-neutral-500 text-right">
+                  Showing {filteredAudits.length} of {auditLeads.length} leads
                 </div>
               )}
             </>

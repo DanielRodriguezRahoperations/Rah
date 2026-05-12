@@ -233,6 +233,17 @@ const Header = () => {
               About
               <span className={`absolute bottom-0 left-0 h-px bg-[#F5F5F5] transition-all duration-200 ${location.pathname === '/about' ? 'w-full' : 'w-0'}`} />
             </Link>
+
+            {/* Free Audit accent link */}
+            <Link
+              to="/website-audit"
+              className={`relative px-1 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] transition-colors duration-200 ${
+                location.pathname === '/website-audit' ? 'text-luxury-accent' : 'text-luxury-light hover:text-luxury-accent'
+              }`}
+            >
+              Free Audit →
+              <span className={`absolute bottom-0 left-0 h-px bg-luxury-accent transition-all duration-200 ${location.pathname === '/website-audit' ? 'w-full' : 'w-0'}`} />
+            </Link>
           </nav>
 
           {/* Desktop right cluster */}
@@ -400,6 +411,7 @@ const Header = () => {
 
             <Link to="/portfolio" onClick={closeAllMenus} className="block border-b border-[#1A1A1A] py-4 text-[12px] font-semibold uppercase tracking-[0.18em] text-[#666666]">Work</Link>
             <Link to="/about" onClick={closeAllMenus} className="block border-b border-[#1A1A1A] py-4 text-[12px] font-semibold uppercase tracking-[0.18em] text-[#666666]">About</Link>
+            <Link to="/website-audit" onClick={closeAllMenus} className="block border-b border-[#1A1A1A] py-4 text-[12px] font-semibold uppercase tracking-[0.18em] text-[#9d3f3f]">Free Website Audit →</Link>
 
             {/* Client portals */}
             <div className="border-b border-[#1A1A1A] py-2">

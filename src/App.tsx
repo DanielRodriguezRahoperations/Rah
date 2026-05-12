@@ -47,6 +47,7 @@ import PortalDashboardPage from './pages/portal/PortalDashboardPage';
 // Website intake page
 import WebsiteIntakePage from './pages/WebsiteIntakePage';
 import GetStartedPage from './pages/GetStartedPage';
+import WebsiteAuditPage from './pages/WebsiteAuditPage';
 
 // Marketing pages
 import MarketingIntakePage from './pages/marketing/MarketingIntakePage';
@@ -165,6 +166,7 @@ function App() {
               {/* Public site — wrapped in Layout (nav + breadcrumbs + footer) */}
               <Route element={<Layout><Outlet /></Layout>}>
                 <Route path="/" element={<HomePage />} />
+                <Route path="/website-audit" element={<WebsiteAuditPage />} />
                 <Route path="/services" element={<ServicesPage />} />
                 <Route path="/website-design-and-seo" element={<WebsiteDesignSEOPage />} />
                 <Route path="/business-credit-and-funding" element={<BusinessCreditPage />} />
