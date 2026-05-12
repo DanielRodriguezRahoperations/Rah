@@ -6,6 +6,15 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Digital Marketing Agency Phoenix AZ | RAH Operations",
+      displayTitle: "Why Phoenix Businesses Are Choosing a Local Digital Marketing Agency to Dominate Their Market",
+      date: "May 12, 2026",
+      issue: 'No. 024',
+      category: "Digital Marketing",
+      excerpt: "Phoenix is one of the fastest-growing business markets in the country, and standing out online requires more than a basic website. RAH Operations is the Scottsdale-based digital marketing agency helping Phoenix businesses build visibility, generate leads, and grow revenue through proven strategies. Here's what working with a local agency actually looks like.",
+      slug: 'digital-marketing-agency-phoenix-az'
+    },
+    {
       title: "Social Media Management Scottsdale | RAH Operations",
       displayTitle: "Social Media Management in Scottsdale: How Local Businesses Are Winning Online in 2025",
       date: "May 12, 2026",
