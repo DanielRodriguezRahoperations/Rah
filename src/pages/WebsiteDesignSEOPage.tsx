@@ -331,7 +331,7 @@ const WebsiteDesignSEOPage = () => {
           <motion.div className="relative h-full" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 1, delay: 0.2 }}>
             <div className="relative">
               <div className="absolute -inset-8 border-4 border-luxury-red/20 -rotate-2 hidden lg:block" />
-              <img src="/newhero.png" alt="Website design and SEO" className="w-full relative z-10 border-4 border-slate-dark" />
+              <img src="/newhero.png" alt="Website design and SEO" className="w-full relative z-10 border-4 border-slate-dark" loading="lazy" decoding="async" />
             </div>
           </motion.div>
         </div>

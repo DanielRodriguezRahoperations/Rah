@@ -90,6 +90,8 @@ const EmpireBuildsAzCaseStudy = () => {
                   src="/emp.png"
                   alt="Empire Builds AZ website case study preview"
                   className="h-[300px] w-full object-cover sm:h-[440px] lg:h-[600px]"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
 

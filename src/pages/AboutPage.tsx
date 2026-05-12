@@ -57,6 +57,8 @@ const AboutPage = () => {
                   src="/newhero.png"
                   alt="RAH Operations team"
                   className="w-full h-auto"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
               <div className="absolute -bottom-12 -right-12 bg-luxury-red text-white p-8 border-4 border-white">
