@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "LLC Setup Arizona: Complete Guide for 2026",
+      displayTitle: "LLC Setup Arizona: Everything You Need to Know to Launch Your Business the Right Way",
+      date: "May 12, 2026",
+      pubDate: "Tue, 12 May 2026 22:55:49 GMT",
+      issue: 'No. 028',
+      category: "Business Services",
+      excerpt: "Setting up an LLC in Arizona is one of the smartest moves you can make as an entrepreneur, but the process has specific requirements you need to get right from day one. From filing your Articles of Organization to building your digital presence, this guide covers everything Arizona business owners need to know. RAH Operations helps local founders launch with confidence and grow with strategy.",
+      slug: 'llc-setup-arizona'
+    },
+    {
       title: "Credit Repair Services Scottsdale | RAH Operations",
       displayTitle: "Credit Repair Services in Scottsdale: Rebuild Your Score and Unlock Real Financial Opportunities",
       date: "May 12, 2026",
