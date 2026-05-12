@@ -103,6 +103,66 @@ interface ClaudePost {
   imagePrompt: string;
 }
 
+// ── RSS helpers ───────────────────────────────────────────────────────────────
+
+interface BlogPostMeta {
+  title: string;
+  excerpt: string;
+  slug: string;
+  date: string;
+}
+
+function parseBlogPagePosts(source: string): BlogPostMeta[] {
+  const posts: BlogPostMeta[] = [];
+  const match = source.match(/const posts\s*=\s*\[([\s\S]*?)\n\s*\];/);
+  if (!match) return posts;
+
+  for (const entry of match[1].split(/(?=\n\s*\{)/)) {
+    const titleM   = entry.match(/\btitle:\s*"((?:[^"\\]|\\.)*)"/);
+    const excerptM = entry.match(/\bexcerpt:\s*"((?:[^"\\]|\\.)*)"/);
+    const slugM    = entry.match(/\bslug:\s*['"]([^'"]+)['"]/);
+    const dateM    = entry.match(/\bdate:\s*"([^"]+)"/);
+    if (titleM && excerptM && slugM && dateM) {
+      posts.push({
+        title:   titleM[1].replace(/\\"/g, '"'),
+        excerpt: excerptM[1].replace(/\\"/g, '"'),
+        slug:    slugM[1],
+        date:    dateM[1],
+      });
+    }
+  }
+  return posts;
+}
+
+function toRFC822(displayDate: string): string {
+  const d = new Date(displayDate);
+  return isNaN(d.getTime()) ? new Date().toUTCString() : d.toUTCString();
+}
+
+function buildRSS(posts: BlogPostMeta[]): string {
+  const items = posts.map((p) => `  <item>
+    <title><![CDATA[${p.title}]]></title>
+    <link>https://www.rahoperations.com/blogs/${p.slug}</link>
+    <guid isPermaLink="true">https://www.rahoperations.com/blogs/${p.slug}</guid>
+    <description><![CDATA[${p.excerpt}]]></description>
+    <pubDate>${toRFC822(p.date)}</pubDate>
+    <enclosure url="https://www.rahoperations.com/blogs/${p.slug}.jpg" length="0" type="image/jpeg"/>
+  </item>`).join('\n');
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>RAH Operations — Business Growth Insights</title>
+    <link>https://www.rahoperations.com/blogs</link>
+    <atom:link href="https://www.rahoperations.com/rss.xml" rel="self" type="application/rss+xml"/>
+    <description>Website design, SEO, digital marketing, and credit repair insights for Arizona businesses.</description>
+    <language>en-us</language>
+    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+${items}
+  </channel>
+</rss>`;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   if (!validateAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
@@ -325,7 +385,25 @@ Return ONLY a JSON object with these exact fields:
     }
   }
 
-  // ── STEP 6: return success ───────────────────────────────────────────────────
+  // ── STEP 6: regenerate rss.xml ──────────────────────────────────────────────
+  try {
+    const allPosts = parseBlogPagePosts(updatedBlogPage);
+    if (allPosts.length > 0) {
+      const rssXml = buildRSS(allPosts);
+      let rssSha: string | null = null;
+      try {
+        const existingRss = await getGitHubFile(githubToken, githubRepo, 'public/rss.xml');
+        rssSha = existingRss.sha;
+      } catch (_) { /* rss.xml doesn't exist yet — will be created */ }
+      await putGitHubBinary(githubToken, githubRepo, githubBranch, 'public/rss.xml', Buffer.from(rssXml, 'utf8'), rssSha, `Regenerate rss.xml: add ${slug}`);
+    } else {
+      console.warn('RSS: no posts parsed from BlogPage.tsx — skipping rss.xml update');
+    }
+  } catch (rssErr) {
+    console.error('RSS generation failed:', rssErr instanceof Error ? rssErr.message : String(rssErr));
+  }
+
+  // ── STEP 7: return success ───────────────────────────────────────────────────
   return res.status(200).json({
     success: true,
     slug,
