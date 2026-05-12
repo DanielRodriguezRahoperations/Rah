@@ -197,7 +197,7 @@ Return ONLY a JSON object with these exact fields:
 
   // ── STEP 3: generate image via Kie.ai ───────────────────────────────────────
   let imageBuffer: Buffer | null = null;
-  let imageShaExisting: string | null = null;
+  const FALLBACK_IMG = `https://raw.githubusercontent.com/${githubRepo}/${githubBranch}/public/blogs/how-to-improve-google-business-profile-scottsdale.jpg`;
 
   if (kieKey) {
     try {
@@ -216,12 +216,21 @@ Return ONLY a JSON object with these exact fields:
           if (download.ok) {
             const ab = await download.arrayBuffer();
             imageBuffer = Buffer.from(ab);
+          } else {
+            console.error(`Kie.ai image download failed: ${download.status} ${download.statusText}`);
           }
+        } else {
+          console.error('Kie.ai returned no url or b64_json:', JSON.stringify(imgData).slice(0, 300));
         }
+      } else {
+        const errBody = await imgRes.text();
+        console.error(`Kie.ai API error: ${imgRes.status} ${imgRes.statusText} — ${errBody.slice(0, 400)}`);
       }
-    } catch (_) {
-      // Image generation is non-fatal; continue without image
+    } catch (imgErr) {
+      console.error('Kie.ai threw:', imgErr instanceof Error ? imgErr.message : String(imgErr));
     }
+  } else {
+    console.warn('KIE_API_KEY not set — skipping image generation');
   }
 
   // ── STEP 4: build file changes ───────────────────────────────────────────────
@@ -278,16 +287,42 @@ Return ONLY a JSON object with these exact fields:
   await putGitHubFile(githubToken, githubRepo, githubBranch, 'src/pages/BlogPost.tsx', updatedBlogPost, blogPostSha, `Add generated blog post data: ${slug}`);
   await putGitHubFile(githubToken, githubRepo, githubBranch, 'public/sitemap.xml', updatedSitemap, sitemapSha, `Sitemap: add /blogs/${slug}`);
 
+  const imgPath = `public/blogs/${slug}.jpg`;
+  let imageUploaded = false;
+
   if (imageBuffer) {
     try {
-      const imgPath = `public/blogs/${slug}.jpg`;
-      let existingImgSha: string | null = imageShaExisting;
+      let existingImgSha: string | null = null;
       try {
         const existing = await getGitHubFile(githubToken, githubRepo, imgPath);
         existingImgSha = existing.sha;
       } catch (_) { /* file doesn't exist yet */ }
       await putGitHubBinary(githubToken, githubRepo, githubBranch, imgPath, imageBuffer, existingImgSha, `Add blog hero image: ${slug}`);
-    } catch (_) { /* non-fatal */ }
+      imageUploaded = true;
+    } catch (imgPushErr) {
+      console.error('Failed to push blog image to GitHub:', imgPushErr instanceof Error ? imgPushErr.message : String(imgPushErr));
+    }
+  }
+
+  // If no image was pushed, copy the fallback so /blogs/[slug].jpg always resolves
+  if (!imageUploaded) {
+    try {
+      const fallbackRes = await fetch(FALLBACK_IMG);
+      if (fallbackRes.ok) {
+        const ab = await fallbackRes.arrayBuffer();
+        let existingImgSha: string | null = null;
+        try {
+          const existing = await getGitHubFile(githubToken, githubRepo, imgPath);
+          existingImgSha = existing.sha;
+        } catch (_) { /* file doesn't exist yet */ }
+        await putGitHubBinary(githubToken, githubRepo, githubBranch, imgPath, Buffer.from(ab), existingImgSha, `Add fallback hero image: ${slug}`);
+        console.log(`Kie.ai image unavailable — used fallback for ${slug}`);
+      } else {
+        console.error(`Could not fetch fallback image: ${fallbackRes.status}`);
+      }
+    } catch (fallbackErr) {
+      console.error('Fallback image push failed:', fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr));
+    }
   }
 
   // ── STEP 6: return success ───────────────────────────────────────────────────
@@ -296,6 +331,7 @@ Return ONLY a JSON object with these exact fields:
     slug,
     title: post.title,
     url: `https://www.rahoperations.com/blogs/${slug}`,
+    image: imageUploaded ? `generated` : `fallback`,
     message: 'Blog published. Vercel deploying. Make.com will post to GMB and Instagram within 15 minutes.',
   });
 }
