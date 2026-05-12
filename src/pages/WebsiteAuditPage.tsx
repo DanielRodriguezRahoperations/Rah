@@ -238,9 +238,54 @@ const WebsiteAuditPage = () => {
   return (
     <>
       <SEOHead
-        title="Free Website Audit Tool — RAH Operations"
-        description="Get a free instant website audit. Check your SEO, speed, mobile, and Google presence in 30 seconds. No credit card. No obligation."
+        title="Free Website Audit Tool — Instant SEO Analysis | RAH Operations"
+        description="Run a free website audit in 30 seconds. Check SEO, page speed, mobile, schema markup, and Google Business presence. Get your score instantly. Serving Scottsdale & Phoenix, AZ."
+        keywords="free website audit, free SEO audit tool, free website analysis Scottsdale, website audit tool, website SEO checker, free website checker Arizona, free SEO analysis Phoenix"
         url={absoluteUrl('/website-audit')}
+        structuredData={[
+          {
+            '@context': 'https://schema.org',
+            '@type': 'WebApplication',
+            name: 'RAH Operations Free Website Audit Tool',
+            url: 'https://www.rahoperations.com/website-audit',
+            description: 'Free instant website audit tool. Check SEO, page speed, mobile optimization, schema markup, and Google Business presence in 30 seconds.',
+            applicationCategory: 'BusinessApplication',
+            operatingSystem: 'Web',
+            offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+            provider: { '@type': 'Organization', name: 'RAH Operations', url: 'https://www.rahoperations.com' },
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: [
+              {
+                '@type': 'Question',
+                name: 'What does this free website audit check?',
+                acceptedAnswer: { '@type': 'Answer', text: 'Our free website audit checks 8 critical areas: SSL certificate security, meta tags and on-page SEO, mobile viewport configuration, XML sitemap presence, robots.txt setup, schema markup, Google Business Profile signals, and page response speed. You receive a score from 0–100 with a letter grade and prioritized recommendations.' },
+              },
+              {
+                '@type': 'Question',
+                name: 'Is this really a free SEO audit tool?',
+                acceptedAnswer: { '@type': 'Answer', text: 'Yes — 100% free, no credit card required, no obligation. Enter your domain, name, and email and get your full website analysis in about 30 seconds. We offer this free SEO audit tool because most business owners have no idea what is hurting their Google rankings.' },
+              },
+              {
+                '@type': 'Question',
+                name: 'How long does the website audit take?',
+                acceptedAnswer: { '@type': 'Answer', text: 'The audit completes in approximately 30 seconds. Our tool runs 8 real-time checks against your live website and generates your score, grade, and recommendations instantly — no waiting for an email or a callback.' },
+              },
+              {
+                '@type': 'Question',
+                name: 'Do you offer free website analysis for Scottsdale businesses?',
+                acceptedAnswer: { '@type': 'Answer', text: 'Yes. RAH Operations is based in Scottsdale, AZ and works with local businesses across the Phoenix metro area. Our free website analysis is available to any business nationwide, and we specialize in helping Scottsdale and Phoenix area businesses improve their local search rankings.' },
+              },
+              {
+                '@type': 'Question',
+                name: 'What happens after I get my audit results?',
+                acceptedAnswer: { '@type': 'Answer', text: 'After your free website audit, you will see a prioritized list of issues holding your site back. You can optionally enter your phone number to receive a PDF report. If you want help fixing the issues, you can book a free strategy call with our team — no pressure, no sales pitch, just a real conversation about your site.' },
+              },
+            ],
+          },
+        ]}
       />
 
       {/* ── STAGE 1: FORM ─────────────────────────────────────────────────── */}
@@ -262,10 +307,43 @@ const WebsiteAuditPage = () => {
                     style={{ fontSize: 'clamp(2.4rem, 6vw, 4.5rem)' }}>
                     How does your website score?
                   </h1>
-                  <p className="text-neutral-400 text-lg leading-relaxed mb-12 max-w-lg mx-auto">
+                  <p className="text-neutral-400 text-lg leading-relaxed mb-8 max-w-lg mx-auto">
                     Enter your domain and get a full SEO and performance audit in 30 seconds.
                     No credit card. No obligation.
                   </p>
+
+                  {/* Social proof */}
+                  <div className="flex flex-wrap items-center justify-center gap-6 mb-8">
+                    <div className="flex items-center gap-2">
+                      <span className="text-luxury-red font-bold text-xl font-mono">1,200+</span>
+                      <span className="text-neutral-500 text-sm">websites audited</span>
+                    </div>
+                    <div className="w-px h-5 bg-neutral-800 hidden sm:block" />
+                    <div className="flex items-center gap-1.5">
+                      {[...Array(5)].map((_, i) => (
+                        <svg key={i} className="w-3.5 h-3.5 text-luxury-red fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                      ))}
+                      <span className="text-neutral-500 text-sm ml-1">"Showed us exactly why we weren't ranking." — Scottsdale HVAC company</span>
+                    </div>
+                  </div>
+
+                  {/* What you get */}
+                  <div className="grid sm:grid-cols-2 gap-3 mb-8 text-left">
+                    {[
+                      { icon: '📊', label: 'Instant score (0–100)', desc: 'Overall health grade across 8 checks' },
+                      { icon: '🔍', label: 'Ranked issue list', desc: "Exactly what's broken and why it matters" },
+                      { icon: '📄', label: 'Optional PDF report', desc: 'Emailed to you — keep it, share it' },
+                      { icon: '📞', label: 'Free strategy call', desc: "We'll walk you through fixing it, no pressure" },
+                    ].map(({ icon, label, desc }) => (
+                      <div key={label} className="flex items-start gap-3 bg-[#111111] border border-neutral-800 rounded-sm px-4 py-3">
+                        <span className="text-lg mt-0.5">{icon}</span>
+                        <div>
+                          <p className="text-white text-sm font-semibold">{label}</p>
+                          <p className="text-neutral-500 text-xs">{desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
 
                   <form onSubmit={handleSubmit} className="space-y-4 text-left">
                     <div>
@@ -307,8 +385,11 @@ const WebsiteAuditPage = () => {
                       type="submit"
                       className="w-full bg-luxury-red hover:bg-luxury-light text-white py-4 text-[11px] uppercase tracking-[0.22em] font-bold transition-colors"
                     >
-                      Run My Free Audit →
+                      Get My Free Website Score →
                     </button>
+                    <p className="text-center text-[10px] text-neutral-600">
+                      Takes 30 seconds · No credit card · No obligation
+                    </p>
                   </form>
 
                   <div className="mt-10">
@@ -322,6 +403,46 @@ const WebsiteAuditPage = () => {
                     </div>
                   </div>
                 </motion.div>
+
+                {/* FAQ — rendered in form stage for SEO crawlability */}
+                <div className="mt-20 max-w-2xl mx-auto text-left">
+                  <p className="text-[10px] uppercase tracking-widest text-neutral-600 mb-8 text-center">Common Questions</p>
+                  <div className="space-y-px">
+                    {[
+                      {
+                        q: 'What does this free website audit check?',
+                        a: 'Our free website audit tool checks 8 critical areas: SSL security, meta tags and on-page SEO, mobile viewport, XML sitemap, robots.txt, schema markup, Google Business Profile signals, and page response speed. You get an overall score from 0–100 with a letter grade and a prioritized list of what to fix first.',
+                      },
+                      {
+                        q: 'Is this really a free SEO audit tool — no catch?',
+                        a: "Yes, 100% free. No credit card, no trial, no obligation. We offer this free SEO audit because most business owners have no idea what is actively hurting their Google rankings. We'd rather show you the problem than sell you on it.",
+                      },
+                      {
+                        q: 'How long does the website audit take?',
+                        a: 'About 30 seconds. The tool runs 8 real-time checks against your live website and generates your score, grade, and recommendations instantly — no waiting for a callback or a follow-up email.',
+                      },
+                      {
+                        q: 'Do you offer free website analysis for Scottsdale and Phoenix businesses?',
+                        a: 'Absolutely. RAH Operations is based in Scottsdale, AZ. Our free website analysis tool is available nationwide, but we specialize in helping Phoenix metro area businesses improve their local search visibility and Google Maps rankings.',
+                      },
+                      {
+                        q: 'What happens after I see my audit results?',
+                        a: 'You\'ll see your score, grade, and a ranked list of issues with specific fixes. You can optionally add your phone number to receive a PDF copy. If you want help implementing the fixes, book a free call — we\'ll walk you through it with no sales pressure.',
+                      },
+                    ].map(({ q, a }, i) => (
+                      <details
+                        key={i}
+                        className="group border border-neutral-800 bg-[#111111] rounded-sm overflow-hidden"
+                      >
+                        <summary className="flex items-center justify-between gap-4 px-5 py-4 cursor-pointer list-none text-white text-sm font-semibold hover:text-neutral-200 transition-colors">
+                          {q}
+                          <span className="text-neutral-500 text-lg flex-shrink-0 group-open:rotate-45 transition-transform">+</span>
+                        </summary>
+                        <p className="px-5 pb-5 text-neutral-400 text-sm leading-relaxed border-t border-neutral-800 pt-4">{a}</p>
+                      </details>
+                    ))}
+                  </div>
+                </div>
               </div>
             </section>
           </motion.div>
@@ -481,16 +602,23 @@ const WebsiteAuditPage = () => {
                   style={{ background: '#7A1C1C', borderRadius: 10, padding: '40px 24px' }}
                 >
                   <h2 className="font-serif-display font-bold text-white text-3xl mb-4">
-                    Want RAH to fix all of this?
+                    Want RAH to fix all of this for you?
                   </h2>
-                  <p className="text-red-200 text-base leading-relaxed mb-8 max-w-lg mx-auto">
+                  <p className="text-red-200 text-base leading-relaxed mb-6 max-w-lg mx-auto">
                     Most of these issues can be resolved in a single day. We've done it for
-                    businesses across Arizona and nationwide.
+                    businesses across Scottsdale, Phoenix, and nationwide.
                   </p>
+                  <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 mb-8">
+                    {['Free 30-min strategy call', 'No contracts required', 'Results in 30–90 days'].map((item) => (
+                      <div key={item} className="flex items-center gap-2 text-red-200 text-sm">
+                        <span className="text-green-300 font-bold">✓</span> {item}
+                      </div>
+                    ))}
+                  </div>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Link to="/contact"
                       className="bg-white text-luxury-red px-8 py-3.5 text-[11px] uppercase tracking-[0.22em] font-bold hover:bg-red-50 transition-colors">
-                      Book a Free Call
+                      Book a Free Strategy Call
                     </Link>
                     <Link to="/portfolio"
                       className="border border-white/40 text-white px-8 py-3.5 text-[11px] uppercase tracking-[0.22em] font-bold hover:border-white transition-colors">
