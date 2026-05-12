@@ -13,7 +13,7 @@ async function generateKieImage(apiKey: string, prompt: string): Promise<Buffer 
     headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'flux-2/pro-text-to-image',
-      input: { prompt, aspect_ratio: '16:9', resolution: '1K', nsfw_checker: false },
+      input: { prompt, aspect_ratio: '1:1', resolution: '1K', nsfw_checker: false },
     }),
   });
 

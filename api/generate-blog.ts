@@ -97,7 +97,7 @@ async function generateKieImage(apiKey: string, prompt: string): Promise<Buffer 
   const submitUrl = 'https://api.kie.ai/api/v1/jobs/createTask';
   const submitBody = {
     model: 'flux-2/pro-text-to-image',
-    input: { prompt, aspect_ratio: '16:9', resolution: '1K', nsfw_checker: false },
+    input: { prompt, aspect_ratio: '1:1', resolution: '1K', nsfw_checker: false },
   };
 
   console.log(`[kie] POST ${submitUrl}`);
