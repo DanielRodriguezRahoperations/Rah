@@ -7,47 +7,59 @@ function validateAdmin(req: VercelRequest): boolean {
   return req.headers.authorization === expected;
 }
 
+// 40 topics in round-robin order across 10 service categories.
+// The generator picks the first unpublished slug via find(), so this interleaving
+// guarantees no category repeats until all others have been covered.
+//
+// Categories (count): Website Design (4) | SEO (4) | Social Media (4) |
+//   Credit Repair (5) | Business Credit (5) | LLC / Formation (5) |
+//   Notary (3) | Reputation (4) | Google Business Profile (3) | AZ General (3)
 const TOPICS = [
-  'website-design-company-scottsdale-az',
-  'affordable-seo-services-scottsdale',
-  'social-media-management-scottsdale',
-  'digital-marketing-agency-phoenix-az',
-  'credit-repair-services-scottsdale',
-  'best-website-designer-near-me-scottsdale',
-  'local-seo-services-phoenix-az',
-  'google-business-profile-management-scottsdale',
-  'business-credit-building-arizona',
-  'reputation-management-scottsdale',
-  'llc-setup-arizona',
-  'new-business-setup-scottsdale',
-  'website-redesign-scottsdale',
-  'ecommerce-website-design-phoenix',
-  'wordpress-vs-custom-website-scottsdale',
-  'how-to-get-more-customers-online-scottsdale',
-  'social-media-marketing-phoenix-az',
-  'instagram-marketing-scottsdale-business',
-  'facebook-advertising-phoenix-az',
-  'content-marketing-strategy-scottsdale',
-  'website-maintenance-scottsdale',
-  'mobile-website-design-scottsdale',
-  'landing-page-design-scottsdale',
-  'email-marketing-scottsdale-business',
-  'online-reputation-management-phoenix',
-  'yelp-review-management-scottsdale',
-  'google-ads-management-scottsdale',
-  'video-marketing-scottsdale-business',
-  'brand-identity-design-scottsdale',
-  'website-speed-optimization-scottsdale',
-  'chatbot-integration-scottsdale-website',
-  'crm-setup-small-business-arizona',
-  'business-automation-tools-scottsdale',
-  'notary-services-scottsdale-az',
-  'apostille-services-arizona',
-  'personal-credit-repair-phoenix-az',
-  'remove-collections-credit-report-arizona',
-  'business-credit-cards-no-personal-guarantee',
-  'how-to-build-business-credit-fast-arizona',
-  'startup-business-services-scottsdale',
+  // ── Round 1 ─────────────────────────────────────────────────────────────────
+  'website-design-company-scottsdale-az',            // Website Design
+  'affordable-seo-services-scottsdale',              // SEO
+  'social-media-management-scottsdale',              // Social Media
+  'credit-repair-services-scottsdale',               // Credit Repair
+  'business-credit-building-arizona',                // Business Credit
+  'llc-setup-arizona',                               // LLC / Formation
+  'notary-services-scottsdale-az',                   // Notary
+  'reputation-management-scottsdale',                // Reputation Mgmt
+  'google-business-profile-optimization-scottsdale', // Google Business Profile
+  'arizona-small-business-growth-strategies',        // AZ General
+  // ── Round 2 ─────────────────────────────────────────────────────────────────
+  'ecommerce-website-design-phoenix',                // Website Design
+  'local-seo-services-phoenix-az',                   // SEO
+  'instagram-marketing-scottsdale-business',         // Social Media
+  'personal-credit-repair-phoenix-az',               // Credit Repair
+  'business-credit-cards-no-personal-guarantee',     // Business Credit
+  'new-business-setup-scottsdale',                   // LLC / Formation
+  'apostille-services-arizona',                      // Notary
+  'online-reputation-management-phoenix',            // Reputation Mgmt
+  'google-maps-ranking-phoenix-business',            // Google Business Profile
+  'best-business-services-scottsdale-az',            // AZ General
+  // ── Round 3 ─────────────────────────────────────────────────────────────────
+  'wordpress-vs-custom-website-scottsdale',          // Website Design
+  'technical-seo-audit-scottsdale-business',         // SEO
+  'facebook-advertising-phoenix-az',                 // Social Media
+  'remove-collections-credit-report-arizona',        // Credit Repair
+  'how-to-build-business-credit-fast-arizona',       // Business Credit
+  'startup-business-services-scottsdale',            // LLC / Formation
+  'mobile-notary-phoenix-arizona',                   // Notary
+  'yelp-review-management-scottsdale',               // Reputation Mgmt
+  'google-business-photos-tips-arizona',             // Google Business Profile
+  'scottsdale-business-owner-guide-to-online-presence', // AZ General
+  // ── Round 4 ─────────────────────────────────────────────────────────────────
+  'mobile-website-design-scottsdale',                // Website Design
+  'on-page-seo-optimization-scottsdale',             // SEO
+  'tiktok-marketing-scottsdale-small-business',      // Social Media
+  'how-to-raise-credit-score-100-points-arizona',    // Credit Repair
+  'net-30-vendors-for-new-business-arizona',         // Business Credit
+  'arizona-llc-vs-corporation-which-is-better',      // LLC / Formation
+  'how-to-respond-to-negative-reviews-arizona',      // Reputation Mgmt
+  // ── Round 5 — Credit Repair, Business Credit, LLC only ──────────────────────
+  'debt-settlement-vs-credit-repair-arizona',        // Credit Repair
+  'business-funding-options-scottsdale-startup',     // Business Credit
+  'how-to-register-a-business-in-arizona',           // LLC / Formation
 ];
 
 async function getGitHubFile(token: string, repo: string, path: string): Promise<{ content: string; sha: string }> {
@@ -240,6 +252,7 @@ const IMAGE_SCENES: Array<[string, string]> = [
   ['rank-on-google',      'confident business owner centered at a premium desk reviewing rising search rankings on a large monitor, clean modern Scottsdale office, warm golden light'],
   ['seo',                 'SEO professional centered at a premium workstation reviewing organic ranking growth charts, clean Scottsdale office, soft desert landscape visible through large window'],
   // Social & Marketing
+  ['tiktok',              'social media creator centered holding a smartphone filming short-form video content, bright clean Scottsdale studio, warm editorial lifestyle lighting'],
   ['instagram',           'content creator centered holding a smartphone with a polished Instagram grid on screen, clean bright Scottsdale studio background, warm lifestyle lighting'],
   ['facebook',            'marketing professional centered at a premium laptop reviewing a social media campaign, clean warm-lit Scottsdale creative workspace, blurred office background'],
   ['video-marketing',     'videographer centered behind a professional camera on tripod in a clean Scottsdale studio, warm directional lighting, minimal background'],
@@ -249,10 +262,12 @@ const IMAGE_SCENES: Array<[string, string]> = [
   ['social-media',        'content creator centered at a premium backlit workspace reviewing social media analytics on screen, Scottsdale Arizona, clean modern background'],
   ['digital-marketing',   'business owner centered at a premium laptop reviewing marketing performance dashboards, Scottsdale office, floor-to-ceiling desert view softly blurred behind'],
   // Credit & Finance
+  ['credit-score',        'determined Arizona entrepreneur centered at a premium laptop watching their credit score climb on screen, clean modern Scottsdale office, warm aspirational desert light'],
   ['personal-credit',     'confident entrepreneur centered at a premium desk reviewing credit score improvement on a tablet, clean modern Scottsdale office, warm desert light'],
   ['business-credit',     'executive centered in a premium Scottsdale boardroom holding a sleek black business credit card, clean background, warm directional light'],
   ['credit-repair',       'determined Arizona entrepreneur centered at a premium laptop reviewing improving financial charts, clean modern office, warm Scottsdale afternoon light'],
   ['remove-collections',  'professional centered at a clean modern desk reviewing financial documents on a premium laptop, Scottsdale office setting, warm side lighting'],
+  ['negative-review',     'composed business owner centered at a premium desk professionally responding to online reviews on a laptop, clean modern Scottsdale office, confident warm lighting'],
   ['business-funding',    'executive centered signing business funding documents at a clean Scottsdale boardroom table, soft desert-mountain view through windows behind'],
   // Business Services
   ['llc',                 'business attorney or owner centered at a marble desk with LLC formation documents and a premium pen, clean Scottsdale office, warm editorial lighting'],
