@@ -6,6 +6,15 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Google Business Profile Management Scottsdale AZ",
+      displayTitle: "Google Business Profile Management in Scottsdale: The Complete Guide to Dominating Local Search",
+      date: "May 12, 2026",
+      issue: 'No. 028',
+      category: "SEO",
+      excerpt: "Your Google Business Profile is the single most powerful free tool for local visibility in Scottsdale — but only if it's managed correctly. Most businesses set it up once and forget it, leaving clicks, calls, and revenue on the table. RAH Operations delivers professional Google Business Profile management that turns your listing into a lead-generating machine.",
+      slug: 'google-business-profile-management-scottsdale'
+    },
+    {
       title: "Local SEO Services Phoenix AZ | RAH Operations",
       displayTitle: "Local SEO Services in Phoenix AZ: How to Dominate Google Search in Your Own Backyard",
       date: "May 12, 2026",
