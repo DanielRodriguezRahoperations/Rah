@@ -6,6 +6,15 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Affordable SEO Services Scottsdale | RAH Operations",
+      displayTitle: "Affordable SEO Services in Scottsdale: What You Actually Get — and Why It Matters",
+      date: "May 12, 2026",
+      issue: 'No. 022',
+      category: "SEO",
+      excerpt: "Affordable SEO in Scottsdale doesn't have to mean cutting corners. RAH Operations helps local businesses rank higher on Google with transparent, results-driven strategies built for the Arizona market. Here's exactly what smart SEO investment looks like in 2024.",
+      slug: 'affordable-seo-services-scottsdale'
+    },
+    {
       title: "Website Design Company Scottsdale AZ | RAH Operations",
       displayTitle: "Why Scottsdale Businesses Choose RAH Operations as Their Website Design Company",
       date: "May 12, 2026",
