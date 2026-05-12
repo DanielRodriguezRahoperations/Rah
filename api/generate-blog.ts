@@ -96,8 +96,16 @@ function formatDateISO(d: Date): string {
 async function generateKieImage(apiKey: string, prompt: string): Promise<Buffer | null> {
   const submitUrl = 'https://api.kie.ai/api/v1/jobs/createTask';
   const submitBody = {
-    model: 'flux-2/pro-text-to-image',
-    input: { prompt, aspect_ratio: '1:1', resolution: '1K', nsfw_checker: false },
+    model: 'ideogram/v3-text-to-image',
+    input: {
+      prompt,
+      rendering_speed: 'QUALITY',
+      style: 'DESIGN',
+      expand_prompt: true,
+      image_size: 'square_hd',
+      negative_prompt: 'text, logos, watermarks, blurry, low quality, distorted, AI-looking, cartoon, illustration, generic, stock photo, boring, plain, corporate',
+      nsfw_checker: true,
+    },
   };
 
   console.log(`[kie] POST ${submitUrl}`);
@@ -211,7 +219,83 @@ interface ClaudePost {
   category: string;
   excerpt: string;
   content: string;
-  imagePrompt: string;
+}
+
+// Ordered slug-pattern → scene pairs. First match wins (most specific first).
+const IMAGE_SCENES: Array<[string, string]> = [
+  // Website Design
+  ['ecommerce',           'business owner centered at a premium desk reviewing a luxury ecommerce storefront on a large monitor, clean Scottsdale home office with soft desert light behind'],
+  ['wordpress',           'web developer centered at a premium dual-monitor workstation with clean code filling the screens, modern Scottsdale glass-walled office, blurred desert backdrop'],
+  ['mobile-website',      'professional holding a smartphone centered in frame displaying a polished mobile website, shallow depth of field, warm Scottsdale golden-hour window light'],
+  ['website-redesign',    'designer centered at a large curved monitor displaying a beautifully redesigned website, clean Scottsdale studio, warm side lighting, blurred background'],
+  ['website-speed',       'professional centered at a premium laptop with a fast-loading website on screen, clean minimal Scottsdale desk setup, warm Arizona afternoon light'],
+  ['website-maintenance', 'confident developer centered at a premium workstation reviewing a clean codebase, modern Scottsdale office, soft desert mountain view through window behind'],
+  ['landing-page',        'UX designer centered at a premium desk reviewing a high-converting landing page on screen, clean Scottsdale creative studio, warm directional light'],
+  ['website-design',      'professional centered at a sleek dual-monitor workstation displaying a beautifully designed website, modern Scottsdale studio, warm golden light from window'],
+  // SEO
+  ['local-seo',           'marketing professional centered at a premium laptop reviewing local search rankings, Scottsdale Old Town architecture softly visible through large windows behind'],
+  ['google-business',     'business owner centered at a premium laptop with Google Business Profile on screen, clean Scottsdale office, soft desert landscape through floor-to-ceiling windows'],
+  ['google-ads',          'marketing professional centered at a premium laptop reviewing a high-performing Google Ads dashboard, clean Scottsdale office, warm Arizona afternoon light'],
+  ['google-maps',         'professional centered holding a smartphone with a Google Maps business listing on screen, clean background, warm Scottsdale golden-hour light'],
+  ['rank-on-google',      'confident business owner centered at a premium desk reviewing rising search rankings on a large monitor, clean modern Scottsdale office, warm golden light'],
+  ['seo',                 'SEO professional centered at a premium workstation reviewing organic ranking growth charts, clean Scottsdale office, soft desert landscape visible through large window'],
+  // Social & Marketing
+  ['instagram',           'content creator centered holding a smartphone with a polished Instagram grid on screen, clean bright Scottsdale studio background, warm lifestyle lighting'],
+  ['facebook',            'marketing professional centered at a premium laptop reviewing a social media campaign, clean warm-lit Scottsdale creative workspace, blurred office background'],
+  ['video-marketing',     'videographer centered behind a professional camera on tripod in a clean Scottsdale studio, warm directional lighting, minimal background'],
+  ['content-marketing',   'content strategist centered at a premium laptop with an artisan coffee beside them, clean Scottsdale creative studio, soft desert light through large windows'],
+  ['email-marketing',     'professional centered at a minimalist desk reviewing an elegant email campaign on a laptop, clean Scottsdale workspace, warm natural Arizona light'],
+  ['brand-identity',      'creative director centered at a premium desk with a brand moodboard spread in front, clean Scottsdale studio, warm editorial side lighting'],
+  ['social-media',        'content creator centered at a premium backlit workspace reviewing social media analytics on screen, Scottsdale Arizona, clean modern background'],
+  ['digital-marketing',   'business owner centered at a premium laptop reviewing marketing performance dashboards, Scottsdale office, floor-to-ceiling desert view softly blurred behind'],
+  // Credit & Finance
+  ['personal-credit',     'confident entrepreneur centered at a premium desk reviewing credit score improvement on a tablet, clean modern Scottsdale office, warm desert light'],
+  ['business-credit',     'executive centered in a premium Scottsdale boardroom holding a sleek black business credit card, clean background, warm directional light'],
+  ['credit-repair',       'determined Arizona entrepreneur centered at a premium laptop reviewing improving financial charts, clean modern office, warm Scottsdale afternoon light'],
+  ['remove-collections',  'professional centered at a clean modern desk reviewing financial documents on a premium laptop, Scottsdale office setting, warm side lighting'],
+  ['business-funding',    'executive centered signing business funding documents at a clean Scottsdale boardroom table, soft desert-mountain view through windows behind'],
+  // Business Services
+  ['llc',                 'business attorney or owner centered at a marble desk with LLC formation documents and a premium pen, clean Scottsdale office, warm editorial lighting'],
+  ['notary',              'professional notary centered at an elegant desk stamping official documents, clean marble surface, Scottsdale office, warm directional side lighting'],
+  ['apostille',           'professional centered at a clean desk with sealed official documents and a luxury fountain pen, minimal Scottsdale legal office background, warm light'],
+  ['startup',             'ambitious entrepreneur centered in a glass-walled Scottsdale coworking space reviewing a business plan, energetic morning light, clean modern background'],
+  ['new-business',        'business founder centered at a modern Scottsdale office desk reviewing a business plan, aspirational golden morning light, clean uncluttered background'],
+  ['crm',                 'business owner centered at a premium wide monitor reviewing a clean CRM analytics dashboard, Scottsdale office, soft desert mountain backdrop through window'],
+  ['automation',          'tech-forward professional centered at a large curved monitor reviewing a workflow automation dashboard, sleek Scottsdale office, warm ambient lighting'],
+  ['chatbot',             'professional centered at a sleek premium laptop with an AI chat interface on screen, modern Scottsdale office, clean background, warm ambient light'],
+  ['reputation',          'business owner centered at a premium desk smiling while reviewing five-star ratings on a tablet, clean modern Scottsdale office background, warm light'],
+  // Generic intent
+  ['how-to',              'professional business owner centered at a premium workstation reviewing success metrics on screen, clean Scottsdale luxury office, warm desert afternoon light'],
+  ['how-much',            'business owner and advisor centered in discussion at a clean Scottsdale boardroom table, warm golden Arizona light, minimal background'],
+  ['best-',               'professional centered at a premium multi-screen workstation reviewing performance analytics, clean warm Scottsdale office atmosphere, desert view behind'],
+  ['why-',                'confident Arizona business leader centered in a modern glass-walled Scottsdale office, clean background, aspirational warm golden light'],
+];
+
+const CATEGORY_SCENES: Record<string, string> = {
+  'Website Design':    'professional centered at a premium dual-monitor workstation displaying a beautiful website, clean Scottsdale design studio, warm desert light from large windows',
+  'SEO':               'SEO professional centered at a premium laptop reviewing organic ranking growth, clean Scottsdale office, soft desert landscape through large window behind',
+  'Digital Marketing': 'marketer centered at a premium laptop reviewing campaign analytics dashboards, clean modern Scottsdale agency office, warm professional atmosphere',
+  'Social Media':      'content creator centered at a premium laptop reviewing social media performance metrics, clean Scottsdale workspace, warm editorial lighting',
+  'Credit Repair':     'confident entrepreneur centered at a premium desk reviewing improving financial charts, clean modern Scottsdale office, warm desert afternoon light',
+  'Business Services': 'business professional centered at a clean Scottsdale boardroom table reviewing documents, warm golden Arizona light, minimal uncluttered background',
+};
+
+function buildImagePrompt(slug: string, category: string): string {
+  const slugLower = slug.toLowerCase();
+  let scene = '';
+
+  for (const [pattern, sceneDesc] of IMAGE_SCENES) {
+    if (slugLower.includes(pattern)) {
+      scene = sceneDesc;
+      break;
+    }
+  }
+
+  if (!scene) {
+    scene = CATEGORY_SCENES[category] ?? 'professional business owner centered at a premium modern desk overlooking the Scottsdale skyline, warm golden light, clean uncluttered background';
+  }
+
+  return `Centered composition, subject centered in frame filling 60-70% of the image, ${scene}, warm golden Arizona light, sharp focus, clean uncluttered background, premium lifestyle photography, aspirational, photorealistic, Instagram-optimized, no text, no logos, no watermarks`;
 }
 
 // ── RSS helpers ───────────────────────────────────────────────────────────────
@@ -222,6 +306,7 @@ interface BlogPostMeta {
   slug: string;
   date: string;
   description?: string; // rich body content for RSS; overrides excerpt when present
+  pubDate?: string;     // RFC 822 timestamp override; bypasses toRFC822 when set
 }
 
 function extractRssDescription(html: string): string {
@@ -279,8 +364,9 @@ function parseBlogPagePosts(source: string): BlogPostMeta[] {
     const title = field('title', entry);
     const excerpt = field('excerpt', entry);
     const date = field('date', entry);
+    const pubDate = field('pubDate', entry) || undefined;
     if (slug && title && date) {
-      posts.push({ title, excerpt, slug, date });
+      posts.push({ title, excerpt, slug, date, pubDate });
     }
   }
   return posts;
@@ -297,7 +383,7 @@ function buildRSS(posts: BlogPostMeta[]): string {
     <link>https://www.rahoperations.com/blogs/${p.slug}</link>
     <guid isPermaLink="true">https://www.rahoperations.com/blogs/${p.slug}</guid>
     <description><![CDATA[${p.description ?? p.excerpt}]]></description>
-    <pubDate>${toRFC822(p.date)}</pubDate>
+    <pubDate>${p.pubDate ?? toRFC822(p.date)}</pubDate>
     <enclosure url="https://www.rahoperations.com/blogs/${p.slug}.jpg" length="0" type="image/jpeg"/>
   </item>`).join('\n');
 
@@ -353,23 +439,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 4000,
-        system: 'You are an expert SEO content writer for RAH Operations, a Scottsdale AZ digital agency offering website design, SEO, digital marketing, social media management, and credit repair. Write blog posts that rank on Google for local Arizona searches. Always write in a confident, helpful, expert tone. Never use filler content.',
+        max_tokens: 8000,
+        system: 'You are an expert SEO content writer for RAH Operations, a Scottsdale AZ digital agency offering website design, SEO, digital marketing, social media management, and credit repair. Write blog posts that rank on Google for local Arizona searches. Always write in a confident, helpful, expert tone. Never use filler content. Output only raw JSON — no prose, no markdown, no code fences. The current year is 2026. Never include a specific year in titles or headlines unless it is 2026.',
         messages: [
           {
             role: 'user',
             content: `Write a complete SEO blog post targeting the keyword: ${keyword}.
 
-Return ONLY a JSON object with these exact fields:
-{
-  "title": "SEO title 50-60 chars with keyword",
-  "displayTitle": "Full engaging headline",
-  "metaDescription": "150-160 char meta description with CTA",
-  "category": "one of: Website Design, SEO, Digital Marketing, Social Media, Credit Repair, Business Services",
-  "excerpt": "2-3 sentence excerpt for blog listing page",
-  "content": "Full HTML blog post content with these requirements: Opening paragraph with primary keyword in first 100 words. 5-6 H2 sections with 150-250 words each. Internal links using <a href='/website-design-and-seo'>anchor text</a> format. Link to these pages naturally throughout: /website-design-and-seo, /digital-marketing, /social-media-management, /personal-credit-repair, /business-credit-and-funding, /website-intake, /marketing/intake, /credit-repair/intake. FAQ section with 3 questions. Closing CTA paragraph linking to most relevant intake form. 1200-1600 words total",
-  "imagePrompt": "Detailed image generation prompt for a professional blog hero image. Style: clean, modern, professional Arizona business context. No text in image. Horizontal format 1200x630."
-}`,
+Return a JSON object with these exact fields:
+- title: SEO title 50-60 chars with keyword
+- displayTitle: Full engaging headline
+- metaDescription: 150-160 char meta description with CTA
+- category: one of: Website Design, SEO, Digital Marketing, Social Media, Credit Repair, Business Services
+- excerpt: 2-3 sentence excerpt for blog listing page
+- content: Full HTML string. Requirements: opening paragraph with primary keyword in first 100 words; 5-6 H2 sections at 150-250 words each; internal links to /website-design-and-seo, /digital-marketing, /social-media-management, /personal-credit-repair, /business-credit-and-funding, /website-intake, /marketing/intake, /credit-repair/intake using single-quoted href attributes; FAQ section with 3 questions; closing CTA paragraph with link to most relevant intake form; 1200-1600 words total`,
+          },
+          {
+            role: 'assistant',
+            content: '{',
           },
         ],
       }),
@@ -379,13 +466,21 @@ Return ONLY a JSON object with these exact fields:
       throw new Error(`Claude API error: ${r.status} — ${err.slice(0, 300)}`);
     }
     const data = await r.json() as { content: Array<{ type: string; text: string }> };
-    return data.content[0]?.text ?? '';
+    // Restore the prefilled '{' that the API strips from the assistant turn
+    return '{' + (data.content[0]?.text ?? '');
   };
 
   const parseClaude = (rawText: string): ClaudePost => {
-    // Strip any opening/closing code fences (```json, ```, with or without trailing newline)
-    const clean = rawText.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
-    return JSON.parse(clean) as ClaudePost;
+    // Strip code fences if present despite the prefill
+    let clean = rawText.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
+    try {
+      return JSON.parse(clean) as ClaudePost;
+    } catch {
+      // Fallback: extract the outermost {...} block in case of any surrounding prose
+      const match = clean.match(/\{[\s\S]*\}/);
+      if (match) return JSON.parse(match[0]) as ClaudePost;
+      throw new SyntaxError(`No valid JSON object found. Preview: ${clean.slice(0, 300)}`);
+    }
   };
 
   let post: ClaudePost;
@@ -396,7 +491,7 @@ Return ONLY a JSON object with these exact fields:
   } catch (err) {
     return res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
   }
-  console.log(`[generate-blog] Claude attempt 1 — ${rawText1.length} chars:`, rawText1.slice(0, 1000));
+  console.log(`[generate-blog] Claude attempt 1 — ${rawText1.length} chars:`, rawText1.slice(0, 2000));
 
   try {
     post = parseClaude(rawText1);
@@ -410,7 +505,7 @@ Return ONLY a JSON object with these exact fields:
     } catch (err) {
       return res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
     }
-    console.log(`[generate-blog] Claude attempt 2 — ${rawText2.length} chars:`, rawText2.slice(0, 1000));
+    console.log(`[generate-blog] Claude attempt 2 — ${rawText2.length} chars:`, rawText2.slice(0, 2000));
 
     try {
       post = parseClaude(rawText2);
@@ -432,7 +527,9 @@ Return ONLY a JSON object with these exact fields:
 
   if (kieKey) {
     try {
-      imageBuffer = await generateKieImage(kieKey, post.imagePrompt);
+      const imagePrompt = buildImagePrompt(slug, post.category);
+      console.log(`[generate-blog] image prompt: ${imagePrompt}`);
+      imageBuffer = await generateKieImage(kieKey, imagePrompt);
     } catch (imgErr) {
       console.error('Kie.ai threw:', imgErr instanceof Error ? imgErr.message : String(imgErr));
     }
@@ -448,10 +545,13 @@ Return ONLY a JSON object with these exact fields:
   const issueCount = (blogPageRaw.match(/slug:/g) || []).length + 1;
   const issueNum = String(issueCount).padStart(3, '0');
 
+  const pubDateUTC = new Date().toUTCString();
+
   const newPostEntry = `    {
       title: ${JSON.stringify(post.title)},
       displayTitle: ${JSON.stringify(post.displayTitle)},
       date: ${JSON.stringify(dateDisplay)},
+      pubDate: ${JSON.stringify(pubDateUTC)},
       issue: 'No. ${issueNum}',
       category: ${JSON.stringify(post.category)},
       excerpt: ${JSON.stringify(post.excerpt)},
@@ -534,14 +634,24 @@ Return ONLY a JSON object with these exact fields:
 
   // ── STEP 6: regenerate rss.xml ──────────────────────────────────────────────
   try {
-    const allPosts = parseBlogPagePosts(updatedBlogPage);
-    // Inject rich body content as the RSS description for the newly published post
-    const newPostIdx = allPosts.findIndex((p) => p.slug === slug);
-    if (newPostIdx >= 0) {
-      allPosts[newPostIdx].description = extractRssDescription(post.content);
-    }
-    if (allPosts.length > 0) {
-      const rssXml = buildRSS(allPosts);
+    // Build the new post entry directly — never rely on parseBlogPagePosts finding it,
+    // because the excerpt/title regex can silently fail on complex Claude output.
+    const newPost: BlogPostMeta = {
+      title: post.title,
+      excerpt: post.excerpt,
+      slug,
+      date: dateDisplay,
+      pubDate: pubDateUTC,
+      description: extractRssDescription(post.content),
+    };
+
+    // Parse the rest of the feed from the updated source, excluding the new slug
+    // (in case parseBlogPagePosts did happen to pick it up).
+    const existingPosts = parseBlogPagePosts(updatedBlogPage).filter((p) => p.slug !== slug);
+
+    const feedPosts = [newPost, ...existingPosts];
+    if (feedPosts.length > 0) {
+      const rssXml = buildRSS(feedPosts);
       let rssSha: string | null = null;
       try {
         const existingRss = await getGitHubFile(githubToken, githubRepo, 'public/rss.xml');

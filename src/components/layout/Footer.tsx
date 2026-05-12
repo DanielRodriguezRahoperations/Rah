@@ -96,6 +96,19 @@ const Footer = () => (
           </Link>
         </div>
       </div>
+
+      {/* Design credit */}
+      <p className="mt-6 text-center text-[11px]" style={{ opacity: 0.45 }}>
+        Designed by{' '}
+        <a
+          href="https://www.rahoperations.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="transition-colors hover:text-[#F5F5F5]"
+        >
+          RAH Operations
+        </a>
+      </p>
     </div>
   </footer>
 );

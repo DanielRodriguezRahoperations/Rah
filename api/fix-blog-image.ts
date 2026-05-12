@@ -12,8 +12,16 @@ async function generateKieImage(apiKey: string, prompt: string): Promise<Buffer 
     method: 'POST',
     headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'flux-2/pro-text-to-image',
-      input: { prompt, aspect_ratio: '1:1', resolution: '1K', nsfw_checker: false },
+      model: 'ideogram/v3-text-to-image',
+      input: {
+        prompt,
+        rendering_speed: 'QUALITY',
+        style: 'DESIGN',
+        expand_prompt: true,
+        image_size: 'square_hd',
+        negative_prompt: 'generic, stock photo, boring, plain, corporate, text, logos, watermarks, blurry, low quality, distorted, AI-looking, cartoon, illustration',
+        nsfw_checker: true,
+      },
     }),
   });
 
@@ -128,7 +136,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (kieKey) {
     try {
-      const prompt = `Professional hero image for a blog post about "${keyword}". Clean, modern, Arizona business context. No text in image. Horizontal 16:9 format.`;
+      const prompt = `Centered composition, subject centered in frame filling 60-70% of the image, professional business setting related to "${keyword}", Scottsdale Arizona, warm golden light, clean uncluttered background, premium lifestyle photography, aspirational, photorealistic, Instagram-optimized, no text, no logos, no watermarks`;
       imageBuffer = await generateKieImage(kieKey, prompt);
       if (imageBuffer) usedKie = true;
     } catch (err) {
