@@ -6,6 +6,15 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Best Website Designer Near Me Scottsdale | RAH Ops",
+      displayTitle: "The Best Website Designer Near You in Scottsdale, AZ (And Why It Matters More Than You Think)",
+      date: "May 12, 2026",
+      issue: 'No. 026',
+      category: "Website Design",
+      excerpt: "If you've been searching for the best website designer near you in Scottsdale, the difference between a good site and a great one is measurable in leads, revenue, and rankings. RAH Operations combines cutting-edge design with built-in SEO strategy to give Arizona businesses a real competitive edge. Here's what to look for — and why local expertise changes everything.",
+      slug: 'best-website-designer-near-me-scottsdale'
+    },
+    {
       title: "Credit Repair Services Scottsdale | RAH Operations",
       displayTitle: "Credit Repair Services in Scottsdale: How to Fix Your Credit and Take Control of Your Financial Future",
       date: "May 12, 2026",
