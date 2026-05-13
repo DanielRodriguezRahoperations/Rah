@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Notary Services Scottsdale AZ | Find & Hire Fast",
+      displayTitle: "Notary Services in Scottsdale AZ: What You Need to Know Before You Sign",
+      date: "May 13, 2026",
+      pubDate: "Wed, 13 May 2026 00:43:45 GMT",
+      issue: 'No. 029',
+      category: "Business Services",
+      excerpt: "Finding reliable notary services in Scottsdale AZ doesn't have to be complicated. Whether you need documents notarized for a real estate deal, business formation, or personal legal matters, knowing your options saves you time and stress. This guide breaks down everything you need to know to get it done right the first time.",
+      slug: 'notary-services-scottsdale-az'
+    },
+    {
       title: "LLC Setup Arizona: Complete Guide for 2026",
       displayTitle: "LLC Setup Arizona: Everything You Need to Know to Launch Your Business the Right Way",
       date: "May 12, 2026",
