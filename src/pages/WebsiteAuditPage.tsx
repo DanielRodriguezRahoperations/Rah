@@ -238,14 +238,14 @@ const WebsiteAuditPage = () => {
   return (
     <>
       <SEOHead
-        title="Free Website Audit Tool — Instant SEO Analysis | RAH Operations"
-        description="Run a free website audit in 30 seconds. Check SEO, page speed, mobile, schema markup, and Google Business presence. Get your score instantly. Serving Scottsdale & Phoenix, AZ."
+        title="Free Website Audit Tool for Small Businesses — RAH Operations"
+        description="Run a free website audit in 60 seconds. Check SEO, speed, mobile, SSL, sitemap and more. No signup required. Built for small business owners by RAH Operations."
         keywords="free website audit, free SEO audit tool, free website analysis Scottsdale, website audit tool, website SEO checker, free website checker Arizona, free SEO analysis Phoenix"
         url={absoluteUrl('/website-audit')}
         structuredData={[
           {
             '@context': 'https://schema.org',
-            '@type': 'WebApplication',
+            '@type': 'SoftwareApplication',
             name: 'RAH Operations Free Website Audit Tool',
             url: 'https://www.rahoperations.com/website-audit',
             description: 'Free instant website audit tool. Check SEO, page speed, mobile optimization, schema markup, and Google Business presence in 30 seconds.',
@@ -305,11 +305,10 @@ const WebsiteAuditPage = () => {
                   </p>
                   <h1 className="font-serif-display font-bold text-white leading-[1.05] mb-6"
                     style={{ fontSize: 'clamp(2.4rem, 6vw, 4.5rem)' }}>
-                    How does your website score?
+                    Free Website Audit for Small Businesses
                   </h1>
                   <p className="text-neutral-400 text-lg leading-relaxed mb-8 max-w-lg mx-auto">
-                    Enter your domain and get a full SEO and performance audit in 30 seconds.
-                    No credit card. No obligation.
+                    Get an instant audit of your website's SEO, speed, mobile friendliness, and technical health. No account needed. Used by small business owners across the US to find and fix what's hurting their Google rankings.
                   </p>
 
                   {/* Social proof */}
@@ -442,6 +441,19 @@ const WebsiteAuditPage = () => {
                       </details>
                     ))}
                   </div>
+                </div>
+
+                {/* Internal links */}
+                <div className="mt-16 pt-10 border-t border-neutral-800 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm">
+                  <Link to="/website-design-and-seo" className="text-neutral-400 hover:text-white transition-colors">
+                    Website Design &amp; SEO →
+                  </Link>
+                  <Link to="/digital-marketing" className="text-neutral-400 hover:text-white transition-colors">
+                    Digital Marketing →
+                  </Link>
+                  <Link to="/book-a-call" className="text-neutral-400 hover:text-white transition-colors">
+                    Book a Free Call →
+                  </Link>
                 </div>
               </div>
             </section>
