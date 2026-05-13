@@ -575,53 +575,73 @@ Return a JSON object with these exact fields:
     return data.content[0]?.text ?? '';
   };
 
+  // Extracts a valid ClaudePost from raw Claude output.
+  // Strategy (applied in order until one succeeds):
+  //   1. Strip ``` fences → parse full string
+  //   2. Substring from first { to last } → parse
+  //   3. Regex scan for any {...} block → parse the largest match
   const parseClaude = (rawText: string): ClaudePost => {
-    let clean = rawText.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
-    try {
-      return JSON.parse(clean) as ClaudePost;
-    } catch {
-      // Fallback: extract the outermost {...} block in case of any surrounding prose
-      const match = clean.match(/\{[\s\S]*\}/);
-      if (match) return JSON.parse(match[0]) as ClaudePost;
-      throw new SyntaxError(`No valid JSON object found. Preview: ${clean.slice(0, 300)}`);
+    // Step 1: strip leading/trailing code fences
+    let clean = rawText
+      .trim()
+      .replace(/^```(?:json)?\s*/i, '')
+      .replace(/\s*```\s*$/,        '')
+      .trim();
+
+    try { return JSON.parse(clean) as ClaudePost; } catch { /* try next */ }
+
+    // Step 2: substring between first { and last }
+    const first = clean.indexOf('{');
+    const last  = clean.lastIndexOf('}');
+    if (first !== -1 && last > first) {
+      const slice = clean.slice(first, last + 1);
+      try { return JSON.parse(slice) as ClaudePost; } catch { /* try next */ }
     }
+
+    // Step 3: regex scan for any {...} block (handles prose before/after)
+    const match = clean.match(/\{[\s\S]*\}/);
+    if (match) {
+      try { return JSON.parse(match[0]) as ClaudePost; } catch { /* fall through */ }
+    }
+
+    throw new SyntaxError(
+      `No valid JSON object found in Claude response.\n` +
+      `Length: ${rawText.length}\n` +
+      `Full raw response:\n${rawText}`,
+    );
   };
 
   let post: ClaudePost;
+  const rawResponses: string[] = [];
+  const MAX_ATTEMPTS = 3;
 
-  let rawText1: string;
-  try {
-    rawText1 = await callClaude();
-  } catch (err) {
-    return res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
-  }
-  console.log(`[generate-blog] Claude attempt 1 — ${rawText1.length} chars:`, rawText1.slice(0, 2000));
-
-  try {
-    post = parseClaude(rawText1);
-  } catch (parseErr1) {
-    console.error('[generate-blog] Parse attempt 1 failed:', parseErr1 instanceof Error ? parseErr1.message : String(parseErr1));
-    console.log('[generate-blog] Retrying Claude API call...');
-
-    let rawText2: string;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    let rawText: string;
     try {
-      rawText2 = await callClaude();
+      rawText = await callClaude();
     } catch (err) {
       return res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
     }
-    console.log(`[generate-blog] Claude attempt 2 — ${rawText2.length} chars:`, rawText2.slice(0, 2000));
+    rawResponses.push(rawText);
+    console.log(`[generate-blog] Claude attempt ${attempt} — ${rawText.length} chars:`, rawText.slice(0, 2000));
 
     try {
-      post = parseClaude(rawText2);
-    } catch (parseErr2) {
-      console.error('[generate-blog] Parse attempt 2 failed:', parseErr2 instanceof Error ? parseErr2.message : String(parseErr2));
-      return res.status(500).json({
-        error: 'Failed to parse Claude JSON after 2 attempts',
-        attempt1_length: rawText1.length,
-        attempt1_preview: rawText1.slice(0, 600),
-        attempt2_length: rawText2.length,
-        attempt2_preview: rawText2.slice(0, 600),
-      });
+      post = parseClaude(rawText);
+      console.log(`[generate-blog] Claude parsed successfully on attempt ${attempt}`);
+      break;
+    } catch (parseErr) {
+      const msg = parseErr instanceof Error ? parseErr.message : String(parseErr);
+      console.error(`[generate-blog] Parse attempt ${attempt} failed: ${msg}`);
+      console.error(`[generate-blog] Full raw response (attempt ${attempt}):\n${rawText}`);
+
+      if (attempt === MAX_ATTEMPTS) {
+        return res.status(500).json({
+          error: `Failed to parse Claude JSON after ${MAX_ATTEMPTS} attempts`,
+          attempts: rawResponses.map((r, i) => ({ attempt: i + 1, length: r.length, preview: r.slice(0, 600) })),
+        });
+      }
+
+      console.log(`[generate-blog] Retrying (attempt ${attempt + 1} of ${MAX_ATTEMPTS})…`);
     }
   }
 
