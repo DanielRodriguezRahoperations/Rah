@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Arizona Small Business Growth Strategies That Work",
+      displayTitle: "Arizona Small Business Growth Strategies That Actually Move the Needle in 2026",
+      date: "May 13, 2026",
+      pubDate: "Wed, 13 May 2026 02:47:17 GMT",
+      issue: 'No. 031',
+      category: "Business Services",
+      excerpt: "Growing a small business in Arizona takes more than a great product — it takes a smart, multi-channel strategy built for the local market. From search visibility to business credit, RAH Operations breaks down exactly what Arizona entrepreneurs need to scale. Read on to discover the growth levers most local businesses overlook.",
+      slug: 'arizona-small-business-growth-strategies'
+    },
+    {
       title: "Google Business Profile Optimization Scottsdale",
       displayTitle: "Google Business Profile Optimization in Scottsdale: The Complete Guide to Dominating Local Search",
       date: "May 13, 2026",
