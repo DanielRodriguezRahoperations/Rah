@@ -316,78 +316,94 @@ function buildImagePrompt(slug: string, category: string): string {
 
 // ── Brand overlay compositor ──────────────────────────────────────────────────
 // Lower-third branded panel over the bottom 28% of the image only.
-// Top 72% is pixel-perfect untouched — no vignette, no text, nothing.
-// Outputs JPEG at 90% quality at the original image dimensions.
+// Top 72% is pixel-perfect untouched.
+//
+// SVG is used only for the panel rectangle and accent line (no fonts needed).
+// Text is rendered via sharp's built-in libvips text engine (font:'sans' maps
+// to DejaVu Sans on Vercel's Linux environment — always available).
 async function compositeOverlay(imageBuffer: Buffer, displayTitle: string, category: string): Promise<Buffer> {
   const meta = await sharp(imageBuffer).metadata();
   const W = meta.width  ?? 1024;
   const H = meta.height ?? 1024;
 
-  // Panel geometry — bottom 28% only
-  const panelTop = Math.round(H * 0.72);
-  const pad      = Math.round(W * 0.04);
+  const panelTop  = Math.round(H * 0.72);
+  const pad       = Math.round(W * 0.04);
+  const accentH   = Math.max(3, Math.round(H * 0.003));  // crimson accent line height
+  const textW     = W - 2 * pad;                          // max text width
+  const bottomPad = Math.round(H * 0.04);
 
-  // Font sizes proportional to image height
-  const catSz  = Math.round(H * 0.016);   // ~16 px at 1024 — category label
-  const headSz = Math.round(H * 0.038);   // ~39 px at 1024 — headline
-  const rahSz  = Math.round(H * 0.028);   // ~29 px at 1024 — RAH. mark
+  // Font sizes scaled from reference values at 1024 px
+  const headSz = Math.round(52 * H / 1024);
+  const catSz  = Math.round(28 * H / 1024);
+  const rahSz  = Math.round(22 * H / 1024);
 
-  // Word-wrap headline into at most 2 lines on word boundaries.
-  // Width estimate: Georgia at headSz uses ~0.52× headSz per character on average.
-  const MAX_CHARS = Math.floor((W - 2 * pad) / (headSz * 0.52));
-  const words = displayTitle.split(' ');
-  let line1 = '';
-  const line2Words: string[] = [];
-  let overflow = false;
-  for (const word of words) {
-    if (!overflow && (line1 + (line1 ? ' ' : '') + word).length <= MAX_CHARS) {
-      line1 += (line1 ? ' ' : '') + word;
-    } else {
-      overflow = true;
-      line2Words.push(word);
-    }
-  }
-  let line2 = line2Words.join(' ');
-  if (line2.length > MAX_CHARS) line2 = line2.slice(0, MAX_CHARS - 1) + '…';
-
-  // Y positions (SVG baselines), built bottom-up:
-  //   catY   — category label, 7% from bottom
-  //   line2Y — headline line 2 (if needed), just above category
-  //   line1Y — headline line 1, above line 2 (or above category if 1-line)
-  const catY   = Math.round(H * 0.93);
-  const gap    = Math.round(headSz * 0.45);          // space between category and headline
-  const lineH  = Math.round(headSz * 1.25);          // headline line height
-  const line2Y = line2 ? catY - catSz - gap        : 0;
-  const line1Y = line2 ? line2Y - lineH            : catY - catSz - gap;
-
+  // Pango XML escaping (used inside <span> markup)
   const esc = (s: string) =>
-    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-  const svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
-  <!-- Dark panel: bottom 28% only. Nothing above panelTop. -->
-  <rect x="0" y="${panelTop}" width="${W}" height="${H - panelTop}"
-        fill="#0A0A0A" fill-opacity="0.88"/>
-  <!-- Headline: Georgia serif bold, white -->
-  <text x="${pad}" y="${line1Y}"
-        font-family="Georgia, 'Times New Roman', serif"
-        font-size="${headSz}" font-weight="bold" fill="#FFFFFF">${esc(line1)}</text>
-  ${line2 ? `<text x="${pad}" y="${line2Y}"
-        font-family="Georgia, 'Times New Roman', serif"
-        font-size="${headSz}" font-weight="bold" fill="#FFFFFF">${esc(line2)}</text>` : ''}
-  <!-- Category: Arial uppercase, brand red, ~7% from bottom -->
-  <text x="${pad}" y="${catY}"
-        font-family="Arial, Helvetica, sans-serif"
-        font-size="${catSz}" font-weight="bold" fill="#8B1E1E"
-        letter-spacing="${Math.round(catSz * 0.20)}">${esc(category.toUpperCase())}</text>
-  <!-- RAH. mark: Georgia serif, cream, bottom-right -->
-  <text x="${W - pad}" y="${catY}"
-        font-family="Georgia, 'Times New Roman', serif"
-        font-size="${rahSz}" font-weight="bold" fill="#C8B99A"
-        text-anchor="end">RAH.</text>
+  // Render each text element as an RGBA PNG via sharp's libvips text renderer.
+  // Pango <span foreground="..."> sets text colour; rgba:true preserves alpha.
+  // width on the headline enables automatic word-wrap at textW pixels.
+  const [headlineBuf, categoryBuf, rahBuf] = await Promise.all([
+    sharp({
+      text: {
+        text: `<span foreground="#FFFFFF">${esc(displayTitle)}</span>`,
+        font: 'sans',
+        fontSize: headSz,
+        rgba: true,
+        width: textW,
+      },
+    }).png().toBuffer(),
+    sharp({
+      text: {
+        text: `<span foreground="#8B1E1E">${esc(category.toUpperCase())}</span>`,
+        font: 'sans',
+        fontSize: catSz,
+        rgba: true,
+      },
+    }).png().toBuffer(),
+    sharp({
+      text: {
+        text: '<span foreground="#C8B99A">RAH.</span>',
+        font: 'sans',
+        fontSize: rahSz,
+        rgba: true,
+      },
+    }).png().toBuffer(),
+  ]);
+
+  // Read back rendered dimensions for precise positioning
+  const [headlineInfo, categoryInfo, rahInfo] = await Promise.all([
+    sharp(headlineBuf).metadata(),
+    sharp(categoryBuf).metadata(),
+    sharp(rahBuf).metadata(),
+  ]);
+
+  const headlineH = headlineInfo.height ?? headSz * 2;
+  const categoryH = categoryInfo.height ?? catSz;
+  const rahW      = rahInfo.width       ?? rahSz * 4;
+  const rahH      = rahInfo.height      ?? rahSz;
+
+  // Positions built bottom-up
+  const catTop      = H - bottomPad - categoryH;
+  const headlineGap = Math.round(H * 0.015);
+  const headlineTop = Math.max(panelTop + accentH + 4, catTop - headlineGap - headlineH);
+  const rahTop      = H - bottomPad - rahH;
+  const rahLeft     = Math.max(pad, W - pad - rahW);
+
+  // Dark panel + crimson accent line — pure SVG rects, no fonts
+  const panelSvg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="${panelTop}" width="${W}" height="${H - panelTop}" fill="#0A0A0A" fill-opacity="0.88"/>
+  <rect x="0" y="${panelTop}" width="${W}" height="${accentH}" fill="#8B1E1E"/>
 </svg>`;
 
   return sharp(imageBuffer)
-    .composite([{ input: Buffer.from(svg), blend: 'over' }])
+    .composite([
+      { input: Buffer.from(panelSvg), blend: 'over' },
+      { input: headlineBuf, top: headlineTop, left: pad,     blend: 'over' },
+      { input: categoryBuf, top: catTop,      left: pad,     blend: 'over' },
+      { input: rahBuf,      top: rahTop,      left: rahLeft, blend: 'over' },
+    ])
     .jpeg({ quality: 90 })
     .toBuffer();
 }

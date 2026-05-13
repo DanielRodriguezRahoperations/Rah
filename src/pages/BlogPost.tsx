@@ -845,7 +845,7 @@ const BlogPost = () => {
         <div className="bg-[#1a1a1a]">
           <div className="container-clean max-w-4xl pb-0">
             <div className="overflow-hidden border border-white/10">
-              <img src={`/blogs/${slug}.jpg`} alt={generatedPost.title} className="w-full aspect-[16/7] object-cover" loading="eager" />
+              <img src={`/blogs/${slug}.jpg`} alt={generatedPost.title} className="w-full block" loading="eager" />
             </div>
           </div>
         </div>
@@ -939,7 +939,7 @@ const BlogPost = () => {
             <img
               src={`/blogs/${slug}.jpg`}
               alt={post!.title}
-              className="w-full aspect-[16/7] object-cover"
+              className="w-full block"
               loading="eager"
             />
           </div>
