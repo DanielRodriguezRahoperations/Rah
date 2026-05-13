@@ -8,59 +8,336 @@ function validateAdmin(req: VercelRequest): boolean {
   return req.headers.authorization === expected;
 }
 
-// 40 topics in round-robin order across 10 service categories.
+// 300 topics in round-robin order across 8 service categories.
 // The generator picks the first unpublished slug via find(), so this interleaving
 // guarantees no category repeats until all others have been covered.
 //
-// Categories (count): Website Design (4) | SEO (4) | Social Media (4) |
-//   Credit Repair (5) | Business Credit (5) | LLC / Formation (5) |
-//   Notary (3) | Reputation (4) | Google Business Profile (3) | AZ General (3)
+// Categories: Website Audit (40) | SEO (50) | Web Design (40) |
+//   Credit Repair (40) | Digital Marketing (40) | Business Services (30) |
+//   Local Scottsdale/Phoenix (30) | Case Studies (30)
 const TOPICS = [
-  // ── Round 1 ─────────────────────────────────────────────────────────────────
-  'website-design-company-scottsdale-az',            // Website Design
-  'affordable-seo-services-scottsdale',              // SEO
-  'social-media-management-scottsdale',              // Social Media
-  'credit-repair-services-scottsdale',               // Credit Repair
-  'business-credit-building-arizona',                // Business Credit
-  'llc-setup-arizona',                               // LLC / Formation
-  'notary-services-scottsdale-az',                   // Notary
-  'reputation-management-scottsdale',                // Reputation Mgmt
-  'google-business-profile-optimization-scottsdale', // Google Business Profile
-  'arizona-small-business-growth-strategies',        // AZ General
-  // ── Round 2 ─────────────────────────────────────────────────────────────────
-  'ecommerce-website-design-phoenix',                // Website Design
-  'local-seo-services-phoenix-az',                   // SEO
-  'instagram-marketing-scottsdale-business',         // Social Media
-  'personal-credit-repair-phoenix-az',               // Credit Repair
-  'business-credit-cards-no-personal-guarantee',     // Business Credit
-  'new-business-setup-scottsdale',                   // LLC / Formation
-  'apostille-services-arizona',                      // Notary
-  'online-reputation-management-phoenix',            // Reputation Mgmt
-  'google-maps-ranking-phoenix-business',            // Google Business Profile
-  'best-business-services-scottsdale-az',            // AZ General
-  // ── Round 3 ─────────────────────────────────────────────────────────────────
-  'wordpress-vs-custom-website-scottsdale',          // Website Design
-  'technical-seo-audit-scottsdale-business',         // SEO
-  'facebook-advertising-phoenix-az',                 // Social Media
-  'remove-collections-credit-report-arizona',        // Credit Repair
-  'how-to-build-business-credit-fast-arizona',       // Business Credit
-  'startup-business-services-scottsdale',            // LLC / Formation
-  'mobile-notary-phoenix-arizona',                   // Notary
-  'yelp-review-management-scottsdale',               // Reputation Mgmt
-  'google-business-photos-tips-arizona',             // Google Business Profile
-  'scottsdale-business-owner-guide-to-online-presence', // AZ General
-  // ── Round 4 ─────────────────────────────────────────────────────────────────
-  'mobile-website-design-scottsdale',                // Website Design
-  'on-page-seo-optimization-scottsdale',             // SEO
-  'tiktok-marketing-scottsdale-small-business',      // Social Media
-  'how-to-raise-credit-score-100-points-arizona',    // Credit Repair
-  'net-30-vendors-for-new-business-arizona',         // Business Credit
-  'arizona-llc-vs-corporation-which-is-better',      // LLC / Formation
-  'how-to-respond-to-negative-reviews-arizona',      // Reputation Mgmt
-  // ── Round 5 — Credit Repair, Business Credit, LLC only ──────────────────────
-  'debt-settlement-vs-credit-repair-arizona',        // Credit Repair
-  'business-funding-options-scottsdale-startup',     // Business Credit
-  'how-to-register-a-business-in-arizona',           // LLC / Formation
+  // ── Round 1 ──────────────────────────────────────────────────────────────────
+  'free-website-audit-scottsdale-small-business',                   // Website Audit
+  'local-seo-services-scottsdale-az',                               // SEO
+  'custom-website-design-scottsdale-az',                            // Web Design
+  'credit-repair-services-scottsdale-az',                           // Credit Repair
+  'digital-marketing-agency-scottsdale-az',                         // Digital Marketing
+  'llc-formation-scottsdale-arizona',                               // Business Services
+  'best-digital-marketing-agency-scottsdale',                       // Local Scottsdale/Phoenix
+  'how-rah-operations-helped-scottsdale-restaurant-rank-on-google', // Case Studies
+  // ── Round 2 ──────────────────────────────────────────────────────────────────
+  'how-to-audit-your-website-for-seo-errors',                       // Website Audit
+  'seo-company-phoenix-az',                                         // SEO
+  'ecommerce-website-design-scottsdale',                            // Web Design
+  'how-to-fix-bad-credit-arizona',                                  // Credit Repair
+  'social-media-marketing-scottsdale-az',                           // Digital Marketing
+  'business-credit-building-scottsdale-az',                         // Business Services
+  'top-seo-agencies-phoenix-arizona',                               // Local Scottsdale/Phoenix
+  'scottsdale-salon-reputation-management-case-study',              // Case Studies
+  // ── Round 3 ──────────────────────────────────────────────────────────────────
+  'website-speed-test-why-it-matters-scottsdale-business',          // Website Audit
+  'google-maps-ranking-scottsdale-az',                              // SEO
+  'mobile-friendly-website-design-scottsdale',                      // Web Design
+  'remove-late-payments-credit-report-arizona',                     // Credit Repair
+  'facebook-advertising-scottsdale-az',                             // Digital Marketing
+  'notary-services-scottsdale-phoenix',                             // Business Services
+  'best-web-designers-scottsdale-arizona',                          // Local Scottsdale/Phoenix
+  'phoenix-contractor-website-redesign-case-study',                 // Case Studies
+  // ── Round 4 ──────────────────────────────────────────────────────────────────
+  'mobile-seo-audit-checklist-small-business',                      // Website Audit
+  'keyword-research-for-arizona-small-business',                    // SEO
+  'wordpress-website-design-scottsdale',                            // Web Design
+  'dispute-collections-credit-report-arizona',                      // Credit Repair
+  'google-ads-management-scottsdale-az',                            // Digital Marketing
+  'apostille-services-scottsdale-arizona',                          // Business Services
+  'affordable-seo-services-phoenix-az',                             // Local Scottsdale/Phoenix
+  'arizona-real-estate-agent-seo-case-study',                       // Case Studies
+  // ── Round 5 ──────────────────────────────────────────────────────────────────
+  'ssl-certificate-why-your-website-needs-https-arizona',           // Website Audit
+  'on-page-seo-optimization-phoenix-az',                            // SEO
+  'landing-page-design-scottsdale-az',                              // Web Design
+  'how-to-raise-credit-score-fast-arizona',                         // Credit Repair
+  'email-marketing-scottsdale-az',                                  // Digital Marketing
+  'reputation-management-scottsdale-az',                            // Business Services
+  'best-reputation-management-company-scottsdale',                  // Local Scottsdale/Phoenix
+  'scottsdale-med-spa-google-ads-case-study',                       // Case Studies
+  // ── Round 6 ──────────────────────────────────────────────────────────────────
+  'broken-links-audit-how-to-find-and-fix-them-scottsdale',         // Website Audit
+  'technical-seo-audit-phoenix-business',                           // SEO
+  'small-business-website-design-phoenix-az',                       // Web Design
+  'business-credit-cards-no-personal-guarantee-arizona',            // Credit Repair
+  'content-marketing-scottsdale-az',                                // Digital Marketing
+  'online-notary-arizona-how-it-works',                             // Business Services
+  'scottsdale-business-growth-strategies-2025',                     // Local Scottsdale/Phoenix
+  'phoenix-law-firm-website-seo-case-study',                        // Case Studies
+  // ── Round 7 ──────────────────────────────────────────────────────────────────
+  'duplicate-content-audit-scottsdale-business-website',            // Website Audit
+  'backlink-building-strategies-arizona-business',                  // SEO
+  'website-redesign-scottsdale-az',                                 // Web Design
+  'net-30-accounts-build-business-credit-arizona',                  // Credit Repair
+  'instagram-marketing-scottsdale-az',                              // Digital Marketing
+  'how-to-register-a-business-in-arizona',                          // Business Services
+  'phoenix-az-digital-marketing-trends-2025',                       // Local Scottsdale/Phoenix
+  'scottsdale-boutique-hotel-social-media-case-study',              // Case Studies
+  // ── Round 8 ──────────────────────────────────────────────────────────────────
+  'meta-tags-audit-scottsdale-business-website',                    // Website Audit
+  'local-citation-building-phoenix-az',                             // SEO
+  'nonprofit-website-design-scottsdale-az',                         // Web Design
+  'how-to-get-business-loan-bad-credit-arizona',                    // Credit Repair
+  'tiktok-marketing-scottsdale-az',                                 // Digital Marketing
+  'llc-vs-sole-proprietor-arizona',                                 // Business Services
+  'top-notary-services-scottsdale-phoenix',                         // Local Scottsdale/Phoenix
+  'arizona-fitness-studio-lead-generation-case-study',              // Case Studies
+  // ── Round 9 ──────────────────────────────────────────────────────────────────
+  'image-optimization-audit-scottsdale-website',                    // Website Audit
+  'google-business-profile-optimization-phoenix-az',                // SEO
+  'law-firm-website-design-scottsdale',                             // Web Design
+  'secured-credit-card-build-credit-arizona',                       // Credit Repair
+  'video-marketing-scottsdale-az',                                  // Digital Marketing
+  'arizona-business-license-how-to-get-one',                        // Business Services
+  'how-to-get-more-google-reviews-scottsdale',                      // Local Scottsdale/Phoenix
+  'scottsdale-roofing-company-website-case-study',                  // Case Studies
+  // ── Round 10 ─────────────────────────────────────────────────────────────────
+  'sitemap-audit-does-your-scottsdale-website-have-one',            // Website Audit
+  'seo-for-real-estate-agents-scottsdale-az',                       // SEO
+  'restaurant-website-design-scottsdale',                           // Web Design
+  'credit-utilization-tips-arizona-business-owner',                 // Credit Repair
+  'ppc-management-scottsdale-az',                                   // Digital Marketing
+  'scottsdale-business-registration-step-by-step',                  // Business Services
+  'best-social-media-managers-scottsdale-az',                       // Local Scottsdale/Phoenix
+  'phoenix-cleaning-company-seo-growth-case-study',                 // Case Studies
+  // ── Round 11 ─────────────────────────────────────────────────────────────────
+  'google-analytics-setup-scottsdale-small-business',               // Website Audit
+  'seo-for-dentists-scottsdale-phoenix',                            // SEO
+  'medical-spa-website-design-scottsdale',                          // Web Design
+  'how-credit-repair-works-arizona',                                // Credit Repair
+  'brand-identity-design-scottsdale-az',                            // Digital Marketing
+  'duns-number-how-to-get-one-arizona',                             // Business Services
+  'scottsdale-small-business-marketing-ideas-2025',                 // Local Scottsdale/Phoenix
+  'scottsdale-dental-office-new-patient-leads-case-study',          // Case Studies
+  // ── Round 12 ─────────────────────────────────────────────────────────────────
+  'core-web-vitals-how-to-fix-them-scottsdale',                     // Website Audit
+  'seo-for-contractors-phoenix-az',                                 // SEO
+  'plumber-website-design-phoenix-az',                              // Web Design
+  'authorized-user-strategy-build-credit-arizona',                  // Credit Repair
+  'yelp-advertising-scottsdale-business',                           // Digital Marketing
+  'employer-identification-number-how-to-get-ein-arizona',          // Business Services
+  'why-scottsdale-businesses-need-professional-seo',                // Local Scottsdale/Phoenix
+  'arizona-insurance-agency-website-case-study',                    // Case Studies
+  // ── Round 13 ─────────────────────────────────────────────────────────────────
+  'website-security-audit-scottsdale-small-business',               // Website Audit
+  'seo-for-lawyers-scottsdale-az',                                  // SEO
+  'electrician-website-design-scottsdale',                          // Web Design
+  'credit-repair-company-vs-diy-arizona',                           // Credit Repair
+  'retargeting-ads-scottsdale-az',                                  // Digital Marketing
+  'business-bank-account-setup-arizona',                            // Business Services
+  'online-reviews-impact-scottsdale-business-revenue',              // Local Scottsdale/Phoenix
+  'scottsdale-event-venue-website-redesign-case-study',             // Case Studies
+  // ── Round 14 ─────────────────────────────────────────────────────────────────
+  'crawlability-audit-is-google-indexing-your-scottsdale-site',     // Website Audit
+  'seo-for-restaurants-scottsdale-az',                              // SEO
+  'hvac-website-design-scottsdale-az',                              // Web Design
+  'how-long-does-credit-repair-take-arizona',                       // Credit Repair
+  'influencer-marketing-scottsdale-az',                             // Digital Marketing
+  'registered-agent-arizona-what-you-need-to-know',                 // Business Services
+  'how-to-dominate-local-search-phoenix-az',                        // Local Scottsdale/Phoenix
+  'phoenix-mortgage-broker-lead-gen-case-study',                    // Case Studies
+  // ── Round 15 ─────────────────────────────────────────────────────────────────
+  'schema-markup-how-it-helps-scottsdale-seo',                      // Website Audit
+  'seo-for-chiropractors-scottsdale-phoenix',                        // SEO
+  'roofing-company-website-design-phoenix',                         // Web Design
+  'credit-score-needed-for-business-loan-arizona',                  // Credit Repair
+  'podcast-marketing-scottsdale-business',                          // Digital Marketing
+  'arizona-corporate-compliance-annual-report',                     // Business Services
+  'scottsdale-luxury-brand-digital-marketing-guide',                // Local Scottsdale/Phoenix
+  'scottsdale-accountant-firm-seo-case-study',                      // Case Studies
+  // ── Round 16 ─────────────────────────────────────────────────────────────────
+  'hreflang-and-international-seo-scottsdale-guide',                // Website Audit
+  'seo-for-financial-advisors-scottsdale',                          // SEO
+  'home-services-website-design-phoenix-az',                        // Web Design
+  'what-is-a-credit-inquiry-and-how-it-affects-you-arizona',        // Credit Repair
+  'linkedin-marketing-scottsdale-b2b',                              // Digital Marketing
+  'how-to-open-a-business-in-scottsdale-arizona',                   // Business Services
+  'scottsdale-hospitality-industry-marketing-tips',                  // Local Scottsdale/Phoenix
+  'phoenix-gym-member-growth-digital-marketing-case-study',         // Case Studies
+  // ── Round 17 ─────────────────────────────────────────────────────────────────
+  'robots-txt-guide-scottsdale-website-owners',                     // Website Audit
+  'seo-for-plastic-surgeons-scottsdale',                            // SEO
+  'automotive-website-design-phoenix-az',                           // Web Design
+  'credit-repair-for-small-business-owners-arizona',                // Credit Repair
+  'pinterest-marketing-scottsdale-business',                        // Digital Marketing
+  's-corp-vs-llc-arizona-which-is-better',                         // Business Services
+  'how-scottsdale-restaurants-attract-customers-online',            // Local Scottsdale/Phoenix
+  'scottsdale-real-estate-team-lead-generation-case-study',         // Case Studies
+  // ── Round 18 ─────────────────────────────────────────────────────────────────
+  'canonical-tags-seo-guide-scottsdale-business',                   // Website Audit
+  'seo-audit-services-scottsdale-az',                               // SEO
+  'construction-company-website-design-scottsdale',                 // Web Design
+  'rebuilding-credit-after-bankruptcy-arizona',                     // Credit Repair
+  'google-display-network-scottsdale-business',                     // Digital Marketing
+  'arizona-annual-report-filing-guide',                             // Business Services
+  'scottsdale-business-district-marketing-opportunities',           // Local Scottsdale/Phoenix
+  'arizona-home-improvement-company-seo-case-study',                // Case Studies
+  // ── Round 19 ─────────────────────────────────────────────────────────────────
+  'website-accessibility-audit-ada-compliance-scottsdale',          // Website Audit
+  'seo-content-strategy-scottsdale-business',                       // SEO
+  'law-firm-website-design-phoenix-az',                             // Web Design
+  'credit-repair-vs-debt-consolidation-arizona',                    // Credit Repair
+  'snapchat-ads-scottsdale-business',                               // Digital Marketing
+  'business-structure-guide-for-arizona-entrepreneurs',             // Business Services
+  'phoenix-tourism-business-digital-marketing-guide',               // Local Scottsdale/Phoenix
+  'scottsdale-tutoring-center-enrollment-growth-case-study',        // Case Studies
+  // ── Round 20 ─────────────────────────────────────────────────────────────────
+  'structured-data-testing-scottsdale-website',                     // Website Audit
+  'long-tail-keyword-strategy-arizona-business',                    // SEO
+  'coaching-consultant-website-design-scottsdale',                  // Web Design
+  'credit-repair-for-veterans-arizona',                             // Credit Repair
+  'conversion-rate-optimization-scottsdale-az',                     // Digital Marketing
+  'corporate-dissolution-arizona-guide',                            // Business Services
+  'top-neighborhoods-in-scottsdale-for-small-business',             // Local Scottsdale/Phoenix
+  'scottsdale-pet-grooming-franchise-website-case-study',           // Case Studies
+  // ── Round 21 ─────────────────────────────────────────────────────────────────
+  'website-analytics-audit-google-search-console-scottsdale',       // Website Audit
+  'voice-search-seo-scottsdale-business',                           // SEO
+  'photography-website-design-scottsdale-az',                       // Web Design
+  'rapid-credit-rescore-arizona-home-buyers',                       // Credit Repair
+  'affiliate-marketing-scottsdale-business',                        // Digital Marketing
+  'scottsdale-business-networking-groups-guide',                    // Business Services
+  'scottsdale-arts-district-business-marketing-guide',              // Local Scottsdale/Phoenix
+  'arizona-pest-control-company-website-redesign-case-study',       // Case Studies
+  // ── Round 22 ─────────────────────────────────────────────────────────────────
+  'user-experience-ux-audit-scottsdale-website',                    // Website Audit
+  'seo-for-e-commerce-scottsdale-az',                               // SEO
+  'accounting-firm-website-design-phoenix',                         // Web Design
+  'identity-theft-credit-repair-arizona',                           // Credit Repair
+  'chatbot-marketing-scottsdale-small-business',                    // Digital Marketing
+  'arizona-trade-name-registration-guide',                          // Business Services
+  'how-to-build-a-brand-in-scottsdale-arizona',                     // Local Scottsdale/Phoenix
+  'scottsdale-yoga-studio-membership-growth-case-study',            // Case Studies
+  // ── Round 23 ─────────────────────────────────────────────────────────────────
+  'conversion-audit-why-your-scottsdale-website-isnt-converting',   // Website Audit
+  'seo-for-nonprofits-scottsdale-phoenix',                          // SEO
+  'mental-health-therapist-website-design-scottsdale',              // Web Design
+  'credit-freeze-vs-fraud-alert-arizona',                           // Credit Repair
+  'webinar-marketing-scottsdale-business',                          // Digital Marketing
+  'business-succession-planning-arizona',                           // Business Services
+  'scottsdale-old-town-business-online-visibility-guide',           // Local Scottsdale/Phoenix
+  'phoenix-photography-studio-social-media-case-study',             // Case Studies
+  // ── Round 24 ─────────────────────────────────────────────────────────────────
+  'color-contrast-accessibility-audit-scottsdale-website',          // Website Audit
+  'seo-for-gyms-fitness-studios-scottsdale',                        // SEO
+  'veterinary-clinic-website-design-scottsdale',                    // Web Design
+  'credit-card-debt-impact-on-credit-score-arizona',                // Credit Repair
+  'referral-marketing-program-scottsdale-business',                 // Digital Marketing
+  'how-to-take-minutes-for-arizona-llc-meetings',                   // Business Services
+  'scottsdale-luxury-real-estate-marketing-online',                 // Local Scottsdale/Phoenix
+  'scottsdale-landscaping-company-lead-gen-case-study',             // Case Studies
+  // ── Round 25 ─────────────────────────────────────────────────────────────────
+  'website-maintenance-audit-scottsdale-small-business',            // Website Audit
+  'seo-for-hotels-scottsdale-az',                                   // SEO
+  'beauty-salon-website-design-scottsdale',                         // Web Design
+  'getting-off-chexsystems-arizona',                                // Credit Repair
+  'sms-marketing-scottsdale-small-business',                        // Digital Marketing
+  'series-llc-arizona-guide',                                       // Business Services
+  'scottsdale-new-business-owner-marketing-checklist',              // Local Scottsdale/Phoenix
+  'arizona-consulting-firm-content-marketing-case-study',           // Case Studies
+  // ── Round 26 ─────────────────────────────────────────────────────────────────
+  'content-freshness-audit-scottsdale-business-blog',               // Website Audit
+  'seo-for-home-services-phoenix-az',                               // SEO
+  'financial-advisor-website-design-scottsdale',                    // Web Design
+  'student-loan-impact-on-credit-arizona',                          // Credit Repair
+  'geofencing-advertising-scottsdale-az',                           // Digital Marketing
+  'how-to-hire-your-first-employee-in-arizona',                     // Business Services
+  'scottsdale-seasonal-marketing-tips-fall-winter',                 // Local Scottsdale/Phoenix
+  'phoenix-interior-designer-website-case-study',                   // Case Studies
+  // ── Round 27 ─────────────────────────────────────────────────────────────────
+  'internal-linking-audit-scottsdale-website',                      // Website Audit
+  'seo-for-insurance-agents-scottsdale',                            // SEO
+  'insurance-agency-website-design-phoenix',                        // Web Design
+  'how-to-negotiate-debt-settlement-arizona',                       // Credit Repair
+  'programmatic-advertising-scottsdale-business',                   // Digital Marketing
+  'arizona-non-disclosure-agreement-guide',                         // Business Services
+  'scottsdale-spring-training-business-marketing-opportunities',    // Local Scottsdale/Phoenix
+  'arizona-solar-company-seo-lead-gen-case-study',                  // Case Studies
+  // ── Round 28 ─────────────────────────────────────────────────────────────────
+  'page-depth-audit-scottsdale-ecommerce-site',                     // Website Audit
+  'link-building-strategies-scottsdale-business',                   // SEO
+  'nonprofit-website-design-phoenix-az',                            // Web Design
+  'how-collection-accounts-affect-your-credit-arizona',             // Credit Repair
+  'event-marketing-scottsdale-business',                            // Digital Marketing
+  'how-to-get-a-merchant-account-arizona',                          // Business Services
+  'scottsdale-open-air-mall-retail-marketing-guide',                // Local Scottsdale/Phoenix
+  'phoenix-pool-service-company-google-ads-case-study',             // Case Studies
+  // ── Round 29 ─────────────────────────────────────────────────────────────────
+  'seo-vs-ppc-which-is-better-for-scottsdale-business',             // Website Audit
+  'competitor-seo-analysis-scottsdale-business',                    // SEO
+  'startup-website-design-scottsdale-az',                           // Web Design
+  'prepaid-debit-card-vs-secured-card-credit-building-arizona',     // Credit Repair
+  'public-relations-scottsdale-small-business',                     // Digital Marketing
+  'arizona-operating-agreement-what-to-include',                    // Business Services
+  'scottsdale-co-working-spaces-for-entrepreneurs-guide',           // Local Scottsdale/Phoenix
+  'scottsdale-car-detailing-business-social-media-case-study',      // Case Studies
+  // ── Round 30 ─────────────────────────────────────────────────────────────────
+  'website-audit-checklist-2025-scottsdale-business',               // Website Audit
+  'seo-mistakes-to-avoid-scottsdale-business-owner',                // SEO
+  'portfolio-website-design-scottsdale-creative',                   // Web Design
+  'credit-repair-myths-busted-arizona',                             // Credit Repair
+  'storytelling-in-marketing-scottsdale-brand',                     // Digital Marketing
+  'how-to-close-an-llc-in-arizona',                                 // Business Services
+  'scottsdale-tech-startup-ecosystem-marketing-guide',              // Local Scottsdale/Phoenix
+  'arizona-plumbing-company-reputation-management-case-study',      // Case Studies
+  // ── Rounds 31-40 — Website Audit, SEO, Web Design, Credit Repair, Digital Marketing ──
+  'how-to-read-a-website-audit-report-scottsdale',                  // Website Audit
+  'seo-roi-how-to-measure-it-scottsdale-business',                  // SEO
+  'how-to-choose-a-web-designer-scottsdale-az',                     // Web Design
+  'goodwill-letter-to-remove-late-payments-arizona',                // Credit Repair
+  'how-to-create-a-marketing-plan-scottsdale-business',             // Digital Marketing
+  'what-makes-a-good-website-audit-scottsdale',                     // Website Audit
+  'why-seo-takes-time-scottsdale-business-owner',                   // SEO
+  'website-design-trends-2025-scottsdale',                          // Web Design
+  'credit-repair-timeline-what-to-expect-arizona',                  // Credit Repair
+  'digital-marketing-budget-guide-scottsdale-small-business',       // Digital Marketing
+  'website-audit-vs-seo-audit-whats-the-difference',                // Website Audit
+  'seo-ranking-factors-2025-arizona-business',                      // SEO
+  'how-much-does-a-website-cost-scottsdale-az',                     // Web Design
+  'credit-repair-and-homeownership-arizona',                        // Credit Repair
+  'how-to-choose-a-digital-marketing-agency-scottsdale',            // Digital Marketing
+  'do-you-need-a-website-audit-scottsdale-checklist',               // Website Audit
+  'local-seo-vs-national-seo-which-does-scottsdale-need',          // SEO
+  'website-design-for-service-businesses-scottsdale-az',            // Web Design
+  'does-credit-repair-work-arizona-honest-answer',                  // Credit Repair
+  'marketing-automation-tools-for-scottsdale-small-business',       // Digital Marketing
+  'how-often-should-you-audit-your-website-scottsdale',             // Website Audit
+  'seo-for-new-websites-scottsdale-az',                             // SEO
+  'single-page-vs-multi-page-website-scottsdale-business',          // Web Design
+  'how-to-read-your-credit-report-arizona',                         // Credit Repair
+  'using-data-analytics-to-grow-scottsdale-business',               // Digital Marketing
+  'google-search-console-beginners-guide-scottsdale',               // Website Audit
+  'what-is-domain-authority-scottsdale-business-seo',               // SEO
+  'responsive-web-design-why-it-matters-scottsdale',                // Web Design
+  'credit-repair-for-entrepreneurs-arizona',                        // Credit Repair
+  'local-influencer-partnerships-scottsdale-business',              // Digital Marketing
+  'website-loading-speed-impact-scottsdale-conversions',            // Website Audit
+  'seo-for-startups-scottsdale-arizona',                            // SEO
+  'website-color-psychology-scottsdale-brand-guide',                // Web Design
+  'removing-hard-inquiries-from-credit-report-arizona',             // Credit Repair
+  'social-proof-strategies-scottsdale-online-marketing',            // Digital Marketing
+  'how-to-use-google-analytics-4-scottsdale-business',              // Website Audit
+  'nap-consistency-seo-guide-scottsdale-business',                  // SEO
+  'website-copywriting-tips-scottsdale-business-owner',             // Web Design
+  'what-credit-score-do-you-need-to-buy-a-house-arizona',          // Credit Repair
+  'seasonal-marketing-campaigns-scottsdale-business',               // Digital Marketing
+  // ── Rounds 41-50 — SEO only (10 remaining topics) ───────────────────────────
+  'how-to-get-featured-snippets-scottsdale-az',                     // SEO
+  'seo-for-multilocation-businesses-scottsdale-phoenix',            // SEO
+  'google-algorithm-updates-what-scottsdale-businesses-need-to-know', // SEO
+  'seo-for-podcasts-scottsdale-business',                           // SEO
+  'local-schema-markup-scottsdale-business-guide',                  // SEO
+  'seo-for-youtube-scottsdale-business',                            // SEO
+  'international-seo-for-scottsdale-exporters',                     // SEO
+  'seo-for-amazon-sellers-arizona',                                 // SEO
+  'seo-for-subscription-businesses-scottsdale',                     // SEO
+  'enterprise-seo-scottsdale-az-large-business',                    // SEO
 ];
 
 async function getGitHubFile(token: string, repo: string, path: string): Promise<{ content: string; sha: string }> {
@@ -454,7 +731,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   for (const m of slugMatches) existingSlugs.add(m[1]);
 
   const slug = TOPICS.find((t) => !existingSlugs.has(t));
-  if (!slug) return res.status(200).json({ success: false, message: 'All 40 topics already published.' });
+  if (!slug) return res.status(200).json({ success: false, message: 'All 300 topics already published.' });
 
   const keyword = slug.replace(/-/g, ' ');
   const today = new Date();
