@@ -1,6 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import sharp from 'sharp';
-import { createCanvas, loadImage } from 'canvas';
 
 export const maxDuration = 90;
 
@@ -107,7 +106,7 @@ function formatDateISO(d: Date): string {
   return d.toISOString().split('T')[0];
 }
 
-async function generateKieImage(apiKey: string, prompt: string): Promise<Buffer | null> {
+async function generateKieImage(apiKey: string, prompt: string): Promise<string | null> {
   const submitUrl = 'https://api.kie.ai/api/v1/jobs/createTask';
   const submitBody = {
     model: 'ideogram/v3-text-to-image',
@@ -202,16 +201,8 @@ async function generateKieImage(apiKey: string, prompt: string): Promise<Buffer 
         console.error(`[kie] FALLBACK: resultUrls is empty`);
         return null;
       }
-      console.log(`[kie] downloading image from: ${urls[0]}`);
-      const dl = await fetch(urls[0]);
-      console.log(`[kie] image download status: ${dl.status}`);
-      if (!dl.ok) {
-        console.error(`[kie] FALLBACK: image download failed with status ${dl.status}`);
-        return null;
-      }
-      const buf = Buffer.from(await dl.arrayBuffer());
-      console.log(`[kie] image downloaded successfully — ${buf.length} bytes`);
-      return buf;
+      console.log(`[kie] image URL ready: ${urls[0]}`);
+      return urls[0];
     }
 
     if (state === 'fail') {
@@ -315,84 +306,27 @@ function buildImagePrompt(slug: string, category: string): string {
   return `Centered composition, subject centered in frame filling 60-70% of the image, ${scene}, warm golden Arizona light, sharp focus, clean uncluttered background, premium lifestyle photography, aspirational, photorealistic, Instagram-optimized, no text, no logos, no watermarks`;
 }
 
-// ── Brand overlay compositor ──────────────────────────────────────────────────
-// Draws dark lower-third panel + text onto the image using node-canvas.
-// node-canvas bundles its own fonts so it works reliably on Vercel.
-async function compositeOverlay(imageBuffer: Buffer, displayTitle: string, category: string): Promise<Buffer> {
-  const img = await loadImage(imageBuffer);
-  const W = img.width  || 1024;
-  const H = img.height || 1024;
+// ── Brand image via og-image edge function ────────────────────────────────────
+// Calls /api/og-image (a @vercel/og edge function) which composites the photo,
+// dark panel, headline, category, and RAH. mark, then converts PNG → JPEG.
+async function brandImage(sourceUrl: string, title: string, category: string): Promise<Buffer> {
+  const host = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : 'https://www.rahoperations.com';
+  const endpoint = new URL(`${host}/api/og-image`);
+  endpoint.searchParams.set('title', title);
+  endpoint.searchParams.set('category', category);
+  endpoint.searchParams.set('imageUrl', sourceUrl);
 
-  const canvas = createCanvas(W, H);
-  const ctx = canvas.getContext('2d');
-
-  // ── Background image ───────────────────────────────────────────────────────
-  ctx.drawImage(img, 0, 0, W, H);
-
-  // ── Layout constants ───────────────────────────────────────────────────────
-  const panelTop  = Math.round(H * 0.72);
-  const pad       = Math.round(W * 0.04);
-  const accentH   = Math.max(3, Math.round(H * 0.003));
-  const bottomPad = Math.round(H * 0.04);
-  const textW     = W - 2 * pad;
-
-  // Font sizes scaled from reference at 1024 px
-  const headSz = Math.round(48 * H / 1024);
-  const catSz  = Math.round(24 * H / 1024);
-  const rahSz  = Math.round(32 * H / 1024);
-
-  // ── Dark panel ─────────────────────────────────────────────────────────────
-  ctx.fillStyle = 'rgba(10,10,10,0.88)';
-  ctx.fillRect(0, panelTop, W, H - panelTop);
-
-  // ── Crimson accent line ────────────────────────────────────────────────────
-  ctx.fillStyle = '#8B1E1E';
-  ctx.fillRect(0, panelTop, W, accentH);
-
-  // ── Headline (word-wrapped) ────────────────────────────────────────────────
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = `bold ${headSz}px sans-serif`;
-  ctx.textBaseline = 'top';
-
-  // Simple word-wrap: split into lines that fit within textW
-  const words = displayTitle.split(' ');
-  const lines: string[] = [];
-  let line = '';
-  for (const word of words) {
-    const test = line ? `${line} ${word}` : word;
-    if (ctx.measureText(test).width > textW && line) {
-      lines.push(line);
-      line = word;
-    } else {
-      line = test;
-    }
+  console.log(`[brand] calling og-image: ${endpoint.toString().slice(0, 200)}`);
+  const res = await fetch(endpoint.toString());
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`og-image ${res.status}: ${err.slice(0, 300)}`);
   }
-  if (line) lines.push(line);
-
-  const lineH     = headSz * 1.25;
-  const headlineH = lines.length * lineH;
-  const catH      = catSz * 1.4;
-
-  // Position: category sits above bottomPad, headline sits above category
-  const catTop      = H - bottomPad - catH;
-  const headlineGap = Math.round(H * 0.015);
-  const headlineTop = Math.max(panelTop + accentH + 6, catTop - headlineGap - headlineH);
-
-  lines.forEach((l, i) => ctx.fillText(l, pad, headlineTop + i * lineH));
-
-  // ── Category label ─────────────────────────────────────────────────────────
-  ctx.fillStyle = '#8B1E1E';
-  ctx.font = `${catSz}px sans-serif`;
-  ctx.textBaseline = 'top';
-  ctx.fillText(category.toUpperCase(), pad, catTop);
-
-  // ── RAH. mark (bottom-right) ───────────────────────────────────────────────
-  ctx.fillStyle = '#C8B99A';
-  ctx.font = `bold ${rahSz}px sans-serif`;
-  ctx.textBaseline = 'bottom';
-  ctx.fillText('RAH.', W - pad - ctx.measureText('RAH.').width, H - bottomPad);
-
-  return canvas.toBuffer('image/jpeg', { quality: 0.92 });
+  const png = Buffer.from(await res.arrayBuffer());
+  console.log(`[brand] og-image PNG received: ${png.length} bytes`);
+  return sharp(png).jpeg({ quality: 90 }).toBuffer();
 }
 
 // ── RSS helpers ───────────────────────────────────────────────────────────────
@@ -632,33 +566,36 @@ Return a JSON object with these exact fields:
     }
   }
 
-  // ── STEP 3: generate image via Kie.ai ───────────────────────────────────────
+  // ── STEP 3: generate branded image ──────────────────────────────────────────
   const FALLBACK_IMG = `https://raw.githubusercontent.com/${githubRepo}/${githubBranch}/public/blogs/how-to-improve-google-business-profile-scottsdale.jpg`;
   let imageBuffer: Buffer | null = null;
 
+  // Resolve photo URL: Kie.ai CDN or fallback
+  let sourceUrl: string = FALLBACK_IMG;
   if (kieKey) {
     try {
       const imagePrompt = buildImagePrompt(slug, post.category);
-      console.log(`[generate-blog] image prompt: ${imagePrompt}`);
-      imageBuffer = await generateKieImage(kieKey, imagePrompt);
-      // ── DEBUG: image buffer from Kie.ai ──────────────────────────────────────
-      if (imageBuffer) {
-        console.log(`[DEBUG:image] Kie.ai returned buffer — size: ${imageBuffer.length} bytes (${(imageBuffer.length / 1024).toFixed(1)} KB)`);
-        try {
-          const rawSize = imageBuffer.length;
-          imageBuffer = await compositeOverlay(imageBuffer, post.displayTitle, post.category);
-          console.log(`[DEBUG:image] compositeOverlay succeeded — before: ${(rawSize / 1024).toFixed(1)} KB, after: ${(imageBuffer.length / 1024).toFixed(1)} KB`);
-        } catch (overlayErr) {
-          console.error('[DEBUG:image] compositeOverlay FAILED (using raw image):', overlayErr instanceof Error ? overlayErr.message : String(overlayErr));
-        }
+      console.log(`[image] prompt: ${imagePrompt}`);
+      const kieUrl = await generateKieImage(kieKey, imagePrompt);
+      if (kieUrl) {
+        sourceUrl = kieUrl;
+        console.log(`[image] Kie.ai URL: ${kieUrl}`);
       } else {
-        console.warn('[DEBUG:image] Kie.ai returned null — will use fallback image');
+        console.warn(`[image] Kie.ai returned null — using fallback`);
       }
-    } catch (imgErr) {
-      console.error('[DEBUG:image] Kie.ai threw:', imgErr instanceof Error ? imgErr.message : String(imgErr));
+    } catch (err) {
+      console.error('[image] Kie.ai threw:', err instanceof Error ? err.message : String(err));
     }
   } else {
-    console.warn('[DEBUG:image] KIE_API_KEY not set — skipping image generation');
+    console.warn('[image] KIE_API_KEY not set — using fallback');
+  }
+
+  // Brand the image via the og-image edge function
+  try {
+    imageBuffer = await brandImage(sourceUrl, post.displayTitle, post.category);
+    console.log(`[image] branded JPEG: ${(imageBuffer.length / 1024).toFixed(1)} KB`);
+  } catch (err) {
+    console.error('[image] brandImage failed:', err instanceof Error ? err.message : String(err));
   }
 
   // ── STEP 4: build file changes ───────────────────────────────────────────────
@@ -728,42 +665,14 @@ Return a JSON object with these exact fields:
         const existing = await getGitHubFile(githubToken, githubRepo, imgPath);
         existingImgSha = existing.sha;
       } catch (_) { /* file doesn't exist yet */ }
-      console.log(`[DEBUG:image] pushing ${(imageBuffer.length / 1024).toFixed(1)} KB to GitHub: ${imgPath}`);
       await putGitHubBinary(githubToken, githubRepo, githubBranch, imgPath, imageBuffer, existingImgSha, `Add blog hero image: ${slug}`);
       imageUploaded = true;
-      const githubRawUrl = `https://raw.githubusercontent.com/${githubRepo}/${githubBranch}/${imgPath}`;
-      const productionUrl  = `https://www.rahoperations.com/blogs/${slug}.jpg`;
-      console.log(`[DEBUG:image] GitHub raw URL: ${githubRawUrl}`);
-      console.log(`[DEBUG:image] Production image URL: ${productionUrl}`);
-    } catch (imgPushErr) {
-      console.error('[DEBUG:image] push to GitHub FAILED:', imgPushErr instanceof Error ? imgPushErr.message : String(imgPushErr));
+      console.log(`[image] pushed ${(imageBuffer.length / 1024).toFixed(1)} KB → ${imgPath}`);
+    } catch (err) {
+      console.error('[image] push to GitHub FAILED:', err instanceof Error ? err.message : String(err));
     }
-  }
-
-  // If no image was pushed, copy the fallback so /blogs/[slug].jpg always resolves
-  if (!imageUploaded) {
-    try {
-      const fallbackRes = await fetch(FALLBACK_IMG);
-      if (fallbackRes.ok) {
-        let fallbackBuf = Buffer.from(await fallbackRes.arrayBuffer());
-        try {
-          fallbackBuf = await compositeOverlay(fallbackBuf, post.displayTitle, post.category);
-        } catch (overlayErr) {
-          console.error('Overlay on fallback failed (using raw fallback):', overlayErr instanceof Error ? overlayErr.message : String(overlayErr));
-        }
-        let existingImgSha: string | null = null;
-        try {
-          const existing = await getGitHubFile(githubToken, githubRepo, imgPath);
-          existingImgSha = existing.sha;
-        } catch (_) { /* file doesn't exist yet */ }
-        await putGitHubBinary(githubToken, githubRepo, githubBranch, imgPath, fallbackBuf, existingImgSha, `Add fallback hero image: ${slug}`);
-        console.log(`Kie.ai image unavailable — used fallback for ${slug}`);
-      } else {
-        console.error(`Could not fetch fallback image: ${fallbackRes.status}`);
-      }
-    } catch (fallbackErr) {
-      console.error('Fallback image push failed:', fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr));
-    }
+  } else {
+    console.error('[image] No branded buffer — skipping image push');
   }
 
   // ── STEP 6: regenerate rss.xml ──────────────────────────────────────────────
