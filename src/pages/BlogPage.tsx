@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Ecommerce Website Design Phoenix | RAH Operations",
+      displayTitle: "Ecommerce Website Design in Phoenix: Build a Store That Actually Sells",
+      date: "May 13, 2026",
+      pubDate: "Wed, 13 May 2026 03:04:17 GMT",
+      issue: 'No. 032',
+      category: "Website Design",
+      excerpt: "If your Phoenix business is ready to sell online, the quality of your ecommerce website design can make or break your revenue. RAH Operations builds fast, conversion-focused online stores tailored to Arizona businesses. Discover what separates a store that sells from one that just exists.",
+      slug: 'ecommerce-website-design-phoenix'
+    },
+    {
       title: "Arizona Small Business Growth Strategies That Work",
       displayTitle: "Arizona Small Business Growth Strategies That Actually Move the Needle in 2026",
       date: "May 13, 2026",
