@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import sharp from 'sharp';
-import { execSync } from 'child_process';
+
+const DEJAVU_BOLD = '/var/task/node_modules/dejavu-fonts-ttf/ttf/DejaVuSans-Bold.ttf';
 
 export const maxDuration = 90;
 
@@ -320,8 +321,8 @@ function buildImagePrompt(slug: string, category: string): string {
 // Top 72% is pixel-perfect untouched.
 //
 // SVG is used only for the panel rectangle and accent line (no fonts needed).
-// Text is rendered via sharp's built-in libvips text engine (font:'sans' maps
-// to DejaVu Sans on Vercel's Linux environment — always available).
+// Text is rendered via sharp's libvips text engine with DejaVuSans-Bold.ttf
+// bundled via the dejavu-fonts-ttf npm package (fontconfig absent on Vercel).
 async function compositeOverlay(imageBuffer: Buffer, displayTitle: string, category: string): Promise<Buffer> {
   const meta = await sharp(imageBuffer).metadata();
   const W = meta.width  ?? 1024;
@@ -349,7 +350,8 @@ async function compositeOverlay(imageBuffer: Buffer, displayTitle: string, categ
     sharp({
       text: {
         text: `<span foreground="#FFFFFF">${esc(displayTitle)}</span>`,
-        font: 'sans',
+        font: 'DejaVu Sans',
+        fontfile: DEJAVU_BOLD,
         fontSize: headSz,
         rgba: true,
         width: textW,
@@ -358,7 +360,8 @@ async function compositeOverlay(imageBuffer: Buffer, displayTitle: string, categ
     sharp({
       text: {
         text: `<span foreground="#8B1E1E">${esc(category.toUpperCase())}</span>`,
-        font: 'sans',
+        font: 'DejaVu Sans',
+        fontfile: DEJAVU_BOLD,
         fontSize: catSz,
         rgba: true,
       },
@@ -366,7 +369,8 @@ async function compositeOverlay(imageBuffer: Buffer, displayTitle: string, categ
     sharp({
       text: {
         text: '<span foreground="#C8B99A">RAH.</span>',
-        font: 'sans',
+        font: 'DejaVu Sans',
+        fontfile: DEJAVU_BOLD,
         fontSize: rahSz,
         rgba: true,
       },
@@ -515,21 +519,6 @@ ${items}
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   if (!validateAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
-
-  // ── FONT PROBE (remove after confirming available fonts) ─────────────────────
-  try {
-    const fcList = execSync('fc-list', { timeout: 5000 }).toString().trim();
-    console.log('[font-probe] fc-list output:\n' + (fcList || '(empty — no fonts found)'));
-  } catch (e) {
-    console.warn('[font-probe] fc-list failed:', e instanceof Error ? e.message : String(e));
-  }
-  try {
-    const fcSans = execSync('fc-match sans', { timeout: 3000 }).toString().trim();
-    console.log('[font-probe] fc-match sans:', fcSans);
-  } catch (e) {
-    console.warn('[font-probe] fc-match sans failed:', e instanceof Error ? e.message : String(e));
-  }
-  // ─────────────────────────────────────────────────────────────────────────────
 
   const githubToken = process.env.GITHUB_TOKEN;
   const githubRepo = process.env.GITHUB_REPO;
