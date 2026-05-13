@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import sharp from 'sharp';
+import { execSync } from 'child_process';
 
 export const maxDuration = 90;
 
@@ -514,6 +515,21 @@ ${items}
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   if (!validateAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
+
+  // ── FONT PROBE (remove after confirming available fonts) ─────────────────────
+  try {
+    const fcList = execSync('fc-list', { timeout: 5000 }).toString().trim();
+    console.log('[font-probe] fc-list output:\n' + (fcList || '(empty — no fonts found)'));
+  } catch (e) {
+    console.warn('[font-probe] fc-list failed:', e instanceof Error ? e.message : String(e));
+  }
+  try {
+    const fcSans = execSync('fc-match sans', { timeout: 3000 }).toString().trim();
+    console.log('[font-probe] fc-match sans:', fcSans);
+  } catch (e) {
+    console.warn('[font-probe] fc-match sans failed:', e instanceof Error ? e.message : String(e));
+  }
+  // ─────────────────────────────────────────────────────────────────────────────
 
   const githubToken = process.env.GITHUB_TOKEN;
   const githubRepo = process.env.GITHUB_REPO;
