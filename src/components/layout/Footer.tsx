@@ -11,7 +11,13 @@ const NAV = [
 const SOCIAL = [
   { label: 'Instagram', href: 'https://www.instagram.com/rahoperations/' },
   { label: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61574789296433' },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/company/rah-operations-llc/' },
   { label: 'Google', href: 'https://share.google/l649HqItg69vKH5sb' },
+];
+
+const DIRECTORIES = [
+  { label: 'Yelp', href: 'https://www.yelp.com/biz/rah-operations-scottsdale' },
+  { label: 'Yahoo Local', href: 'https://local.yahoo.com/info-238916375-rah-operations-scottsdale/' },
 ];
 
 const Footer = () => (
@@ -64,7 +70,7 @@ const Footer = () => (
           </div>
         </div>
 
-        {/* Right — social */}
+        {/* Right — social + directories */}
         <div className="flex flex-col gap-2.5">
           <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-[#3A3A3A]">Follow</p>
           {SOCIAL.map((s) => (
@@ -78,6 +84,20 @@ const Footer = () => (
               {s.label}
             </a>
           ))}
+          <div className="mt-2 border-t border-[#1A1A1A] pt-3">
+            <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.14em] text-[#3A3A3A]">Find Us On</p>
+            {DIRECTORIES.map((d) => (
+              <a
+                key={d.label}
+                href={d.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-[13px] transition-colors hover:text-[#F5F5F5]"
+              >
+                {d.label}
+              </a>
+            ))}
+          </div>
         </div>
       </div>
 
