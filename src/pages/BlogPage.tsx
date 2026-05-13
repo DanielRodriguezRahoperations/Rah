@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Google Business Profile Optimization Scottsdale",
+      displayTitle: "Google Business Profile Optimization in Scottsdale: The Complete Guide to Dominating Local Search",
+      date: "May 13, 2026",
+      pubDate: "Wed, 13 May 2026 02:38:43 GMT",
+      issue: 'No. 030',
+      category: "SEO",
+      excerpt: "If your Scottsdale business isn't showing up in Google's Local Pack, you're losing customers to competitors who've optimized their Google Business Profile. RAH Operations breaks down exactly what it takes to dominate local search in the Valley. Learn the strategies that actually move the needle.",
+      slug: 'google-business-profile-optimization-scottsdale'
+    },
+    {
       title: "Notary Services Scottsdale AZ | Find & Hire Fast",
       displayTitle: "Notary Services in Scottsdale AZ: What You Need to Know Before You Sign",
       date: "May 13, 2026",
