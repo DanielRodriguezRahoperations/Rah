@@ -315,15 +315,26 @@ function buildImagePrompt(slug: string, category: string): string {
 }
 
 // ── Brand overlay compositor ──────────────────────────────────────────────────
-// Composites RAH logo, category label, and headline onto the Ideogram image
-// using an SVG layer via sharp. Outputs JPEG at 90% quality.
+// Lower-third branded panel over the bottom 28% of the image only.
+// Top 72% is pixel-perfect untouched — no vignette, no text, nothing.
+// Outputs JPEG at 90% quality at the original image dimensions.
 async function compositeOverlay(imageBuffer: Buffer, displayTitle: string, category: string): Promise<Buffer> {
   const meta = await sharp(imageBuffer).metadata();
-  const W = meta.width ?? 1024;
+  const W = meta.width  ?? 1024;
   const H = meta.height ?? 1024;
 
-  // Split the title into at most 2 lines on word boundaries
-  const MAX_CHARS = Math.floor(W / 19);
+  // Panel geometry — bottom 28% only
+  const panelTop = Math.round(H * 0.72);
+  const pad      = Math.round(W * 0.04);
+
+  // Font sizes proportional to image height
+  const catSz  = Math.round(H * 0.016);   // ~16 px at 1024 — category label
+  const headSz = Math.round(H * 0.038);   // ~39 px at 1024 — headline
+  const rahSz  = Math.round(H * 0.028);   // ~29 px at 1024 — RAH. mark
+
+  // Word-wrap headline into at most 2 lines on word boundaries.
+  // Width estimate: Georgia at headSz uses ~0.52× headSz per character on average.
+  const MAX_CHARS = Math.floor((W - 2 * pad) / (headSz * 0.52));
   const words = displayTitle.split(' ');
   let line1 = '';
   const line2Words: string[] = [];
@@ -339,47 +350,40 @@ async function compositeOverlay(imageBuffer: Buffer, displayTitle: string, categ
   let line2 = line2Words.join(' ');
   if (line2.length > MAX_CHARS) line2 = line2.slice(0, MAX_CHARS - 1) + '…';
 
-  const pad        = Math.round(W * 0.038);
-  const logoSz     = Math.round(W * 0.034);
-  const catSz      = Math.round(W * 0.018);
-  const headSz     = Math.round(W * 0.036);
-  const catY       = H - pad - (line2 ? headSz * 2.6 : headSz * 1.5) - catSz * 1.2;
-  const line1Y     = catY + catSz * 2.4;
-  const line2Y     = line1Y + headSz * 1.28;
+  // Y positions (SVG baselines), built bottom-up:
+  //   catY   — category label, 7% from bottom
+  //   line2Y — headline line 2 (if needed), just above category
+  //   line1Y — headline line 1, above line 2 (or above category if 1-line)
+  const catY   = Math.round(H * 0.93);
+  const gap    = Math.round(headSz * 0.45);          // space between category and headline
+  const lineH  = Math.round(headSz * 1.25);          // headline line height
+  const line2Y = line2 ? catY - catSz - gap        : 0;
+  const line1Y = line2 ? line2Y - lineH            : catY - catSz - gap;
 
   const esc = (s: string) =>
     s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
   const svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="vg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%"   stop-color="#0A0A0A" stop-opacity="0"/>
-      <stop offset="48%"  stop-color="#0A0A0A" stop-opacity="0"/>
-      <stop offset="100%" stop-color="#0A0A0A" stop-opacity="0.88"/>
-    </linearGradient>
-    <linearGradient id="tg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%"   stop-color="#0A0A0A" stop-opacity="0.42"/>
-      <stop offset="100%" stop-color="#0A0A0A" stop-opacity="0"/>
-    </linearGradient>
-  </defs>
-  <!-- Bottom vignette for text legibility -->
-  <rect width="${W}" height="${H}" fill="url(#vg)"/>
-  <!-- Top vignette for logo legibility -->
-  <rect width="${W}" height="${Math.round(H * 0.22)}" fill="url(#tg)"/>
-  <!-- RAH wordmark -->
-  <text x="${pad}" y="${pad + logoSz}" font-family="Arial, Helvetica, sans-serif"
-        font-size="${logoSz}" font-weight="bold" fill="#C8B99A"
-        letter-spacing="${Math.round(logoSz * 0.24)}">RAH</text>
-  <!-- Category label -->
-  <text x="${pad}" y="${catY}" font-family="Arial, Helvetica, sans-serif"
+  <!-- Dark panel: bottom 28% only. Nothing above panelTop. -->
+  <rect x="0" y="${panelTop}" width="${W}" height="${H - panelTop}"
+        fill="#0A0A0A" fill-opacity="0.88"/>
+  <!-- Headline: Georgia serif bold, white -->
+  <text x="${pad}" y="${line1Y}"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="${headSz}" font-weight="bold" fill="#FFFFFF">${esc(line1)}</text>
+  ${line2 ? `<text x="${pad}" y="${line2Y}"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="${headSz}" font-weight="bold" fill="#FFFFFF">${esc(line2)}</text>` : ''}
+  <!-- Category: Arial uppercase, brand red, ~7% from bottom -->
+  <text x="${pad}" y="${catY}"
+        font-family="Arial, Helvetica, sans-serif"
         font-size="${catSz}" font-weight="bold" fill="#8B1E1E"
-        letter-spacing="${Math.round(catSz * 0.18)}">${esc(category.toUpperCase())}</text>
-  <!-- Headline line 1 -->
-  <text x="${pad}" y="${line1Y}" font-family="Arial, Helvetica, sans-serif"
-        font-size="${headSz}" font-weight="bold" fill="#C8B99A">${esc(line1)}</text>
-  ${line2 ? `<!-- Headline line 2 -->
-  <text x="${pad}" y="${line2Y}" font-family="Arial, Helvetica, sans-serif"
-        font-size="${headSz}" font-weight="bold" fill="#C8B99A">${esc(line2)}</text>` : ''}
+        letter-spacing="${Math.round(catSz * 0.20)}">${esc(category.toUpperCase())}</text>
+  <!-- RAH. mark: Georgia serif, cream, bottom-right -->
+  <text x="${W - pad}" y="${catY}"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="${rahSz}" font-weight="bold" fill="#C8B99A"
+        text-anchor="end">RAH.</text>
 </svg>`;
 
   return sharp(imageBuffer)
