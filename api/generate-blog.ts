@@ -1,7 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import sharp from 'sharp';
-
-const DEJAVU_BOLD = '/var/task/node_modules/dejavu-fonts-ttf/ttf/DejaVuSans-Bold.ttf';
+import { createCanvas, loadImage } from 'canvas';
 
 export const maxDuration = 90;
 
@@ -317,100 +316,83 @@ function buildImagePrompt(slug: string, category: string): string {
 }
 
 // ── Brand overlay compositor ──────────────────────────────────────────────────
-// Lower-third branded panel over the bottom 28% of the image only.
-// Top 72% is pixel-perfect untouched.
-//
-// SVG is used only for the panel rectangle and accent line (no fonts needed).
-// Text is rendered via sharp's libvips text engine with DejaVuSans-Bold.ttf
-// bundled via the dejavu-fonts-ttf npm package (fontconfig absent on Vercel).
+// Draws dark lower-third panel + text onto the image using node-canvas.
+// node-canvas bundles its own fonts so it works reliably on Vercel.
 async function compositeOverlay(imageBuffer: Buffer, displayTitle: string, category: string): Promise<Buffer> {
-  const meta = await sharp(imageBuffer).metadata();
-  const W = meta.width  ?? 1024;
-  const H = meta.height ?? 1024;
+  const img = await loadImage(imageBuffer);
+  const W = img.width  || 1024;
+  const H = img.height || 1024;
 
+  const canvas = createCanvas(W, H);
+  const ctx = canvas.getContext('2d');
+
+  // ── Background image ───────────────────────────────────────────────────────
+  ctx.drawImage(img, 0, 0, W, H);
+
+  // ── Layout constants ───────────────────────────────────────────────────────
   const panelTop  = Math.round(H * 0.72);
   const pad       = Math.round(W * 0.04);
-  const accentH   = Math.max(3, Math.round(H * 0.003));  // crimson accent line height
-  const textW     = W - 2 * pad;                          // max text width
+  const accentH   = Math.max(3, Math.round(H * 0.003));
   const bottomPad = Math.round(H * 0.04);
+  const textW     = W - 2 * pad;
 
-  // Font sizes scaled from reference values at 1024 px
-  const headSz = Math.round(52 * H / 1024);
-  const catSz  = Math.round(28 * H / 1024);
-  const rahSz  = Math.round(22 * H / 1024);
+  // Font sizes scaled from reference at 1024 px
+  const headSz = Math.round(48 * H / 1024);
+  const catSz  = Math.round(24 * H / 1024);
+  const rahSz  = Math.round(32 * H / 1024);
 
-  // Pango XML escaping (used inside <span> markup)
-  const esc = (s: string) =>
-    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  // ── Dark panel ─────────────────────────────────────────────────────────────
+  ctx.fillStyle = 'rgba(10,10,10,0.88)';
+  ctx.fillRect(0, panelTop, W, H - panelTop);
 
-  // Render each text element as an RGBA PNG via sharp's libvips text renderer.
-  // Pango <span foreground="..."> sets text colour; rgba:true preserves alpha.
-  // width on the headline enables automatic word-wrap at textW pixels.
-  const [headlineBuf, categoryBuf, rahBuf] = await Promise.all([
-    sharp({
-      text: {
-        text: `<span foreground="#FFFFFF">${esc(displayTitle)}</span>`,
-        font: 'DejaVu Sans',
-        fontfile: DEJAVU_BOLD,
-        fontSize: headSz,
-        rgba: true,
-        width: textW,
-      },
-    }).png().toBuffer(),
-    sharp({
-      text: {
-        text: `<span foreground="#8B1E1E">${esc(category.toUpperCase())}</span>`,
-        font: 'DejaVu Sans',
-        fontfile: DEJAVU_BOLD,
-        fontSize: catSz,
-        rgba: true,
-      },
-    }).png().toBuffer(),
-    sharp({
-      text: {
-        text: '<span foreground="#C8B99A">RAH.</span>',
-        font: 'DejaVu Sans',
-        fontfile: DEJAVU_BOLD,
-        fontSize: rahSz,
-        rgba: true,
-      },
-    }).png().toBuffer(),
-  ]);
+  // ── Crimson accent line ────────────────────────────────────────────────────
+  ctx.fillStyle = '#8B1E1E';
+  ctx.fillRect(0, panelTop, W, accentH);
 
-  // Read back rendered dimensions for precise positioning
-  const [headlineInfo, categoryInfo, rahInfo] = await Promise.all([
-    sharp(headlineBuf).metadata(),
-    sharp(categoryBuf).metadata(),
-    sharp(rahBuf).metadata(),
-  ]);
+  // ── Headline (word-wrapped) ────────────────────────────────────────────────
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = `bold ${headSz}px sans-serif`;
+  ctx.textBaseline = 'top';
 
-  const headlineH = headlineInfo.height ?? headSz * 2;
-  const categoryH = categoryInfo.height ?? catSz;
-  const rahW      = rahInfo.width       ?? rahSz * 4;
-  const rahH      = rahInfo.height      ?? rahSz;
+  // Simple word-wrap: split into lines that fit within textW
+  const words = displayTitle.split(' ');
+  const lines: string[] = [];
+  let line = '';
+  for (const word of words) {
+    const test = line ? `${line} ${word}` : word;
+    if (ctx.measureText(test).width > textW && line) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = test;
+    }
+  }
+  if (line) lines.push(line);
 
-  // Positions built bottom-up
-  const catTop      = H - bottomPad - categoryH;
+  const lineH     = headSz * 1.25;
+  const headlineH = lines.length * lineH;
+  const catH      = catSz * 1.4;
+
+  // Position: category sits above bottomPad, headline sits above category
+  const catTop      = H - bottomPad - catH;
   const headlineGap = Math.round(H * 0.015);
-  const headlineTop = Math.max(panelTop + accentH + 4, catTop - headlineGap - headlineH);
-  const rahTop      = H - bottomPad - rahH;
-  const rahLeft     = Math.max(pad, W - pad - rahW);
+  const headlineTop = Math.max(panelTop + accentH + 6, catTop - headlineGap - headlineH);
 
-  // Dark panel + crimson accent line — pure SVG rects, no fonts
-  const panelSvg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
-  <rect x="0" y="${panelTop}" width="${W}" height="${H - panelTop}" fill="#0A0A0A" fill-opacity="0.88"/>
-  <rect x="0" y="${panelTop}" width="${W}" height="${accentH}" fill="#8B1E1E"/>
-</svg>`;
+  lines.forEach((l, i) => ctx.fillText(l, pad, headlineTop + i * lineH));
 
-  return sharp(imageBuffer)
-    .composite([
-      { input: Buffer.from(panelSvg), blend: 'over' },
-      { input: headlineBuf, top: headlineTop, left: pad,     blend: 'over' },
-      { input: categoryBuf, top: catTop,      left: pad,     blend: 'over' },
-      { input: rahBuf,      top: rahTop,      left: rahLeft, blend: 'over' },
-    ])
-    .jpeg({ quality: 90 })
-    .toBuffer();
+  // ── Category label ─────────────────────────────────────────────────────────
+  ctx.fillStyle = '#8B1E1E';
+  ctx.font = `${catSz}px sans-serif`;
+  ctx.textBaseline = 'top';
+  ctx.fillText(category.toUpperCase(), pad, catTop);
+
+  // ── RAH. mark (bottom-right) ───────────────────────────────────────────────
+  ctx.fillStyle = '#C8B99A';
+  ctx.font = `bold ${rahSz}px sans-serif`;
+  ctx.textBaseline = 'bottom';
+  ctx.fillText('RAH.', W - pad - ctx.measureText('RAH.').width, H - bottomPad);
+
+  return canvas.toBuffer('image/jpeg', { quality: 0.92 });
 }
 
 // ── RSS helpers ───────────────────────────────────────────────────────────────
