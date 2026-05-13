@@ -1,4 +1,10 @@
 {
+  "crons": [
+    {
+      "path": "/api/generate-blog",
+      "schedule": "0 */4 * * *"
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
