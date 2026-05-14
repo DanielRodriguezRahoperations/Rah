@@ -681,6 +681,15 @@ Return a JSON object with these exact fields:
   //   2. Substring from first { to last } → parse
   //   3. Regex scan for any {...} block → parse the largest match
   const parseClaude = (rawText: string): ClaudePost => {
+    // Step 0: global fence strip — most common Claude output pattern
+    try {
+      const cleaned = rawText
+        .replace(/```json\n?/g, '')
+        .replace(/```\n?/g, '')
+        .trim();
+      return JSON.parse(cleaned) as ClaudePost;
+    } catch { /* try next */ }
+
     // Step 1: strip leading/trailing code fences
     let clean = rawText
       .trim()
