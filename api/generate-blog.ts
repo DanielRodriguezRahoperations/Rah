@@ -649,7 +649,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 8000,
+        max_tokens: 16000,
         system: 'You are an expert SEO content writer for RAH Operations, a Scottsdale AZ digital agency offering website design, SEO, digital marketing, social media management, and credit repair. Write blog posts that rank on Google for local Arizona searches. Always write in a confident, helpful, expert tone. Never use filler content. Output only raw JSON — no prose, no markdown, no code fences. The current year is 2026. Never include a specific year in titles or headlines unless it is 2026.',
         messages: [
           {
@@ -702,6 +702,18 @@ Return a JSON object with these exact fields:
     const match = clean.match(/\{[\s\S]*\}/);
     if (match) {
       try { return JSON.parse(match[0]) as ClaudePost; } catch { /* fall through */ }
+    }
+
+    // Step 4: sanitize smart quotes and em dashes, then re-attempt full parse
+    const sanitized = clean
+      .replace(/[“”]/g, '"')
+      .replace(/[‘’]/g, "'")
+      .replace(/—/g, '-');
+    try { return JSON.parse(sanitized) as ClaudePost; } catch { /* fall through */ }
+    const sfirst = sanitized.indexOf('{');
+    const slast  = sanitized.lastIndexOf('}');
+    if (sfirst !== -1 && slast > sfirst) {
+      try { return JSON.parse(sanitized.slice(sfirst, slast + 1)) as ClaudePost; } catch { /* fall through */ }
     }
 
     throw new SyntaxError(
