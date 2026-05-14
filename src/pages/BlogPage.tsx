@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "How to Audit Your Website SEO Step by Step Free Guide",
+      displayTitle: "How to Audit Your Website SEO Step by Step: The Complete Free Guide",
+      date: "May 14, 2026",
+      pubDate: "Thu, 14 May 2026 03:51:50 GMT",
+      issue: 'No. 035',
+      category: "SEO",
+      excerpt: "If your website isn't ranking on Google, a thorough SEO audit is the first step to finding out why. This free step-by-step guide walks you through every layer of your site's SEO so you can identify problems, prioritize fixes, and start climbing the search results. Whether you're a small business owner in Arizona or managing a growing brand, this guide gives you the tools to take action.",
+      slug: 'how-to-audit-your-website-seo-step-by-step-free-guide'
+    },
+    {
       title: "Website Audit Checklist for Small Business Owners 2026",
       displayTitle: "The Complete Website Audit Checklist Every Small Business Owner Needs in 2026",
       date: "May 14, 2026",
