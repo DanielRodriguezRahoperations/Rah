@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Website Audit for Plumbers: How to Rank Locally in 2026",
+      displayTitle: "Website Audit for Plumbers: The Complete Guide to Dominating Local Search",
+      date: "May 14, 2026",
+      pubDate: "Thu, 14 May 2026 12:01:52 GMT",
+      issue: 'No. 044',
+      category: "SEO",
+      excerpt: "If your plumbing business is not showing up on Google when local customers search for help, a website audit is the first step to fixing that. This guide walks you through exactly what to look for and how to turn your site into a lead-generating machine. RAH Operations helps Arizona plumbers rank locally and grow fast.",
+      slug: 'website-audit-for-plumbers-how-to-rank-locally'
+    },
+    {
       title: "Website Audit for Law Firms: What Google Looks For",
       displayTitle: "Website Audit for Law Firms: What Google Really Looks For in 2026",
       date: "May 14, 2026",
