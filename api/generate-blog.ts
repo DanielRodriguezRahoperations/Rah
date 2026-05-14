@@ -601,7 +601,10 @@ ${items}
 }
 
 function parseClaude(raw: string): Record<string, unknown> {
-  const s = raw.replace(/```json/g, '').replace(/```/g, '').trim();
+  const s = raw
+    .replace(/```json\s*/g, '')
+    .replace(/```\s*/g, '')
+    .trim();
   try { return JSON.parse(s); } catch {}
   const a = s.indexOf('{');
   const b = s.lastIndexOf('}');
