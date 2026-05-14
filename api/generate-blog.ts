@@ -600,13 +600,13 @@ ${items}
 </rss>`;
 }
 
-function parseClaude(raw: string) {
-  const stripped = raw.replace(/^```json\s*/,'').replace(/\s*```$/,'').trim();
-  try { return JSON.parse(stripped); } catch {}
-  const start = stripped.indexOf('{');
-  const end = stripped.lastIndexOf('}');
-  if (start !== -1 && end !== -1) {
-    try { return JSON.parse(stripped.slice(start, end + 1)); } catch {}
+function parseClaude(raw: string): Record<string, unknown> {
+  const s = raw.replace(/```json/g, '').replace(/```/g, '').trim();
+  try { return JSON.parse(s); } catch {}
+  const a = s.indexOf('{');
+  const b = s.lastIndexOf('}');
+  if (a !== -1 && b !== -1) {
+    try { return JSON.parse(s.slice(a, b + 1)); } catch {}
   }
   throw new Error('Failed to parse Claude JSON');
 }
