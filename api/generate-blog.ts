@@ -601,15 +601,13 @@ ${items}
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Accept POST (admin portal) or GET (Vercel cron — sends Authorization: Bearer <CRON_SECRET>)
+  // Accept POST (admin portal) or GET (Vercel cron — sends x-vercel-cron: 1)
   if (req.method !== 'POST' && req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const isCron = req.method === 'GET';
-  if (isCron) {
-    const cronSecret = process.env.CRON_SECRET;
-    if (!cronSecret || req.headers.authorization !== `Bearer ${cronSecret}`) {
+  if (req.method === 'GET') {
+    if (req.headers['x-vercel-cron'] !== '1') {
       return res.status(401).json({ error: 'Unauthorized' });
     }
   } else {
