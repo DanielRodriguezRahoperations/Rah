@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Website Audit for Law Firms: What Google Looks For",
+      displayTitle: "Website Audit for Law Firms: What Google Really Looks For in 2026",
+      date: "May 14, 2026",
+      pubDate: "Thu, 14 May 2026 08:02:06 GMT",
+      issue: 'No. 043',
+      category: "SEO",
+      excerpt: "A website audit for law firms reveals exactly why your site is not ranking on Google and what needs to change. From technical SEO to content quality, Google evaluates dozens of factors that most law firm websites fail to address. Learn what matters most and how to fix it fast.",
+      slug: 'website-audit-for-law-firms-what-google-looks-for'
+    },
+    {
       title: "Website Audit for Real Estate Agents: Complete SEO Guide",
       displayTitle: "Website Audit for Real Estate Agents: The Complete SEO Guide to Ranking Higher and Closing More Deals",
       date: "May 14, 2026",
