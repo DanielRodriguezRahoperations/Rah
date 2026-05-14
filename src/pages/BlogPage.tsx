@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Website Audit for HVAC Companies Local SEO Guide 2026",
+      displayTitle: "Website Audit for HVAC Companies: The Complete Local SEO Guide",
+      date: "May 14, 2026",
+      pubDate: "Thu, 14 May 2026 16:01:37 GMT",
+      issue: 'No. 045',
+      category: "SEO",
+      excerpt: "If your HVAC company is not showing up when Arizona homeowners search for heating and cooling services, your website is likely the problem. A thorough website audit reveals the exact technical, content, and local SEO issues holding your rankings back. This guide walks you through every step so you can fix what matters and start generating more local leads.",
+      slug: 'website-audit-for-hvac-companies-local-seo-guide-2026'
+    },
+    {
       title: "Website Audit for Plumbers: How to Rank Locally in 2026",
       displayTitle: "Website Audit for Plumbers: The Complete Guide to Dominating Local Search",
       date: "May 14, 2026",
