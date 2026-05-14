@@ -475,19 +475,21 @@ function buildImagePrompt(slug: string, category: string): string {
 }
 
 // ── Download image from Kie.ai and convert to JPEG ───────────────────────────
-async function brandImage(sourceUrl: string, _title: string, _category: string): Promise<Buffer> {
-  console.log(`[brand] fetching image from: ${sourceUrl.slice(0, 200)}`);
-  const res = await fetch(sourceUrl);
-  console.log(`[brand] fetch response status: ${res.status} ${res.statusText}`);
-  if (!res.ok) throw new Error(`image fetch ${res.status}: ${sourceUrl.slice(0, 200)}`);
-  const arrayBuf = await res.arrayBuffer();
-  const buf = Buffer.from(arrayBuf);
-  console.log(`[brand] image downloaded: ${buf.length} bytes (${(buf.length / 1024).toFixed(1)} KB)`);
-  if (buf.length === 0) throw new Error(`downloaded buffer is empty — URL may be expired or invalid`);
-  console.log(`[brand] starting sharp JPEG conversion (quality=90)...`);
-  const result = await sharp(buf).jpeg({ quality: 90 }).toBuffer();
-  console.log(`[brand] sharp conversion complete: ${result.length} bytes (${(result.length / 1024).toFixed(1)} KB)`);
-  return result;
+async function brandImage(sourceUrl: string): Promise<Buffer | null> {
+  try {
+    console.log('[brandImage] downloading:', sourceUrl);
+    const res = await fetch(sourceUrl);
+    console.log('[brandImage] status:', res.status);
+    const buf = Buffer.from(await res.arrayBuffer());
+    console.log('[brandImage] buffer size:', buf.length);
+    if (!buf.length) throw new Error('Empty buffer');
+    const jpeg = await sharp(buf).jpeg({ quality: 90 }).toBuffer();
+    console.log('[brandImage] jpeg size:', jpeg.length);
+    return jpeg;
+  } catch (err) {
+    console.error('[brandImage] failed:', err instanceof Error ? err.message : err);
+    return null;
+  }
 }
 
 // ── RSS helpers ───────────────────────────────────────────────────────────────
@@ -740,15 +742,12 @@ Return a JSON object with these exact fields:
   }
 
   // Download and convert image to JPEG
-  console.log(`[image] calling brandImage with sourceUrl: ${sourceUrl.slice(0, 200)}`);
   console.log(`[image] is fallback URL: ${sourceUrl === FALLBACK_IMG}`);
-  try {
-    imageBuffer = await brandImage(sourceUrl, post.displayTitle, post.category);
+  imageBuffer = await brandImage(sourceUrl);
+  if (imageBuffer) {
     console.log(`[image] branded JPEG ready: ${(imageBuffer.length / 1024).toFixed(1)} KB`);
-  } catch (err) {
-    console.error('[image] brandImage FAILED — full error:');
-    console.error(err instanceof Error ? err.message : String(err));
-    if (err instanceof Error && err.stack) console.error(err.stack);
+  } else {
+    console.error('[image] brandImage returned null — image will be skipped');
   }
 
   // ── STEP 4: build file changes ───────────────────────────────────────────────
