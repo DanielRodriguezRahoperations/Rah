@@ -607,9 +607,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (req.method === 'GET') {
-    if (req.headers['x-vercel-cron'] !== '1') {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+    console.log('[cron] headers:', JSON.stringify(req.headers));
+    const userAgent = req.headers['user-agent'] || '';
+    const isCron = req.headers['x-vercel-cron'] === '1' || userAgent.includes('vercel-cron');
+    if (!isCron) return res.status(401).json({ error: 'Unauthorized' });
   } else {
     if (!validateAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
   }
