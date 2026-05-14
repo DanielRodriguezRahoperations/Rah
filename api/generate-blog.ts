@@ -474,27 +474,14 @@ function buildImagePrompt(slug: string, category: string): string {
   return `Centered composition, subject centered in frame filling 60-70% of the image, ${scene}, warm golden Arizona light, sharp focus, clean uncluttered background, premium lifestyle photography, aspirational, photorealistic, Instagram-optimized, no text, no logos, no watermarks`;
 }
 
-// ── Brand image via og-image edge function ────────────────────────────────────
-// Calls /api/og-image (a @vercel/og edge function) which composites the photo,
-// dark panel, headline, category, and RAH. mark, then converts PNG → JPEG.
-async function brandImage(sourceUrl: string, title: string, category: string): Promise<Buffer> {
-  const host = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : 'https://www.rahoperations.com';
-  const endpoint = new URL(`${host}/api/og-image`);
-  endpoint.searchParams.set('title', title);
-  endpoint.searchParams.set('category', category);
-  endpoint.searchParams.set('imageUrl', sourceUrl);
-
-  console.log(`[brand] calling og-image: ${endpoint.toString().slice(0, 200)}`);
-  const res = await fetch(endpoint.toString());
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`og-image ${res.status}: ${err.slice(0, 300)}`);
-  }
-  const png = Buffer.from(await res.arrayBuffer());
-  console.log(`[brand] og-image PNG received: ${png.length} bytes`);
-  return sharp(png).jpeg({ quality: 90 }).toBuffer();
+// ── Download image from Kie.ai and convert to JPEG ───────────────────────────
+async function brandImage(sourceUrl: string, _title: string, _category: string): Promise<Buffer> {
+  console.log(`[brand] fetching image: ${sourceUrl.slice(0, 200)}`);
+  const res = await fetch(sourceUrl);
+  if (!res.ok) throw new Error(`image fetch ${res.status}: ${sourceUrl.slice(0, 200)}`);
+  const buf = Buffer.from(await res.arrayBuffer());
+  console.log(`[brand] image downloaded: ${buf.length} bytes`);
+  return sharp(buf).jpeg({ quality: 90 }).toBuffer();
 }
 
 // ── RSS helpers ───────────────────────────────────────────────────────────────
@@ -605,6 +592,8 @@ function parseClaude(raw: string): Record<string, unknown> {
   const a = s.indexOf('{');
   const b = s.lastIndexOf('}');
   const candidate = a !== -1 && b !== -1 ? s.slice(a, b + 1) : s;
+  const clean = candidate.replace(/[\x00-\x1F\x7F]/g, ' ');
+  try { return JSON.parse(clean); } catch {}
   try { return JSON.parse(candidate); } catch (e) {
     console.error('[parseClaude] JSON.parse error:', e instanceof Error ? e.message : e);
     console.error('[parseClaude] First 500 chars:', candidate.slice(0, 500));
@@ -746,7 +735,7 @@ Return a JSON object with these exact fields:
     console.warn('[image] KIE_API_KEY not set — using fallback');
   }
 
-  // Brand the image via the og-image edge function
+  // Download and convert image to JPEG
   try {
     imageBuffer = await brandImage(sourceUrl, post.displayTitle, post.category);
     console.log(`[image] branded JPEG: ${(imageBuffer.length / 1024).toFixed(1)} KB`);
