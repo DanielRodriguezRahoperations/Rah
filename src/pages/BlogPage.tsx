@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Free Website Audit Tool for Small Businesses No Signup",
+      displayTitle: "The Best Free Website Audit Tool for Small Businesses — No Signup Required",
+      date: "May 14, 2026",
+      pubDate: "Thu, 14 May 2026 03:05:53 GMT",
+      issue: 'No. 033',
+      category: "SEO",
+      excerpt: "Not sure why your website isn't showing up on Google? A free website audit tool can reveal hidden technical issues, SEO gaps, and performance problems dragging your rankings down — no signup required. This guide breaks down the best options and what to do with the results.",
+      slug: 'free-website-audit-tool-for-small-businesses-no-signup-required'
+    },
+    {
       title: "Ecommerce Website Design Phoenix | RAH Operations",
       displayTitle: "Ecommerce Website Design in Phoenix: Build a Store That Actually Sells",
       date: "May 13, 2026",
