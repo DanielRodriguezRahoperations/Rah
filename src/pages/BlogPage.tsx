@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Website Audit for Dentists: Get More Patients from Google",
+      displayTitle: "Website Audit for Dentists: How to Get More Patients from Google in 2026",
+      date: "May 14, 2026",
+      pubDate: "Thu, 14 May 2026 06:02:57 GMT",
+      issue: 'No. 041',
+      category: "SEO",
+      excerpt: "If your dental practice is not showing up on Google, a professional website audit could reveal exactly why. From slow load times to missing local SEO signals, small technical issues are costing you new patients every day. Learn what a website audit for dentists covers and how to turn your site into a patient-generating machine.",
+      slug: 'website-audit-for-dentists-get-more-patients-from-google'
+    },
+    {
       title: "Website Audit for Contractors: Rank Higher in Your City",
       displayTitle: "Website Audit for Contractors: How to Rank Higher in Your City and Win More Local Jobs",
       date: "May 14, 2026",
