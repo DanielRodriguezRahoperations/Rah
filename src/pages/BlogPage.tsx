@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Website Audit Checklist for Small Business Owners 2026",
+      displayTitle: "The Complete Website Audit Checklist Every Small Business Owner Needs in 2026",
+      date: "May 14, 2026",
+      pubDate: "Thu, 14 May 2026 03:37:59 GMT",
+      issue: 'No. 034',
+      category: "Website Design",
+      excerpt: "If your website isn't generating leads, it's costing you money. Use this complete website audit checklist for small business owners to identify exactly what's broken, what's underperforming, and what needs to change in 2026. RAH Operations breaks it all down so you can take action today.",
+      slug: 'website-audit-checklist-for-small-business-owners-2026'
+    },
+    {
       title: "Free Website Audit Tool for Small Businesses No Signup",
       displayTitle: "The Best Free Website Audit Tool for Small Businesses — No Signup Required",
       date: "May 14, 2026",
