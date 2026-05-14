@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Website Audit for Real Estate Agents: Complete SEO Guide",
+      displayTitle: "Website Audit for Real Estate Agents: The Complete SEO Guide to Ranking Higher and Closing More Deals",
+      date: "May 14, 2026",
+      pubDate: "Thu, 14 May 2026 06:07:14 GMT",
+      issue: 'No. 042',
+      category: "SEO",
+      excerpt: "If your real estate website is not showing up on Google, you are losing listings and buyers to competitors every single day. A complete website audit for real estate agents reveals exactly what is holding your site back and what to fix first. This guide walks you through every critical step so you can rank higher, generate more leads, and close more deals in Arizona.",
+      slug: 'website-audit-for-real-estate-agents-complete-seo-guide'
+    },
+    {
       title: "Website Audit for Dentists: Get More Patients from Google",
       displayTitle: "Website Audit for Dentists: How to Get More Patients from Google in 2026",
       date: "May 14, 2026",
