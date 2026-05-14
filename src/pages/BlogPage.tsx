@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "How to Read a Website Audit Report and What to Fix First",
+      displayTitle: "How to Read a Website Audit Report and What to Fix First (A Plain-English Guide)",
+      date: "May 14, 2026",
+      pubDate: "Thu, 14 May 2026 04:30:41 GMT",
+      issue: 'No. 038',
+      category: "SEO",
+      excerpt: "A website audit report can feel overwhelming if you do not know what you are looking at. This guide breaks down every section in plain English and tells you exactly what to fix first so your site starts ranking and converting. RAH Operations helps Arizona businesses turn audit data into real results.",
+      slug: 'how-to-read-a-website-audit-report-and-what-to-fix-first'
+    },
+    {
       title: "Free Website SEO Checker No Account Needed | RAH Ops",
       displayTitle: "Free Website SEO Checker No Account Needed: What These Tools Really Tell You (And What They Miss)",
       date: "May 14, 2026",
