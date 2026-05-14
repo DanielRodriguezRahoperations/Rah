@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Website Audit for Roofers: Get More Leads From Google",
+      displayTitle: "Website Audit for Roofers: How to Get More Leads From Google in 2026",
+      date: "May 14, 2026",
+      pubDate: "Thu, 14 May 2026 20:01:35 GMT",
+      issue: 'No. 046',
+      category: "SEO",
+      excerpt: "Most roofing companies are losing leads every single day because of fixable website problems they do not even know exist. A professional website audit for roofers identifies exactly what is holding your site back from ranking on Google and converting visitors into paying customers. Learn what to look for and how to fix it fast.",
+      slug: 'website-audit-for-roofers-get-more-leads-from-google'
+    },
+    {
       title: "Website Audit for HVAC Companies Local SEO Guide 2026",
       displayTitle: "Website Audit for HVAC Companies: The Complete Local SEO Guide",
       date: "May 14, 2026",
