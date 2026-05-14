@@ -600,6 +600,17 @@ ${items}
 </rss>`;
 }
 
+function parseClaude(raw: string) {
+  const stripped = raw.replace(/^```json\s*/,'').replace(/\s*```$/,'').trim();
+  try { return JSON.parse(stripped); } catch {}
+  const start = stripped.indexOf('{');
+  const end = stripped.lastIndexOf('}');
+  if (start !== -1 && end !== -1) {
+    try { return JSON.parse(stripped.slice(start, end + 1)); } catch {}
+  }
+  throw new Error('Failed to parse Claude JSON');
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Accept POST (admin portal) or GET (Vercel cron — sends x-vercel-cron: 1)
   if (req.method !== 'POST' && req.method !== 'GET') {
@@ -674,22 +685,6 @@ Return a JSON object with these exact fields:
     const data = await r.json() as { content: Array<{ type: string; text: string }> };
     return data.content[0]?.text ?? '';
   };
-
-  // Extracts a valid ClaudePost from raw Claude output.
-  // Strategy (applied in order until one succeeds):
-  //   1. Strip ``` fences → parse full string
-  //   2. Substring from first { to last } → parse
-  //   3. Regex scan for any {...} block → parse the largest match
-  function parseClaude(raw: string) {
-    const stripped = raw.replace(/^```json\s*/,’’).replace(/\s*```$/,’’).trim();
-    try { return JSON.parse(stripped); } catch {}
-    const start = stripped.indexOf(‘{‘);
-    const end = stripped.lastIndexOf(‘}’);
-    if (start !== -1 && end !== -1) {
-      try { return JSON.parse(stripped.slice(start, end + 1)); } catch {}
-    }
-    throw new Error(‘Failed to parse Claude JSON’);
-  }
 
   let post: ClaudePost;
   const rawResponses: string[] = [];
