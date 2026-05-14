@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Why Your Website Is Not Showing Up on Google – Fix It Now",
+      displayTitle: "Why Your Website Is Not Showing Up on Google (And How to Fix It Now)",
+      date: "May 14, 2026",
+      pubDate: "Thu, 14 May 2026 03:56:21 GMT",
+      issue: 'No. 036',
+      category: "SEO",
+      excerpt: "If your website is not showing up on Google, you are losing customers every single day to competitors who figured out what you have not yet. The good news is that most visibility problems have clear, fixable causes. This guide breaks down exactly why your site is invisible and what you can do right now to change it.",
+      slug: 'why-your-website-is-not-showing-up-on-google-fix-it-now'
+    },
+    {
       title: "How to Audit Your Website SEO Step by Step Free Guide",
       displayTitle: "How to Audit Your Website SEO Step by Step: The Complete Free Guide",
       date: "May 14, 2026",
