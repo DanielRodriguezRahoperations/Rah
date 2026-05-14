@@ -604,11 +604,13 @@ function parseClaude(raw: string): Record<string, unknown> {
   const s = raw.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
   const a = s.indexOf('{');
   const b = s.lastIndexOf('}');
-  if (a !== -1 && b !== -1) {
-    try { return JSON.parse(s.slice(a, b + 1)); } catch {}
+  const candidate = a !== -1 && b !== -1 ? s.slice(a, b + 1) : s;
+  try { return JSON.parse(candidate); } catch (e) {
+    console.error('[parseClaude] JSON.parse error:', e instanceof Error ? e.message : e);
+    console.error('[parseClaude] First 500 chars:', candidate.slice(0, 500));
+    console.error('[parseClaude] Last 500 chars:', candidate.slice(-500));
+    throw new Error('Failed to parse Claude JSON');
   }
-  try { return JSON.parse(s); } catch {}
-  throw new Error('Failed to parse Claude JSON');
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
