@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Website Audit for Restaurants: How to Get Found on Google",
+      displayTitle: "Website Audit for Restaurants: How to Get Found on Google and Fill More Tables",
+      date: "May 14, 2026",
+      pubDate: "Thu, 14 May 2026 05:37:30 GMT",
+      issue: 'No. 039',
+      category: "SEO",
+      excerpt: "If your restaurant is not showing up on Google, you are losing customers to competitors every single day. A proper website audit for restaurants reveals exactly what is holding your site back and what needs to change to start ranking. RAH Operations breaks down the entire process so Arizona restaurant owners can take action now.",
+      slug: 'website-audit-for-restaurants-how-to-get-found-on-google'
+    },
+    {
       title: "How to Read a Website Audit Report and What to Fix First",
       displayTitle: "How to Read a Website Audit Report and What to Fix First (A Plain-English Guide)",
       date: "May 14, 2026",
