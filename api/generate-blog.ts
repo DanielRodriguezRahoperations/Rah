@@ -680,57 +680,16 @@ Return a JSON object with these exact fields:
   //   1. Strip ``` fences → parse full string
   //   2. Substring from first { to last } → parse
   //   3. Regex scan for any {...} block → parse the largest match
-  const parseClaude = (rawText: string): ClaudePost => {
-    // Step 0: global fence strip — most common Claude output pattern
-    try {
-      const cleaned = rawText
-        .replace(/```json\n?/g, '')
-        .replace(/```\n?/g, '')
-        .trim();
-      return JSON.parse(cleaned) as ClaudePost;
-    } catch { /* try next */ }
-
-    // Step 1: strip leading/trailing code fences
-    let clean = rawText
-      .trim()
-      .replace(/^```(?:json)?\s*/i, '')
-      .replace(/\s*```\s*$/,        '')
-      .trim();
-
-    try { return JSON.parse(clean) as ClaudePost; } catch { /* try next */ }
-
-    // Step 2: substring between first { and last }
-    const first = clean.indexOf('{');
-    const last  = clean.lastIndexOf('}');
-    if (first !== -1 && last > first) {
-      const slice = clean.slice(first, last + 1);
-      try { return JSON.parse(slice) as ClaudePost; } catch { /* try next */ }
+  function parseClaude(raw: string) {
+    const stripped = raw.replace(/^```json\s*/,’’).replace(/\s*```$/,’’).trim();
+    try { return JSON.parse(stripped); } catch {}
+    const start = stripped.indexOf(‘{‘);
+    const end = stripped.lastIndexOf(‘}’);
+    if (start !== -1 && end !== -1) {
+      try { return JSON.parse(stripped.slice(start, end + 1)); } catch {}
     }
-
-    // Step 3: regex scan for any {...} block (handles prose before/after)
-    const match = clean.match(/\{[\s\S]*\}/);
-    if (match) {
-      try { return JSON.parse(match[0]) as ClaudePost; } catch { /* fall through */ }
-    }
-
-    // Step 4: sanitize smart quotes and em dashes, then re-attempt full parse
-    const sanitized = clean
-      .replace(/[“”]/g, '"')
-      .replace(/[‘’]/g, "'")
-      .replace(/—/g, '-');
-    try { return JSON.parse(sanitized) as ClaudePost; } catch { /* fall through */ }
-    const sfirst = sanitized.indexOf('{');
-    const slast  = sanitized.lastIndexOf('}');
-    if (sfirst !== -1 && slast > sfirst) {
-      try { return JSON.parse(sanitized.slice(sfirst, slast + 1)) as ClaudePost; } catch { /* fall through */ }
-    }
-
-    throw new SyntaxError(
-      `No valid JSON object found in Claude response.\n` +
-      `Length: ${rawText.length}\n` +
-      `Full raw response:\n${rawText}`,
-    );
-  };
+    throw new Error(‘Failed to parse Claude JSON’);
+  }
 
   let post: ClaudePost;
   const rawResponses: string[] = [];
