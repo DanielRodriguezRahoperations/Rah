@@ -601,16 +601,13 @@ ${items}
 }
 
 function parseClaude(raw: string): Record<string, unknown> {
-  const s = raw
-    .replace(/```json\s*/g, '')
-    .replace(/```\s*/g, '')
-    .trim();
-  try { return JSON.parse(s); } catch {}
+  const s = raw.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
   const a = s.indexOf('{');
   const b = s.lastIndexOf('}');
   if (a !== -1 && b !== -1) {
     try { return JSON.parse(s.slice(a, b + 1)); } catch {}
   }
+  try { return JSON.parse(s); } catch {}
   throw new Error('Failed to parse Claude JSON');
 }
 
@@ -664,7 +661,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 16000,
-        system: 'You are an expert SEO content writer for RAH Operations, a Scottsdale AZ digital agency offering website design, SEO, digital marketing, social media management, and credit repair. Write blog posts that rank on Google for local Arizona searches. Always write in a confident, helpful, expert tone. Never use filler content. Output only raw JSON — no prose, no markdown, no code fences. The current year is 2026. Never include a specific year in titles or headlines unless it is 2026.',
+        system: 'You are an expert SEO content writer for RAH Operations, a Scottsdale AZ digital agency offering website design, SEO, digital marketing, social media management, and credit repair. Write blog posts that rank on Google for local Arizona searches. Always write in a confident, helpful, expert tone. Never use filler content. Output only raw JSON — no prose, no markdown, no code fences. The current year is 2026. Never include a specific year in titles or headlines unless it is 2026. Respond with only a raw JSON object. Do not wrap your response in markdown code fences or backticks. Start your response directly with { and end with }.',
         messages: [
           {
             role: 'user',
