@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Website Audit for Contractors: Rank Higher in Your City",
+      displayTitle: "Website Audit for Contractors: How to Rank Higher in Your City and Win More Local Jobs",
+      date: "May 14, 2026",
+      pubDate: "Thu, 14 May 2026 05:53:05 GMT",
+      issue: 'No. 040',
+      category: "SEO",
+      excerpt: "If your contracting business is not showing up on the first page of Google, a website audit could reveal exactly why. From broken links to missing local SEO signals, small technical issues are costing you real jobs. Learn what a professional audit covers and how it helps contractors rank higher in their city.",
+      slug: 'website-audit-for-contractors-rank-higher-in-your-city'
+    },
+    {
       title: "Website Audit for Restaurants: How to Get Found on Google",
       displayTitle: "Website Audit for Restaurants: How to Get Found on Google and Fill More Tables",
       date: "May 14, 2026",
