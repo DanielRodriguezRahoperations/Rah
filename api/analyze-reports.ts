@@ -91,6 +91,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const anthropic = new Anthropic({ apiKey: claudeKey });
 
+    // DEBUG — remove after testing
+    console.log('[analyze-reports] equifax text (first 500):', (texts.equifax || '').slice(0, 500));
+    console.log('[analyze-reports] experian text (first 500):', (texts.experian || '').slice(0, 500));
+    console.log('[analyze-reports] transunion text (first 500):', (texts.transunion || '').slice(0, 500));
+
     const userMsg = `Extract every negative account from these credit reports and return them as a JSON array.
 
 EQUIFAX REPORT TEXT:
@@ -116,6 +121,8 @@ Return ONLY a JSON array. Each item shape:
 
       const textBlock = response.content.find((b) => b.type === 'text');
       const raw = textBlock && textBlock.type === 'text' ? textBlock.text : '';
+      // DEBUG — remove after testing
+      console.log('[analyze-reports] Claude raw response:', raw);
       // Strip markdown fences if present
       const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
       const startIdx = cleaned.indexOf('[');
