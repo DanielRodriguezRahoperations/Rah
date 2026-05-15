@@ -167,6 +167,11 @@ const AdminDashboardPage = () => {
   const [blogResult, setBlogResult] = useState<{ title: string; url: string } | null>(null);
   const [blogError, setBlogError] = useState('');
 
+  // Reel generation
+  const [reelGenerating, setReelGenerating] = useState(false);
+  const [reelResult, setReelResult] = useState<{ video_url: string; script: string } | null>(null);
+  const [reelError, setReelError] = useState('');
+
   useEffect(() => {
     if (!isAdminAuthenticated()) {
       navigate('/admin/login', { replace: true });
@@ -380,6 +385,28 @@ const AdminDashboardPage = () => {
     }
   };
 
+  const handleGenerateReel = async () => {
+    setReelGenerating(true);
+    setReelResult(null);
+    setReelError('');
+    try {
+      const res = await fetch('/api/generate-reel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        setReelError(json.error || 'Reel generation failed');
+      } else {
+        setReelResult({ video_url: json.video_url, script: json.script });
+      }
+    } catch {
+      setReelError('Network error — check your connection');
+    } finally {
+      setReelGenerating(false);
+    }
+  };
+
   const filtered = clients.filter((c) => {
     if (filter !== 'all' && c.status !== filter) return false;
     if (!search) return true;
@@ -567,6 +594,21 @@ const AdminDashboardPage = () => {
                 {blogGenerating ? 'Generating…' : 'Generate Blog Post'}
               </button>
 
+              <button
+                onClick={handleGenerateReel}
+                disabled={reelGenerating}
+                style={{ backgroundColor: reelGenerating ? '#5a1111' : '#8B1E1E', borderColor: '#6b1818' }}
+                className="hover:opacity-90 border disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2 rounded-sm text-xs uppercase tracking-widest font-semibold transition-opacity flex items-center gap-2"
+              >
+                {reelGenerating && (
+                  <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                )}
+                {reelGenerating ? 'Generating Reel... this takes 2-5 minutes' : 'Generate Reel'}
+              </button>
+
               {mainTab === 'credit-repair' && (
                 <button
                   onClick={openSms}
@@ -633,6 +675,33 @@ const AdminDashboardPage = () => {
             <div className="bg-red-950/50 border border-red-900 text-red-200 text-sm px-5 py-3 rounded-sm mb-6 flex items-center justify-between">
               <span>{blogError}</span>
               <button onClick={() => setBlogError('')} className="text-red-600 hover:text-white text-lg leading-none ml-4">×</button>
+            </div>
+          )}
+
+          {/* Reel generation result */}
+          {reelResult && (
+            <div className="bg-[#2a0f0f] border border-[#6b1818] text-red-100 px-5 py-4 rounded-sm mb-6">
+              <div className="flex items-start justify-between gap-4 mb-3">
+                <p className="font-semibold text-sm">Reel ready!</p>
+                <button onClick={() => setReelResult(null)} className="text-[#6b1818] hover:text-white text-lg leading-none">×</button>
+              </div>
+              <a
+                href={reelResult.video_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs underline underline-offset-2 hover:text-white break-all"
+              >
+                {reelResult.video_url}
+              </a>
+              <div className="mt-3 bg-black/30 border border-[#4a1010] rounded-sm px-4 py-3 text-xs text-red-200 leading-relaxed whitespace-pre-wrap font-mono">
+                {reelResult.script}
+              </div>
+            </div>
+          )}
+          {reelError && (
+            <div className="bg-red-950/50 border border-red-900 text-red-200 text-sm px-5 py-3 rounded-sm mb-6 flex items-center justify-between">
+              <span>{reelError}</span>
+              <button onClick={() => setReelError('')} className="text-red-600 hover:text-white text-lg leading-none ml-4">×</button>
             </div>
           )}
 
