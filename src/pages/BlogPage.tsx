@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "What Is an SSL Certificate and Why Your Website Needs It",
+      displayTitle: "What Is an SSL Certificate and Why Your Website Needs It in 2026",
+      date: "May 15, 2026",
+      pubDate: "Fri, 15 May 2026 20:03:01 GMT",
+      issue: 'No. 053',
+      category: "Website Design",
+      excerpt: "If you have ever wondered what an SSL certificate is and why your website needs it, you are not alone. SSL certificates are one of the most important foundational elements of a secure, trustworthy, and high-ranking website. In this guide, RAH Operations breaks down everything Arizona business owners need to know.",
+      slug: 'what-is-ssl-certificate-and-why-your-website-needs-it'
+    },
+    {
       title: "How to Check If Your Website Is Mobile Friendly Free Tool",
       displayTitle: "How to Check If Your Website Is Mobile Friendly Using Free Tools (And What to Do Next)",
       date: "May 15, 2026",
