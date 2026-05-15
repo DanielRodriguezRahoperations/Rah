@@ -7,6 +7,12 @@ interface Props {
   onNext: () => void;
   onBack: () => void;
   uploading: boolean;
+  ftcReports: File[];
+  additionalFiles: File[];
+  onFtcReportAdd: (file: File) => void;
+  onFtcReportRemove: (index: number) => void;
+  onAdditionalFileAdd: (file: File) => void;
+  onAdditionalFileRemove: (index: number) => void;
 }
 
 const DOCS: {
@@ -79,6 +85,8 @@ const emptyErrors = (): FieldErrors => ({
   crEquifax: null,
   crExperian: null,
   crTransunion: null,
+  ftcReports: null,
+  additionalFiles: null,
 });
 
 const validateFile = (file: File): string | null => {
@@ -102,8 +110,16 @@ const Step2Documents: React.FC<Props> = ({
   onNext,
   onBack,
   uploading,
+  ftcReports,
+  additionalFiles,
+  onFtcReportAdd,
+  onFtcReportRemove,
+  onAdditionalFileAdd,
+  onAdditionalFileRemove,
 }) => {
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const ftcInputRef = useRef<HTMLInputElement>(null);
+  const additionalInputRef = useRef<HTMLInputElement>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>(emptyErrors());
 
   const setError = (key: keyof SelectedFiles, msg: string | null) =>
@@ -266,6 +282,121 @@ const Step2Documents: React.FC<Props> = ({
         <span className="text-xs text-neutral-400 shrink-0">
           {selectedCount} / {DOCS.length} uploaded
         </span>
+      </div>
+
+      {/* Optional: FTC Identity Theft Report(s) */}
+      <div className="mt-6 border border-neutral-200 bg-white p-4">
+        <div className="flex items-start justify-between gap-4 mb-3">
+          <div>
+            <p className="text-sm font-semibold text-slate-dark">
+              FTC Identity Theft Report(s){' '}
+              <span className="text-neutral-400 font-normal text-xs">(Optional)</span>
+            </p>
+            <p className="text-xs text-neutral-400 leading-relaxed mt-0.5">
+              Upload any FTC Identity Theft Reports. These strengthen your dispute letters significantly.
+              Get one free at{' '}
+              <span className="font-medium text-luxury-red">IdentityTheft.gov</span>.
+            </p>
+          </div>
+          <input
+            ref={ftcInputRef}
+            type="file"
+            accept={ACCEPT_ATTR}
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) { onFtcReportAdd(f); if (ftcInputRef.current) ftcInputRef.current.value = ''; }
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => ftcInputRef.current?.click()}
+            disabled={uploading}
+            className="shrink-0 border border-neutral-300 text-neutral-600 hover:border-luxury-red hover:text-luxury-red px-4 py-2 text-[10px] font-semibold uppercase tracking-wider transition-colors duration-200 disabled:opacity-40"
+          >
+            + Add Report
+          </button>
+        </div>
+        {ftcReports.length === 0 ? (
+          <p className="text-[10px] text-neutral-400">{ACCEPTED_LABEL}</p>
+        ) : (
+          <div className="space-y-1.5">
+            {ftcReports.map((file, i) => (
+              <div key={i} className="flex items-center justify-between bg-green-50 border border-green-200 px-3 py-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <svg className="h-3.5 w-3.5 shrink-0 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-[11px] font-medium text-green-700 truncate">{file.name}</span>
+                  <span className="text-[10px] text-green-500 shrink-0">({formatSize(file.size)})</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onFtcReportRemove(i)}
+                  disabled={uploading}
+                  className="ml-3 text-[10px] text-neutral-400 hover:text-luxury-red uppercase tracking-wider disabled:opacity-40"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Optional: Additional Supporting Documents */}
+      <div className="mt-4 border border-neutral-200 bg-white p-4">
+        <div className="flex items-start justify-between gap-4 mb-3">
+          <div>
+            <p className="text-sm font-semibold text-slate-dark">
+              Additional Supporting Documents{' '}
+              <span className="text-neutral-400 font-normal text-xs">(Optional)</span>
+            </p>
+            <p className="text-xs text-neutral-400 leading-relaxed mt-0.5">
+              Prior dispute letters, bureau response letters, police reports, or any other case documents.
+            </p>
+          </div>
+          <input
+            ref={additionalInputRef}
+            type="file"
+            accept={ACCEPT_ATTR}
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) { onAdditionalFileAdd(f); if (additionalInputRef.current) additionalInputRef.current.value = ''; }
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => additionalInputRef.current?.click()}
+            disabled={uploading}
+            className="shrink-0 border border-neutral-300 text-neutral-600 hover:border-luxury-red hover:text-luxury-red px-4 py-2 text-[10px] font-semibold uppercase tracking-wider transition-colors duration-200 disabled:opacity-40"
+          >
+            + Add File
+          </button>
+        </div>
+        {additionalFiles.length === 0 ? (
+          <p className="text-[10px] text-neutral-400">{ACCEPTED_LABEL}</p>
+        ) : (
+          <div className="space-y-1.5">
+            {additionalFiles.map((file, i) => (
+              <div key={i} className="flex items-center justify-between bg-neutral-50 border border-neutral-200 px-3 py-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-[11px] font-medium text-neutral-700 truncate">{file.name}</span>
+                  <span className="text-[10px] text-neutral-400 shrink-0">({formatSize(file.size)})</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onAdditionalFileRemove(i)}
+                  disabled={uploading}
+                  className="ml-3 text-[10px] text-neutral-400 hover:text-luxury-red uppercase tracking-wider disabled:opacity-40"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="mt-10 flex items-center justify-between border-t border-neutral-100 pt-8">

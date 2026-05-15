@@ -13,6 +13,11 @@ interface PortalLetter {
   recipient_name: string;
   letter_type: string;
   created_at: string;
+  lob_tracking_number?: string | null;
+  mailed_at?: string | null;
+  mail_status?: string | null;
+  signed_at?: string | null;
+  signed_by?: string | null;
   tracking_log?: Array<{
     tracking_number?: string | null;
     date_mailed?: string | null;
@@ -234,18 +239,23 @@ const PortalDashboardPage = () => {
                       <th className="px-5 py-3">Generated</th>
                       <th className="px-5 py-3">Tracking</th>
                       <th className="px-5 py-3">Status</th>
+                      <th className="px-5 py-3">Signature</th>
                     </tr>
                   </thead>
                   <tbody>
                     {letters.map((l) => {
                       const t = (l.tracking_log || [])[0];
+                      const isMailed = !!l.lob_tracking_number || !!t?.tracking_number;
+                      const trackingNum = l.lob_tracking_number || t?.tracking_number;
+                      const isSigned = !!l.signed_at;
+
                       let statusLabel = 'Drafted';
                       let statusColor = 'text-neutral-500';
-                      if (t?.delivered_at) {
+                      if (l.lob_tracking_number || t?.delivered_at) {
                         statusLabel = 'Delivered';
                         statusColor = 'text-green-600';
-                      } else if (t?.tracking_number) {
-                        statusLabel = 'In transit';
+                      } else if (isMailed) {
+                        statusLabel = 'In Transit';
                         statusColor = 'text-amber-600';
                       } else if (t?.date_mailed) {
                         statusLabel = 'Mailed';
@@ -253,20 +263,41 @@ const PortalDashboardPage = () => {
                       }
                       return (
                         <tr key={l.id} className="border-b border-neutral-200/60">
-                          <td className="px-5 py-4 text-slate-dark font-medium">
-                            {l.recipient_name}
+                          <td className="px-5 py-4 text-slate-dark font-medium">{l.recipient_name}</td>
+                          <td className="px-5 py-4 text-neutral-600 text-xs uppercase tracking-widest">{l.letter_type}</td>
+                          <td className="px-5 py-4 text-neutral-600 text-xs">{new Date(l.created_at).toLocaleDateString()}</td>
+                          <td className="px-5 py-4 text-xs">
+                            {trackingNum ? (
+                              <div>
+                                <a
+                                  href={`https://tools.usps.com/go/TrackConfirmAction?tLabels=${trackingNum}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="font-mono text-luxury-red hover:text-luxury-accent underline"
+                                >
+                                  {trackingNum}
+                                </a>
+                                {l.mailed_at && (
+                                  <p className="text-neutral-500 text-[10px] mt-0.5">
+                                    Mailed {new Date(l.mailed_at).toLocaleDateString()}
+                                  </p>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-neutral-400">—</span>
+                            )}
                           </td>
-                          <td className="px-5 py-4 text-neutral-600 text-xs uppercase tracking-widest">
-                            {l.letter_type}
-                          </td>
-                          <td className="px-5 py-4 text-neutral-600 text-xs">
-                            {new Date(l.created_at).toLocaleDateString()}
-                          </td>
-                          <td className="px-5 py-4 text-neutral-600 text-xs font-mono">
-                            {t?.tracking_number || '—'}
-                          </td>
-                          <td className={`px-5 py-4 text-xs font-semibold ${statusColor}`}>
-                            {statusLabel}
+                          <td className={`px-5 py-4 text-xs font-semibold ${statusColor}`}>{statusLabel}</td>
+                          <td className="px-5 py-4 text-xs">
+                            {isSigned ? (
+                              <span className="text-green-600 font-semibold">Signed ✓</span>
+                            ) : (
+                              <SignLetterButton
+                                letterId={l.id}
+                                token={portalToken}
+                                onSigned={() => fetchData(portalToken)}
+                              />
+                            )}
                           </td>
                         </tr>
                       );
@@ -651,6 +682,100 @@ function PortalResponseSection({
         </div>
       )}
     </div>
+  );
+}
+
+function SignLetterButton({
+  letterId,
+  token,
+  onSigned,
+}: {
+  letterId: string;
+  token: string;
+  onSigned: () => void;
+}) {
+  const [showModal, setShowModal] = useState(false);
+  const [signedName, setSignedName] = useState('');
+  const [signing, setSigning] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSign = async () => {
+    if (!signedName.trim()) { setError('Please type your full legal name.'); return; }
+    setSigning(true);
+    setError('');
+    try {
+      const res = await fetch('/api/sign-letter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ letterId, signedName: signedName.trim(), sessionToken: token }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        setShowModal(false);
+        setSignedName('');
+        onSigned();
+      } else {
+        setError(json.error || 'Failed to sign. Please try again.');
+      }
+    } catch {
+      setError('Network error. Please try again.');
+    } finally {
+      setSigning(false);
+    }
+  };
+
+  return (
+    <>
+      <button
+        onClick={() => { setShowModal(true); setError(''); setSignedName(''); }}
+        className="text-xs font-semibold text-luxury-red hover:text-luxury-accent border border-luxury-red/40 hover:border-luxury-accent px-3 py-1.5 rounded-sm transition-colors"
+      >
+        Sign Letter
+      </button>
+
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="bg-white rounded-sm shadow-xl max-w-md w-full p-8">
+            <h3 className="font-serif-display text-xl text-slate-dark mb-2">Sign This Letter</h3>
+            <p className="text-xs text-neutral-500 leading-relaxed mb-6">
+              By typing your full legal name below you are applying your electronic signature to this
+              dispute letter under the E-SIGN Act (15 U.S.C. §7001). This signature is legally binding.
+            </p>
+            <label className="block text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500 mb-2">
+              Type Your Full Legal Name to Sign
+            </label>
+            <input
+              type="text"
+              value={signedName}
+              onChange={(e) => setSignedName(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleSign(); }}
+              placeholder="Full legal name"
+              disabled={signing}
+              className="w-full border-b border-neutral-300 bg-transparent py-3 text-sm font-serif-body italic text-neutral-950 outline-none focus:border-luxury-red mb-2 placeholder:text-neutral-400"
+            />
+            {error && <p className="text-xs text-luxury-red mb-4">{error}</p>}
+            <div className="flex items-center justify-end gap-3 mt-6">
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                disabled={signing}
+                className="text-xs text-neutral-500 hover:text-slate-dark uppercase tracking-widest font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSign}
+                disabled={signing || !signedName.trim()}
+                className="bg-luxury-red hover:bg-luxury-light disabled:opacity-50 text-white px-6 py-2.5 text-xs font-semibold uppercase tracking-widest transition-colors"
+              >
+                {signing ? 'Signing…' : 'Confirm Signature'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

@@ -1,10 +1,16 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 
-const VALID_STORAGE_NAMES = new Set([
+const FIXED_STORAGE_NAMES = new Set([
   'dl-front', 'dl-back', 'ss-card', 'utility-bill',
   'cr-equifax', 'cr-experian', 'cr-transunion',
 ]);
+
+function isValidStorageName(name: string): boolean {
+  return FIXED_STORAGE_NAMES.has(name)
+    || /^ftc-report-\d+$/.test(name)
+    || /^additional-\d+$/.test(name);
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   console.log('[upload] env check — SUPABASE_URL:', process.env.SUPABASE_URL ? `exists, starts with "${process.env.SUPABASE_URL.slice(0, 10)}"` : 'MISSING');
@@ -18,7 +24,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (
     typeof clientId !== 'string' || !clientId ||
-    typeof storageName !== 'string' || !VALID_STORAGE_NAMES.has(storageName) ||
+    typeof storageName !== 'string' || !isValidStorageName(storageName) ||
     typeof ext !== 'string' || !ext
   ) {
     return res.status(400).json({ error: 'Invalid parameters' });
@@ -33,7 +39,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const supabase = createClient(supabaseUrl, serviceKey);
-  const path = `${clientId}/${storageName}.${ext.toLowerCase()}`;
+  const path = (storageName as string).startsWith('additional-')
+    ? `${clientId}/additional-docs/${storageName}.${ext.toLowerCase()}`
+    : `${clientId}/${storageName}.${ext.toLowerCase()}`;
 
   const { data, error } = await supabase.storage
     .from('intake-documents')

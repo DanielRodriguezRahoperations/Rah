@@ -26,6 +26,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     signatureName,
     signatureDate,
     docPaths,
+    ftcReportPaths,
+    additionalFilePaths,
   } = req.body ?? {};
 
   if (!clientId || !fullName || !email || !agreedToCroa || !signatureName) {
@@ -71,6 +73,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     doc_cr_equifax: docPaths?.crEquifax ?? null,
     doc_cr_experian: docPaths?.crExperian ?? null,
     doc_cr_transunion: docPaths?.crTransunion ?? null,
+    doc_ftc_reports: Array.isArray(ftcReportPaths) && ftcReportPaths.length > 0
+      ? ftcReportPaths.map((path: string, i: number) => ({ path, filename: `ftc-report-${i}`, uploaded_at: new Date().toISOString() }))
+      : [],
+    doc_additional_files: Array.isArray(additionalFilePaths) && additionalFilePaths.length > 0
+      ? additionalFilePaths.map((path: string) => ({ path, filename: path.split('/').pop() ?? 'document', uploaded_at: new Date().toISOString() }))
+      : [],
   });
 
   if (dbError) {

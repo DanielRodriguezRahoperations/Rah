@@ -24,6 +24,8 @@ export interface IntakeData {
   docCrEquifax: string | null;
   docCrExperian: string | null;
   docCrTransunion: string | null;
+  docFtcReports: string[];
+  docAdditionalFiles: string[];
   goals: string;
   timeline: string;
   disputedAccounts: string;
@@ -40,6 +42,8 @@ export interface SelectedFiles {
   crEquifax: File | null;
   crExperian: File | null;
   crTransunion: File | null;
+  ftcReports: File[];
+  additionalFiles: File[];
 }
 
 const INITIAL_DATA: IntakeData = {
@@ -59,6 +63,8 @@ const INITIAL_DATA: IntakeData = {
   docCrEquifax: null,
   docCrExperian: null,
   docCrTransunion: null,
+  docFtcReports: [],
+  docAdditionalFiles: [],
   goals: '',
   timeline: '',
   disputedAccounts: '',
@@ -75,6 +81,8 @@ const INITIAL_FILES: SelectedFiles = {
   crEquifax: null,
   crExperian: null,
   crTransunion: null,
+  ftcReports: [],
+  additionalFiles: [],
 };
 
 type DocDataKey = 'docDlFront' | 'docDlBack' | 'docSsCard' | 'docUtilityBill' | 'docCrEquifax' | 'docCrExperian' | 'docCrTransunion';
@@ -111,6 +119,18 @@ const IntakeForm: React.FC = () => {
   const handleFileSelect = (key: keyof SelectedFiles, file: File) => {
     setSelectedFiles((prev) => ({ ...prev, [key]: file }));
   };
+
+  const handleFtcReportAdd = (file: File) =>
+    setSelectedFiles((prev) => ({ ...prev, ftcReports: [...prev.ftcReports, file] }));
+
+  const handleFtcReportRemove = (index: number) =>
+    setSelectedFiles((prev) => ({ ...prev, ftcReports: prev.ftcReports.filter((_, i) => i !== index) }));
+
+  const handleAdditionalFileAdd = (file: File) =>
+    setSelectedFiles((prev) => ({ ...prev, additionalFiles: [...prev.additionalFiles, file] }));
+
+  const handleAdditionalFileRemove = (index: number) =>
+    setSelectedFiles((prev) => ({ ...prev, additionalFiles: prev.additionalFiles.filter((_, i) => i !== index) }));
 
   const uploadFiles = async (): Promise<boolean> => {
     setUploading(true);
@@ -157,7 +177,41 @@ const IntakeForm: React.FC = () => {
       updatedPaths[dataKey] = path;
     }
 
-    setData((prev) => ({ ...prev, ...updatedPaths }));
+    // Upload optional FTC reports (non-blocking — failure doesn't fail the whole upload)
+    const ftcPaths: string[] = [];
+    for (let i = 0; i < selectedFiles.ftcReports.length; i++) {
+      const file = selectedFiles.ftcReports[i];
+      const ext = file.name.split('.').pop()?.toLowerCase() ?? 'bin';
+      const urlRes = await fetch(
+        `/api/upload?clientId=${encodeURIComponent(clientId)}&storageName=ftc-report-${i}&ext=${encodeURIComponent(ext)}`
+      ).catch(() => null);
+      if (!urlRes?.ok) continue;
+      const { signedUrl, path } = await urlRes.json();
+      const uploadRes = await fetch(signedUrl, {
+        method: 'PUT', body: file,
+        headers: { 'Content-Type': file.type || 'application/octet-stream' },
+      }).catch(() => null);
+      if (uploadRes?.ok) ftcPaths.push(path);
+    }
+
+    // Upload optional additional files (non-blocking)
+    const additionalPaths: string[] = [];
+    for (const file of selectedFiles.additionalFiles) {
+      const ext = file.name.split('.').pop()?.toLowerCase() ?? 'bin';
+      const storageName = `additional-${Date.now()}`;
+      const urlRes = await fetch(
+        `/api/upload?clientId=${encodeURIComponent(clientId)}&storageName=${encodeURIComponent(storageName)}&ext=${encodeURIComponent(ext)}`
+      ).catch(() => null);
+      if (!urlRes?.ok) continue;
+      const { signedUrl, path } = await urlRes.json();
+      const uploadRes = await fetch(signedUrl, {
+        method: 'PUT', body: file,
+        headers: { 'Content-Type': file.type || 'application/octet-stream' },
+      }).catch(() => null);
+      if (uploadRes?.ok) additionalPaths.push(path);
+    }
+
+    setData((prev) => ({ ...prev, ...updatedPaths, docFtcReports: ftcPaths, docAdditionalFiles: additionalPaths }));
     setUploading(false);
     return true;
   };
@@ -201,6 +255,8 @@ const IntakeForm: React.FC = () => {
             crExperian: data.docCrExperian,
             crTransunion: data.docCrTransunion,
           },
+          ftcReportPaths: data.docFtcReports,
+          additionalFilePaths: data.docAdditionalFiles,
         }),
       });
 
@@ -275,6 +331,12 @@ const IntakeForm: React.FC = () => {
               onNext={handleStep2Next}
               onBack={() => setStep(1)}
               uploading={uploading}
+              ftcReports={selectedFiles.ftcReports}
+              additionalFiles={selectedFiles.additionalFiles}
+              onFtcReportAdd={handleFtcReportAdd}
+              onFtcReportRemove={handleFtcReportRemove}
+              onAdditionalFileAdd={handleAdditionalFileAdd}
+              onAdditionalFileRemove={handleAdditionalFileRemove}
             />
           </motion.div>
         )}

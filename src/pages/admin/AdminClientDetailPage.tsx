@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SEOHead from '../../components/ui/SEOHead';
@@ -26,11 +26,13 @@ interface ClientDetail {
     address_flag_notes?: string | null;
     created_at: string;
   };
-  letters: Array<Record<string, unknown> & { id: string; recipient_name: string; letter_type: string; created_at: string; pdf_unsigned_path?: string | null }>;
+  letters: Array<Record<string, unknown> & { id: string; recipient_name: string; letter_type: string; created_at: string; pdf_unsigned_path?: string | null; lob_tracking_number?: string | null; mailed_at?: string | null; mail_status?: string | null; }>;
   accounts: Array<Record<string, unknown> & { id: string; creditor_name: string; account_number: string; balance: string; date_opened: string; account_type: string; account_status: string; bureaus: string[]; selected: boolean }>;
   responses: Array<Record<string, unknown> & { id: string; created_at: string }>;
   docUrls: Record<string, string | null>;
   miscFiles: Array<{ path: string; filename: string; uploaded_at: string; signedUrl: string | null }>;
+  ftcReportFiles: Array<{ path: string; filename: string; uploaded_at: string; signedUrl: string | null }>;
+  additionalFiles: Array<{ path: string; filename: string; uploaded_at: string; signedUrl: string | null }>;
 }
 
 const DOC_LABELS: Record<string, string> = {
@@ -190,7 +192,7 @@ const AdminClientDetailPage = () => {
     );
   }
 
-  const { client, letters, accounts, docUrls, miscFiles } = data;
+  const { client, letters, accounts, docUrls, miscFiles, responses } = data;
 
   return (
     <>
@@ -266,12 +268,32 @@ const AdminClientDetailPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
-            {tab === 'overview' && <OverviewTab client={client} />}
+            {tab === 'overview' && (
+              <OverviewTab
+                client={client}
+                clientId={client.id}
+                busy={busy}
+                onSaveRound={async (round, notes) => {
+                  setBusy(true);
+                  setBusyMsg('Saving round…');
+                  await fetch('/api/update-status', {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+                    body: JSON.stringify({ clientId: client.id, dispute_round: round, round_notes: notes }),
+                  });
+                  await loadDetail();
+                  setBusy(false);
+                  setBusyMsg('');
+                }}
+              />
+            )}
             {tab === 'documents' && (
               <DocumentsTab
                 clientId={client.id}
                 docUrls={docUrls}
                 miscFiles={miscFiles ?? []}
+                ftcReportFiles={data.ftcReportFiles ?? []}
+                additionalFiles={data.additionalFiles ?? []}
                 onRefresh={loadDetail}
               />
             )}
@@ -292,6 +314,8 @@ const AdminClientDetailPage = () => {
                 setBusy={setBusy}
                 setBusyMsg={setBusyMsg}
                 busy={busy}
+                disputeRound={Number(client.dispute_round ?? 1)}
+                responseCount={data.responses?.length ?? 0}
               />
             )}
             {tab === 'tracking' && <TrackingTab letters={letters} />}
@@ -303,39 +327,85 @@ const AdminClientDetailPage = () => {
 };
 
 // === Overview Tab ===
-const OverviewTab = ({ client }: { client: ClientDetail['client'] }) => (
-  <div className="grid lg:grid-cols-2 gap-6">
-    <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-6">
-      <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold mb-4">
-        Personal Info
-      </h3>
-      <Field label="Full Name" value={client.full_name} />
-      <Field label="Email" value={client.email} />
-      <Field label="Phone" value={client.phone} />
-      <Field label="Address" value={`${client.address}, ${client.city}, ${client.state} ${client.zip}`} />
-      <Field
-        label="Address Verification"
-        value={
-          client.address_verified === true
-            ? 'Verified'
-            : client.address_verified === false
-              ? `Flagged${client.address_flag_notes ? ' — ' + client.address_flag_notes : ''}`
-              : 'Pending'
-        }
-      />
+const OverviewTab = ({
+  client,
+  clientId,
+  busy,
+  onSaveRound,
+}: {
+  client: ClientDetail['client'];
+  clientId: string;
+  busy: boolean;
+  onSaveRound: (round: number, notes: string) => void;
+}) => {
+  const [round, setRound] = React.useState<number>(Number(client.dispute_round ?? 1));
+  const [notes, setNotes] = React.useState<string>(String(client.round_notes ?? ''));
+
+  return (
+    <div className="grid lg:grid-cols-2 gap-6">
+      <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-6">
+        <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold mb-4">Personal Info</h3>
+        <Field label="Full Name" value={client.full_name} />
+        <Field label="Email" value={client.email} />
+        <Field label="Phone" value={client.phone} />
+        <Field label="Address" value={`${client.address}, ${client.city}, ${client.state} ${client.zip}`} />
+        <Field
+          label="Address Verification"
+          value={
+            client.address_verified === true ? 'Verified'
+            : client.address_verified === false ? `Flagged${client.address_flag_notes ? ' — ' + client.address_flag_notes : ''}`
+            : 'Pending'
+          }
+        />
+      </div>
+      <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-6">
+        <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold mb-4">Case Details</h3>
+        <Field label="Goals" value={client.goals || '—'} multiline />
+        <Field label="Timeline" value={client.timeline || '—'} />
+        <Field label="Disputed Accounts" value={client.disputed_accounts || '—'} multiline />
+        <Field label="CROA Signature" value={`${client.signature_name || ''} (${client.signature_date || ''})`} />
+        <Field label="Submitted" value={new Date(client.created_at).toLocaleString()} />
+      </div>
+      <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-6 lg:col-span-2">
+        <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold mb-4">Dispute Round</h3>
+        <div className="grid sm:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block text-xs uppercase tracking-widest text-neutral-400 mb-2">Round</label>
+            <select
+              value={round}
+              onChange={(e) => setRound(Number(e.target.value))}
+              disabled={busy}
+              className="w-full bg-[#0f0f0f] border border-neutral-800 text-white px-3 py-2 rounded-sm text-sm focus:outline-none focus:border-luxury-red"
+            >
+              <option value={1}>Round 1 — Initial Dispute</option>
+              <option value={2}>Round 2 — Escalated</option>
+              <option value={3}>Round 3 — CFPB Threat</option>
+              <option value={4}>Round 4 — Legal Action</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs uppercase tracking-widest text-neutral-400 mb-2">Round Notes</label>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={3}
+              disabled={busy}
+              placeholder="Notes for this round (prior dispute dates, tracking numbers, etc.)"
+              className="w-full bg-[#0f0f0f] border border-neutral-800 text-white px-3 py-2 rounded-sm text-sm focus:outline-none focus:border-luxury-red resize-none"
+            />
+          </div>
+        </div>
+        <button
+          onClick={() => onSaveRound(round, notes)}
+          disabled={busy}
+          className="bg-luxury-red hover:bg-luxury-light disabled:opacity-50 text-white px-5 py-2.5 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
+        >
+          Save Round
+        </button>
+      </div>
     </div>
-    <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-6">
-      <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold mb-4">
-        Case Details
-      </h3>
-      <Field label="Goals" value={client.goals || '—'} multiline />
-      <Field label="Timeline" value={client.timeline || '—'} />
-      <Field label="Disputed Accounts" value={client.disputed_accounts || '—'} multiline />
-      <Field label="CROA Signature" value={`${client.signature_name || ''} (${client.signature_date || ''})`} />
-      <Field label="Submitted" value={new Date(client.created_at).toLocaleString()} />
-    </div>
-  </div>
-);
+  );
+};
 
 const Field = ({ label, value, multiline }: { label: string; value: string; multiline?: boolean }) => (
   <div className="mb-3">
@@ -359,11 +429,15 @@ const DocumentsTab = ({
   clientId,
   docUrls,
   miscFiles,
+  ftcReportFiles,
+  additionalFiles,
   onRefresh,
 }: {
   clientId: string;
   docUrls: Record<string, string | null>;
   miscFiles: Array<{ path: string; filename: string; uploaded_at: string; signedUrl: string | null }>;
+  ftcReportFiles: Array<{ path: string; filename: string; uploaded_at: string; signedUrl: string | null }>;
+  additionalFiles: Array<{ path: string; filename: string; uploaded_at: string; signedUrl: string | null }>;
   onRefresh: () => void;
 }) => {
   const [docType, setDocType] = useState<AdminDocType>('ftc-report');
@@ -535,6 +609,60 @@ const DocumentsTab = ({
           </div>
         </div>
       )}
+
+      {/* FTC Identity Theft Reports */}
+      {ftcReportFiles.length > 0 && (
+        <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-neutral-800">
+            <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold">
+              FTC Identity Theft Reports ({ftcReportFiles.length})
+            </h3>
+          </div>
+          <div className="divide-y divide-neutral-800">
+            {ftcReportFiles.map((f, i) => (
+              <div key={i} className="px-6 py-4 flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm text-white">{f.filename || `FTC Report ${i + 1}`}</p>
+                  <p className="text-xs text-neutral-500 mt-0.5">{new Date(f.uploaded_at).toLocaleDateString()}</p>
+                </div>
+                {f.signedUrl ? (
+                  <a href={f.signedUrl} target="_blank" rel="noopener noreferrer"
+                    className="text-luxury-red hover:text-luxury-accent text-xs uppercase tracking-widest font-semibold whitespace-nowrap">
+                    Download →
+                  </a>
+                ) : <span className="text-neutral-500 text-xs">Link expired</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Additional Client Documents */}
+      {additionalFiles.length > 0 && (
+        <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-neutral-800">
+            <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold">
+              Additional Client Documents ({additionalFiles.length})
+            </h3>
+          </div>
+          <div className="divide-y divide-neutral-800">
+            {additionalFiles.map((f, i) => (
+              <div key={i} className="px-6 py-4 flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm text-white">{f.filename || `Document ${i + 1}`}</p>
+                  <p className="text-xs text-neutral-500 mt-0.5">{new Date(f.uploaded_at).toLocaleDateString()}</p>
+                </div>
+                {f.signedUrl ? (
+                  <a href={f.signedUrl} target="_blank" rel="noopener noreferrer"
+                    className="text-luxury-red hover:text-luxury-accent text-xs uppercase tracking-widest font-semibold whitespace-nowrap">
+                    Download →
+                  </a>
+                ) : <span className="text-neutral-500 text-xs">Link expired</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -659,6 +787,8 @@ const LettersTab = ({
   setBusy,
   setBusyMsg,
   busy,
+  disputeRound,
+  responseCount,
 }: {
   clientId: string;
   client: ClientDetail['client'];
@@ -668,6 +798,8 @@ const LettersTab = ({
   setBusy: (b: boolean) => void;
   setBusyMsg: (m: string) => void;
   busy: boolean;
+  disputeRound: number;
+  responseCount: number;
 }) => {
   const [recipientName, setRecipientName] = useState('');
   const [recipientAddress, setRecipientAddress] = useState('');
@@ -677,6 +809,30 @@ const LettersTab = ({
 
   const toggle = (id: string) => setSelected((s) => ({ ...s, [id]: !s[id] }));
   const selectedIds = Object.keys(selected).filter((k) => selected[k]);
+
+  const sendMail = async (letterId: string) => {
+    setBusy(true);
+    setBusyMsg('Sending via Lob…');
+    try {
+      const res = await fetch('/api/send-mail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+        body: JSON.stringify({ letterId, clientId }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        alert(`Mailed via USPS Certified Mail. Tracking: ${json.trackingNumber}`);
+        onChange();
+      } else {
+        alert(json.error || 'Failed to send mail');
+      }
+    } catch (err) {
+      alert('Error: ' + (err as Error).message);
+    } finally {
+      setBusy(false);
+      setBusyMsg('');
+    }
+  };
 
   const applyPreset = (key: string) => {
     const preset = RECIPIENT_PRESETS.find((p) => p.key === key);
@@ -767,6 +923,17 @@ const LettersTab = ({
 
   return (
     <div className="space-y-8">
+      {/* Round badge + bureau response warning */}
+      <div className="flex flex-wrap items-center gap-3 mb-2">
+        <span className="inline-flex items-center px-3 py-1 text-xs font-bold uppercase tracking-widest bg-luxury-red/20 text-luxury-red rounded-sm border border-luxury-red/30">
+          Round {disputeRound}
+        </span>
+      </div>
+      {responseCount > 0 && (
+        <div className="bg-amber-950/40 border border-amber-800 text-amber-200 text-sm px-4 py-3 rounded-sm">
+          ⚠ {responseCount} bureau/creditor response{responseCount > 1 ? 's' : ''} on file — Claude will analyze {responseCount > 1 ? 'these' : 'this'} in letter generation.
+        </div>
+      )}
       {/* Generator */}
       <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-6">
         <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold mb-4">
@@ -906,14 +1073,28 @@ const LettersTab = ({
                   <td className="px-4 py-3 text-neutral-400 text-xs">
                     {new Date(l.created_at).toLocaleDateString()}
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-4 py-3 text-right flex items-center justify-end gap-3">
                     <button
                       onClick={() => downloadPdf(l.id)}
                       disabled={busy}
-                      className="text-luxury-red hover:text-luxury-accent text-xs uppercase tracking-widest font-semibold mr-3"
+                      className="text-luxury-red hover:text-luxury-accent text-xs uppercase tracking-widest font-semibold"
                     >
                       Download PDF
                     </button>
+                    {l.lob_tracking_number ? (
+                      <span className="text-green-400 text-xs font-mono">
+                        Mailed ✓ {l.lob_tracking_number}
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => sendMail(l.id)}
+                        disabled={busy || !l.pdf_unsigned_path}
+                        className="text-amber-400 hover:text-amber-300 text-xs uppercase tracking-widest font-semibold disabled:opacity-40"
+                        title={!l.pdf_unsigned_path ? 'Generate PDF first' : 'Send via USPS Certified Mail'}
+                      >
+                        Send Mail
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

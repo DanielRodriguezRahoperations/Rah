@@ -106,6 +106,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     })
   );
 
+  // FTC reports array with signed URLs
+  const ftcReportsRaw = (client as Record<string, unknown>).doc_ftc_reports;
+  const ftcReportsArr = Array.isArray(ftcReportsRaw)
+    ? (ftcReportsRaw as Array<{ path: string; filename: string; uploaded_at: string }>)
+    : [];
+  const ftcReportFiles = await Promise.all(
+    ftcReportsArr.map(async (m) => {
+      const { data: signed } = await supabase.storage
+        .from('intake-documents')
+        .createSignedUrl(m.path, SIGNED_URL_TTL);
+      return { ...m, signedUrl: signed?.signedUrl ?? null };
+    })
+  );
+
+  // Additional files array with signed URLs
+  const additionalFilesRaw = (client as Record<string, unknown>).doc_additional_files;
+  const additionalFilesArr = Array.isArray(additionalFilesRaw)
+    ? (additionalFilesRaw as Array<{ path: string; filename: string; uploaded_at: string }>)
+    : [];
+  const additionalFiles = await Promise.all(
+    additionalFilesArr.map(async (m) => {
+      const { data: signed } = await supabase.storage
+        .from('intake-documents')
+        .createSignedUrl(m.path, SIGNED_URL_TTL);
+      return { ...m, signedUrl: signed?.signedUrl ?? null };
+    })
+  );
+
   return res.status(200).json({
     client,
     letters: letters ?? [],
@@ -113,5 +141,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     responses: responses ?? [],
     docUrls,
     miscFiles,
+    ftcReportFiles,
+    additionalFiles,
   });
 }

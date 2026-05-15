@@ -52,6 +52,42 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     accounts = data ?? [];
   }
 
+  // Fetch client record for round / police / FTC context
+  const { data: clientRecord } = await supabase
+    .from('credit_repair_clients')
+    .select('*')
+    .eq('id', clientId)
+    .maybeSingle();
+
+  const cr = clientRecord as Record<string, unknown> | null;
+
+  const ftcNumbers = [
+    ...(cr?.doc_ftc_report ? ['primary report on file'] : []),
+    ...(Array.isArray(cr?.doc_ftc_reports)
+      ? (cr.doc_ftc_reports as unknown[]).map((_, i) => `Report ${i + 1}`)
+      : []),
+  ].join(', ') || 'on file';
+
+  const { data: bureauResponses } = await supabase
+    .from('bureau_responses')
+    .select('id')
+    .eq('client_id', clientId);
+
+  const disputeRound = Number(cr?.dispute_round ?? 1);
+  const roundContext = disputeRound > 1
+    ? `\nDISPUTE ROUND: ${disputeRound}\nROUND NOTES: ${cr?.round_notes || 'No notes provided'}\nThis is not a first-time dispute. Escalate language appropriately per round escalation strategy.`
+    : 'DISPUTE ROUND: 1 — Use standard first-round dispute language.';
+
+  const policeContext = cr?.police_report_number
+    ? `\nPOLICE REPORT ON FILE: ${cr.police_agency} Report #${cr.police_report_number}, Officer: ${cr.police_officer}, Date: ${cr.police_report_date}\nInclude this in all applicable letters and enclosures lists.`
+    : '';
+
+  const responseContext = (bureauResponses?.length ?? 0) > 0
+    ? `\nBUREAU/CREDITOR RESPONSE LETTERS HAVE BEEN UPLOADED.\nAnalyze and refute each response directly:\n- If they claimed verification: Challenge under §611(a)(7), demand furnisher name and original source docs\n- If they claimed accuracy: Escalate to §609(a)(1) full file disclosure and Metro 2 §607(b) challenge\n- If procedural defects exist: Cite as additional FCRA violations`
+    : '';
+
+  const extrasContext = `\n\n---\nADDITIONAL CONTEXT FOR THIS LETTER:\n${roundContext}${policeContext}${responseContext}\nFTC REPORT NUMBERS: ${ftcNumbers}\nCLIENT ADDRESS (use exactly as written): ${cr?.address ?? clientData.address}\nCLIENT FULL NAME (use exactly): ${cr?.full_name ?? clientData.fullName}\n---`;
+
   let template: string;
   try {
     template = getTemplate(letterType);
@@ -98,7 +134,7 @@ ${accountsList}
 TEMPLATE:
 ${template}
 
-Return ONLY a JSON object in the exact shape specified. No explanation. No markdown.`;
+Return ONLY a JSON object in the exact shape specified. No explanation. No markdown.${extrasContext}`;
 
   let parsed: { letter: string; attachmentA: string; packetTopSlip: string };
   try {

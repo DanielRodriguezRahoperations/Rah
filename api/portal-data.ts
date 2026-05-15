@@ -57,7 +57,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Letters with tracking
   const { data: letters } = await supabase
     .from('dispute_letters')
-    .select('id, recipient_name, letter_type, created_at, tracking_log(*)')
+    .select('id, recipient_name, letter_type, created_at, signed_at, signed_by, lob_tracking_number, mailed_at, mail_status, tracking_log(*)')
     .eq('client_id', clientId)
     .order('created_at', { ascending: false });
 
