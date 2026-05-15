@@ -63,6 +63,15 @@ interface AuditLead {
   created_at: string;
 }
 
+interface Reel {
+  id: string;
+  created_at: string;
+  script: string;
+  video_url: string;
+  status: string;
+  category: string;
+}
+
 // ─── Status color maps ────────────────────────────────────────────────────────
 
 const STATUS_COLORS: Record<string, string> = {
@@ -97,6 +106,12 @@ const AUDIT_STATUS_COLORS: Record<string, string> = {
   closed: 'bg-neutral-800 text-neutral-300 border-neutral-700',
 };
 
+const REEL_STATUS_COLORS: Record<string, string> = {
+  completed: 'bg-green-950/50 text-green-300 border-green-900',
+  processing: 'bg-amber-950/50 text-amber-300 border-amber-900',
+  failed: 'bg-red-950/50 text-red-300 border-red-900',
+};
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 function auditScoreColor(score: number | null): string {
@@ -117,7 +132,7 @@ function auditGrade(score: number | null): string {
 
 const AdminDashboardPage = () => {
   const navigate = useNavigate();
-  const [mainTab, setMainTab] = useState<'credit-repair' | 'marketing' | 'website' | 'audits' | 'blog'>('credit-repair');
+  const [mainTab, setMainTab] = useState<'credit-repair' | 'marketing' | 'website' | 'audits' | 'blog' | 'reels'>('credit-repair');
 
   // Credit repair state
   const [clients, setClients] = useState<Client[]>([]);
@@ -172,6 +187,11 @@ const AdminDashboardPage = () => {
   const [reelResult, setReelResult] = useState<{ video_url: string; script: string } | null>(null);
   const [reelError, setReelError] = useState('');
 
+  // Reels tab state
+  const [reels, setReels] = useState<Reel[]>([]);
+  const [reelsLoading, setReelsLoading] = useState(false);
+  const [reelsError, setReelsError] = useState('');
+
   useEffect(() => {
     if (!isAdminAuthenticated()) {
       navigate('/admin/login', { replace: true });
@@ -193,6 +213,9 @@ const AdminDashboardPage = () => {
     }
     if (mainTab === 'blog' && blogPosts.length === 0 && !blogPostsLoading) {
       fetchBlogPosts();
+    }
+    if (mainTab === 'reels' && reels.length === 0 && !reelsLoading) {
+      fetchReels();
     }
   }, [mainTab]);
 
@@ -304,6 +327,19 @@ const AdminDashboardPage = () => {
       else { setAuditLeads(json.leads || []); }
     } catch { setAuditError('Network error'); }
     finally { setAuditLoading(false); }
+  };
+
+  const fetchReels = async () => {
+    setReelsLoading(true);
+    setReelsError('');
+    try {
+      const res = await fetch('/api/reels', { headers: adminHeaders() });
+      if (res.status === 401) { clearAdminToken(); navigate('/admin/login', { replace: true }); return; }
+      const json = await res.json();
+      if (!res.ok) { setReelsError(json.error || 'Failed to load reels'); }
+      else { setReels(json.reels || []); }
+    } catch { setReelsError('Network error'); }
+    finally { setReelsLoading(false); }
   };
 
   const handleAuditStatusChange = async (leadId: string, status: string) => {
@@ -576,7 +612,7 @@ const AdminDashboardPage = () => {
                 Admin Dashboard
               </p>
               <h1 className="font-serif-display text-4xl text-white">
-                {mainTab === 'credit-repair' ? 'Credit Repair Clients' : mainTab === 'marketing' ? 'Marketing Clients' : mainTab === 'website' ? 'Website Clients' : 'Audit Leads'}
+                {mainTab === 'credit-repair' ? 'Credit Repair Clients' : mainTab === 'marketing' ? 'Marketing Clients' : mainTab === 'website' ? 'Website Clients' : mainTab === 'audits' ? 'Audit Leads' : mainTab === 'blog' ? 'Blog Posts' : 'Reels'}
               </h1>
             </div>
             <div className="flex items-center gap-3 self-start flex-wrap">
@@ -707,7 +743,7 @@ const AdminDashboardPage = () => {
 
           {/* Main tabs */}
           <div className="flex border-b border-neutral-800 mb-6 overflow-x-auto">
-            {(['credit-repair', 'marketing', 'website', 'audits', 'blog'] as const).map((tab) => (
+            {(['credit-repair', 'marketing', 'website', 'audits', 'blog', 'reels'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setMainTab(tab)}
@@ -717,7 +753,7 @@ const AdminDashboardPage = () => {
                     : 'border-transparent text-neutral-500 hover:text-neutral-300'
                 }`}
               >
-                {tab === 'credit-repair' ? 'Credit Repair' : tab === 'marketing' ? 'Marketing' : tab === 'website' ? 'Website' : tab === 'audits' ? 'Audits' : 'Blog'}
+                {tab === 'credit-repair' ? 'Credit Repair' : tab === 'marketing' ? 'Marketing' : tab === 'website' ? 'Website' : tab === 'audits' ? 'Audits' : tab === 'blog' ? 'Blog' : 'Reels'}
                 {tab === 'credit-repair' && clients.length > 0 && (
                   <span className="ml-2 text-[10px] bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded-sm">{clients.length}</span>
                 )}
@@ -732,6 +768,9 @@ const AdminDashboardPage = () => {
                 )}
                 {tab === 'blog' && blogPosts.length > 0 && (
                   <span className="ml-2 text-[10px] bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded-sm">{blogPosts.length}</span>
+                )}
+                {tab === 'reels' && reels.length > 0 && (
+                  <span className="ml-2 text-[10px] bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded-sm">{reels.length}</span>
                 )}
               </button>
             ))}
@@ -1144,6 +1183,79 @@ const AdminDashboardPage = () => {
               {!auditLoading && auditLeads.length > 0 && (
                 <div className="mt-6 text-xs text-neutral-500 text-right">
                   Showing {filteredAudits.length} of {auditLeads.length} leads
+                </div>
+              )}
+            </>
+          )}
+
+          {/* ── Reels Tab ── */}
+          {mainTab === 'reels' && (
+            <>
+              <div className="flex items-center justify-between mb-6">
+                <p className="text-sm text-neutral-400">{reels.length} reel{reels.length !== 1 ? 's' : ''} generated</p>
+                <button
+                  onClick={fetchReels}
+                  className="bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded-sm text-xs uppercase tracking-widest transition-colors"
+                >
+                  Refresh
+                </button>
+              </div>
+
+              {reelsLoading ? (
+                <div className="text-center py-20 text-neutral-500">Loading reels…</div>
+              ) : reelsError ? (
+                <div className="bg-red-950/50 border border-red-900 text-red-200 text-sm px-4 py-3 rounded-sm">{reelsError}</div>
+              ) : reels.length === 0 ? (
+                <div className="text-center py-20 text-neutral-500">0 reels generated</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-neutral-800 text-neutral-500 text-xs uppercase tracking-widest">
+                        <th className="text-left py-3 px-4 font-medium">No.</th>
+                        <th className="text-left py-3 px-4 font-medium">Script</th>
+                        <th className="text-left py-3 px-4 font-medium">Category</th>
+                        <th className="text-left py-3 px-4 font-medium">Date</th>
+                        <th className="text-left py-3 px-4 font-medium">Status</th>
+                        <th className="text-right py-3 px-4 font-medium">Video</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {reels.map((reel, idx) => (
+                        <tr key={reel.id} className="border-b border-neutral-800/50 hover:bg-neutral-800/20 transition-colors">
+                          <td className="py-3 px-4 text-neutral-500 text-xs whitespace-nowrap">
+                            No. {String(reels.length - idx).padStart(3, '0')}
+                          </td>
+                          <td className="py-3 px-4 text-neutral-300 max-w-xs text-xs">
+                            {reel.script ? reel.script.slice(0, 80) + (reel.script.length > 80 ? '…' : '') : '—'}
+                          </td>
+                          <td className="py-3 px-4 text-neutral-400 whitespace-nowrap text-xs">{reel.category || '—'}</td>
+                          <td className="py-3 px-4 text-neutral-500 whitespace-nowrap text-xs">
+                            {new Date(reel.created_at).toLocaleDateString()}
+                          </td>
+                          <td className="py-3 px-4 whitespace-nowrap">
+                            <span className={`inline-block text-[10px] uppercase tracking-widest px-2 py-1 rounded-sm border ${REEL_STATUS_COLORS[reel.status] ?? 'bg-neutral-800 text-neutral-300 border-neutral-700'}`}>
+                              {reel.status}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-right whitespace-nowrap">
+                            {reel.video_url ? (
+                              <a
+                                href={reel.video_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs px-3 py-1.5 rounded-sm border border-neutral-700 text-neutral-300 hover:border-luxury-red hover:text-white transition-colors"
+                              >
+                                Watch →
+                              </a>
+                            ) : (
+                              <span className="text-neutral-600 text-xs">—</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </>
