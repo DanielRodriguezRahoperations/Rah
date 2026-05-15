@@ -184,8 +184,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               voice_id: '1bd001e7e50f421d891986aad5158bc8',
             },
             background: {
-              type: 'color',
-              value: '#000000',
+              type: 'none',
             },
           },
         ],
