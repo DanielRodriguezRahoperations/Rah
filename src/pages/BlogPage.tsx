@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "What Does a Free Website Audit Actually Check?",
+      displayTitle: "What Does a Free Website Audit Actually Check? Here Is What You Should Expect",
+      date: "May 15, 2026",
+      pubDate: "Fri, 15 May 2026 01:58:06 GMT",
+      issue: 'No. 048',
+      category: "SEO",
+      excerpt: "A free website audit sounds great, but most business owners have no idea what is actually being evaluated. RAH Operations explains every component a real audit covers, from technical SEO to page speed, so you can make informed decisions about your site. If your Arizona business is not ranking, this is where the answers start.",
+      slug: 'what-does-a-free-website-audit-actually-check'
+    },
+    {
       title: "Website Audit for Med Spas: Attract More Clients Online",
       displayTitle: "The Complete Website Audit for Med Spas: How to Attract More Clients Online in 2026",
       date: "May 15, 2026",
