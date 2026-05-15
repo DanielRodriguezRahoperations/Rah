@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Website Audit for Med Spas: Attract More Clients Online",
+      displayTitle: "The Complete Website Audit for Med Spas: How to Attract More Clients Online in 2026",
+      date: "May 15, 2026",
+      pubDate: "Fri, 15 May 2026 00:02:07 GMT",
+      issue: 'No. 047',
+      category: "SEO",
+      excerpt: "If your med spa is not showing up on Google or converting visitors into booked appointments, your website may be the problem. A thorough website audit for med spas can uncover hidden issues that are costing you clients every single day. Learn what to look for and how to fix it fast.",
+      slug: 'website-audit-for-med-spas-attract-more-clients-online'
+    },
+    {
       title: "Website Audit for Roofers: Get More Leads From Google",
       displayTitle: "Website Audit for Roofers: How to Get More Leads From Google in 2026",
       date: "May 14, 2026",
