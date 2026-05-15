@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Website Health Check: What Every Small Business Owner Needs",
+      displayTitle: "Website Health Check: What Every Small Business Owner in Arizona Needs to Know",
+      date: "May 15, 2026",
+      pubDate: "Fri, 15 May 2026 12:01:05 GMT",
+      issue: 'No. 051',
+      category: "Website Design",
+      excerpt: "Your website is your most important digital asset, but most small business owners have no idea if it is actually working for them. A website health check reveals hidden issues that cost you traffic, leads, and revenue. Learn what to look for and how to fix it fast.",
+      slug: 'website-health-check-what-every-small-business-owner-needs'
+    },
+    {
       title: "How to Fix a Low Website SEO Score Fast in 2026",
       displayTitle: "How to Fix a Low Website SEO Score Fast: A Step-by-Step Guide",
       date: "May 15, 2026",
