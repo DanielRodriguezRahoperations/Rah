@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "How to Fix a Low Website SEO Score Fast in 2026",
+      displayTitle: "How to Fix a Low Website SEO Score Fast: A Step-by-Step Guide",
+      date: "May 15, 2026",
+      pubDate: "Fri, 15 May 2026 08:01:37 GMT",
+      issue: 'No. 050',
+      category: "SEO",
+      excerpt: "A low website SEO score is costing you traffic, leads, and revenue every single day. The good news is that many of the most damaging SEO issues can be identified and corrected quickly with the right approach. This guide walks you through exactly what to fix and how to do it fast.",
+      slug: 'how-to-fix-a-low-website-seo-score-fast'
+    },
+    {
       title: "What Is a Good Website Audit Score and How to Improve It",
       displayTitle: "What Is a Good Website Audit Score and How to Improve It in 2026",
       date: "May 15, 2026",
