@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "How to Check If Your Website Is Mobile Friendly Free Tool",
+      displayTitle: "How to Check If Your Website Is Mobile Friendly Using Free Tools (And What to Do Next)",
+      date: "May 15, 2026",
+      pubDate: "Fri, 15 May 2026 16:01:09 GMT",
+      issue: 'No. 052',
+      category: "Website Design",
+      excerpt: "Not sure if your website passes the mobile test? Discover the best free tools to check mobile friendliness and learn what the results actually mean for your Google rankings. RAH Operations breaks it down so Arizona business owners can take action fast.",
+      slug: 'how-to-check-if-your-website-is-mobile-friendly-free-tool'
+    },
+    {
       title: "Website Health Check: What Every Small Business Owner Needs",
       displayTitle: "Website Health Check: What Every Small Business Owner in Arizona Needs to Know",
       date: "May 15, 2026",
