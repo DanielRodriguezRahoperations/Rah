@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "What Is a Good Website Audit Score and How to Improve It",
+      displayTitle: "What Is a Good Website Audit Score and How to Improve It in 2026",
+      date: "May 15, 2026",
+      pubDate: "Fri, 15 May 2026 04:01:32 GMT",
+      issue: 'No. 049',
+      category: "SEO",
+      excerpt: "A website audit score tells you exactly how healthy your site is and where you are losing rankings, traffic, and customers. Understanding what a good score looks like is the first step toward fixing the problems holding your business back. In this guide, RAH Operations breaks down audit scores, what they mean, and how to improve yours fast.",
+      slug: 'what-is-a-good-website-audit-score-and-how-to-improve-it'
+    },
+    {
       title: "What Does a Free Website Audit Actually Check?",
       displayTitle: "What Does a Free Website Audit Actually Check? Here Is What You Should Expect",
       date: "May 15, 2026",
