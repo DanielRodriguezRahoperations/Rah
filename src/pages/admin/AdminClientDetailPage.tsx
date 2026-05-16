@@ -95,6 +95,25 @@ const AdminClientDetailPage = () => {
     }
   };
 
+  const sendWelcomeEmail = async () => {
+    if (!clientId) return;
+    try {
+      const r = await fetch('/api/send-welcome-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+        body: JSON.stringify({ clientId }),
+      });
+      const j = await r.json();
+      if (r.ok) {
+        showToast('Welcome email sent successfully.', 'success');
+      } else {
+        showToast(j.error || 'Failed to send welcome email.', 'error');
+      }
+    } catch (err) {
+      showToast('Network error sending welcome email.', 'error');
+    }
+  };
+
   useEffect(() => {
     if (!isAdminAuthenticated()) {
       navigate('/admin/login', { replace: true });
@@ -256,6 +275,13 @@ const AdminClientDetailPage = () => {
                     className="text-[10px] uppercase tracking-widest text-luxury-red border border-luxury-red/40 px-2 py-0.5 rounded-sm hover:bg-luxury-red/10 disabled:opacity-40 transition-colors"
                   >
                     Resend Portal Email
+                  </button>
+                  <button
+                    onClick={sendWelcomeEmail}
+                    disabled={busy}
+                    className="text-[10px] uppercase tracking-widest text-luxury-red border border-luxury-red/40 px-2 py-0.5 rounded-sm hover:bg-luxury-red/10 disabled:opacity-40 transition-colors"
+                  >
+                    Send Welcome Email
                   </button>
                 </p>
               </div>

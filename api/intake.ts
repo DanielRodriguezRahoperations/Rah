@@ -428,35 +428,39 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     'Content-Type': 'application/json',
   };
 
-  const [adminRes, clientRes] = await Promise.all([
-    fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: emailHeaders,
-      body: JSON.stringify({
-        from: 'RAH Website <onboarding@resend.dev>',
-        to: ['daniel@rahoperations.com'],
-        reply_to: email,
-        subject: `New Credit Repair Intake — ${fullName}`,
-        html: adminHtml,
+  try {
+    const [adminRes, clientRes] = await Promise.all([
+      fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: emailHeaders,
+        body: JSON.stringify({
+          from: 'RAH Operations <noreply@rahoperations.com>',
+          to: ['daniel@rahoperations.com'],
+          reply_to: email,
+          subject: `New Credit Repair Intake — ${fullName}`,
+          html: adminHtml,
+        }),
       }),
-    }),
-    fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: emailHeaders,
-      body: JSON.stringify({
-        from: 'RAH Operations <onboarding@resend.dev>',
-        to: [email],
-        reply_to: 'daniel@rahoperations.com',
-        subject: 'Your Credit Repair Intake Has Been Received — RAH Operations',
-        html: clientHtml,
+      fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: emailHeaders,
+        body: JSON.stringify({
+          from: 'RAH Operations <noreply@rahoperations.com>',
+          to: [email],
+          reply_to: 'daniel@rahoperations.com',
+          subject: 'Welcome to RAH Operations — We\'re on it!',
+          html: clientHtml,
+        }),
       }),
-    }),
-  ]);
+    ]);
 
-  if (!adminRes.ok || !clientRes.ok) {
-    const adminErr = adminRes.ok ? null : await adminRes.json().catch(() => ({}));
-    const clientErr = clientRes.ok ? null : await clientRes.json().catch(() => ({}));
-    console.error('Resend errors:', { adminErr, clientErr });
+    if (!adminRes.ok || !clientRes.ok) {
+      const adminErr = adminRes.ok ? null : await adminRes.json().catch(() => ({}));
+      const clientErr = clientRes.ok ? null : await clientRes.json().catch(() => ({}));
+      console.error('[intake] resend errors — status:', { admin: adminRes.status, client: clientRes.status }, 'body:', { adminErr, clientErr });
+    }
+  } catch (err) {
+    console.error('[intake] resend fetch threw:', err);
     // Don't fail the request — the DB record is already saved
   }
 
