@@ -70,6 +70,9 @@ const AdminClientDetailPage = () => {
   const [busy, setBusy] = useState(false);
   const [busyMsg, setBusyMsg] = useState('');
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
+  const [disputeModal, setDisputeModal] = useState(false);
+  const [disputeMsg, setDisputeMsg] = useState('');
+  const [disputeSending, setDisputeSending] = useState(false);
 
   const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
     setToast({ msg, type });
@@ -111,6 +114,31 @@ const AdminClientDetailPage = () => {
       }
     } catch (err) {
       showToast('Network error sending welcome email.', 'error');
+    }
+  };
+
+  const sendDisputeNotice = async () => {
+    if (!clientId || !disputeMsg.trim()) return;
+    setDisputeSending(true);
+    try {
+      const r = await fetch('/api/send-dispute-notice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+        body: JSON.stringify({ clientId, message: disputeMsg }),
+      });
+      const j = await r.json();
+      if (r.ok) {
+        showToast(`Round ${j.round} dispute notice sent.`, 'success');
+        setDisputeModal(false);
+        setDisputeMsg('');
+        await loadDetail();
+      } else {
+        showToast(j.error || 'Failed to send dispute notice.', 'error');
+      }
+    } catch {
+      showToast('Network error sending dispute notice.', 'error');
+    } finally {
+      setDisputeSending(false);
     }
   };
 
@@ -283,6 +311,16 @@ const AdminClientDetailPage = () => {
                   >
                     Send Welcome Email
                   </button>
+                  <button
+                    onClick={() => {
+                      setDisputeMsg(`Your Round ${Number(client.dispute_round ?? 1)} dispute letters have been sent to the credit bureaus. Please watch for mailed responses over the next 30-45 days.`);
+                      setDisputeModal(true);
+                    }}
+                    disabled={busy}
+                    className="text-[10px] uppercase tracking-widest text-luxury-red border border-luxury-red/40 px-2 py-0.5 rounded-sm hover:bg-luxury-red/10 disabled:opacity-40 transition-colors"
+                  >
+                    Send Dispute Notice
+                  </button>
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -347,7 +385,6 @@ const AdminClientDetailPage = () => {
             {tab === 'overview' && (
               <OverviewTab
                 client={client}
-                clientId={client.id}
                 busy={busy}
                 onSaveRound={async (round, notes) => {
                   setBusy(true);
@@ -398,6 +435,37 @@ const AdminClientDetailPage = () => {
           </motion.div>
         </div>
       </section>
+
+      {disputeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
+          <div className="bg-[#1a1a1a] border border-neutral-700 rounded-sm p-6 w-full max-w-lg">
+            <h3 className="text-sm uppercase tracking-widest text-luxury-red font-bold mb-4">Send Dispute Notice</h3>
+            <p className="text-neutral-400 text-xs mb-3">This will be emailed to the client and logged as a round update.</p>
+            <textarea
+              value={disputeMsg}
+              onChange={(e) => setDisputeMsg(e.target.value)}
+              rows={5}
+              className="w-full bg-[#0f0f0f] border border-neutral-700 text-white text-sm p-3 rounded-sm resize-none focus:outline-none focus:border-luxury-red mb-4"
+              placeholder="Message to client…"
+            />
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setDisputeModal(false)}
+                className="text-xs uppercase tracking-widest text-neutral-400 hover:text-white px-4 py-2 border border-neutral-700 rounded-sm transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={sendDisputeNotice}
+                disabled={disputeSending || !disputeMsg.trim()}
+                className="text-xs uppercase tracking-widest bg-luxury-red hover:bg-luxury-light disabled:opacity-50 text-white px-5 py-2 rounded-sm transition-colors"
+              >
+                {disputeSending ? 'Sending…' : 'Send Notice'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
@@ -405,12 +473,10 @@ const AdminClientDetailPage = () => {
 // === Overview Tab ===
 const OverviewTab = ({
   client,
-  clientId,
   busy,
   onSaveRound,
 }: {
   client: ClientDetail['client'];
-  clientId: string;
   busy: boolean;
   onSaveRound: (round: number, notes: string) => void;
 }) => {

@@ -39,7 +39,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Fetch client
   const { data: client } = await supabase
     .from('credit_repair_clients')
-    .select('id, full_name, email, phone, address, city, state, zip, status, created_at, goals, timeline, doc_ftc_report, doc_police_report')
+    .select('id, full_name, email, phone, address, city, state, zip, status, created_at, goals, timeline, doc_ftc_report, doc_police_report, dispute_rounds')
     .eq('id', clientId)
     .maybeSingle();
 
@@ -60,6 +60,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .select('id, recipient_name, letter_type, created_at, signed_at, signed_by, lob_tracking_number, mailed_at, mail_status, tracking_log(*)')
     .eq('client_id', clientId)
     .order('created_at', { ascending: false });
+
+  // Fetch dispute accounts for this client
+  const { data: accounts } = await supabase
+    .from('dispute_accounts')
+    .select('id, creditor_name, account_number, balance, account_type, account_status, bureaus, dispute_types, selected')
+    .eq('client_id', clientId)
+    .order('created_at', { ascending: true });
 
   // Bureau responses with signed download URLs for uploaded files
   const { data: responses } = await supabase
@@ -83,5 +90,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     client: clientOut,
     letters: letters ?? [],
     responses: responsesWithUrls,
+    accounts: accounts ?? [],
   });
 }

@@ -36,6 +36,24 @@ interface PortalResponse {
   signedUrl?: string | null;
 }
 
+interface PortalAccount {
+  id: string;
+  creditor_name: string;
+  account_number: string;
+  balance: string;
+  account_type: string;
+  account_status: string;
+  bureaus: string[];
+  dispute_types: string[];
+  selected: boolean;
+}
+
+interface DisputeRound {
+  round: number;
+  sent_at: string;
+  message: string;
+}
+
 interface PortalData {
   client: {
     id: string;
@@ -48,9 +66,18 @@ interface PortalData {
     timeline?: string;
     doc_ftc_report?: boolean;
     doc_police_report?: boolean;
+    dispute_rounds?: DisputeRound[];
   };
   letters: PortalLetter[];
   responses: PortalResponse[];
+  accounts: PortalAccount[];
+}
+
+const NEGATIVE_KEYWORDS = ['collection', 'charge', 'late', 'derogatory', 'delinquent', 'judgment', 'inquiry', 'past due', 'write-off', 'written off', 'bankruptcy', 'repossession', 'repo'];
+
+function isNegativeStatus(status: string): boolean {
+  const s = status.toLowerCase();
+  return NEGATIVE_KEYWORDS.some((kw) => s.includes(kw));
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -141,7 +168,7 @@ const PortalDashboardPage = () => {
     );
   }
 
-  const { client, letters, responses } = data;
+  const { client, letters, responses, accounts } = data;
   const currentStageIdx = Math.max(0, STAGES.indexOf(client.status));
   const portalToken = localStorage.getItem(PORTAL_TOKEN_KEY) ?? '';
 
@@ -214,6 +241,146 @@ const PortalDashboardPage = () => {
               </div>
             </div>
           </motion.div>
+
+          {/* Positive Accounts */}
+          {(() => {
+            const positiveAccounts = accounts.filter((a) => !isNegativeStatus(a.account_status));
+            return (
+              <div className="bg-white border border-neutral-200 rounded-sm overflow-hidden mb-8 shadow-sm">
+                <div className="px-6 py-5 border-b border-neutral-200 flex items-center gap-3">
+                  <span className="text-green-500 text-xl">✓</span>
+                  <div>
+                    <p className="text-[10px] tracking-[0.3em] uppercase text-luxury-red font-bold mb-1">Credit Report</p>
+                    <h3 className="font-serif-display text-2xl text-slate-dark">Positive Accounts on Your Report</h3>
+                  </div>
+                </div>
+                {positiveAccounts.length === 0 ? (
+                  <div className="p-8 text-center text-neutral-500 text-sm">
+                    Your positive accounts will appear here once your reports are analyzed.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-cream-100 border-b border-neutral-200">
+                        <tr className="text-left text-xs uppercase tracking-widest text-neutral-500">
+                          <th className="px-5 py-3">Creditor</th>
+                          <th className="px-5 py-3">Type</th>
+                          <th className="px-5 py-3">Status</th>
+                          <th className="px-5 py-3">Bureaus</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {positiveAccounts.map((a) => (
+                          <tr key={a.id} className="border-b border-neutral-200/60">
+                            <td className="px-5 py-3 text-slate-dark font-medium">{a.creditor_name}</td>
+                            <td className="px-5 py-3 text-neutral-600 text-xs">{a.account_type}</td>
+                            <td className="px-5 py-3">
+                              <span className="text-green-600 text-xs font-semibold">{a.account_status}</span>
+                            </td>
+                            <td className="px-5 py-3 text-neutral-500 text-xs uppercase">{(a.bureaus || []).join(', ')}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* Items Being Disputed */}
+          {(() => {
+            const disputedAccounts = accounts.filter((a) => a.dispute_types && a.dispute_types.length > 0);
+            return (
+              <div className="bg-white border border-neutral-200 rounded-sm overflow-hidden mb-8 shadow-sm">
+                <div className="px-6 py-5 border-b border-neutral-200 flex items-center gap-3">
+                  <span className="text-luxury-red text-xl">🛡</span>
+                  <div>
+                    <p className="text-[10px] tracking-[0.3em] uppercase text-luxury-red font-bold mb-1">Active Disputes</p>
+                    <h3 className="font-serif-display text-2xl text-slate-dark">Items We're Disputing on Your Behalf</h3>
+                  </div>
+                </div>
+                {disputedAccounts.length === 0 ? (
+                  <div className="p-8 text-center text-neutral-500 text-sm">
+                    Your dispute items will appear here once your case review is complete.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-cream-100 border-b border-neutral-200">
+                        <tr className="text-left text-xs uppercase tracking-widest text-neutral-500">
+                          <th className="px-5 py-3">Creditor</th>
+                          <th className="px-5 py-3">Account #</th>
+                          <th className="px-5 py-3">Balance</th>
+                          <th className="px-5 py-3">Status</th>
+                          <th className="px-5 py-3">Dispute Type</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {disputedAccounts.map((a) => {
+                          const dtype = a.dispute_types[0];
+                          return (
+                            <tr key={a.id} className="border-b border-neutral-200/60">
+                              <td className="px-5 py-3 text-slate-dark font-medium">{a.creditor_name}</td>
+                              <td className="px-5 py-3 text-neutral-500 font-mono text-xs">{a.account_number || '—'}</td>
+                              <td className="px-5 py-3 text-neutral-600 text-xs">{a.balance || '—'}</td>
+                              <td className="px-5 py-3 text-neutral-600 text-xs">{a.account_status}</td>
+                              <td className="px-5 py-3">
+                                <span className={`text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-sm ${
+                                  dtype === 'identity_theft'
+                                    ? 'bg-red-50 text-red-700 border border-red-200'
+                                    : 'bg-amber-50 text-amber-700 border border-amber-200'
+                                }`}>
+                                  {dtype === 'identity_theft' ? 'Identity Theft' : 'Standard Dispute'}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* Dispute Status Updates */}
+          {(() => {
+            const rounds: DisputeRound[] = Array.isArray(client.dispute_rounds) ? client.dispute_rounds : [];
+            return (
+              <div className="bg-white border border-neutral-200 rounded-sm overflow-hidden mb-8 shadow-sm">
+                <div className="px-6 py-5 border-b border-neutral-200">
+                  <p className="text-[10px] tracking-[0.3em] uppercase text-luxury-red font-bold mb-1">Timeline</p>
+                  <h3 className="font-serif-display text-2xl text-slate-dark">Dispute Status Updates</h3>
+                </div>
+                {rounds.length === 0 ? (
+                  <div className="p-8 text-center text-neutral-500 text-sm">
+                    Status updates will appear here when your dispute letters are sent.
+                  </div>
+                ) : (
+                  <div className="p-6 space-y-4">
+                    {rounds.map((r, i) => (
+                      <div key={i} className="flex gap-4">
+                        <div className="flex flex-col items-center">
+                          <div className="w-8 h-8 rounded-full bg-luxury-red flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                            {r.round}
+                          </div>
+                          {i < rounds.length - 1 && <div className="w-px flex-1 bg-neutral-200 mt-2" />}
+                        </div>
+                        <div className="pb-4 flex-1">
+                          <p className="text-xs uppercase tracking-widest text-luxury-red font-semibold mb-1">
+                            Round {r.round} — {new Date(r.sent_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                          </p>
+                          <p className="text-sm text-neutral-600 leading-relaxed">{r.message}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Letters */}
           <div className="bg-white border border-neutral-200 rounded-sm overflow-hidden mb-8 shadow-sm">
