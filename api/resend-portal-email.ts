@@ -103,7 +103,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'RAH Operations <onboarding@resend.dev>',
+        from: 'RAH Operations <noreply@rahoperations.com>',
         to: [email],
         subject: `Your RAH Portal Login Code: ${code}`,
         html,
