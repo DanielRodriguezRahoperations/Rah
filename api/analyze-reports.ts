@@ -67,10 +67,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     try {
       const buf = Buffer.from(await fileData.arrayBuffer());
-      const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.js' as 'pdfjs-dist');
-      pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+      const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs' as 'pdfjs-dist');
 
-      const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
+      const loadingTask = pdfjsLib.getDocument({
+        data: new Uint8Array(buf),
+        useWorkerFetch: false,
+        isEvalSupported: false,
+        useSystemFonts: true,
+      });
+      const pdf = await loadingTask.promise;
       const pageTexts: string[] = [];
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
