@@ -69,6 +69,31 @@ const AdminClientDetailPage = () => {
   const [tab, setTab] = useState<Tab>('overview');
   const [busy, setBusy] = useState(false);
   const [busyMsg, setBusyMsg] = useState('');
+  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 4000);
+  };
+
+  const resendPortalEmail = async () => {
+    if (!clientId) return;
+    try {
+      const r = await fetch('/api/resend-portal-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+        body: JSON.stringify({ clientId }),
+      });
+      const j = await r.json();
+      if (r.ok) {
+        showToast('Portal login email sent successfully.', 'success');
+      } else {
+        showToast(j.error || 'Failed to send portal email.', 'error');
+      }
+    } catch (err) {
+      showToast('Network error sending portal email.', 'error');
+    }
+  };
 
   useEffect(() => {
     if (!isAdminAuthenticated()) {
@@ -128,29 +153,39 @@ const AdminClientDetailPage = () => {
     setBusy(true);
     setBusyMsg('Extracting credit reports…');
     try {
-      // 1. Extract text per available bureau
-      const texts: Record<string, string> = {};
-      for (const bureau of ['equifax', 'experian', 'transunion'] as const) {
-        const field = `doc_cr_${bureau}` as keyof ClientDetail['docUrls'];
-        if (!data.docUrls[field as string]) continue;
-        setBusyMsg(`Extracting ${bureau}…`);
-        const r = await fetch(`/api/analyze-reports?action=extract&bureau=${bureau}&clientId=${clientId}`, {
-          headers: adminHeaders(),
-        });
-        if (r.ok) {
-          const j = await r.json();
-          texts[bureau] = j.text || '';
-        }
-      }
+      // 1. Extract all available bureaus in parallel
+      const bureaus = (['equifax', 'experian', 'transunion'] as const).filter(
+        (b) => !!data.docUrls[`doc_cr_${b}` as string],
+      );
 
-      if (Object.keys(texts).length === 0) {
+      if (bureaus.length === 0) {
         alert('No credit reports uploaded — cannot analyze.');
-        setBusy(false);
-        setBusyMsg('');
         return;
       }
 
-      // 2. Send to Claude
+      setBusyMsg('Extracting credit reports…');
+      const results = await Promise.all(
+        bureaus.map((bureau) =>
+          fetch(`/api/analyze-reports?action=extract&bureau=${bureau}&clientId=${clientId}`, {
+            headers: adminHeaders(),
+          }).then(async (r) => ({ bureau, r, j: await r.json() })),
+        ),
+      );
+
+      const failed = results.filter(({ r }) => !r.ok);
+      if (failed.length > 0) {
+        const msgs = failed.map(({ bureau, r, j }) => `${bureau}: ${j.error ?? r.status}`).join('\n');
+        alert(`Bureau extraction failed — analysis aborted:\n\n${msgs}`);
+        return;
+      }
+
+      const texts: Record<string, string> = {};
+      for (const { bureau, j } of results) {
+        console.log(`[analyze] ${bureau} text length: ${j.text?.length ?? 0}`);
+        texts[bureau] = j.text ?? '';
+      }
+
+      // 2. Send to Claude only after all bureaus extracted successfully
       setBusyMsg('Analyzing with Claude…');
       const r2 = await fetch('/api/analyze-reports', {
         method: 'POST',
@@ -213,7 +248,16 @@ const AdminClientDetailPage = () => {
                   Client Record
                 </p>
                 <h1 className="font-serif-display text-4xl text-white">{client.full_name}</h1>
-                <p className="text-neutral-400 text-sm mt-1">{client.email} · {client.phone}</p>
+                <p className="text-neutral-400 text-sm mt-1 flex items-center gap-3 flex-wrap">
+                  <span>{client.email} · {client.phone}</span>
+                  <button
+                    onClick={resendPortalEmail}
+                    disabled={busy}
+                    className="text-[10px] uppercase tracking-widest text-luxury-red border border-luxury-red/40 px-2 py-0.5 rounded-sm hover:bg-luxury-red/10 disabled:opacity-40 transition-colors"
+                  >
+                    Resend Portal Email
+                  </button>
+                </p>
               </div>
               <div className="flex items-center gap-3">
                 <select
@@ -233,6 +277,12 @@ const AdminClientDetailPage = () => {
           {busy && (
             <div className="bg-amber-950/50 border border-amber-900 text-amber-200 text-sm px-4 py-3 rounded-sm mb-4">
               {busyMsg || 'Working…'}
+            </div>
+          )}
+
+          {toast && (
+            <div className={`text-sm px-4 py-3 rounded-sm mb-4 ${toast.type === 'success' ? 'bg-emerald-950/50 border border-emerald-800 text-emerald-200' : 'bg-red-950/50 border border-red-800 text-red-300'}`}>
+              {toast.msg}
             </div>
           )}
 

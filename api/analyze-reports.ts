@@ -70,10 +70,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // @ts-ignore — pdf-parse has CJS-style default export
       const pdfParse = (await import('pdf-parse')).default;
       const result = await pdfParse(buf);
-      return res.status(200).json({ text: result.text ?? '', bureau });
+      const text = result.text ?? '';
+      if (text.length < 50) {
+        return res.status(422).json({
+          error: `PDF text extraction failed for ${bureau} — may be scanned/image-based`,
+          bureau,
+          extractedLength: text.length,
+        });
+      }
+      console.log(`[analyze-reports] ${bureau} extracted ${text.length} characters`);
+      return res.status(200).json({ text, bureau });
     } catch (err) {
       console.error('[analyze-reports] pdf-parse error:', err);
-      return res.status(200).json({ text: '', bureau, fallback: true });
+      return res.status(500).json({ error: `Failed to parse ${bureau} PDF`, bureau });
     }
   }
 

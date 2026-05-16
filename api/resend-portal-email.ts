@@ -1,14 +1,23 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 
+function validateAdmin(req: VercelRequest): boolean {
+  const expected = `Bearer ${Buffer.from(process.env.ADMIN_PASSWORD ?? '').toString('base64')}`;
+  return req.headers.authorization === expected;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { email } = req.body ?? {};
-  if (typeof email !== 'string' || !email) {
-    return res.status(400).json({ error: 'Email is required' });
+  if (!validateAdmin(req)) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const { clientId } = req.body ?? {};
+  if (typeof clientId !== 'string' || !clientId) {
+    return res.status(400).json({ error: 'clientId is required' });
   }
 
   const supabaseUrl = process.env.SUPABASE_URL;
@@ -16,7 +25,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const resendKey = process.env.RESEND_API_KEY;
 
   if (!supabaseUrl || !serviceKey || !resendKey) {
-    console.error('[portal-login] missing env vars');
+    console.error('[resend-portal-email] missing env vars');
     return res.status(500).json({ error: 'Server configuration error' });
   }
 
@@ -25,25 +34,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { data: client, error: cErr } = await supabase
     .from('credit_repair_clients')
     .select('id, full_name, email')
-    .eq('email', email)
+    .eq('id', clientId)
     .maybeSingle();
 
   if (cErr) {
-    console.error('[portal-login] lookup error:', cErr);
+    console.error('[resend-portal-email] lookup error:', cErr);
     return res.status(500).json({ error: 'Lookup failed' });
   }
   if (!client) {
-    return res.status(404).json({ error: 'No account found for this email address.' });
+    return res.status(404).json({ error: 'Client not found' });
   }
+
+  const { email, full_name } = client as { id: string; full_name: string; email: string };
 
   const code = Math.floor(100000 + Math.random() * 900000).toString();
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
 
-  // Clear stale sessions for this email
   await supabase.from('portal_sessions').delete().eq('email', email);
 
   const { error: insErr } = await supabase.from('portal_sessions').insert({
-    client_id: client.id,
+    client_id: clientId,
     email,
     code,
     code_expires_at: expiresAt,
@@ -51,10 +61,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   });
 
   if (insErr) {
-    console.error('[portal-login] insert error:', insErr);
+    console.error('[resend-portal-email] insert error:', insErr);
     return res.status(500).json({ error: 'Failed to create login session' });
   }
 
+  const firstName = full_name?.split(' ')[0] ?? '';
   const html = `
 <!DOCTYPE html>
 <html>
@@ -68,7 +79,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           <p style="margin:8px 0 0;color:#888;font-size:10px;text-transform:uppercase;letter-spacing:4px;">Client Portal Login</p>
         </td></tr>
         <tr><td style="padding:36px 40px;">
-          <p style="margin:0 0 16px;font-size:15px;color:#1a1a1a;">Hi ${client.full_name?.split(' ')[0] ?? ''},</p>
+          <p style="margin:0 0 16px;font-size:15px;color:#1a1a1a;">Hi ${firstName},</p>
           <p style="margin:0 0 24px;font-size:14px;color:#555;line-height:1.7;">Use the verification code below to sign in to your client portal. This code expires in 15 minutes.</p>
           <div style="background:#f9f9f7;border-left:3px solid #7a1c1c;padding:24px;text-align:center;margin:0 0 24px;">
             <p style="margin:0;font-size:32px;font-weight:bold;letter-spacing:8px;color:#1a1a1a;font-family:monospace;">${code}</p>
@@ -101,13 +112,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!emailRes.ok) {
       const errBody = await emailRes.json().catch(() => ({}));
-      console.error('[portal-login] resend error — status:', emailRes.status, 'body:', errBody);
-      return res.status(500).json({ error: 'Failed to send code' });
+      console.error('[resend-portal-email] resend error — status:', emailRes.status, 'body:', errBody);
+      return res.status(500).json({ error: 'Failed to send portal email' });
     }
   } catch (err) {
-    console.error('[portal-login] resend fetch threw:', err);
-    return res.status(500).json({ error: 'Failed to send code' });
+    console.error('[resend-portal-email] resend fetch threw:', err);
+    return res.status(500).json({ error: 'Failed to send portal email' });
   }
 
-  return res.status(200).json({ message: 'Code sent' });
+  console.log(`[resend-portal-email] sent portal login code to ${email} for client ${clientId}`);
+  return res.status(200).json({ success: true });
 }
