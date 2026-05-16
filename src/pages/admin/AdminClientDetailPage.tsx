@@ -415,6 +415,8 @@ const AdminClientDetailPage = () => {
                 accounts={accounts}
                 runAnalyze={runAnalyze}
                 busy={busy}
+                clientId={client.id}
+                clientEmail={client.email}
               />
             )}
             {tab === 'letters' && (
@@ -814,14 +816,19 @@ const AnalyzeTab = ({
   accounts,
   runAnalyze,
   busy,
+  clientId,
+  clientEmail,
 }: {
   accounts: ClientDetail['accounts'];
   runAnalyze: () => void;
   busy: boolean;
+  clientId: string;
+  clientEmail: string;
 }) => {
   const [disputeTypes, setDisputeTypes] = React.useState<Record<string, string>>(() =>
     Object.fromEntries(accounts.map((a) => [a.id, a.dispute_types?.[0] ?? ''])),
   );
+  const [summaryToast, setSummaryToast] = React.useState<{ msg: string; ok: boolean } | null>(null);
 
   React.useEffect(() => {
     setDisputeTypes(Object.fromEntries(accounts.map((a) => [a.id, a.dispute_types?.[0] ?? ''])));
@@ -837,20 +844,53 @@ const AnalyzeTab = ({
     });
   };
 
+  const sendReportSummary = async () => {
+    try {
+      const r = await fetch('/api/send-report-summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+        body: JSON.stringify({ clientId }),
+      });
+      const j = await r.json();
+      if (r.ok) {
+        setSummaryToast({ msg: `Report summary sent to ${clientEmail}`, ok: true });
+      } else {
+        setSummaryToast({ msg: j.error || 'Failed to send report summary', ok: false });
+      }
+    } catch {
+      setSummaryToast({ msg: 'Network error sending report summary', ok: false });
+    }
+    setTimeout(() => setSummaryToast(null), 4000);
+  };
+
   return (
     <div>
+      {summaryToast && (
+        <div className={`text-sm px-4 py-3 rounded-sm mb-4 ${summaryToast.ok ? 'bg-emerald-950/50 border border-emerald-800 text-emerald-200' : 'bg-red-950/50 border border-red-800 text-red-300'}`}>
+          {summaryToast.msg}
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
           <h2 className="font-serif-display text-2xl text-white">Negative Accounts</h2>
           <p className="text-sm text-neutral-400">Extracted by Claude from credit reports.</p>
         </div>
-        <button
-          onClick={runAnalyze}
-          disabled={busy}
-          className="bg-luxury-red hover:bg-luxury-light disabled:opacity-50 text-white px-5 py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
-        >
-          {accounts.length === 0 ? 'Run Analysis' : 'Re-run Analysis'}
-        </button>
+        <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={sendReportSummary}
+            disabled={busy || accounts.length === 0}
+            className="border border-luxury-red/40 hover:bg-luxury-red/10 disabled:opacity-40 text-luxury-red px-5 py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
+          >
+            Send Report Summary
+          </button>
+          <button
+            onClick={runAnalyze}
+            disabled={busy}
+            className="bg-luxury-red hover:bg-luxury-light disabled:opacity-50 text-white px-5 py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
+          >
+            {accounts.length === 0 ? 'Run Analysis' : 'Re-run Analysis'}
+          </button>
+        </div>
       </div>
 
       {accounts.length === 0 ? (
