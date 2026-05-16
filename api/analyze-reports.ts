@@ -92,8 +92,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.log(`[analyze-reports] ${bureau} extracted ${text.length} characters`);
       return res.status(200).json({ text, bureau });
     } catch (err) {
-      console.error('[analyze-reports] pdfjs error:', err);
-      return res.status(500).json({ error: `Failed to parse ${bureau} PDF`, bureau });
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.error('[analyze-reports] pdfjs error full:', errMsg);
+      return res.status(500).json({ error: `Failed to parse ${bureau} PDF`, bureau, detail: errMsg });
     }
   }
 
