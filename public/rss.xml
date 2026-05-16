@@ -6,12 +6,20 @@
     <atom:link href="https://www.rahoperations.com/rss.xml" rel="self" type="application/rss+xml"/>
     <description>Website design, SEO, digital marketing, and credit repair insights for Arizona businesses.</description>
     <language>en-us</language>
-    <lastBuildDate>Sat, 16 May 2026 04:01:59 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 16 May 2026 08:01:34 GMT</lastBuildDate>
+  <item>
+    <title><![CDATA[What Is an XML Sitemap and Does Your Website Need One?]]></title>
+    <link>https://www.rahoperations.com/blogs/what-is-an-xml-sitemap-and-does-your-website-need-one</link>
+    <guid isPermaLink="true">https://www.rahoperations.com/blogs/what-is-an-xml-sitemap-and-does-your-website-need-one</guid>
+    <description><![CDATA[If you have been asking yourself what is an XML sitemap and does your website need one , you are asking exactly the right question. An XML sitemap is one of those behind-the-scenes technical elements that quietly determines how well Google can find, crawl, and index your web pages. For Arizona business owners competing in markets like Scottsdale, Phoenix, and Tempe, ignoring your sitemap could mean leaving serious search visibility on the table. In this post, we break down everything you need to know about XML sitemaps, why they matter for SEO, and how to know if your site is missing one. What Is an XML Sitemap? An XML sitemap is a structured file that lists every important page on your website and tells search engines like Google and Bing exactly where to find them. Think of it as a roadmap you hand directly to Google so its crawlers never miss a page.]]></description>
+    <pubDate>Sat, 16 May 2026 08:01:30 GMT</pubDate>
+    <enclosure url="https://www.rahoperations.com/blogs/what-is-an-xml-sitemap-and-does-your-website-need-one.jpg" length="0" type="image/jpeg"/>
+  </item>
   <item>
     <title><![CDATA[What Is Schema Markup and Does Your Website Have It?]]></title>
     <link>https://www.rahoperations.com/blogs/what-is-schema-markup-and-does-your-website-have-it</link>
     <guid isPermaLink="true">https://www.rahoperations.com/blogs/what-is-schema-markup-and-does-your-website-have-it</guid>
-    <description><![CDATA[If you have been asking yourself what is schema markup and does your website have it , you are already ahead of most small business owners in Arizona. Schema markup is a form of structured data code added to your website that helps search engines like Google understand the content on your pages more clearly. When implemented correctly, it can unlock rich results in Google search, improve your click-through rates, and give your business a serious competitive edge in local search. At RAH Operations, we work with businesses across Scottsdale and the greater Phoenix area to make sure their websites are fully optimized, and schema markup is always part of that conversation. What Is Schema Markup, Exactly? Schema markup is code, typically written in JSON-LD format, that you add to your website to give search engines additional context about your content. It is based on a shared vocabulary developed at Schema.org, a collaboration between Google, Bing, Yahoo, and Yandex.]]></description>
+    <description><![CDATA[Schema markup is one of the most overlooked SEO tools available to small business owners, yet it can dramatically improve how your website appears in Google search results. If you have never heard of it or are not sure whether your site uses it, you are not alone. This guide breaks down exactly what schema markup is, why it matters, and how to find out if your website is missing it.]]></description>
     <pubDate>Sat, 16 May 2026 04:01:55 GMT</pubDate>
     <enclosure url="https://www.rahoperations.com/blogs/what-is-schema-markup-and-does-your-website-have-it.jpg" length="0" type="image/jpeg"/>
   </item>
