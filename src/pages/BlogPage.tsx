@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "What Is Schema Markup and Does Your Website Have It?",
+      displayTitle: "What Is Schema Markup and Does Your Website Have It? Here Is What Arizona Business Owners Need to Know",
+      date: "May 16, 2026",
+      pubDate: "Sat, 16 May 2026 04:01:55 GMT",
+      issue: 'No. 055',
+      category: "SEO",
+      excerpt: "Schema markup is one of the most overlooked SEO tools available to small business owners, yet it can dramatically improve how your website appears in Google search results. If you have never heard of it or are not sure whether your site uses it, you are not alone. This guide breaks down exactly what schema markup is, why it matters, and how to find out if your website is missing it.",
+      slug: 'what-is-schema-markup-and-does-your-website-have-it'
+    },
+    {
       title: "How to Check Your Website Speed and Fix Slow Load Times",
       displayTitle: "How to Check Your Website Speed and Fix Slow Load Times (And Why It Matters for Your Arizona Business)",
       date: "May 16, 2026",
