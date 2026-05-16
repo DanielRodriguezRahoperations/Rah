@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Website Audit vs SEO Audit: What Is the Difference?",
+      displayTitle: "Website Audit vs SEO Audit: What Is the Difference and Which One Do You Need?",
+      date: "May 16, 2026",
+      pubDate: "Sat, 16 May 2026 12:01:22 GMT",
+      issue: 'No. 057',
+      category: "SEO",
+      excerpt: "Many Arizona business owners use the terms website audit and SEO audit interchangeably, but they are not the same thing. Understanding the difference can save you time, money, and missed opportunities online. This guide breaks down exactly what each audit covers and how to know which one your business needs right now.",
+      slug: 'website-audit-vs-seo-audit-what-is-the-difference'
+    },
+    {
       title: "What Is an XML Sitemap and Does Your Website Need One?",
       displayTitle: "What Is an XML Sitemap and Does Your Website Need One? Here Is What Every Arizona Business Owner Should Know",
       date: "May 16, 2026",
