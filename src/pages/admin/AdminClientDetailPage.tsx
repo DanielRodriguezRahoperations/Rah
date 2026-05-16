@@ -27,7 +27,7 @@ interface ClientDetail {
     created_at: string;
   };
   letters: Array<Record<string, unknown> & { id: string; recipient_name: string; letter_type: string; created_at: string; pdf_unsigned_path?: string | null; lob_tracking_number?: string | null; mailed_at?: string | null; mail_status?: string | null; }>;
-  accounts: Array<Record<string, unknown> & { id: string; creditor_name: string; account_number: string; balance: string; date_opened: string; account_type: string; account_status: string; bureaus: string[]; selected: boolean }>;
+  accounts: Array<Record<string, unknown> & { id: string; creditor_name: string; account_number: string; balance: string; date_opened: string; account_type: string; account_status: string; bureaus: string[]; selected: boolean; dispute_types: string[] }>;
   responses: Array<Record<string, unknown> & { id: string; created_at: string }>;
   docUrls: Record<string, string | null>;
   miscFiles: Array<{ path: string; filename: string; uploaded_at: string; signedUrl: string | null }>;
@@ -752,60 +752,106 @@ const AnalyzeTab = ({
   accounts: ClientDetail['accounts'];
   runAnalyze: () => void;
   busy: boolean;
-}) => (
-  <div>
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-      <div>
-        <h2 className="font-serif-display text-2xl text-white">Negative Accounts</h2>
-        <p className="text-sm text-neutral-400">Extracted by Claude from credit reports.</p>
-      </div>
-      <button
-        onClick={runAnalyze}
-        disabled={busy}
-        className="bg-luxury-red hover:bg-luxury-light disabled:opacity-50 text-white px-5 py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
-      >
-        {accounts.length === 0 ? 'Run Analysis' : 'Re-run Analysis'}
-      </button>
-    </div>
+}) => {
+  const [disputeTypes, setDisputeTypes] = React.useState<Record<string, string>>(() =>
+    Object.fromEntries(accounts.map((a) => [a.id, a.dispute_types?.[0] ?? ''])),
+  );
 
-    {accounts.length === 0 ? (
-      <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-10 text-center text-neutral-400">
-        No accounts analyzed yet. Click "Run Analysis" to extract negative items from uploaded credit reports.
-      </div>
-    ) : (
-      <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-[#0f0f0f] border-b border-neutral-800">
-              <tr className="text-left text-xs uppercase tracking-widest text-neutral-400">
-                <th className="px-4 py-3">Creditor</th>
-                <th className="px-4 py-3">Account #</th>
-                <th className="px-4 py-3">Balance</th>
-                <th className="px-4 py-3">Type</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Bureaus</th>
-              </tr>
-            </thead>
-            <tbody>
-              {accounts.map((a) => (
-                <tr key={a.id} className="border-b border-neutral-800/60">
-                  <td className="px-4 py-3 text-white">{a.creditor_name}</td>
-                  <td className="px-4 py-3 text-neutral-300 font-mono text-xs">{a.account_number}</td>
-                  <td className="px-4 py-3 text-neutral-300">{a.balance}</td>
-                  <td className="px-4 py-3 text-neutral-300">{a.account_type}</td>
-                  <td className="px-4 py-3 text-neutral-300">{a.account_status}</td>
-                  <td className="px-4 py-3 text-neutral-300 text-xs uppercase">
-                    {(a.bureaus || []).join(', ')}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+  React.useEffect(() => {
+    setDisputeTypes(Object.fromEntries(accounts.map((a) => [a.id, a.dispute_types?.[0] ?? ''])));
+  }, [accounts]);
+
+  const handleDisputeType = async (accountId: string, type: string) => {
+    const next = disputeTypes[accountId] === type ? '' : type;
+    setDisputeTypes((prev) => ({ ...prev, [accountId]: next }));
+    await fetch('/api/analyze-reports', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+      body: JSON.stringify({ accountId, disputeTypes: next ? [next] : [] }),
+    });
+  };
+
+  return (
+    <div>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <div>
+          <h2 className="font-serif-display text-2xl text-white">Negative Accounts</h2>
+          <p className="text-sm text-neutral-400">Extracted by Claude from credit reports.</p>
         </div>
+        <button
+          onClick={runAnalyze}
+          disabled={busy}
+          className="bg-luxury-red hover:bg-luxury-light disabled:opacity-50 text-white px-5 py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
+        >
+          {accounts.length === 0 ? 'Run Analysis' : 'Re-run Analysis'}
+        </button>
       </div>
-    )}
-  </div>
-);
+
+      {accounts.length === 0 ? (
+        <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-10 text-center text-neutral-400">
+          No accounts analyzed yet. Click "Run Analysis" to extract negative items from uploaded credit reports.
+        </div>
+      ) : (
+        <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-[#0f0f0f] border-b border-neutral-800">
+                <tr className="text-left text-xs uppercase tracking-widest text-neutral-400">
+                  <th className="px-4 py-3">Creditor</th>
+                  <th className="px-4 py-3">Account #</th>
+                  <th className="px-4 py-3">Balance</th>
+                  <th className="px-4 py-3">Type</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Bureaus</th>
+                  <th className="px-4 py-3">Dispute Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                {accounts.map((a) => {
+                  const current = disputeTypes[a.id] ?? '';
+                  return (
+                    <tr key={a.id} className="border-b border-neutral-800/60">
+                      <td className="px-4 py-3 text-white">{a.creditor_name}</td>
+                      <td className="px-4 py-3 text-neutral-300 font-mono text-xs">{a.account_number}</td>
+                      <td className="px-4 py-3 text-neutral-300">{a.balance}</td>
+                      <td className="px-4 py-3 text-neutral-300">{a.account_type}</td>
+                      <td className="px-4 py-3 text-neutral-300">{a.account_status}</td>
+                      <td className="px-4 py-3 text-neutral-300 text-xs uppercase">
+                        {(a.bureaus || []).join(', ')}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-col gap-1.5">
+                          {(['standard', 'identity_theft'] as const).map((type) => {
+                            const label = type === 'standard' ? 'Standard Dispute' : 'Identity Theft';
+                            const active = current === type;
+                            return (
+                              <button
+                                key={type}
+                                onClick={() => handleDisputeType(a.id, type)}
+                                className={`flex items-center gap-2 text-[11px] uppercase tracking-wider px-2 py-1 rounded-sm border transition-colors text-left whitespace-nowrap ${
+                                  active
+                                    ? 'border-luxury-red bg-luxury-red/10 text-luxury-red'
+                                    : 'border-neutral-700 text-neutral-500 hover:border-neutral-500 hover:text-neutral-300'
+                                }`}
+                              >
+                                <span className={`w-3 h-3 rounded-full border flex-shrink-0 ${active ? 'bg-luxury-red border-luxury-red' : 'border-neutral-600'}`} />
+                                {label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // === Letters Tab ===
 type LetterTypeKey = '605B' | '611' | '623' | '609' | '809';

@@ -184,5 +184,25 @@ Return ONLY a JSON array. Each item shape:
     return res.status(200).json({ accounts: inserted, count: inserted.length });
   }
 
+  // === PATCH: Update dispute_types for a single account ===
+  if (req.method === 'PATCH') {
+    const { accountId, disputeTypes } = req.body ?? {};
+    if (typeof accountId !== 'string' || !accountId || !Array.isArray(disputeTypes)) {
+      return res.status(400).json({ error: 'Missing accountId or disputeTypes' });
+    }
+
+    const { error: updErr } = await supabase
+      .from('dispute_accounts')
+      .update({ dispute_types: disputeTypes })
+      .eq('id', accountId);
+
+    if (updErr) {
+      console.error('[analyze-reports] dispute_types update error:', updErr);
+      return res.status(500).json({ error: 'Failed to update dispute type' });
+    }
+
+    return res.status(200).json({ success: true });
+  }
+
   return res.status(405).json({ error: 'Method not allowed' });
 }
