@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "How to Check Your Website Speed and Fix Slow Load Times",
+      displayTitle: "How to Check Your Website Speed and Fix Slow Load Times (And Why It Matters for Your Arizona Business)",
+      date: "May 16, 2026",
+      pubDate: "Sat, 16 May 2026 00:01:18 GMT",
+      issue: 'No. 054',
+      category: "Website Design",
+      excerpt: "A slow website is costing your Arizona business real money in lost traffic, lower Google rankings, and frustrated visitors who leave before your page even loads. In this guide, we break down exactly how to check your website speed and fix the issues dragging it down. Whether you are a local Scottsdale business or serving clients across Arizona, site speed is one of the highest-ROI improvements you can make right now.",
+      slug: 'how-to-check-your-website-speed-and-fix-slow-load-times'
+    },
+    {
       title: "What Is an SSL Certificate and Why Your Website Needs It",
       displayTitle: "What Is an SSL Certificate and Why Your Website Needs It in 2026",
       date: "May 15, 2026",
