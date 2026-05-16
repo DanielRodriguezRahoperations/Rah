@@ -67,10 +67,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     try {
       const buf = Buffer.from(await fileData.arrayBuffer());
-      // @ts-ignore — pdf-parse has CJS-style default export
-      const pdfParse = (await import('pdf-parse')).default;
-      const result = await pdfParse(buf);
-      const text = result.text ?? '';
+      const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.js' as 'pdfjs-dist');
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+
+      const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
+      const pageTexts: string[] = [];
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const pageText = content.items
+          .map((item: { str?: string }) => item.str ?? '')
+          .join(' ');
+        pageTexts.push(pageText);
+      }
+      const text = pageTexts.join('\n');
+
       if (text.length < 50) {
         return res.status(422).json({
           error: `PDF text extraction failed for ${bureau} — may be scanned/image-based`,
@@ -81,7 +92,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.log(`[analyze-reports] ${bureau} extracted ${text.length} characters`);
       return res.status(200).json({ text, bureau });
     } catch (err) {
-      console.error('[analyze-reports] pdf-parse error:', err);
+      console.error('[analyze-reports] pdfjs error:', err);
       return res.status(500).json({ error: `Failed to parse ${bureau} PDF`, bureau });
     }
   }
