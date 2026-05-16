@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "What Is an XML Sitemap and Does Your Website Need One?",
+      displayTitle: "What Is an XML Sitemap and Does Your Website Need One? Here Is What Every Arizona Business Owner Should Know",
+      date: "May 16, 2026",
+      pubDate: "Sat, 16 May 2026 08:01:30 GMT",
+      issue: 'No. 056',
+      category: "SEO",
+      excerpt: "If you have ever wondered what an XML sitemap is and whether your website actually needs one, you are not alone. Most Arizona business owners have heard the term but have no idea how it affects their Google rankings. In this guide, RAH Operations breaks it all down in plain language so you can make smarter decisions about your website.",
+      slug: 'what-is-an-xml-sitemap-and-does-your-website-need-one'
+    },
+    {
       title: "What Is Schema Markup and Does Your Website Have It?",
       displayTitle: "What Is Schema Markup and Does Your Website Have It? Here Is What Arizona Business Owners Need to Know",
       date: "May 16, 2026",
