@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "How Often Should You Audit Your Small Business Website?",
+      displayTitle: "How Often Should You Audit Your Small Business Website? A Complete Guide for Arizona Entrepreneurs",
+      date: "May 16, 2026",
+      pubDate: "Sat, 16 May 2026 16:02:06 GMT",
+      issue: 'No. 058',
+      category: "Website Design",
+      excerpt: "If you are not auditing your small business website on a regular schedule, you are likely losing traffic, leads, and revenue without even knowing it. A website audit reveals broken links, outdated content, slow load times, and SEO gaps that quietly drain your results. This guide breaks down exactly how often you should audit your site and what to look for each time.",
+      slug: 'how-often-should-you-audit-your-small-business-website'
+    },
+    {
       title: "Website Audit vs SEO Audit: What Is the Difference?",
       displayTitle: "Website Audit vs SEO Audit: What Is the Difference and Which One Do You Need?",
       date: "May 16, 2026",
