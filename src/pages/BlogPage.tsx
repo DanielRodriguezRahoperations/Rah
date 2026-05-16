@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Technical SEO Audit: What It Is and Why It Matters",
+      displayTitle: "Technical SEO Audit: What It Is, Why It Matters, and How to Get One Done Right",
+      date: "May 16, 2026",
+      pubDate: "Sat, 16 May 2026 20:01:31 GMT",
+      issue: 'No. 059',
+      category: "SEO",
+      excerpt: "A technical SEO audit is the foundation of any serious search engine optimization strategy. Without it, you are guessing at why your site is not ranking. This guide breaks down exactly what a technical audit covers and why every Arizona business needs one.",
+      slug: 'technical-seo-audit-what-it-is-and-why-it-matters'
+    },
+    {
       title: "How Often Should You Audit Your Small Business Website?",
       displayTitle: "How Often Should You Audit Your Small Business Website? A Complete Guide for Arizona Entrepreneurs",
       date: "May 16, 2026",
