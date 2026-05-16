@@ -67,25 +67,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     try {
       const buf = Buffer.from(await fileData.arrayBuffer());
-      const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs' as 'pdfjs-dist');
-
-      const loadingTask = pdfjsLib.getDocument({
-        data: new Uint8Array(buf),
-        useWorkerFetch: false,
-        isEvalSupported: false,
-        useSystemFonts: true,
-      });
-      const pdf = await loadingTask.promise;
-      const pageTexts: string[] = [];
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const content = await page.getTextContent();
-        const pageText = content.items
-          .map((item: { str?: string }) => item.str ?? '')
-          .join(' ');
-        pageTexts.push(pageText);
-      }
-      const text = pageTexts.join('\n');
+      const { extractText } = await import('unpdf');
+      const { text } = await extractText(new Uint8Array(buf), { mergePages: true });
 
       if (text.length < 50) {
         return res.status(422).json({
@@ -98,7 +81,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ text, bureau });
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : String(err);
-      console.error('[analyze-reports] pdfjs error full:', errMsg);
+      console.error('[analyze-reports] unpdf error full:', errMsg);
       return res.status(500).json({ error: `Failed to parse ${bureau} PDF`, bureau, detail: errMsg });
     }
   }
