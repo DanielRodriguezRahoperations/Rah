@@ -31,6 +31,14 @@ interface ClientDetail {
     dispute_selections?: Record<string, unknown> | null;
     case_type?: string | null;
     positive_accounts?: Array<Record<string, unknown>> | null;
+    address_verification_result?: {
+      intake_address: string;
+      id_address: string | null;
+      utility_address: string | null;
+      match_status: 'verified' | 'partial' | 'mismatch';
+      match_notes: string;
+      verified: boolean;
+    } | null;
   };
   letters: Array<Record<string, unknown> & { id: string; recipient_name: string; letter_type: string; created_at: string; pdf_unsigned_path?: string | null; lob_tracking_number?: string | null; mailed_at?: string | null; mail_status?: string | null; }>;
   accounts: Array<Record<string, unknown> & { id: string; creditor_name: string; account_number: string; account_number_equifax?: string; account_number_experian?: string; account_number_transunion?: string; balance: string; date_opened: string; account_type: string; account_status: string; bureaus: string[]; selected: boolean; dispute_types: string[]; original_creditor?: string; phone_numbers?: string[]; name_variations?: string[]; addresses?: string[]; equifax_data?: Record<string, unknown> | null; experian_data?: Record<string, unknown> | null; transunion_data?: Record<string, unknown> | null; duplicate_flag?: boolean; duplicate_note?: string; balance_inconsistency?: boolean; balance_inconsistency_note?: string; dispute_priority?: string; recommended_fcra_sections?: string[]; letter_targets?: Record<string, unknown> }>;
@@ -506,6 +514,44 @@ const OverviewTab = ({
   const [caseType, setCaseType] = React.useState<string>(String(client.case_type ?? 'identity_theft'));
   const [caseTypeFlash, setCaseTypeFlash] = React.useState(false);
 
+  type VerifyResult = NonNullable<ClientDetail['client']['address_verification_result']>;
+  const [verifying, setVerifying] = React.useState(false);
+  const [verifyResult, setVerifyResult] = React.useState<VerifyResult | null>(
+    client.address_verification_result ?? null,
+  );
+
+  const runVerifyAddress = async () => {
+    setVerifying(true);
+    try {
+      const res = await fetch('/api/verify-address', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+        body: JSON.stringify({ clientId }),
+      });
+      const j = await res.json();
+      if (!res.ok) {
+        alert(j.error || 'Address verification failed');
+      } else {
+        setVerifyResult(j as VerifyResult);
+      }
+    } catch {
+      alert('Network error during address verification');
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const markAddressVerified = async () => {
+    await fetch('/api/update-status', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+      body: JSON.stringify({ clientId, address_verified: true }),
+    });
+    setVerifyResult((prev) =>
+      prev ? { ...prev, match_status: 'verified', verified: true, match_notes: 'Manually verified by admin.' } : prev,
+    );
+  };
+
   const saveFtcNumbers = async () => {
     setFtcSaving(true);
     const parsed = ftcInput.split(',').map((s) => s.trim()).filter(Boolean);
@@ -565,14 +611,90 @@ const OverviewTab = ({
         <Field label="Email" value={client.email} />
         <Field label="Phone" value={client.phone} />
         <Field label="Address" value={`${client.address}, ${client.city}, ${client.state} ${client.zip}`} />
-        <Field
-          label="Address Verification"
-          value={
-            client.address_verified === true ? 'Verified'
-            : client.address_verified === false ? `Flagged${client.address_flag_notes ? ' — ' + client.address_flag_notes : ''}`
-            : 'Pending'
-          }
-        />
+
+        {/* Address Verification */}
+        <div className="mb-3">
+          <p className="text-[10px] uppercase tracking-widest text-neutral-500 mb-2">Address Verification</p>
+
+          {verifyResult ? (
+            <div>
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-sm border ${
+                  verifyResult.match_status === 'verified'
+                    ? 'text-emerald-400 bg-emerald-950/30 border-emerald-800'
+                    : verifyResult.match_status === 'partial'
+                    ? 'text-amber-400 bg-amber-950/30 border-amber-800'
+                    : 'text-red-400 bg-red-950/30 border-red-800'
+                }`}>
+                  {verifyResult.match_status === 'verified' ? 'Verified' : verifyResult.match_status === 'partial' ? 'Partial Match' : 'Mismatch'}
+                </span>
+                {verifyResult.match_status !== 'verified' && (
+                  <button
+                    onClick={markAddressVerified}
+                    className="text-[9px] uppercase tracking-widest text-neutral-400 hover:text-white border border-neutral-700 hover:border-neutral-500 px-2 py-0.5 rounded-sm transition-colors"
+                  >
+                    Mark as Verified
+                  </button>
+                )}
+                <button
+                  onClick={runVerifyAddress}
+                  disabled={verifying}
+                  className="text-[9px] uppercase tracking-widest text-neutral-600 hover:text-neutral-300 disabled:opacity-40 transition-colors"
+                >
+                  {verifying ? 'Verifying…' : 'Re-verify'}
+                </button>
+              </div>
+
+              {verifyResult.match_notes && (
+                <p className="text-[11px] text-neutral-400 mb-2 leading-relaxed">{verifyResult.match_notes}</p>
+              )}
+
+              <table className="w-full text-xs border-collapse mb-1">
+                <thead>
+                  <tr>
+                    <th className="text-left text-[9px] uppercase tracking-widest text-neutral-600 pb-1 pr-3 w-28 font-normal">Source</th>
+                    <th className="text-left text-[9px] uppercase tracking-widest text-neutral-600 pb-1 font-normal">Address</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="py-0.5 pr-3 text-neutral-500 align-top">Intake Form</td>
+                    <td className="py-0.5 text-neutral-200">{verifyResult.intake_address}</td>
+                  </tr>
+                  {verifyResult.id_address && (
+                    <tr>
+                      <td className="py-0.5 pr-3 text-neutral-500 align-top">Government ID</td>
+                      <td className={`py-0.5 ${verifyResult.match_status !== 'verified' ? 'text-amber-300' : 'text-neutral-200'}`}>{verifyResult.id_address}</td>
+                    </tr>
+                  )}
+                  {verifyResult.utility_address && (
+                    <tr>
+                      <td className="py-0.5 pr-3 text-neutral-500 align-top">Utility Bill</td>
+                      <td className={`py-0.5 ${verifyResult.match_status !== 'verified' ? 'text-amber-300' : 'text-neutral-200'}`}>{verifyResult.utility_address}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="text-sm text-neutral-500">
+                {client.address_verified === true
+                  ? 'Manually verified'
+                  : client.address_verified === false
+                  ? `Flagged${client.address_flag_notes ? ' — ' + client.address_flag_notes : ''}`
+                  : 'Not yet verified'}
+              </span>
+              <button
+                onClick={runVerifyAddress}
+                disabled={verifying}
+                className="bg-luxury-red hover:bg-luxury-light disabled:opacity-50 text-white px-3 py-1.5 rounded-sm text-[10px] uppercase tracking-widest font-semibold transition-colors"
+              >
+                {verifying ? 'Verifying…' : 'Verify Address'}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
       <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-6">
         <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold mb-4">Case Details</h3>
