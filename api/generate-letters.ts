@@ -19,7 +19,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  const { clientId, letterType, recipientName, recipientAddress, accountIds, clientData } =
+  const { clientId, letterType, recipientName, recipientAddress, accountIds, clientData, bureau } =
     req.body ?? {};
 
   if (
@@ -105,10 +105,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const accountsList = accounts.length
     ? accounts
-        .map(
-          (a, i) =>
-            `${i + 1}. Creditor: ${a.creditor_name} | Account #: ${a.account_number} | Balance: ${a.balance} | Date Opened: ${a.date_opened} | Type: ${a.account_type} | Status: ${a.account_status} | Bureaus: ${(a.bureaus as string[] | undefined)?.join(', ') ?? ''}`
-        )
+        .map((a, i) => {
+          const orig = a.original_creditor ? ` (Original: ${a.original_creditor})` : '';
+          const bd = typeof bureau === 'string' && bureau
+            ? (a[`${bureau}_data`] as Record<string, unknown> | null | undefined)
+            : null;
+          let acctStr: string;
+          if (bureau) {
+            const num = bd?.account_number ?? a[`account_number_${bureau}`] ?? a.account_number;
+            acctStr = num ? String(num) : '—';
+          } else {
+            const acctParts = [
+              a.account_number_equifax ? `EQ: ${a.account_number_equifax}` : null,
+              a.account_number_experian ? `EX: ${a.account_number_experian}` : null,
+              a.account_number_transunion ? `TU: ${a.account_number_transunion}` : null,
+            ].filter(Boolean);
+            acctStr = acctParts.length ? acctParts.join(' | ') : (a.account_number ? `Ref: ${a.account_number}` : '—');
+          }
+          const phoneArr = (Array.isArray(bd?.phone_numbers) ? bd!.phone_numbers : a.phone_numbers) as string[] | undefined;
+          const nameArr = (Array.isArray(bd?.name_variations) ? bd!.name_variations : a.name_variations) as string[] | undefined;
+          const addrArr = (Array.isArray(bd?.addresses) ? bd!.addresses : a.addresses) as string[] | undefined;
+          const phones = phoneArr?.length ? ` | Phone Numbers: ${phoneArr.join(', ')}` : '';
+          const names = nameArr?.length ? ` | Name Variations: ${nameArr.join(', ')}` : '';
+          const addrs = addrArr?.length ? ` | Addresses: ${addrArr.join('; ')}` : '';
+          const bureauLabel = bureau ? String(bureau) : (a.bureaus as string[] | undefined)?.join(', ') ?? '';
+          return `${i + 1}. Creditor: ${a.creditor_name}${orig} | Account #: ${acctStr} | Balance: ${a.balance} | Date Opened: ${a.date_opened} | Type: ${a.account_type} | Status: ${a.account_status} | Bureau: ${bureauLabel}${phones}${names}${addrs}`;
+        })
         .join('\n')
     : '[no accounts attached]';
 

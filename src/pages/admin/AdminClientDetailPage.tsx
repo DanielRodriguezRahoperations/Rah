@@ -25,9 +25,11 @@ interface ClientDetail {
     address_verified?: boolean | null;
     address_flag_notes?: string | null;
     created_at: string;
+    personal_info_errors?: { name_variations: string[]; unknown_addresses: string[]; unknown_phone_numbers: string[] } | null;
+    inquiries?: Array<{ creditor: string; date: string; bureau: string; potentially_unauthorized: boolean }> | null;
   };
   letters: Array<Record<string, unknown> & { id: string; recipient_name: string; letter_type: string; created_at: string; pdf_unsigned_path?: string | null; lob_tracking_number?: string | null; mailed_at?: string | null; mail_status?: string | null; }>;
-  accounts: Array<Record<string, unknown> & { id: string; creditor_name: string; account_number: string; balance: string; date_opened: string; account_type: string; account_status: string; bureaus: string[]; selected: boolean; dispute_types: string[] }>;
+  accounts: Array<Record<string, unknown> & { id: string; creditor_name: string; account_number: string; account_number_equifax?: string; account_number_experian?: string; account_number_transunion?: string; balance: string; date_opened: string; account_type: string; account_status: string; bureaus: string[]; selected: boolean; dispute_types: string[]; original_creditor?: string; phone_numbers?: string[]; name_variations?: string[]; addresses?: string[]; equifax_data?: Record<string, unknown> | null; experian_data?: Record<string, unknown> | null; transunion_data?: Record<string, unknown> | null; duplicate_flag?: boolean; duplicate_note?: string; balance_inconsistency?: boolean; balance_inconsistency_note?: string; dispute_priority?: string; recommended_fcra_sections?: string[]; letter_targets?: Record<string, unknown> }>;
   responses: Array<Record<string, unknown> & { id: string; created_at: string }>;
   docUrls: Record<string, string | null>;
   miscFiles: Array<{ path: string; filename: string; uploaded_at: string; signedUrl: string | null }>;
@@ -417,6 +419,8 @@ const AdminClientDetailPage = () => {
                 busy={busy}
                 clientId={client.id}
                 clientEmail={client.email}
+                onChange={loadDetail}
+                client={client}
               />
             )}
             {tab === 'letters' && (
@@ -811,36 +815,226 @@ const DocumentsTab = ({
   );
 };
 
+const FCRA_SECTIONS = [
+  { key: '611',  label: '§611 Reinvestigation' },
+  { key: '623',  label: '§623 Furnisher Dispute' },
+  { key: '605B', label: '§605B Identity Theft Block' },
+  { key: '609',  label: '§609 Full File Disclosure' },
+  { key: '809',  label: '§809 FDCPA Debt Validation' },
+] as const;
+
+type BureauDataEdit = {
+  account_number: string;
+  balance: string;
+  date_opened: string;
+  account_status: string;
+  estimated_removal: string;
+  addresses: string;
+  phone_numbers: string;
+  name_variations: string;
+};
+
+const COMPARISON_FIELDS: Array<{ key: keyof BureauDataEdit; label: string }> = [
+  { key: 'account_number', label: 'Account #' },
+  { key: 'balance', label: 'Balance' },
+  { key: 'date_opened', label: 'Date Opened' },
+  { key: 'account_status', label: 'Status' },
+  { key: 'estimated_removal', label: 'Est. Removal' },
+  { key: 'addresses', label: 'Addresses' },
+  { key: 'phone_numbers', label: 'Phone Numbers' },
+  { key: 'name_variations', label: 'Name Variations' },
+];
+
+const emptyBureauEdit = (): BureauDataEdit => ({
+  account_number: '', balance: '', date_opened: '', account_status: '',
+  estimated_removal: '', addresses: '', phone_numbers: '', name_variations: '',
+});
+
+const toBureauEdit = (d: Record<string, unknown> | null | undefined): BureauDataEdit | null => {
+  if (!d) return null;
+  const arrToStr = (v: unknown) => Array.isArray(v) ? v.join(', ') : String(v ?? '');
+  return {
+    account_number: String(d.account_number ?? ''),
+    balance: String(d.balance ?? ''),
+    date_opened: String(d.date_opened ?? ''),
+    account_status: String(d.account_status ?? ''),
+    estimated_removal: String(d.estimated_removal ?? ''),
+    addresses: arrToStr(d.addresses),
+    phone_numbers: arrToStr(d.phone_numbers),
+    name_variations: arrToStr(d.name_variations),
+  };
+};
+
+const bureauEditToJsonb = (e: BureauDataEdit) => ({
+  account_number: e.account_number,
+  balance: e.balance,
+  date_opened: e.date_opened,
+  account_status: e.account_status,
+  estimated_removal: e.estimated_removal,
+  addresses: e.addresses.split(',').map((s) => s.trim()).filter(Boolean),
+  phone_numbers: e.phone_numbers.split(',').map((s) => s.trim()).filter(Boolean),
+  name_variations: e.name_variations.split(',').map((s) => s.trim()).filter(Boolean),
+});
+
+type TopFields = { creditor_name: string; original_creditor: string; account_type: string };
+
+const buildBureauEdits = (accts: ClientDetail['accounts']): Record<string, Record<string, BureauDataEdit | null>> =>
+  Object.fromEntries(accts.map((a) => [a.id, {
+    equifax: toBureauEdit(a.equifax_data ?? null),
+    experian: toBureauEdit(a.experian_data ?? null),
+    transunion: toBureauEdit(a.transunion_data ?? null),
+  }]));
+
+const buildTopFields = (accts: ClientDetail['accounts']): Record<string, TopFields> =>
+  Object.fromEntries(accts.map((a) => [a.id, {
+    creditor_name: a.creditor_name,
+    original_creditor: String(a.original_creditor ?? ''),
+    account_type: a.account_type,
+  }]));
+
 // === Analyze Tab ===
+type PersonalInfoErrors = {
+  name_variations: string[];
+  unknown_addresses: string[];
+  unknown_phone_numbers: string[];
+};
+
+const PRIORITY_STYLES: Record<string, string> = {
+  critical: 'bg-red-950/40 border-red-800 text-red-400',
+  high:     'bg-orange-950/40 border-orange-800 text-orange-400',
+  medium:   'bg-yellow-950/30 border-yellow-800/60 text-yellow-500',
+  low:      'bg-neutral-800/40 border-neutral-700 text-neutral-500',
+};
+
 const AnalyzeTab = ({
   accounts,
   runAnalyze,
   busy,
   clientId,
   clientEmail,
+  onChange,
+  client,
 }: {
   accounts: ClientDetail['accounts'];
   runAnalyze: () => void;
   busy: boolean;
   clientId: string;
   clientEmail: string;
+  onChange: () => void;
+  client: ClientDetail['client'];
 }) => {
-  const [disputeTypes, setDisputeTypes] = React.useState<Record<string, string>>(() =>
-    Object.fromEntries(accounts.map((a) => [a.id, a.dispute_types?.[0] ?? ''])),
-  );
+  const getPersonalInfo = (c: ClientDetail['client']): PersonalInfoErrors => {
+    const pie = c.personal_info_errors;
+    return {
+      name_variations: pie?.name_variations ?? [],
+      unknown_addresses: pie?.unknown_addresses ?? [],
+      unknown_phone_numbers: pie?.unknown_phone_numbers ?? [],
+    };
+  };
+
+  const [disputeTypes, setDisputeTypes] = React.useState<Record<string, string[]>>(() =>
+    Object.fromEntries(accounts.map((a) => [a.id, a.dispute_types ?? []])));
+  const [expandedRows, setExpandedRows] = React.useState<Set<string>>(new Set());
+  const [bureauEdits, setBureauEdits] = React.useState<Record<string, Record<string, BureauDataEdit | null>>>(() => buildBureauEdits(accounts));
+  const [topFields, setTopFields] = React.useState<Record<string, TopFields>>(() => buildTopFields(accounts));
+  const [savedFlash, setSavedFlash] = React.useState<Record<string, boolean>>({});
+  const [deleteConfirm, setDeleteConfirm] = React.useState<string | null>(null);
   const [summaryToast, setSummaryToast] = React.useState<{ msg: string; ok: boolean } | null>(null);
+  const [personalInfo, setPersonalInfo] = React.useState<PersonalInfoErrors>(() => getPersonalInfo(client));
 
   React.useEffect(() => {
-    setDisputeTypes(Object.fromEntries(accounts.map((a) => [a.id, a.dispute_types?.[0] ?? ''])));
+    setDisputeTypes(Object.fromEntries(accounts.map((a) => [a.id, a.dispute_types ?? []])));
+    setBureauEdits(buildBureauEdits(accounts));
+    setTopFields(buildTopFields(accounts));
   }, [accounts]);
 
-  const handleDisputeType = async (accountId: string, type: string) => {
-    const next = disputeTypes[accountId] === type ? '' : type;
-    setDisputeTypes((prev) => ({ ...prev, [accountId]: next }));
-    await fetch('/api/analyze-reports', {
+  React.useEffect(() => {
+    setPersonalInfo(getPersonalInfo(client));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [client]);
+
+  const showFlash = (key: string) => {
+    setSavedFlash((prev) => ({ ...prev, [key]: true }));
+    setTimeout(() => setSavedFlash((prev) => ({ ...prev, [key]: false })), 1500);
+  };
+
+  const flash = (k: string) =>
+    savedFlash[k] ? <span className="text-emerald-400 text-[9px] ml-1">✓</span> : null;
+
+  const patchAccount = (accountId: string, data: Record<string, unknown>) =>
+    fetch('/api/analyze-reports', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', ...adminHeaders() },
-      body: JSON.stringify({ accountId, disputeTypes: next ? [next] : [] }),
+      body: JSON.stringify({ accountId, ...data }),
+    });
+
+  const toggleExpanded = (id: string) => {
+    setExpandedRows((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const handleFCRASection = async (accountId: string, section: string) => {
+    const current = disputeTypes[accountId] ?? [];
+    const next = current.includes(section) ? current.filter((s) => s !== section) : [...current, section];
+    setDisputeTypes((prev) => ({ ...prev, [accountId]: next }));
+    await patchAccount(accountId, { dispute_types: next });
+  };
+
+  const getActiveBureaus = (accountId: string): string[] => {
+    const edits = bureauEdits[accountId];
+    if (!edits) return [];
+    return (['equifax', 'experian', 'transunion'] as const).filter((b) => edits[b] != null);
+  };
+
+  const handleTopFieldBlur = async (accountId: string, field: keyof TopFields, value: string) => {
+    await patchAccount(accountId, { [field]: value });
+    showFlash(`${accountId}:${field}`);
+  };
+
+  const handleBureauCellChange = (accountId: string, bureau: string, field: keyof BureauDataEdit, value: string) => {
+    setBureauEdits((prev) => ({
+      ...prev,
+      [accountId]: {
+        ...prev[accountId],
+        [bureau]: { ...(prev[accountId]?.[bureau] ?? emptyBureauEdit()), [field]: value },
+      },
+    }));
+  };
+
+  const handleBureauCellBlur = async (accountId: string, bureau: string, field: keyof BureauDataEdit) => {
+    const edit = bureauEdits[accountId]?.[bureau];
+    if (!edit) return;
+    const jsonb = bureauEditToJsonb(edit);
+    await patchAccount(accountId, {
+      [`${bureau}_data`]: jsonb,
+      [`account_number_${bureau}`]: jsonb.account_number,
+    });
+    showFlash(`${accountId}:${bureau}:${field}`);
+  };
+
+  const handleDeleteAccount = async (accountId: string) => {
+    await fetch('/api/analyze-reports', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+      body: JSON.stringify({ accountId }),
+    });
+    setDeleteConfirm(null);
+    onChange();
+  };
+
+  const removePersonalInfoItem = async (field: keyof PersonalInfoErrors, index: number) => {
+    const updated: PersonalInfoErrors = {
+      ...personalInfo,
+      [field]: personalInfo[field].filter((_, i) => i !== index),
+    };
+    setPersonalInfo(updated);
+    await fetch('/api/update-status', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+      body: JSON.stringify({ clientId, personal_info_errors: updated }),
     });
   };
 
@@ -852,16 +1046,22 @@ const AnalyzeTab = ({
         body: JSON.stringify({ clientId }),
       });
       const j = await r.json();
-      if (r.ok) {
-        setSummaryToast({ msg: `Report summary sent to ${clientEmail}`, ok: true });
-      } else {
-        setSummaryToast({ msg: j.error || 'Failed to send report summary', ok: false });
-      }
+      setSummaryToast({ msg: r.ok ? `Report summary sent to ${clientEmail}` : (j.error || 'Failed'), ok: r.ok });
     } catch {
       setSummaryToast({ msg: 'Network error sending report summary', ok: false });
     }
     setTimeout(() => setSummaryToast(null), 4000);
   };
+
+  const inp = 'bg-transparent border-b border-transparent hover:border-neutral-700 focus:border-luxury-red/50 focus:bg-[#111] text-white px-1 py-0.5 text-xs w-full focus:outline-none transition-colors rounded-sm';
+  const BUREAU_LABELS: Record<string, string> = { equifax: 'Equifax', experian: 'Experian', transunion: 'TransUnion' };
+
+  const hasPersonalInfo =
+    personalInfo.name_variations.length > 0 ||
+    personalInfo.unknown_addresses.length > 0 ||
+    personalInfo.unknown_phone_numbers.length > 0;
+
+  const unauthorizedInquiries = (client.inquiries ?? []).filter((q) => q.potentially_unauthorized);
 
   return (
     <div>
@@ -870,10 +1070,11 @@ const AnalyzeTab = ({
           {summaryToast.msg}
         </div>
       )}
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
           <h2 className="font-serif-display text-2xl text-white">Negative Accounts</h2>
-          <p className="text-sm text-neutral-400">Extracted by Claude from credit reports.</p>
+          <p className="text-sm text-neutral-400">Click any field to edit inline. Expand rows to compare bureau data.</p>
         </div>
         <div className="flex gap-2 flex-wrap">
           <button
@@ -893,6 +1094,40 @@ const AnalyzeTab = ({
         </div>
       </div>
 
+      {/* Personal Info Errors */}
+      {hasPersonalInfo && (
+        <div className="bg-[#1a1a1a] border border-amber-900/50 rounded-sm p-5 mb-6">
+          <h3 className="text-xs uppercase tracking-widest text-amber-400 font-bold mb-1">Personal Information Errors Detected</h3>
+          <p className="text-xs text-neutral-500 mb-3">Remove any item that has been corrected or is not a dispute target.</p>
+          <div className="grid sm:grid-cols-3 gap-4">
+            {([
+              { field: 'name_variations' as const, label: 'Name Variations' },
+              { field: 'unknown_addresses' as const, label: 'Unknown Addresses' },
+              { field: 'unknown_phone_numbers' as const, label: 'Unknown Phone Numbers' },
+            ]).map(({ field, label }) =>
+              personalInfo[field].length > 0 ? (
+                <div key={field}>
+                  <p className="text-[10px] uppercase tracking-widest text-neutral-500 mb-2">{label}</p>
+                  <div className="flex flex-col gap-1">
+                    {personalInfo[field].map((item, i) => (
+                      <div key={i} className="flex items-center gap-2 bg-[#0f0f0f] border border-neutral-800 rounded-sm px-2 py-1">
+                        <span className="text-xs text-neutral-300 flex-1">{item}</span>
+                        <button
+                          onClick={() => removePersonalInfoItem(field, i)}
+                          className="text-neutral-600 hover:text-red-400 transition-colors text-sm leading-none flex-shrink-0"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null
+            )}
+          </div>
+        </div>
+      )}
+
       {accounts.length === 0 ? (
         <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-10 text-center text-neutral-400">
           No accounts analyzed yet. Click "Run Analysis" to extract negative items from uploaded credit reports.
@@ -902,57 +1137,266 @@ const AnalyzeTab = ({
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-[#0f0f0f] border-b border-neutral-800">
-                <tr className="text-left text-xs uppercase tracking-widest text-neutral-400">
-                  <th className="px-4 py-3">Creditor</th>
-                  <th className="px-4 py-3">Account #</th>
-                  <th className="px-4 py-3">Balance</th>
-                  <th className="px-4 py-3">Type</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Bureaus</th>
-                  <th className="px-4 py-3">Dispute Type</th>
+                <tr className="text-left text-[10px] uppercase tracking-widest text-neutral-500">
+                  <th className="px-3 py-3 w-8"></th>
+                  <th className="px-3 py-3 min-w-[220px]">Creditor / Type</th>
+                  <th className="px-3 py-3 min-w-[120px]">Bureaus</th>
+                  <th className="px-3 py-3 min-w-[155px]">FCRA Sections</th>
+                  <th className="px-3 py-3 w-24"></th>
                 </tr>
               </thead>
               <tbody>
                 {accounts.map((a) => {
-                  const current = disputeTypes[a.id] ?? '';
+                  const isExpanded = expandedRows.has(a.id);
+                  const fcra = disputeTypes[a.id] ?? [];
+                  const activeBureaus = getActiveBureaus(a.id);
+                  const tf = topFields[a.id];
+                  if (!tf) return null;
+                  const priority = (a.dispute_priority ?? 'medium') as string;
+                  const priorityStyle = PRIORITY_STYLES[priority] ?? PRIORITY_STYLES.low;
+
                   return (
-                    <tr key={a.id} className="border-b border-neutral-800/60">
-                      <td className="px-4 py-3 text-white">{a.creditor_name}</td>
-                      <td className="px-4 py-3 text-neutral-300 font-mono text-xs">{a.account_number}</td>
-                      <td className="px-4 py-3 text-neutral-300">{a.balance}</td>
-                      <td className="px-4 py-3 text-neutral-300">{a.account_type}</td>
-                      <td className="px-4 py-3 text-neutral-300">{a.account_status}</td>
-                      <td className="px-4 py-3 text-neutral-300 text-xs uppercase">
-                        {(a.bureaus || []).join(', ')}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex flex-col gap-1.5">
-                          {(['standard', 'identity_theft'] as const).map((type) => {
-                            const label = type === 'standard' ? 'Standard Dispute' : 'Identity Theft';
-                            const active = current === type;
-                            return (
+                    <React.Fragment key={a.id}>
+                      {/* Collapsed row */}
+                      <tr className={`border-b border-neutral-800/50 align-top ${isExpanded ? 'bg-[#151515]' : ''}`}>
+
+                        {/* Expand toggle */}
+                        <td className="px-3 py-3 text-center align-middle">
+                          <button
+                            onClick={() => toggleExpanded(a.id)}
+                            className="text-neutral-500 hover:text-white transition-colors text-base leading-none select-none"
+                          >
+                            {isExpanded ? '▾' : '▸'}
+                          </button>
+                        </td>
+
+                        {/* Creditor / Original / Type + priority badge + flags */}
+                        <td className="px-3 py-2">
+                          <div className="flex items-start gap-1.5 mb-0.5">
+                            <input
+                              value={tf.creditor_name}
+                              onChange={(e) => setTopFields((p) => ({ ...p, [a.id]: { ...p[a.id], creditor_name: e.target.value } }))}
+                              onBlur={(e) => handleTopFieldBlur(a.id, 'creditor_name', e.target.value)}
+                              className={`${inp} font-semibold`}
+                              placeholder="Creditor"
+                            />
+                            {flash(`${a.id}:creditor_name`)}
+                            <span className={`flex-shrink-0 text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm border font-bold ${priorityStyle}`}>
+                              {priority}
+                            </span>
+                          </div>
+                          <div className="mt-0.5 flex items-center gap-0.5">
+                            <input
+                              value={tf.original_creditor}
+                              onChange={(e) => setTopFields((p) => ({ ...p, [a.id]: { ...p[a.id], original_creditor: e.target.value } }))}
+                              onBlur={(e) => handleTopFieldBlur(a.id, 'original_creditor', e.target.value)}
+                              className={`${inp} text-neutral-400`}
+                              placeholder="Original creditor"
+                            />
+                            {flash(`${a.id}:original_creditor`)}
+                          </div>
+                          <div className="mt-0.5 flex items-center gap-0.5">
+                            <input
+                              value={tf.account_type}
+                              onChange={(e) => setTopFields((p) => ({ ...p, [a.id]: { ...p[a.id], account_type: e.target.value } }))}
+                              onBlur={(e) => handleTopFieldBlur(a.id, 'account_type', e.target.value)}
+                              className={`${inp} text-neutral-500 text-[10px]`}
+                              placeholder="Account type"
+                            />
+                            {flash(`${a.id}:account_type`)}
+                          </div>
+                          {a.duplicate_flag && (
+                            <p className="mt-1 text-[10px] text-amber-400 bg-amber-950/30 border border-amber-800/50 rounded-sm px-1.5 py-0.5">
+                              ⚠ Possible duplicate reporting — verify before disputing
+                            </p>
+                          )}
+                          {a.balance_inconsistency && (
+                            <p className="mt-1 text-[10px] text-sky-400 bg-sky-950/30 border border-sky-800/50 rounded-sm px-1.5 py-0.5">
+                              ≠ Balance inconsistency across bureaus — dispute angle
+                            </p>
+                          )}
+                        </td>
+
+                        {/* Bureau badges — read-only, derived from non-null jsonb */}
+                        <td className="px-3 py-2">
+                          <div className="flex flex-col gap-1">
+                            {(['equifax', 'experian', 'transunion'] as const).map((b) => {
+                              const active = activeBureaus.includes(b);
+                              return (
+                                <span
+                                  key={b}
+                                  className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-sm border w-fit ${
+                                    active
+                                      ? 'border-luxury-red bg-luxury-red/10 text-luxury-red'
+                                      : 'border-neutral-800 text-neutral-700'
+                                  }`}
+                                >
+                                  {BUREAU_LABELS[b]}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </td>
+
+                        {/* FCRA Sections — pre-selected from recommended_fcra_sections via dispute_types */}
+                        <td className="px-3 py-2">
+                          <div className="flex flex-col gap-1">
+                            {FCRA_SECTIONS.map(({ key, label }) => {
+                              const active = fcra.includes(key);
+                              return (
+                                <label key={key} className="flex items-center gap-1.5 cursor-pointer group">
+                                  <input
+                                    type="checkbox"
+                                    checked={active}
+                                    onChange={() => handleFCRASection(a.id, key)}
+                                    className="accent-luxury-red w-3 h-3 flex-shrink-0"
+                                  />
+                                  <span className={`text-[10px] uppercase tracking-wider ${active ? 'text-luxury-red' : 'text-neutral-500 group-hover:text-neutral-300'}`}>
+                                    {label}
+                                  </span>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </td>
+
+                        {/* Delete */}
+                        <td className="px-3 py-2 text-right align-middle">
+                          {deleteConfirm === a.id ? (
+                            <div className="flex items-center gap-1 justify-end">
+                              <span className="text-[9px] text-red-400">Delete?</span>
                               <button
-                                key={type}
-                                onClick={() => handleDisputeType(a.id, type)}
-                                className={`flex items-center gap-2 text-[11px] uppercase tracking-wider px-2 py-1 rounded-sm border transition-colors text-left whitespace-nowrap ${
-                                  active
-                                    ? 'border-luxury-red bg-luxury-red/10 text-luxury-red'
-                                    : 'border-neutral-700 text-neutral-500 hover:border-neutral-500 hover:text-neutral-300'
-                                }`}
+                                onClick={() => handleDeleteAccount(a.id)}
+                                className="text-[9px] uppercase tracking-wider text-red-400 border border-red-800 px-1.5 py-0.5 rounded-sm hover:bg-red-950"
                               >
-                                <span className={`w-3 h-3 rounded-full border flex-shrink-0 ${active ? 'bg-luxury-red border-luxury-red' : 'border-neutral-600'}`} />
-                                {label}
+                                Yes
                               </button>
-                            );
-                          })}
-                        </div>
-                      </td>
-                    </tr>
+                              <button
+                                onClick={() => setDeleteConfirm(null)}
+                                className="text-[9px] uppercase tracking-wider text-neutral-400 border border-neutral-700 px-1.5 py-0.5 rounded-sm hover:bg-neutral-800"
+                              >
+                                No
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setDeleteConfirm(a.id)}
+                              className="text-neutral-600 hover:text-red-400 transition-colors text-sm px-1"
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+
+                      {/* Expanded comparison row */}
+                      {isExpanded && (
+                        <tr className="border-b border-neutral-700 bg-[#111]">
+                          <td colSpan={5} className="px-6 py-5">
+                            {(a.duplicate_note || a.balance_inconsistency_note) && (
+                              <div className="flex flex-wrap gap-2 mb-4">
+                                {a.duplicate_note && (
+                                  <p className="text-[11px] text-amber-300 bg-amber-950/30 border border-amber-800/50 rounded-sm px-3 py-1.5 flex-1 min-w-0">
+                                    <span className="font-semibold">Duplicate note:</span> {a.duplicate_note}
+                                  </p>
+                                )}
+                                {a.balance_inconsistency_note && (
+                                  <p className="text-[11px] text-sky-300 bg-sky-950/30 border border-sky-800/50 rounded-sm px-3 py-1.5 flex-1 min-w-0">
+                                    <span className="font-semibold">Balance note:</span> {a.balance_inconsistency_note}
+                                  </p>
+                                )}
+                              </div>
+                            )}
+                            <table className="w-full text-xs border-collapse">
+                              <thead>
+                                <tr className="text-[10px] uppercase tracking-widest">
+                                  <th className="text-left py-2 pr-4 text-neutral-500 font-normal w-28">Field</th>
+                                  {(['equifax', 'experian', 'transunion'] as const).map((b) => {
+                                    const active = activeBureaus.includes(b);
+                                    return (
+                                      <th key={b} className={`text-left py-2 px-3 font-semibold ${active ? 'text-luxury-red' : 'text-neutral-700'}`}>
+                                        {BUREAU_LABELS[b]}
+                                        {!active && <span className="ml-1 font-normal text-neutral-700 normal-case tracking-normal">(not reported)</span>}
+                                      </th>
+                                    );
+                                  })}
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-neutral-800/50">
+                                {COMPARISON_FIELDS.map(({ key, label }) => (
+                                  <tr key={key}>
+                                    <td className="py-1.5 pr-4 text-neutral-500">{label}</td>
+                                    {(['equifax', 'experian', 'transunion'] as const).map((b) => {
+                                      const bEdit = bureauEdits[a.id]?.[b] ?? null;
+                                      const flashKey = `${a.id}:${b}:${key}`;
+                                      return (
+                                        <td key={b} className="py-1.5 px-3">
+                                          {bEdit !== null ? (
+                                            <div className="flex items-center gap-0.5">
+                                              <input
+                                                value={bEdit[key]}
+                                                onChange={(e) => handleBureauCellChange(a.id, b, key, e.target.value)}
+                                                onBlur={() => handleBureauCellBlur(a.id, b, key)}
+                                                className="bg-transparent border-b border-transparent hover:border-neutral-700 focus:border-luxury-red/50 focus:bg-[#0f0f0f] text-neutral-300 px-1 py-0.5 w-full focus:outline-none transition-colors"
+                                                placeholder="—"
+                                              />
+                                              {flash(flashKey)}
+                                            </div>
+                                          ) : (
+                                            <span className="text-neutral-700">—</span>
+                                          )}
+                                        </td>
+                                      );
+                                    })}
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   );
                 })}
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {/* Potentially Unauthorized Inquiries */}
+      {unauthorizedInquiries.length > 0 && (
+        <div className="mt-6 bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-neutral-800">
+            <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold">
+              Potentially Unauthorized Inquiries ({unauthorizedInquiries.length})
+            </h3>
+            <p className="text-xs text-neutral-500 mt-1">May be disputable under FCRA §611.</p>
+          </div>
+          <table className="w-full text-sm">
+            <thead className="bg-[#0f0f0f] border-b border-neutral-800">
+              <tr className="text-left text-[10px] uppercase tracking-widest text-neutral-500">
+                <th className="px-4 py-3">Creditor</th>
+                <th className="px-4 py-3">Bureau</th>
+                <th className="px-4 py-3">Date</th>
+                <th className="px-4 py-3">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {unauthorizedInquiries.map((q, i) => (
+                <tr key={i} className="border-b border-neutral-800/60">
+                  <td className="px-4 py-3 text-white">{q.creditor}</td>
+                  <td className="px-4 py-3 text-neutral-300 capitalize">{q.bureau}</td>
+                  <td className="px-4 py-3 text-neutral-400 text-xs">{q.date}</td>
+                  <td className="px-4 py-3">
+                    <span className="text-[10px] uppercase tracking-wider text-amber-400 bg-amber-950/30 border border-amber-800/50 rounded-sm px-2 py-0.5">
+                      ⚠ Unauthorized
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
@@ -1034,9 +1478,137 @@ const LettersTab = ({
   const [letterType, setLetterType] = useState<LetterTypeKey>('605B');
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [showCustom, setShowCustom] = useState(false);
+  const [bureauLetterType, setBureauLetterType] = useState<LetterTypeKey>('611');
 
   const toggle = (id: string) => setSelected((s) => ({ ...s, [id]: !s[id] }));
   const selectedIds = Object.keys(selected).filter((k) => selected[k]);
+
+  const furnisherMap: Record<string, ClientDetail['accounts']> = {};
+  for (const a of accounts) {
+    if ((a.dispute_types ?? []).some((t: string) => ['623', '809'].includes(t))) {
+      const key = (a.original_creditor as string | undefined) || a.creditor_name;
+      furnisherMap[key] = [...(furnisherMap[key] ?? []), a];
+    }
+  }
+  const furnisherGroups = Object.entries(furnisherMap);
+
+  const bureauLettersList = letters.filter((l) =>
+    ['Experian', 'Equifax', 'TransUnion'].includes(l.recipient_name),
+  );
+  const furnisherLettersList = letters.filter(
+    (l) => !['Experian', 'Equifax', 'TransUnion'].includes(l.recipient_name),
+  );
+
+  const getBureauPreset = (bureau: string, type: LetterTypeKey) => {
+    const isFraud = type === '605B';
+    switch (bureau) {
+      case 'equifax':
+        return isFraud
+          ? { name: BUREAU_ADDRESSES.equifaxFraud.name, address: `${BUREAU_ADDRESSES.equifaxFraud.dept}\n${BUREAU_ADDRESSES.equifaxFraud.address}` }
+          : { name: BUREAU_ADDRESSES.equifaxDispute.name, address: `${BUREAU_ADDRESSES.equifaxDispute.dept}\n${BUREAU_ADDRESSES.equifaxDispute.address}` };
+      case 'experian':
+        return isFraud
+          ? { name: BUREAU_ADDRESSES.experianFraud.name, address: `${BUREAU_ADDRESSES.experianFraud.dept}\n${BUREAU_ADDRESSES.experianFraud.address}` }
+          : { name: BUREAU_ADDRESSES.experianDispute.name, address: `${BUREAU_ADDRESSES.experianDispute.dept}\n${BUREAU_ADDRESSES.experianDispute.address}` };
+      default: // transunion
+        return {
+          name: BUREAU_ADDRESSES.transunion.name,
+          address: `${isFraud ? BUREAU_ADDRESSES.transunion.dept : 'Dispute Department'}\n${BUREAU_ADDRESSES.transunion.address}`,
+        };
+    }
+  };
+
+  const handleGenerateBureauLetters = async () => {
+    const bureaus = ['equifax', 'experian', 'transunion'] as const;
+    let anyGenerated = false;
+    setBusy(true);
+    try {
+      for (const bureau of bureaus) {
+        const bureauAccts = accounts.filter((a) => (a as Record<string, unknown>)[`${bureau}_data`] != null);
+        if (bureauAccts.length === 0) continue;
+        const preset = getBureauPreset(bureau, bureauLetterType);
+        setBusyMsg(`Generating ${bureau.charAt(0).toUpperCase() + bureau.slice(1)} letter…`);
+        const res = await fetch('/api/generate-letters', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+          body: JSON.stringify({
+            clientId,
+            letterType: bureauLetterType,
+            recipientName: preset.name,
+            recipientAddress: preset.address,
+            accountIds: bureauAccts.map((a) => a.id),
+            bureau,
+            clientData: {
+              fullName: client.full_name,
+              address: client.address,
+              city: client.city,
+              state: client.state,
+              zip: client.zip,
+              email: client.email,
+              phone: client.phone,
+            },
+          }),
+        });
+        if (!res.ok) {
+          const j = await res.json();
+          alert(`Failed to generate ${bureau} letter: ${j.error || 'Unknown error'}`);
+          continue;
+        }
+        anyGenerated = true;
+      }
+      if (anyGenerated) onChange();
+    } catch (err) {
+      alert('Error: ' + (err as Error).message);
+    } finally {
+      setBusy(false);
+      setBusyMsg('');
+    }
+  };
+
+  const handleGenerateFurnisherLetters = async () => {
+    if (furnisherGroups.length === 0) return;
+    let anyGenerated = false;
+    setBusy(true);
+    try {
+      for (const [creditorName, credAccts] of furnisherGroups) {
+        const types = credAccts.flatMap((a) => a.dispute_types ?? []);
+        const lType: LetterTypeKey = types.includes('623') ? '623' : '809';
+        setBusyMsg(`Generating letter to ${creditorName}…`);
+        const res = await fetch('/api/generate-letters', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+          body: JSON.stringify({
+            clientId,
+            letterType: lType,
+            recipientName: creditorName,
+            recipientAddress: 'Address on File — Verify Before Mailing',
+            accountIds: credAccts.map((a) => a.id),
+            clientData: {
+              fullName: client.full_name,
+              address: client.address,
+              city: client.city,
+              state: client.state,
+              zip: client.zip,
+              email: client.email,
+              phone: client.phone,
+            },
+          }),
+        });
+        if (!res.ok) {
+          const j = await res.json();
+          alert(`Failed to generate letter to ${creditorName}: ${j.error || 'Unknown error'}`);
+          continue;
+        }
+        anyGenerated = true;
+      }
+      if (anyGenerated) onChange();
+    } catch (err) {
+      alert('Error: ' + (err as Error).message);
+    } finally {
+      setBusy(false);
+      setBusyMsg('');
+    }
+  };
 
   const sendMail = async (letterId: string) => {
     setBusy(true);
@@ -1162,10 +1734,85 @@ const LettersTab = ({
           ⚠ {responseCount} bureau/creditor response{responseCount > 1 ? 's' : ''} on file — Claude will analyze {responseCount > 1 ? 'these' : 'this'} in letter generation.
         </div>
       )}
-      {/* Generator */}
+
+      {/* Generate Bureau Letters */}
+      <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-6">
+        <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold mb-1">
+          Bureau Letters
+        </h3>
+        <p className="text-xs text-neutral-400 mb-4">
+          Generates one combined letter per bureau, listing only the accounts that bureau reports.
+        </p>
+        <div className="flex flex-wrap items-end gap-3 mb-3">
+          <div>
+            <label className="block text-xs uppercase tracking-widest text-neutral-400 mb-2">Letter Type</label>
+            <select
+              value={bureauLetterType}
+              onChange={(e) => setBureauLetterType(e.target.value as LetterTypeKey)}
+              className="bg-[#0f0f0f] border border-neutral-800 text-white px-3 py-2 rounded-sm text-sm focus:outline-none focus:border-luxury-red"
+            >
+              <option value="611">FCRA §611 — Dispute & Reinvestigation</option>
+              <option value="605B">FCRA §605B — Identity Theft Block</option>
+              <option value="609">FCRA §609 — File Disclosure</option>
+            </select>
+          </div>
+          <button
+            onClick={handleGenerateBureauLetters}
+            disabled={busy || accounts.length === 0}
+            className="bg-luxury-red hover:bg-luxury-light disabled:opacity-50 text-white px-5 py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
+          >
+            Generate Bureau Letters
+          </button>
+        </div>
+        {accounts.length > 0 && (
+          <div className="flex gap-4 text-xs">
+            {(['equifax', 'experian', 'transunion'] as const).map((b) => {
+              const cnt = accounts.filter((a) => (a as Record<string, unknown>)[`${b}_data`] != null).length;
+              return (
+                <span key={b} className={cnt > 0 ? 'text-emerald-400' : 'text-neutral-600'}>
+                  {b.charAt(0).toUpperCase() + b.slice(1)}: {cnt} acct{cnt !== 1 ? 's' : ''}
+                </span>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Generate Furnisher Letters */}
+      {furnisherGroups.length > 0 && (
+        <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-6">
+          <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold mb-1">
+            Furnisher Letters
+          </h3>
+          <p className="text-xs text-neutral-400 mb-3">
+            §623/§809 letters for accounts with Furnisher Dispute or Debt Validation selected.
+          </p>
+          <div className="bg-[#0f0f0f] border border-neutral-800 rounded-sm p-3 mb-4 space-y-1">
+            {furnisherGroups.map(([name, accts]) => {
+              const types = accts.flatMap((a) => a.dispute_types ?? []);
+              const lType = types.includes('623') ? '§623' : '§809';
+              return (
+                <div key={name} className="flex items-center justify-between text-xs">
+                  <span className="text-white">{name}</span>
+                  <span className="text-neutral-400">{lType} · {accts.length} acct{accts.length !== 1 ? 's' : ''}</span>
+                </div>
+              );
+            })}
+          </div>
+          <button
+            onClick={handleGenerateFurnisherLetters}
+            disabled={busy}
+            className="bg-luxury-red hover:bg-luxury-light disabled:opacity-50 text-white px-5 py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
+          >
+            Generate Furnisher Letters
+          </button>
+        </div>
+      )}
+
+      {/* Custom Letter Generator */}
       <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-6">
         <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold mb-4">
-          Generate New Letter
+          Custom Letter
         </h3>
 
         <div className="grid md:grid-cols-2 gap-4 mb-5">
@@ -1272,15 +1919,15 @@ const LettersTab = ({
         </button>
       </div>
 
-      {/* Existing letters */}
+      {/* Bureau Letters */}
       <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-neutral-800">
           <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold">
-            Generated Letters ({letters.length})
+            Bureau Letters ({bureauLettersList.length})
           </h3>
         </div>
-        {letters.length === 0 ? (
-          <div className="p-10 text-center text-neutral-500 text-sm">No letters generated yet.</div>
+        {bureauLettersList.length === 0 ? (
+          <div className="p-10 text-center text-neutral-500 text-sm">No bureau letters generated yet.</div>
         ) : (
           <table className="w-full text-sm">
             <thead className="bg-[#0f0f0f] border-b border-neutral-800">
@@ -1292,34 +1939,63 @@ const LettersTab = ({
               </tr>
             </thead>
             <tbody>
-              {letters.map((l) => (
+              {bureauLettersList.map((l) => (
                 <tr key={l.id} className="border-b border-neutral-800/60">
                   <td className="px-4 py-3 text-white">{l.recipient_name}</td>
-                  <td className="px-4 py-3 text-neutral-300 text-xs uppercase tracking-widest">
-                    {l.letter_type}
-                  </td>
-                  <td className="px-4 py-3 text-neutral-400 text-xs">
-                    {new Date(l.created_at).toLocaleDateString()}
-                  </td>
+                  <td className="px-4 py-3 text-neutral-300 text-xs uppercase tracking-widest">{l.letter_type}</td>
+                  <td className="px-4 py-3 text-neutral-400 text-xs">{new Date(l.created_at).toLocaleDateString()}</td>
                   <td className="px-4 py-3 text-right flex items-center justify-end gap-3">
-                    <button
-                      onClick={() => downloadPdf(l.id)}
-                      disabled={busy}
-                      className="text-luxury-red hover:text-luxury-accent text-xs uppercase tracking-widest font-semibold"
-                    >
+                    <button onClick={() => downloadPdf(l.id)} disabled={busy} className="text-luxury-red hover:text-luxury-accent text-xs uppercase tracking-widest font-semibold">
                       Download PDF
                     </button>
                     {l.lob_tracking_number ? (
-                      <span className="text-green-400 text-xs font-mono">
-                        Mailed ✓ {l.lob_tracking_number}
-                      </span>
+                      <span className="text-green-400 text-xs font-mono">Mailed ✓ {l.lob_tracking_number}</span>
                     ) : (
-                      <button
-                        onClick={() => sendMail(l.id)}
-                        disabled={busy || !l.pdf_unsigned_path}
-                        className="text-amber-400 hover:text-amber-300 text-xs uppercase tracking-widest font-semibold disabled:opacity-40"
-                        title={!l.pdf_unsigned_path ? 'Generate PDF first' : 'Send via USPS Certified Mail'}
-                      >
+                      <button onClick={() => sendMail(l.id)} disabled={busy || !l.pdf_unsigned_path} className="text-amber-400 hover:text-amber-300 text-xs uppercase tracking-widest font-semibold disabled:opacity-40" title={!l.pdf_unsigned_path ? 'Generate PDF first' : 'Send via USPS Certified Mail'}>
+                        Send Mail
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* Furnisher Letters */}
+      <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-neutral-800">
+          <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold">
+            Furnisher Letters ({furnisherLettersList.length})
+          </h3>
+        </div>
+        {furnisherLettersList.length === 0 ? (
+          <div className="p-10 text-center text-neutral-500 text-sm">No furnisher letters generated yet.</div>
+        ) : (
+          <table className="w-full text-sm">
+            <thead className="bg-[#0f0f0f] border-b border-neutral-800">
+              <tr className="text-left text-xs uppercase tracking-widest text-neutral-400">
+                <th className="px-4 py-3">Recipient</th>
+                <th className="px-4 py-3">Type</th>
+                <th className="px-4 py-3">Created</th>
+                <th className="px-4 py-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {furnisherLettersList.map((l) => (
+                <tr key={l.id} className="border-b border-neutral-800/60">
+                  <td className="px-4 py-3 text-white">{l.recipient_name}</td>
+                  <td className="px-4 py-3 text-neutral-300 text-xs uppercase tracking-widest">{l.letter_type}</td>
+                  <td className="px-4 py-3 text-neutral-400 text-xs">{new Date(l.created_at).toLocaleDateString()}</td>
+                  <td className="px-4 py-3 text-right flex items-center justify-end gap-3">
+                    <button onClick={() => downloadPdf(l.id)} disabled={busy} className="text-luxury-red hover:text-luxury-accent text-xs uppercase tracking-widest font-semibold">
+                      Download PDF
+                    </button>
+                    {l.lob_tracking_number ? (
+                      <span className="text-green-400 text-xs font-mono">Mailed ✓ {l.lob_tracking_number}</span>
+                    ) : (
+                      <button onClick={() => sendMail(l.id)} disabled={busy || !l.pdf_unsigned_path} className="text-amber-400 hover:text-amber-300 text-xs uppercase tracking-widest font-semibold disabled:opacity-40" title={!l.pdf_unsigned_path ? 'Generate PDF first' : 'Send via USPS Certified Mail'}>
                         Send Mail
                       </button>
                     )}
