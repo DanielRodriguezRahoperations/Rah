@@ -15,7 +15,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  const { clientId, status, dispute_round, round_notes, personal_info_errors, ftc_report_numbers } = req.body ?? {};
+  const { clientId, status, dispute_round, round_notes, personal_info_errors, ftc_report_numbers, case_type } = req.body ?? {};
 
   if (!clientId) {
     return res.status(400).json({ error: 'Missing clientId' });
@@ -27,6 +27,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (round_notes !== undefined) update.round_notes = round_notes;
   if (personal_info_errors !== undefined) update.personal_info_errors = personal_info_errors;
   if (ftc_report_numbers !== undefined) update.ftc_report_numbers = ftc_report_numbers;
+  if (case_type !== undefined) update.case_type = case_type;
 
   if (Object.keys(update).length === 0) {
     return res.status(400).json({ error: 'No fields to update' });

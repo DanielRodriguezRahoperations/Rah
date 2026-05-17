@@ -29,6 +29,8 @@ interface ClientDetail {
     inquiries?: Array<{ creditor: string; date: string; bureau: string; potentially_unauthorized: boolean }> | null;
     ftc_report_numbers?: string[] | null;
     dispute_selections?: Record<string, unknown> | null;
+    case_type?: string | null;
+    positive_accounts?: Array<Record<string, unknown>> | null;
   };
   letters: Array<Record<string, unknown> & { id: string; recipient_name: string; letter_type: string; created_at: string; pdf_unsigned_path?: string | null; lob_tracking_number?: string | null; mailed_at?: string | null; mail_status?: string | null; }>;
   accounts: Array<Record<string, unknown> & { id: string; creditor_name: string; account_number: string; account_number_equifax?: string; account_number_experian?: string; account_number_transunion?: string; balance: string; date_opened: string; account_type: string; account_status: string; bureaus: string[]; selected: boolean; dispute_types: string[]; original_creditor?: string; phone_numbers?: string[]; name_variations?: string[]; addresses?: string[]; equifax_data?: Record<string, unknown> | null; experian_data?: Record<string, unknown> | null; transunion_data?: Record<string, unknown> | null; duplicate_flag?: boolean; duplicate_note?: string; balance_inconsistency?: boolean; balance_inconsistency_note?: string; dispute_priority?: string; recommended_fcra_sections?: string[]; letter_targets?: Record<string, unknown> }>;
@@ -403,6 +405,9 @@ const AdminClientDetailPage = () => {
                   setBusy(false);
                   setBusyMsg('');
                 }}
+                onSaveCaseType={async (caseType) => {
+                  setData((prev) => prev ? { ...prev, client: { ...prev.client, case_type: caseType } } : prev);
+                }}
               />
             )}
             {tab === 'documents' && (
@@ -485,17 +490,21 @@ const OverviewTab = ({
   clientId,
   busy,
   onSaveRound,
+  onSaveCaseType,
 }: {
   client: ClientDetail['client'];
   clientId: string;
   busy: boolean;
   onSaveRound: (round: number, notes: string) => void;
+  onSaveCaseType: (caseType: string) => void;
 }) => {
   const [round, setRound] = React.useState<number>(Number(client.dispute_round ?? 1));
   const [notes, setNotes] = React.useState<string>(String(client.round_notes ?? ''));
   const [ftcInput, setFtcInput] = React.useState<string>((client.ftc_report_numbers ?? []).join(', '));
   const [ftcSaving, setFtcSaving] = React.useState(false);
   const [ftcFlash, setFtcFlash] = React.useState(false);
+  const [caseType, setCaseType] = React.useState<string>(String(client.case_type ?? 'identity_theft'));
+  const [caseTypeFlash, setCaseTypeFlash] = React.useState(false);
 
   const saveFtcNumbers = async () => {
     setFtcSaving(true);
@@ -510,8 +519,46 @@ const OverviewTab = ({
     setTimeout(() => setFtcFlash(false), 2000);
   };
 
+  const handleCaseTypeChange = async (val: string) => {
+    setCaseType(val);
+    await fetch('/api/update-status', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+      body: JSON.stringify({ clientId, case_type: val }),
+    });
+    onSaveCaseType(val);
+    setCaseTypeFlash(true);
+    setTimeout(() => setCaseTypeFlash(false), 2000);
+  };
+
   return (
     <div className="grid lg:grid-cols-2 gap-6">
+      {/* Case Type Toggle */}
+      <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-6 lg:col-span-2">
+        <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold mb-3">Case Type</h3>
+        <div className="flex gap-3 flex-wrap">
+          {[
+            { value: 'identity_theft', label: 'Identity Theft', desc: '§605B blocks + full packet' },
+            { value: 'standard_dispute', label: 'Standard Dispute', desc: '§611 / §623 reinvestigation' },
+          ].map(({ value, label, desc }) => (
+            <button
+              key={value}
+              onClick={() => handleCaseTypeChange(value)}
+              disabled={busy}
+              className={`flex flex-col text-left px-4 py-3 rounded-sm border transition-colors ${
+                caseType === value
+                  ? 'border-luxury-red bg-luxury-red/10 text-luxury-red'
+                  : 'border-neutral-700 text-neutral-400 hover:border-neutral-500 hover:text-white'
+              }`}
+            >
+              <span className="text-xs uppercase tracking-widest font-bold">{label}</span>
+              <span className="text-[10px] text-neutral-500 mt-0.5">{desc}</span>
+            </button>
+          ))}
+          {caseTypeFlash && <span className="self-center text-emerald-400 text-xs">✓ Saved</span>}
+        </div>
+      </div>
+
       <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-6">
         <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold mb-4">Personal Info</h3>
         <Field label="Full Name" value={client.full_name} />
@@ -1585,6 +1632,56 @@ const AnalyzeTab = ({
         </div>
       )}
 
+      {/* Positive Accounts */}
+      {Array.isArray(client.positive_accounts) && client.positive_accounts.length > 0 && (
+        <div className="mt-6 bg-[#1a1a1a] border border-emerald-900/40 rounded-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-emerald-900/40">
+            <h3 className="text-xs uppercase tracking-widest text-emerald-400 font-bold">
+              Positive Accounts ({client.positive_accounts.length})
+            </h3>
+            <p className="text-xs text-neutral-500 mt-1">Accounts in good standing — use to demonstrate creditworthiness in letters.</p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-[#0f0f0f] border-b border-emerald-900/30">
+                <tr className="text-left text-[10px] uppercase tracking-widest text-neutral-500">
+                  <th className="px-4 py-3">Creditor</th>
+                  <th className="px-4 py-3">Type</th>
+                  <th className="px-4 py-3">Balance</th>
+                  <th className="px-4 py-3">Opened</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Bureaus</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(client.positive_accounts as Array<Record<string, unknown>>).map((pa, i) => (
+                  <tr key={i} className="border-b border-neutral-800/50">
+                    <td className="px-4 py-3 text-white font-medium">{String(pa.creditor_name ?? '—')}</td>
+                    <td className="px-4 py-3 text-neutral-400 text-xs">{String(pa.account_type ?? '—')}</td>
+                    <td className="px-4 py-3 text-neutral-300">{String(pa.balance ?? '—')}</td>
+                    <td className="px-4 py-3 text-neutral-400 text-xs">{String(pa.date_opened ?? '—')}</td>
+                    <td className="px-4 py-3">
+                      <span className="text-[10px] uppercase tracking-wider text-emerald-400 bg-emerald-950/30 border border-emerald-800/50 rounded-sm px-2 py-0.5">
+                        {String(pa.status ?? '—')}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-1">
+                        {(Array.isArray(pa.bureaus) ? pa.bureaus : []).map((b) => (
+                          <span key={String(b)} className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm border border-emerald-900/50 text-emerald-500">
+                            {String(b)}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       {/* Potentially Unauthorized Inquiries */}
       {unauthorizedInquiries.length > 0 && (
         <div className="mt-6 bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden">
@@ -1746,6 +1843,10 @@ const LettersTab = ({
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [showCustom, setShowCustom] = useState(false);
   const [bureauLetterType, setBureauLetterType] = useState<LetterTypeKey>('611');
+  const [phase1Steps, setPhase1Steps] = useState<Array<{ label: string; status: 'pending' | 'generating' | 'done' | 'error' }>>([]);
+  const [phase1Running, setPhase1Running] = useState(false);
+  const [mailAllModal, setMailAllModal] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const toggle = (id: string) => setSelected((s) => ({ ...s, [id]: !s[id] }));
   const selectedIds = Object.keys(selected).filter((k) => selected[k]);
@@ -1758,6 +1859,109 @@ const LettersTab = ({
     }
   }
   const furnisherGroups = Object.entries(furnisherMap);
+
+  const caseTypeLabel = String(client.case_type ?? 'identity_theft') === 'standard_dispute' ? 'Standard Dispute' : 'Identity Theft';
+  const ftcNums = (client.ftc_report_numbers ?? []) as string[];
+  const totalSelected = accounts.length;
+  const unmairedLetters = letters.filter((l) => !l.lob_tracking_number);
+
+  const addBizDays = (d: Date, n: number): Date => {
+    const r = new Date(d);
+    let c = 0;
+    while (c < n) { r.setDate(r.getDate() + 1); if (r.getDay() !== 0 && r.getDay() !== 6) c++; }
+    return r;
+  };
+  const getDeadline = (mailedAt: string | null | undefined, type: string): Date | null => {
+    if (!mailedAt) return null;
+    const d = new Date(mailedAt);
+    if (type === '605B') return addBizDays(d, 4);
+    if (type === '609') { const r = new Date(d); r.setDate(r.getDate() + 15); return r; }
+    if (['611', '623', '809'].includes(type)) { const r = new Date(d); r.setDate(r.getDate() + 30); return r; }
+    return null;
+  };
+
+  const handleGeneratePhase1Packet = async () => {
+    const bureaus = (['equifax', 'experian', 'transunion'] as const).filter(
+      (b) => accounts.some((a) => (a as Record<string, unknown>)[`${b}_data`] != null),
+    );
+    if (bureaus.length === 0 && furnisherGroups.length === 0) {
+      alert('No credit report data available. Run analysis first.');
+      return;
+    }
+    const phaseType: LetterTypeKey = String(client.case_type ?? 'identity_theft') === 'standard_dispute' ? '611' : '605B';
+    const steps = [
+      ...bureaus.map((b) => ({ label: `${b.charAt(0).toUpperCase() + b.slice(1)} §${phaseType}`, status: 'pending' as const })),
+      ...furnisherGroups.map(([name]) => ({ label: `${name} (Furnisher)`, status: 'pending' as const })),
+    ];
+    setPhase1Steps(steps);
+    setPhase1Running(true);
+    setBusy(true);
+    try {
+      for (let i = 0; i < bureaus.length; i++) {
+        const b = bureaus[i];
+        setPhase1Steps((p) => p.map((s, idx) => idx === i ? { ...s, status: 'generating' } : s));
+        setBusyMsg(`Generating ${b} §${phaseType} letter…`);
+        const bureauAccts = accounts.filter((a) => (a as Record<string, unknown>)[`${b}_data`] != null);
+        const preset = getBureauPreset(b, phaseType);
+        const res = await fetch('/api/generate-letters', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+          body: JSON.stringify({
+            clientId, letterType: phaseType, recipientName: preset.name, recipientAddress: preset.address,
+            accountIds: bureauAccts.map((a) => a.id), bureau: b,
+            clientData: { fullName: client.full_name, address: client.address, city: client.city, state: client.state, zip: client.zip, email: client.email, phone: client.phone },
+          }),
+        });
+        setPhase1Steps((p) => p.map((s, idx) => idx === i ? { ...s, status: res.ok ? 'done' : 'error' } : s));
+      }
+      const offset = bureaus.length;
+      for (let i = 0; i < furnisherGroups.length; i++) {
+        const [creditorName, credAccts] = furnisherGroups[i];
+        setPhase1Steps((p) => p.map((s, idx) => idx === offset + i ? { ...s, status: 'generating' } : s));
+        setBusyMsg(`Generating letter to ${creditorName}…`);
+        const types = credAccts.flatMap((a) => a.dispute_types ?? []);
+        const lType: LetterTypeKey = types.includes('623') ? '623' : '809';
+        const res = await fetch('/api/generate-letters', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+          body: JSON.stringify({
+            clientId, letterType: lType, recipientName: creditorName,
+            recipientAddress: 'Address on File — Verify Before Mailing',
+            accountIds: credAccts.map((a) => a.id),
+            clientData: { fullName: client.full_name, address: client.address, city: client.city, state: client.state, zip: client.zip, email: client.email, phone: client.phone },
+          }),
+        });
+        setPhase1Steps((p) => p.map((s, idx) => idx === offset + i ? { ...s, status: res.ok ? 'done' : 'error' } : s));
+      }
+      onChange();
+    } catch (err) {
+      alert('Error: ' + (err as Error).message);
+    } finally {
+      setPhase1Running(false);
+      setBusy(false);
+      setBusyMsg('');
+    }
+  };
+
+  const handleMailAll = async () => {
+    setMailAllModal(false);
+    setBusy(true);
+    for (const l of unmairedLetters.filter((x) => x.pdf_unsigned_path)) {
+      setBusyMsg(`Mailing to ${l.recipient_name}…`);
+      const res = await fetch('/api/send-mail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+        body: JSON.stringify({ letterId: l.id, clientId }),
+      });
+      if (!res.ok) {
+        const j = await res.json();
+        alert(`Failed to mail to ${l.recipient_name}: ${j.error || 'Unknown error'}`);
+      }
+    }
+    setBusy(false);
+    setBusyMsg('');
+    onChange();
+  };
 
   const bureauLettersList = letters.filter((l) =>
     ['Experian', 'Equifax', 'TransUnion'].includes(l.recipient_name),
@@ -1990,6 +2194,125 @@ const LettersTab = ({
 
   return (
     <div className="space-y-8">
+
+      {/* === Phase 1 Packet === */}
+      <div className="bg-[#111] border border-luxury-red/25 rounded-sm p-6">
+        <div className="flex flex-wrap items-start justify-between gap-4 mb-5">
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold">Phase 1 Packet</h3>
+              <span className="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-sm border border-luxury-red/30 text-luxury-red/80">
+                {caseTypeLabel}
+              </span>
+              <span className="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-sm border border-neutral-700 text-neutral-400">
+                Round {disputeRound}
+              </span>
+            </div>
+            <p className="text-xs text-neutral-500">
+              {ftcNums.length > 0
+                ? `FTC Report(s): ${ftcNums.join(', ')}`
+                : <span className="text-amber-400">⚠ No FTC report numbers entered — add in Overview tab</span>}
+            </p>
+          </div>
+          <p className="text-xs text-neutral-400">
+            <span className="text-white font-semibold">{totalSelected}</span> account{totalSelected !== 1 ? 's' : ''} analyzed
+            {totalSelected === 0 && <span className="ml-2 text-amber-400">— run analysis first</span>}
+          </p>
+        </div>
+
+        {phase1Steps.length > 0 && (
+          <div className="mb-5 space-y-1.5">
+            {phase1Steps.map((step, i) => (
+              <div key={i} className="flex items-center gap-3 text-xs">
+                <span className={`w-4 text-center font-bold ${step.status === 'done' ? 'text-emerald-400' : step.status === 'error' ? 'text-red-400' : step.status === 'generating' ? 'text-amber-400' : 'text-neutral-700'}`}>
+                  {step.status === 'done' ? '✓' : step.status === 'error' ? '✕' : step.status === 'generating' ? '…' : '○'}
+                </span>
+                <span className={step.status === 'generating' ? 'text-amber-300' : step.status === 'done' ? 'text-emerald-300' : step.status === 'error' ? 'text-red-400' : 'text-neutral-500'}>
+                  {step.label}
+                </span>
+                {step.status === 'generating' && <span className="text-amber-400 text-[9px] uppercase tracking-widest">Generating…</span>}
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={handleGeneratePhase1Packet}
+            disabled={busy || phase1Running || accounts.length === 0}
+            className="bg-luxury-red hover:bg-luxury-light disabled:opacity-50 text-white px-6 py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
+          >
+            {phase1Running ? 'Generating Packet…' : 'Generate Full Phase 1 Packet'}
+          </button>
+          {unmairedLetters.length > 0 && !phase1Running && (
+            <button
+              onClick={() => setMailAllModal(true)}
+              disabled={busy}
+              className="border border-luxury-red/40 hover:bg-luxury-red/10 disabled:opacity-40 text-luxury-red px-6 py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
+            >
+              Approve &amp; Mail All ({unmairedLetters.length})
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Mail All Modal */}
+      {mailAllModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
+          <div className="bg-[#1a1a1a] border border-neutral-700 rounded-sm p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+            <h3 className="text-sm uppercase tracking-widest text-luxury-red font-bold mb-2">Approve &amp; Mail All Letters</h3>
+            <p className="text-xs text-neutral-400 mb-4">The following letters will be sent via USPS Certified Mail. Response deadlines are calculated from today's mailing date.</p>
+            <div className="space-y-2 mb-5">
+              {unmairedLetters.map((l) => {
+                const deadline = getDeadline(new Date().toISOString(), l.letter_type);
+                return (
+                  <div key={l.id} className="flex items-center justify-between text-xs bg-[#0f0f0f] border border-neutral-800 rounded-sm px-4 py-3">
+                    <div>
+                      <div className="text-white font-semibold">{l.recipient_name}</div>
+                      <div className="text-neutral-400 mt-0.5">
+                        {l.letter_type} · Response due: <span className="text-neutral-200">{deadline?.toLocaleDateString() ?? '—'}</span>
+                      </div>
+                    </div>
+                    <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-sm border ${l.pdf_unsigned_path ? 'border-emerald-800 text-emerald-400' : 'border-amber-800 text-amber-400'}`}>
+                      {l.pdf_unsigned_path ? 'PDF Ready' : 'No PDF'}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+            {unmairedLetters.some((l) => !l.pdf_unsigned_path) && (
+              <div className="mb-4 bg-amber-950/30 border border-amber-800 text-amber-200 text-xs px-4 py-3 rounded-sm">
+                ⚠ Some letters have no PDF yet. Generate PDFs first — only PDF-ready letters will be mailed.
+              </div>
+            )}
+            <div className="flex gap-3 justify-end">
+              <button onClick={() => setMailAllModal(false)} className="text-xs uppercase tracking-widest text-neutral-400 hover:text-white px-4 py-2 border border-neutral-700 rounded-sm transition-colors">
+                Cancel
+              </button>
+              <button
+                onClick={handleMailAll}
+                disabled={busy || unmairedLetters.every((l) => !l.pdf_unsigned_path)}
+                className="text-xs uppercase tracking-widest bg-luxury-red hover:bg-luxury-light disabled:opacity-50 text-white px-5 py-2 rounded-sm transition-colors"
+              >
+                Confirm Mail All
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Advanced — Individual Generators (collapsible) */}
+      <div>
+        <button
+          onClick={() => setShowAdvanced((s) => !s)}
+          className="w-full flex items-center justify-between px-5 py-3 bg-[#1a1a1a] border border-neutral-800 rounded-sm text-xs uppercase tracking-widest text-neutral-500 hover:text-white hover:border-neutral-600 transition-colors"
+        >
+          <span>Advanced — Individual Letter Generators</span>
+          <span className="text-base leading-none">{showAdvanced ? '▾' : '▸'}</span>
+        </button>
+        {showAdvanced && (
+          <div className="space-y-6 mt-4">
+
       {/* Round badge + bureau response warning */}
       <div className="flex flex-wrap items-center gap-3 mb-2">
         <span className="inline-flex items-center px-3 py-1 text-xs font-bold uppercase tracking-widest bg-luxury-red/20 text-luxury-red rounded-sm border border-luxury-red/30">
@@ -2186,6 +2509,10 @@ const LettersTab = ({
         </button>
       </div>
 
+          </div>
+        )}
+      </div>
+
       {/* Bureau Letters */}
       <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-neutral-800">
@@ -2278,50 +2605,123 @@ const LettersTab = ({
 };
 
 // === Tracking Tab ===
-const TrackingTab = ({ letters }: { letters: ClientDetail['letters'] }) => (
-  <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden">
-    <div className="px-6 py-4 border-b border-neutral-800">
-      <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold">
-        Mailing Tracking ({letters.length})
-      </h3>
-    </div>
-    {letters.length === 0 ? (
-      <div className="p-10 text-center text-neutral-500 text-sm">
-        No letters to track yet.
-      </div>
-    ) : (
-      <table className="w-full text-sm">
-        <thead className="bg-[#0f0f0f] border-b border-neutral-800">
-          <tr className="text-left text-xs uppercase tracking-widest text-neutral-400">
-            <th className="px-4 py-3">Recipient</th>
-            <th className="px-4 py-3">Type</th>
-            <th className="px-4 py-3">Generated</th>
-            <th className="px-4 py-3">Tracking #</th>
-          </tr>
-        </thead>
-        <tbody>
-          {letters.map((l) => {
-            const tracking = (l.tracking_log as Array<Record<string, unknown>> | undefined) || [];
-            const t = tracking[0];
-            return (
-              <tr key={l.id} className="border-b border-neutral-800/60">
-                <td className="px-4 py-3 text-white">{l.recipient_name}</td>
-                <td className="px-4 py-3 text-neutral-300 text-xs uppercase">{l.letter_type}</td>
-                <td className="px-4 py-3 text-neutral-400 text-xs">
-                  {new Date(l.created_at).toLocaleDateString()}
-                </td>
-                <td className="px-4 py-3 text-neutral-300 text-xs font-mono">
-                  {t && (t.tracking_number as string)
-                    ? (t.tracking_number as string)
-                    : <span className="text-neutral-500">— not yet mailed —</span>}
-                </td>
+const TrackingTab = ({ letters }: { letters: ClientDetail['letters'] }) => {
+  const addBizDays = (d: Date, n: number): Date => {
+    const r = new Date(d);
+    let c = 0;
+    while (c < n) { r.setDate(r.getDate() + 1); if (r.getDay() !== 0 && r.getDay() !== 6) c++; }
+    return r;
+  };
+  const getDeadline = (mailedAt: string | null | undefined, type: string): Date | null => {
+    if (!mailedAt) return null;
+    const d = new Date(mailedAt);
+    if (type === '605B') return addBizDays(d, 4);
+    if (type === '609') { const r = new Date(d); r.setDate(r.getDate() + 15); return r; }
+    if (['611', '623', '809'].includes(type)) { const r = new Date(d); r.setDate(r.getDate() + 30); return r; }
+    return null;
+  };
+  const today = new Date();
+  const daysDiff = (d: Date) => Math.floor((d.getTime() - today.getTime()) / 86400000);
+
+  const mailedLetters = letters.filter((l) => l.mailed_at);
+  const totalDaysSinceFirst = mailedLetters.length > 0
+    ? Math.floor((today.getTime() - new Date(mailedLetters[0].mailed_at as string).getTime()) / 86400000)
+    : null;
+
+  const escalationFlags: string[] = [];
+  for (const l of mailedLetters) {
+    const daysSince = Math.floor((today.getTime() - new Date(l.mailed_at as string).getTime()) / 86400000);
+    if (l.letter_type === '605B' && daysSince >= 6) escalationFlags.push(`⚠ Day ${daysSince}: ${l.recipient_name} §605B — bureau should have responded. Check for confirmation.`);
+    if (l.letter_type === '623' && daysSince >= 30) escalationFlags.push(`⚠ Day ${daysSince}: ${l.recipient_name} §623 — 30-day response window expired. Consider CFPB complaint.`);
+    if (daysSince >= 35) escalationFlags.push(`🔴 Day ${daysSince}: ${l.recipient_name} — 35+ days elapsed. Prepare CFPB complaint filing.`);
+  }
+
+  return (
+    <div className="space-y-6">
+      {escalationFlags.length > 0 && (
+        <div className="space-y-2">
+          {escalationFlags.map((flag, i) => (
+            <div key={i} className={`text-sm px-4 py-3 rounded-sm border ${flag.startsWith('🔴') ? 'bg-red-950/40 border-red-800 text-red-200' : 'bg-amber-950/40 border-amber-800 text-amber-200'}`}>
+              {flag}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {totalDaysSinceFirst !== null && (
+        <div className="text-xs text-neutral-400 px-1">
+          Day <span className="text-white font-bold text-sm">{totalDaysSinceFirst}</span> of dispute cycle — first letter mailed {new Date(mailedLetters[0].mailed_at as string).toLocaleDateString()}
+        </div>
+      )}
+
+      <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-neutral-800">
+          <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold">
+            Mailing Timeline ({letters.length} letters)
+          </h3>
+        </div>
+        {letters.length === 0 ? (
+          <div className="p-10 text-center text-neutral-500 text-sm">No letters generated yet.</div>
+        ) : (
+          <table className="w-full text-sm">
+            <thead className="bg-[#0f0f0f] border-b border-neutral-800">
+              <tr className="text-left text-[10px] uppercase tracking-widest text-neutral-500">
+                <th className="px-4 py-3">Recipient</th>
+                <th className="px-4 py-3">Type</th>
+                <th className="px-4 py-3">Mailed</th>
+                <th className="px-4 py-3">Response Due</th>
+                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Tracking #</th>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    )}
-  </div>
-);
+            </thead>
+            <tbody>
+              {letters.map((l) => {
+                const mailedAt = l.mailed_at as string | null | undefined;
+                const deadline = getDeadline(mailedAt, l.letter_type);
+                const daysLeft = deadline ? daysDiff(deadline) : null;
+                const isOverdue = daysLeft !== null && daysLeft < 0;
+                return (
+                  <tr key={l.id} className="border-b border-neutral-800/60 align-top">
+                    <td className="px-4 py-3 text-white">{l.recipient_name}</td>
+                    <td className="px-4 py-3 text-neutral-300 text-xs uppercase tracking-widest">{l.letter_type}</td>
+                    <td className="px-4 py-3 text-neutral-400 text-xs">
+                      {mailedAt ? new Date(mailedAt).toLocaleDateString() : <span className="text-neutral-600">Not yet mailed</span>}
+                    </td>
+                    <td className="px-4 py-3 text-neutral-300 text-xs">
+                      {deadline
+                        ? <>
+                            {deadline.toLocaleDateString()}
+                            <span className="block text-[9px] text-neutral-600 mt-0.5">
+                              {l.letter_type === '605B' ? '4 biz days' : l.letter_type === '609' ? '15 cal days' : '30 cal days'}
+                            </span>
+                          </>
+                        : <span className="text-neutral-600">—</span>}
+                    </td>
+                    <td className="px-4 py-3">
+                      {!mailedAt ? (
+                        <span className="text-[10px] uppercase tracking-wider text-neutral-600 border border-neutral-800 rounded-sm px-2 py-0.5">Pending</span>
+                      ) : isOverdue ? (
+                        <span className="text-[10px] uppercase tracking-wider text-red-400 bg-red-950/30 border border-red-800/50 rounded-sm px-2 py-0.5">Overdue {Math.abs(daysLeft!)}d</span>
+                      ) : daysLeft !== null ? (
+                        <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-sm border ${daysLeft <= 3 ? 'text-amber-400 bg-amber-950/30 border-amber-800/50' : 'text-emerald-400 bg-emerald-950/30 border-emerald-800/50'}`}>
+                          {daysLeft}d left
+                        </span>
+                      ) : null}
+                    </td>
+                    <td className="px-4 py-3 text-neutral-400 text-xs font-mono">
+                      {l.lob_tracking_number
+                        ? <span className="text-green-400">{String(l.lob_tracking_number)}</span>
+                        : <span className="text-neutral-600">—</span>}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default AdminClientDetailPage;

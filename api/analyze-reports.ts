@@ -20,6 +20,8 @@
 // ALTER TABLE credit_repair_clients ADD COLUMN IF NOT EXISTS inquiries jsonb;
 // ALTER TABLE credit_repair_clients ADD COLUMN IF NOT EXISTS ftc_report_numbers text[] DEFAULT '{}';
 // ALTER TABLE credit_repair_clients ADD COLUMN IF NOT EXISTS dispute_selections jsonb DEFAULT '{}';
+// ALTER TABLE credit_repair_clients ADD COLUMN IF NOT EXISTS case_type text DEFAULT 'identity_theft';
+// ALTER TABLE credit_repair_clients ADD COLUMN IF NOT EXISTS positive_accounts jsonb DEFAULT '[]';
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
@@ -110,6 +112,78 @@ Return ONLY a valid JSON object — no markdown, no explanation:
 }
 
 Never guess bureau assignment — only include a bureau data object if that bureau's report text explicitly contains that account. Set that bureau to null otherwise.`;
+
+type AutoItemSelection = {
+  bureaus: { equifax: boolean; experian: boolean; transunion: boolean };
+  fcra_sections: string[];
+};
+
+function buildAutoDisputeSelections(
+  insertedAccounts: Array<Record<string, unknown>>,
+  personalInfoErrors: Record<string, unknown>,
+  inquiries: unknown[],
+): Record<string, unknown> {
+  const accounts: Record<string, AutoItemSelection> = {};
+  for (const acct of insertedAccounts) {
+    const id = String(acct.id);
+    accounts[id] = {
+      bureaus: {
+        equifax: acct.equifax_data != null,
+        experian: acct.experian_data != null,
+        transunion: acct.transunion_data != null,
+      },
+      fcra_sections: Array.isArray(acct.recommended_fcra_sections)
+        ? (acct.recommended_fcra_sections as string[])
+        : [],
+    };
+  }
+
+  const pie = personalInfoErrors as {
+    name_variations?: Record<string, unknown>;
+    unknown_addresses?: Record<string, unknown>;
+    unknown_phone_numbers?: Record<string, unknown>;
+  };
+
+  const buildCategory = (
+    map: Record<string, unknown> | undefined,
+    defaultSections: string[],
+  ): Record<string, AutoItemSelection> => {
+    const result: Record<string, AutoItemSelection> = {};
+    for (const [item, bureauData] of Object.entries(map ?? {})) {
+      const bureauArr = Array.isArray(bureauData) ? bureauData.map(String) : [];
+      result[item] = {
+        bureaus: {
+          equifax: bureauArr.includes('equifax'),
+          experian: bureauArr.includes('experian'),
+          transunion: bureauArr.includes('transunion'),
+        },
+        fcra_sections: defaultSections,
+      };
+    }
+    return result;
+  };
+
+  type InqRow = { creditor: string; date: string; bureau: string; potentially_unauthorized: boolean };
+  const inquiriesMap: Record<string, AutoItemSelection> = {};
+  for (const inq of (inquiries as InqRow[])) {
+    if (inq.potentially_unauthorized) {
+      const key = `${inq.creditor}:${inq.bureau}:${inq.date}`;
+      const b = (inq.bureau ?? '').toLowerCase();
+      inquiriesMap[key] = {
+        bureaus: { equifax: b === 'equifax', experian: b === 'experian', transunion: b === 'transunion' },
+        fcra_sections: ['611'],
+      };
+    }
+  }
+
+  return {
+    accounts,
+    names: buildCategory(pie.name_variations, ['605B', '611']),
+    addresses: buildCategory(pie.unknown_addresses, ['605B']),
+    phones: buildCategory(pie.unknown_phone_numbers, ['605B']),
+    inquiries: inquiriesMap,
+  };
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!validateAdmin(req)) {
@@ -250,6 +324,7 @@ Return ONLY the JSON object described in the system prompt. No markdown. No expl
     }> = [];
     let parsedPersonalInfoErrors: Record<string, unknown> = {};
     let parsedInquiries: unknown[] = [];
+    let parsedPositiveAccounts: unknown[] = [];
 
     try {
       const response = await anthropic.messages.create({
@@ -271,6 +346,7 @@ Return ONLY the JSON object described in the system prompt. No markdown. No expl
       extractedAccounts = parsed.accounts;
       parsedPersonalInfoErrors = (parsed.personal_info_errors && typeof parsed.personal_info_errors === 'object') ? parsed.personal_info_errors as Record<string, unknown> : {};
       parsedInquiries = Array.isArray(parsed.inquiries) ? parsed.inquiries : [];
+      parsedPositiveAccounts = Array.isArray(parsed.positive_accounts) ? parsed.positive_accounts : [];
     } catch (err) {
       console.error('[analyze-reports] Claude error:', err);
       return res.status(500).json({ error: 'Failed to analyze reports' });
@@ -332,12 +408,16 @@ Return ONLY the JSON object described in the system prompt. No markdown. No expl
       inserted = data ?? [];
     }
 
+    const autoDisputeSelections = buildAutoDisputeSelections(inserted, parsedPersonalInfoErrors, parsedInquiries);
+
     await supabase
       .from('credit_repair_clients')
       .update({
         status: 'analyzing',
         personal_info_errors: parsedPersonalInfoErrors,
         inquiries: parsedInquiries,
+        positive_accounts: parsedPositiveAccounts,
+        dispute_selections: autoDisputeSelections,
       })
       .eq('id', clientId);
 

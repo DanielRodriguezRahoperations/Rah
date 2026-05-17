@@ -74,139 +74,207 @@ Sincerely,
 
 [CLIENT FULL NAME]`;
 
-export const TEMPLATE_611 = `[CLIENT FULL NAME]
-[CLIENT ADDRESS]
-[CITY, STATE ZIP]
-[EMAIL] • [PHONE]
-Date: [DATE]
-VIA CERTIFIED MAIL – RETURN RECEIPT REQUESTED
-[Tracking #: __________]
+export const TEMPLATE_611 = `[DATE]
 
 [BUREAU NAME]
 Attn: Dispute Department
 [BUREAU ADDRESS]
 
-RE: FCRA §611 DISPUTE & REINVESTIGATION – FRAUDULENT/UNAUTHORIZED ACCOUNTS
+Re: [ROTATE: "Demand for Reinvestigation — FCRA § 611(a)(1) — Immediate Action Required" / "Formal Dispute and Reinvestigation Request under 15 U.S.C. § 1681i" / "FCRA § 611 Reinvestigation Demand — Identity Theft / Inaccurate Reporting"]
+
+CONSUMER INFORMATION:
+Full Name:         [CLIENT FULL NAME]
+Current Address:   [CLIENT ADDRESS]
+                   [CITY, STATE ZIP]
+Phone:             [PHONE]
+Email:             [EMAIL]
+FTC Report No(s).: [FTC REPORT NUMBERS]
 
 To Whom It May Concern:
 
-I dispute the accuracy and completeness of the items in my credit file identified in Attachment A. These resulted from identity theft and are not mine. I have enclosed copies of my FTC Identity Theft Report, my government ID, and proof of address.
+Pursuant to the Fair Credit Reporting Act, 15 U.S.C. § 1681i (FCRA § 611), I formally dispute the accuracy and/or verifiability of the accounts identified in Attachment A. Each item is inaccurate, unverifiable, and/or the result of identity theft. You are required to conduct a reasonable reinvestigation within thirty (30) calendar days of receipt of this notice.
 
-Under FCRA §611, please reinvestigate and delete/correct the Disputed Items within the statutory period. Please also ensure Metro 2 fraud coding is applied where applicable and provide me written results of your investigation.
+I. DISPUTED ACCOUNTS
 
-If any Disputed Item is verified, please provide the furnisher's name, address, and the documentation relied upon to verify the account, as well as notice of my rights regarding reinsertion under §611(a)(5)(B).
+[Numbered list of disputed accounts: Creditor Name | Account # (bureau-specific) | Balance | Status | Reason for dispute. Use only accounts assigned to this bureau.]
+
+II. REINVESTIGATION DEMANDS
+
+For each disputed account:
+  1. Conduct a full reinvestigation under § 611(a)(1);
+  2. Delete or correct any information that cannot be independently verified;
+  3. Provide written notice of results within 5 business days of completion per § 611(a)(6);
+  4. Disclose the name, address, and telephone number of each furnisher contacted per § 611(a)(6)(B)(ii);
+  5. If any item is verified, provide the furnisher's name and a complete description of the procedure used to determine accuracy per § 611(a)(7).
+
+Verification without providing original source documentation from the furnisher is legally insufficient under § 611(a)(7) and will be treated as willful non-compliance.
+
+Please be advised that failure to comply within the statutory period may result in: (1) a formal complaint filed with the Consumer Financial Protection Bureau (CFPB); (2) a complaint filed with the applicable state Attorney General's office; and (3) pursuit of civil damages under FCRA §§ 616 and 617, which provide for statutory damages of $100 to $1,000 per willful violation, plus attorney's fees and costs.
+
+Enclosed:
+  1. FTC Identity Theft Report(s) — Report No(s). [FTC REPORT NUMBERS]
+  2. Government-issued photo identification
+  3. Proof of current address (utility bill)
+  4. Social Security card (copy)
+  5. Attachment A — Disputed Accounts Summary
+
+This correspondence is being transmitted via USPS Certified Mail with Return Receipt Requested.
 
 Sincerely,
 
-[CLIENT NAME]
+/s/ [CLIENT FULL NAME]
+[CLIENT FULL NAME]`;
 
-Enclosures: FTC Report; ID; Proof of Address; Attachment A`;
-
-export const TEMPLATE_623 = `[CLIENT FULL NAME]
-[CLIENT ADDRESS]
-[CITY, STATE ZIP]
-[EMAIL] • [PHONE]
-Date: [DATE]
-VIA CERTIFIED MAIL – RETURN RECEIPT REQUESTED
-[Tracking #: __________]
+export const TEMPLATE_623 = `[DATE]
 
 [FURNISHER NAME]
-Attn: Fraud/Identity Theft or FCRA Compliance
+Attn: FCRA Compliance Department
 [FURNISHER ADDRESS]
 
-RE: FCRA §623(a)(8) & §623(b) – IDENTITY THEFT NOTICE AND DEMAND TO CEASE REPORTING / CORRECT TRADELINE(S)
-Accounts: see Attachment A (only accounts you report)
+Re: [ROTATE: "Notice of Disputed Account(s) — FCRA § 623(a)(8) Furnisher Obligations" / "Demand to Cease Reporting — FCRA § 623(b) — Identity Theft Notification" / "FCRA § 623 Furnisher Dispute — Fraudulent Account Removal Demand"]
+
+CONSUMER INFORMATION:
+Full Name:         [CLIENT FULL NAME]
+Current Address:   [CLIENT ADDRESS]
+                   [CITY, STATE ZIP]
+Phone:             [PHONE]
+Email:             [EMAIL]
+FTC Report No(s).: [FTC REPORT NUMBERS]
 
 To Whom It May Concern:
 
-I am a victim of identity theft. The accounts identified in Attachment A were opened or used without my authorization and are being reported to one or more consumer reporting agencies. Enclosed are copies of my FTC Identity Theft Report, my government ID, and proof of current address.
+I am a victim of identity theft. Pursuant to the Fair Credit Reporting Act, 15 U.S.C. § 1681s-2(a)(8) and § 1681s-2(b) (FCRA § 623), I formally dispute the accuracy of the account(s) identified in Attachment A, which were opened or used without my authorization and are being furnished to one or more consumer reporting agencies.
 
-Pursuant to FCRA §623(a)(8) and §623(b), upon receiving notice of identity theft you must:
+I. DISPUTED ACCOUNTS
 
-  1. Conduct a reasonable investigation;
-  2. Delete or block any information that you cannot verify as accurate and authorized;
-  3. Cease reporting information you know or reasonably should know is the result of identity theft;
-  4. Notify all CRAs to which you furnished the information so they can delete/correct the reporting.
+[Numbered list: Creditor Name | Account # | Balance | Date Opened | Status | Reason for Dispute. Use only accounts this furnisher reports.]
 
-ACTION REQUESTED:
+II. YOUR OBLIGATIONS UNDER FCRA § 623
 
-  1. Immediately cease reporting the fraudulent tradeline(s);
-  2. Notify Experian, Equifax, and TransUnion to delete/block the item(s);
-  3. Provide written confirmation of deletion/correction to me;
-  4. Provide copies of any documentation bearing my signature that you believe authorizes the account(s).
+Upon receiving this notice with accompanying documentation, you are legally required to:
+  1. Conduct a reasonable investigation of each disputed item within 30 calendar days;
+  2. Review all relevant information submitted with this notice;
+  3. Report results of your investigation to every consumer reporting agency to which you furnished the information;
+  4. Correct or delete any information determined to be inaccurate, incomplete, or unverifiable;
+  5. Cease reporting any information you know or reasonably should know resulted from identity theft.
 
-Failure to comply may result in regulatory complaints and legal action for willful or negligent noncompliance under the FCRA.
+III. DEMANDED ACTION
+
+  1. Immediately cease furnishing the disputed account(s) to Equifax, Experian, and TransUnion;
+  2. Direct all three bureaus to delete and block the disputed tradeline(s);
+  3. Provide written confirmation of deletion/correction to me within 30 calendar days;
+  4. Provide copies of any documents bearing my signature that you believe authorize the disputed account(s).
+
+Please be advised that failure to comply may result in: (1) a formal complaint filed with the Consumer Financial Protection Bureau (CFPB); (2) a complaint filed with the applicable state Attorney General's office; and (3) pursuit of civil damages under FCRA §§ 616 and 617, which provide for statutory damages of $100 to $1,000 per willful violation, plus attorney's fees and costs.
+
+Enclosed:
+  1. FTC Identity Theft Report(s) — Report No(s). [FTC REPORT NUMBERS]
+  2. Government-issued photo identification
+  3. Proof of current address (utility bill)
+  4. Social Security card (copy)
+  5. Attachment A — Disputed Accounts (Furnisher-Specific)
+
+This correspondence is being transmitted via USPS Certified Mail with Return Receipt Requested.
 
 Sincerely,
 
-[CLIENT NAME]
+/s/ [CLIENT FULL NAME]
+[CLIENT FULL NAME]`;
 
-Enclosures: FTC Report; ID; Proof of Address; Attachment A (furnisher-specific)`;
-
-export const TEMPLATE_609 = `[CLIENT FULL NAME]
-[CLIENT ADDRESS]
-[CITY, STATE ZIP]
-[EMAIL] • [PHONE]
-Date: [DATE]
-VIA CERTIFIED MAIL – RETURN RECEIPT REQUESTED
-[Tracking #: __________]
+export const TEMPLATE_609 = `[DATE]
 
 [BUREAU NAME]
-Attn: Disclosure Department
+Attn: Consumer Disclosure Department
 [BUREAU ADDRESS]
 
-RE: FCRA §609(a)(1) REQUEST – FULL FILE DISCLOSURE
+Re: [ROTATE: "Full File Disclosure Request — FCRA § 609(a)(1)" / "Consumer File Disclosure Request under 15 U.S.C. § 1681g" / "FCRA § 609(a)(1) — Complete Consumer File Requested"]
+
+CONSUMER INFORMATION:
+Full Name:       [CLIENT FULL NAME]
+Current Address: [CLIENT ADDRESS]
+                 [CITY, STATE ZIP]
+Phone:           [PHONE]
+Email:           [EMAIL]
 
 To Whom It May Concern:
 
-Pursuant to FCRA §609(a)(1), please provide a complete copy of my file as of the date of this request, including but not limited to:
+Pursuant to the Fair Credit Reporting Act, 15 U.S.C. § 1681g (FCRA § 609(a)(1)), I formally request a complete copy of my consumer file as it exists in your records as of the date of this letter. You are required to provide this disclosure within fifteen (15) calendar days of receipt.
 
-  1. All tradelines and collection items (current and suppressed);
-  2. Furnisher names, addresses, dates first reported, and date of last update;
-  3. Any fraud alerts, credit freezes, and internal fraud flags;
-  4. Any "blocked for identity theft" coding (e.g., Metro 2 XB) and the effective dates;
-  5. Any reinsertion history/logs, including date(s) of reinsertion, furnisher identity, and documentation relied upon.
+I. INFORMATION REQUESTED
 
-I have enclosed copies of my government ID and proof of address for identity verification. Please mail the full file disclosure to the address above.
+Please include:
+  1. All tradelines and collection items, including active, suppressed, and previously blocked accounts;
+  2. The name, address, and telephone number of each furnisher that provided information in my file;
+  3. The date each item was first reported and the most recent update date;
+  4. Any fraud alerts, credit freezes, or identity theft flags currently in place;
+  5. Any Metro 2 fraud coding (e.g., XB, XH) applied to any tradeline, including effective dates;
+  6. Any reinsertion history, including date(s) of reinsertion, furnisher identity, and documentation relied upon;
+  7. All public record items and credit inquiries;
+  8. The complete list of parties who accessed my file in the past 24 months.
+
+II. PURPOSE
+
+This request is made in connection with an ongoing identity theft dispute. I am reviewing my file to confirm that all previously blocked items remain blocked, that no unauthorized reinsertions have occurred, and that all consumer information is accurate and complete.
+
+Please mail the complete file disclosure — not a summary — to my current address listed above.
+
+Enclosed:
+  1. Government-issued photo identification
+  2. Proof of current address (utility bill)
+
+This correspondence is being transmitted via USPS Certified Mail with Return Receipt Requested.
 
 Sincerely,
 
-[CLIENT NAME]
+/s/ [CLIENT FULL NAME]
+[CLIENT FULL NAME]`;
 
-Enclosures: ID; Proof of Address`;
-
-export const TEMPLATE_809 = `[CLIENT FULL NAME]
-[CLIENT ADDRESS]
-[CITY, STATE ZIP]
-[EMAIL] • [PHONE]
-Date: [DATE]
-VIA CERTIFIED MAIL – RETURN RECEIPT REQUESTED
-[Tracking #: __________]
+export const TEMPLATE_809 = `[DATE]
 
 [COLLECTION AGENCY NAME]
-Attn: Compliance / Validation
+Attn: Compliance / Consumer Validation Department
 [COLLECTOR ADDRESS]
 
-RE: FDCPA §809(b) VALIDATION REQUEST AND CEASE COLLECTION PENDING VERIFICATION
-Account: [AGENCY ACCOUNT # / ORIGINAL CREDITOR]
+Re: [ROTATE: "Debt Validation Demand — FDCPA § 809(b) — Cease Collection Pending Validation" / "Formal Validation Request — 15 U.S.C. § 1692g(b)" / "FDCPA § 809(b) Notice — Disputed Debt / Validation Required"]
+    Account: [AGENCY ACCOUNT # / ORIGINAL CREDITOR — use bureau-specific account number]
+
+CONSUMER INFORMATION:
+Full Name:       [CLIENT FULL NAME]
+Current Address: [CLIENT ADDRESS]
+                 [CITY, STATE ZIP]
+Phone:           [PHONE]
+Email:           [EMAIL]
 
 To Whom It May Concern:
 
-I dispute this alleged debt in its entirety. This letter is a timely request under 15 U.S.C. §1692g(b) (FDCPA §809(b)) for validation. Until you provide proper validation, you must cease all collection activities, including reporting or causing to be reported any information to consumer reporting agencies.
+I dispute this alleged debt in its entirety and hereby demand validation pursuant to 15 U.S.C. § 1692g(b) (FDCPA § 809(b)). This constitutes a timely written request for validation. Until you provide complete validation as set forth below, you must cease all collection activity, including any reporting or continued reporting of this alleged debt to any consumer reporting agency.
 
-Please provide:
+I. VALIDATION DEMANDED
 
-  1. The name and address of the original creditor;
-  2. The amount of the alleged debt with an itemized breakdown;
-  3. Copies of any documents bearing my signature or that establish my liability;
-  4. Your authority to collect in my state;
-  5. The date you began furnishing information to any CRA and where.
+Please provide all of the following:
+  1. The name and current address of the original creditor;
+  2. A complete itemized breakdown of the alleged debt: principal, interest, fees, and any other charges;
+  3. Copies of any written agreements or documents bearing my signature establishing my liability;
+  4. Proof that your organization is licensed to collect debts in my state, including your license number and registered agent;
+  5. The date you first began reporting this alleged debt to any consumer reporting agency, and the names of all agencies to which you have reported;
+  6. If this is a purchased debt: a complete chain of title from the original creditor to your organization.
 
-If you cannot validate, you must cease collection and request deletion of any reporting you initiated. This letter is not a refusal to pay; it is a notice that your claim is disputed.
+II. CEASE COLLECTION NOTICE
+
+Until validation is provided, you must immediately cease all collection activity, including:
+  - Continued reporting to Equifax, Experian, or TransUnion;
+  - Any telephone calls, letters, or other communications attempting collection.
+
+Failure to validate and continued collection activity without validation constitutes willful violation of the FDCPA, subjecting you to actual damages, statutory damages of $1,000 per violation, plus attorney's fees and costs under 15 U.S.C. § 1692k.
+
+This letter is not a refusal to pay a legitimate debt — it is a formal notice that your claim is disputed and validation is required before any collection activity may continue.
+
+This correspondence is being transmitted via USPS Certified Mail with Return Receipt Requested.
 
 Sincerely,
 
-[CLIENT NAME]`;
+/s/ [CLIENT FULL NAME]
+[CLIENT FULL NAME]`;
 
 export const PACKET_TOP_SLIP_TEMPLATE = `IDENTITY THEFT – FCRA §605B BLOCK REQUEST
 DO NOT REINSERT WITHOUT PRIOR WRITTEN VERIFICATION TO CONSUMER
@@ -304,6 +372,28 @@ The /s/ prefix is the standard legal electronic signature notation under the E-S
 8. SIGNATURE: For §605B letters, sign as "Sincerely, [CLIENT FULL NAME]" — NO /s/ prefix. No date under signature.
 
 9. NO ATTACHMENT A REFERENCE: §605B letters list fraudulent accounts directly in the letter body under Section I. Do not reference "Attachment A" in the main letter body.
+
+ROTATING "Re:" LINES — use a different variant for each bureau letter so no two are identical:
+
+§ 611 VARIANTS (pick one per letter, no repeats across Equifax/Experian/TransUnion):
+- "Re: Demand for Reinvestigation — FCRA § 611(a)(1) — Immediate Action Required"
+- "Re: Formal Dispute and Reinvestigation Request under 15 U.S.C. § 1681i"
+- "Re: FCRA § 611 Reinvestigation Demand — Identity Theft / Inaccurate Reporting"
+
+§ 623 VARIANTS:
+- "Re: Notice of Disputed Account(s) — FCRA § 623(a)(8) Furnisher Obligations"
+- "Re: Demand to Cease Reporting — FCRA § 623(b) — Identity Theft Notification"
+- "Re: FCRA § 623 Furnisher Dispute — Fraudulent Account Removal Demand"
+
+§ 609 VARIANTS:
+- "Re: Full File Disclosure Request — FCRA § 609(a)(1)"
+- "Re: Consumer File Disclosure Request under 15 U.S.C. § 1681g"
+- "Re: FCRA § 609(a)(1) — Complete Consumer File Requested"
+
+§ 809 VARIANTS:
+- "Re: Debt Validation Demand — FDCPA § 809(b) — Cease Collection Pending Validation"
+- "Re: Formal Validation Request — 15 U.S.C. § 1692g(b)"
+- "Re: FDCPA § 809(b) Notice — Disputed Debt / Validation Required"
 `;
 
 export function getTemplate(letterType: string): string {
