@@ -14,47 +14,65 @@ export const RESPONSE_WINDOWS = {
   '809':  30,  // calendar days
 } as const;
 
-export const TEMPLATE_605B = `[CLIENT FULL NAME]
-[CLIENT ADDRESS]
-[CITY, STATE ZIP]
-[EMAIL] • [PHONE]
-Date: [DATE]
-VIA CERTIFIED MAIL – RETURN RECEIPT REQUESTED
-[Tracking #: __________]
+export const TEMPLATE_605B = `[DATE]
 
 [BUREAU NAME]
 Attn: Fraud / Identity Theft Unit
 [BUREAU ADDRESS]
 
-RE: REQUEST FOR IMMEDIATE BLOCK UNDER FCRA §605B (15 U.S.C. §1681c-2); DO NOT REINSERT WITHOUT PRIOR WRITTEN VERIFICATION
+Re: Identity Theft Block Request — FCRA § 605B (15 U.S.C. § 1681c-2)
+    DO NOT REINSERT WITHOUT PRIOR WRITTEN VERIFICATION
+
+CONSUMER INFORMATION:
+Full Name:          [CLIENT FULL NAME]
+Current Address:    [CLIENT ADDRESS]
+                    [CITY, STATE ZIP]
+Date of Birth:      [CLIENT DOB]
+SSN (Last 4):       XXXX
+FTC Report No(s).:  [FTC REPORT NUMBERS]
 
 To Whom It May Concern:
 
-I am a victim of identity theft. Pursuant to FCRA §605B, you are required to block information in my file that results from identity theft within four (4) business days of your receipt of adequate documentation.
+I am a victim of identity theft. Pursuant to 15 U.S.C. § 1681c-2 (FCRA § 605B), you are required to block the fraudulent information listed below from my consumer credit file within four (4) business days of your receipt of this written notice and the accompanying documentation establishing my identity.
 
-Enclosed are the following:
+I. FRAUDULENT ACCOUNTS — BLOCK REQUIRED
 
-  1. FTC Identity Theft Report for [CLIENT NAME];
-  2. Government-issued photo ID (copy);
-  3. Proof of current address (copy);
-  4. Attachment A – List of fraudulent accounts/tradelines to be blocked.
+[Numbered list of each fraudulent account in this bureau: Creditor Name | Account # (bureau-specific) | Balance | Status]
 
-ACTION REQUESTED:
+[SECTION II — FRAUDULENT ADDRESSES: Include ONLY if unknown_addresses were provided in the context. If none, omit this section entirely.]
+II. FRAUDULENT ADDRESSES — REMOVE FROM FILE
 
-  1. Block each tradeline listed in Attachment A within 4 business days;
-  2. Apply correct Metro 2 fraud coding (e.g., "XB – Blocked for Fraud/Identity Theft");
-  3. Provide written confirmation within five (5) business days that the items are blocked and will not be reinserted absent prior written verification to me;
-  4. For any future reinsertion, provide advance notice and include the identity of the furnisher and the specific documentation relied upon per FCRA §611(a)(5)(B).
+The following addresses appearing in my credit file are addresses where I have never resided. They must be removed immediately:
 
-For avoidance of doubt, this request is made under FCRA §605B. In parallel, I am also submitting a dispute under §611 for any related items that remain.
+[Numbered list of fraudulent addresses from context]
 
-Please send all correspondence to the mailing address above.
+[SECTION III — FRAUDULENT PHONE NUMBERS: Include ONLY if unknown_phone_numbers were provided in the context. If none, omit this section entirely.]
+III. FRAUDULENT PHONE NUMBERS — REMOVE FROM FILE
+
+The following phone numbers appearing in my credit file are numbers I have never used. They must be removed immediately:
+
+[Numbered list of fraudulent phone numbers from context]
+
+[SECTION IV — FRAUDULENT CREDIT INQUIRIES: Include ONLY if unauthorized inquiries for this bureau were provided in the context. If none, omit this section entirely.]
+IV. FRAUDULENT CREDIT INQUIRIES — REMOVE FROM FILE
+
+The following credit inquiries appearing in my file were not authorized by me and must be deleted immediately:
+
+[Numbered list: Creditor Name — Date — Bureau]
+
+Please be advised that failure to comply with this request within the statutory four (4) business day period may result in: (1) a formal complaint filed with the Consumer Financial Protection Bureau (CFPB); (2) a complaint filed with the applicable state Attorney General's office; and (3) pursuit of civil damages under FCRA §§ 616 and 617, which provide for statutory damages of $100 to $1,000 per willful violation, plus attorney's fees and costs.
+
+Enclosed:
+  1. FTC Identity Theft Report(s) — Report No(s). [FTC REPORT NUMBERS]
+  2. Government-issued photo identification
+  3. Proof of current address (utility bill)
+  4. Social Security card (copy)
+
+This correspondence is being transmitted via USPS Certified Mail with Return Receipt Requested.
 
 Sincerely,
 
-[CLIENT NAME]
-
-Enclosures: FTC Report; ID; Proof of Address; Attachment A`;
+[CLIENT FULL NAME]`;
 
 export const TEMPLATE_611 = `[CLIENT FULL NAME]
 [CLIENT ADDRESS]
@@ -263,6 +281,29 @@ Sincerely,
 [DATE]
 
 The /s/ prefix is the standard legal electronic signature notation under the E-SIGN Act (15 U.S.C. §7001).
+
+§ 605B LETTER — CRITICAL RULES (override all others for letterType "605B"):
+
+1. DATE-FIRST FORMAT: The letter opens with the date on the first line. No client address block at the top. The bureau name and address come after the date.
+
+2. CONSUMER INFO BLOCK: After the bureau address, include a labeled consumer information block with Full Name, Current Address, Date of Birth, SSN (Last 4 as XXXX), and FTC Report No(s). — use actual values from client data.
+
+3. FOUR BUSINESS DAYS: The phrase "four (4) business days" is MANDATORY in the opening paragraph. Never shorten to "4 days" or omit.
+
+4. CONDITIONAL SECTIONS — only include if data exists in context:
+   - Section II (Fraudulent Addresses): include ONLY if FRAUDULENT ADDRESSES section is provided in context with actual addresses. Omit entirely if none.
+   - Section III (Fraudulent Phone Numbers): include ONLY if FRAUDULENT PHONE NUMBERS section is provided in context with actual numbers. Omit entirely if none.
+   - Section IV (Fraudulent Credit Inquiries): include ONLY if UNAUTHORIZED INQUIRIES section is provided in context with actual entries. Omit entirely if none.
+
+5. CFPB/AG/CIVIL ACTION WARNING: The paragraph warning about CFPB complaints, Attorney General complaints, and civil damages under §§ 616 and 617 is MANDATORY. Always include it verbatim.
+
+6. ENCLOSURES: Always list FTC Identity Theft Report(s) with actual report number(s), photo ID, proof of address (utility bill), and Social Security card.
+
+7. USPS CERTIFIED MAIL: Always include "This correspondence is being transmitted via USPS Certified Mail with Return Receipt Requested."
+
+8. SIGNATURE: For §605B letters, sign as "Sincerely, [CLIENT FULL NAME]" — NO /s/ prefix. No date under signature.
+
+9. NO ATTACHMENT A REFERENCE: §605B letters list fraudulent accounts directly in the letter body under Section I. Do not reference "Attachment A" in the main letter body.
 `;
 
 export function getTemplate(letterType: string): string {

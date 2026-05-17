@@ -61,12 +61,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const cr = clientRecord as Record<string, unknown> | null;
 
-  const ftcNumbers = [
-    ...(cr?.doc_ftc_report ? ['primary report on file'] : []),
-    ...(Array.isArray(cr?.doc_ftc_reports)
-      ? (cr.doc_ftc_reports as unknown[]).map((_, i) => `Report ${i + 1}`)
-      : []),
-  ].join(', ') || 'on file';
+  const ftcNumbers = (() => {
+    if (Array.isArray(cr?.ftc_report_numbers) && (cr!.ftc_report_numbers as unknown[]).length > 0) {
+      return (cr!.ftc_report_numbers as unknown[]).map(String).join(', ');
+    }
+    const fallback = [
+      ...(cr?.doc_ftc_report ? ['primary report on file'] : []),
+      ...(Array.isArray(cr?.doc_ftc_reports)
+        ? (cr!.doc_ftc_reports as unknown[]).map((_, i) => `Report ${i + 1}`)
+        : []),
+    ].join(', ');
+    return fallback || 'on file';
+  })();
 
   const { data: bureauResponses } = await supabase
     .from('bureau_responses')
@@ -86,7 +92,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     ? `\nBUREAU/CREDITOR RESPONSE LETTERS HAVE BEEN UPLOADED.\nAnalyze and refute each response directly:\n- If they claimed verification: Challenge under §611(a)(7), demand furnisher name and original source docs\n- If they claimed accuracy: Escalate to §609(a)(1) full file disclosure and Metro 2 §607(b) challenge\n- If procedural defects exist: Cite as additional FCRA violations`
     : '';
 
-  const extrasContext = `\n\n---\nADDITIONAL CONTEXT FOR THIS LETTER:\n${roundContext}${policeContext}${responseContext}\nFTC REPORT NUMBERS: ${ftcNumbers}\nCLIENT ADDRESS (use exactly as written): ${cr?.address ?? clientData.address}\nCLIENT FULL NAME (use exactly): ${cr?.full_name ?? clientData.fullName}\n---`;
+  // §605B-specific context: personal info errors and unauthorized inquiries
+  let bureau605bContext = '';
+  if (letterType === '605B' && typeof bureau === 'string' && bureau) {
+    const pie = cr?.personal_info_errors as { unknown_addresses?: string[]; unknown_phone_numbers?: string[] } | null | undefined;
+    const unknownAddresses: string[] = Array.isArray(pie?.unknown_addresses) ? pie!.unknown_addresses : [];
+    const unknownPhones: string[] = Array.isArray(pie?.unknown_phone_numbers) ? pie!.unknown_phone_numbers : [];
+    const allInquiries = Array.isArray(cr?.inquiries) ? cr!.inquiries as Array<{ creditor: string; date: string; bureau: string; potentially_unauthorized: boolean }> : [];
+    const unauthorizedForBureau = allInquiries.filter(
+      (q) => q.potentially_unauthorized && q.bureau?.toLowerCase() === bureau.toLowerCase()
+    );
+
+    if (unknownAddresses.length > 0) {
+      bureau605bContext += `\n\nFRAUDULENT ADDRESSES (include as Section II):\n${unknownAddresses.map((a, i) => `  ${i + 1}. ${a}`).join('\n')}`;
+    }
+    if (unknownPhones.length > 0) {
+      bureau605bContext += `\n\nFRAUDULENT PHONE NUMBERS (include as Section III):\n${unknownPhones.map((p, i) => `  ${i + 1}. ${p}`).join('\n')}`;
+    }
+    if (unauthorizedForBureau.length > 0) {
+      bureau605bContext += `\n\nUNAUTHORIZED INQUIRIES FOR ${bureau.toUpperCase()} (include as Section IV):\n${unauthorizedForBureau.map((q, i) => `  ${i + 1}. ${q.creditor} — ${q.date}`).join('\n')}`;
+    }
+  }
+
+  const extrasContext = `\n\n---\nADDITIONAL CONTEXT FOR THIS LETTER:\n${roundContext}${policeContext}${responseContext}\nFTC REPORT NUMBERS: ${ftcNumbers}\nCLIENT ADDRESS (use exactly as written): ${cr?.address ?? clientData.address}\nCLIENT FULL NAME (use exactly): ${cr?.full_name ?? clientData.fullName}${bureau605bContext}\n---`;
 
   let template: string;
   try {

@@ -27,6 +27,7 @@ interface ClientDetail {
     created_at: string;
     personal_info_errors?: { name_variations: string[]; unknown_addresses: string[]; unknown_phone_numbers: string[] } | null;
     inquiries?: Array<{ creditor: string; date: string; bureau: string; potentially_unauthorized: boolean }> | null;
+    ftc_report_numbers?: string[] | null;
   };
   letters: Array<Record<string, unknown> & { id: string; recipient_name: string; letter_type: string; created_at: string; pdf_unsigned_path?: string | null; lob_tracking_number?: string | null; mailed_at?: string | null; mail_status?: string | null; }>;
   accounts: Array<Record<string, unknown> & { id: string; creditor_name: string; account_number: string; account_number_equifax?: string; account_number_experian?: string; account_number_transunion?: string; balance: string; date_opened: string; account_type: string; account_status: string; bureaus: string[]; selected: boolean; dispute_types: string[]; original_creditor?: string; phone_numbers?: string[]; name_variations?: string[]; addresses?: string[]; equifax_data?: Record<string, unknown> | null; experian_data?: Record<string, unknown> | null; transunion_data?: Record<string, unknown> | null; duplicate_flag?: boolean; duplicate_note?: string; balance_inconsistency?: boolean; balance_inconsistency_note?: string; dispute_priority?: string; recommended_fcra_sections?: string[]; letter_targets?: Record<string, unknown> }>;
@@ -387,6 +388,7 @@ const AdminClientDetailPage = () => {
             {tab === 'overview' && (
               <OverviewTab
                 client={client}
+                clientId={client.id}
                 busy={busy}
                 onSaveRound={async (round, notes) => {
                   setBusy(true);
@@ -479,15 +481,33 @@ const AdminClientDetailPage = () => {
 // === Overview Tab ===
 const OverviewTab = ({
   client,
+  clientId,
   busy,
   onSaveRound,
 }: {
   client: ClientDetail['client'];
+  clientId: string;
   busy: boolean;
   onSaveRound: (round: number, notes: string) => void;
 }) => {
   const [round, setRound] = React.useState<number>(Number(client.dispute_round ?? 1));
   const [notes, setNotes] = React.useState<string>(String(client.round_notes ?? ''));
+  const [ftcInput, setFtcInput] = React.useState<string>((client.ftc_report_numbers ?? []).join(', '));
+  const [ftcSaving, setFtcSaving] = React.useState(false);
+  const [ftcFlash, setFtcFlash] = React.useState(false);
+
+  const saveFtcNumbers = async () => {
+    setFtcSaving(true);
+    const parsed = ftcInput.split(',').map((s) => s.trim()).filter(Boolean);
+    await fetch('/api/update-status', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+      body: JSON.stringify({ clientId, ftc_report_numbers: parsed }),
+    });
+    setFtcSaving(false);
+    setFtcFlash(true);
+    setTimeout(() => setFtcFlash(false), 2000);
+  };
 
   return (
     <div className="grid lg:grid-cols-2 gap-6">
@@ -513,6 +533,26 @@ const OverviewTab = ({
         <Field label="Disputed Accounts" value={client.disputed_accounts || '—'} multiline />
         <Field label="CROA Signature" value={`${client.signature_name || ''} (${client.signature_date || ''})`} />
         <Field label="Submitted" value={new Date(client.created_at).toLocaleString()} />
+      </div>
+      <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-6 lg:col-span-2">
+        <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold mb-4">FTC Report Numbers</h3>
+        <p className="text-[11px] text-neutral-500 mb-3">Enter FTC Identity Theft Report numbers, comma-separated (e.g. 12345678, 87654321). Used automatically in §605B letters.</p>
+        <div className="flex gap-3 items-start">
+          <input
+            type="text"
+            value={ftcInput}
+            onChange={(e) => setFtcInput(e.target.value)}
+            placeholder="e.g. 12345678, 87654321"
+            className="flex-1 bg-[#0f0f0f] border border-neutral-800 text-white px-3 py-2 rounded-sm text-sm focus:outline-none focus:border-luxury-red"
+          />
+          <button
+            onClick={saveFtcNumbers}
+            disabled={ftcSaving}
+            className="bg-luxury-red hover:bg-luxury-light disabled:opacity-50 text-white px-4 py-2 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors whitespace-nowrap"
+          >
+            {ftcFlash ? 'Saved ✓' : ftcSaving ? 'Saving…' : 'Save'}
+          </button>
+        </div>
       </div>
       <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-6 lg:col-span-2">
         <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold mb-4">Dispute Round</h3>

@@ -18,6 +18,7 @@
 // ALTER TABLE dispute_accounts ADD COLUMN IF NOT EXISTS letter_targets jsonb DEFAULT '{}';
 // ALTER TABLE credit_repair_clients ADD COLUMN IF NOT EXISTS personal_info_errors jsonb;
 // ALTER TABLE credit_repair_clients ADD COLUMN IF NOT EXISTS inquiries jsonb;
+// ALTER TABLE credit_repair_clients ADD COLUMN IF NOT EXISTS ftc_report_numbers text[] DEFAULT '{}';
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
