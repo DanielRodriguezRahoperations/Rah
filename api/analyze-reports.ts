@@ -16,7 +16,15 @@ const BUREAU_FIELD: Record<string, string> = {
 const CREDIT_ANALYSIS_SYSTEM_PROMPT = `You are an expert at reading credit reports and extracting negative account information.
 Extract EVERY negative item from the provided credit reports: collections, late payments, charge-offs, judgments, incorrect addresses, unauthorized inquiries.
 For each item extract: creditor_name, account_number (partial ok), balance, date_opened, account_type, account_status, bureaus (array of 'equifax'|'experian'|'transunion').
-Return ONLY a JSON array of account objects. No explanation. No markdown.`;
+Return ONLY a JSON array of account objects. No explanation. No markdown.
+
+BUREAU ASSIGNMENT RULES — critical:
+- Only assign 'equifax' to an account if it explicitly appears in the Equifax report text
+- Only assign 'experian' to an account if it explicitly appears in the Experian report text
+- Only assign 'transunion' to an account if it explicitly appears in the TransUnion report text
+- Do NOT assign all three bureaus by default
+- The bureaus array must only contain bureaus that actually report that specific account
+- It is normal for an account to appear on only 1 or 2 bureaus — that is correct behavior`;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!validateAdmin(req)) {
@@ -107,13 +115,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const userMsg = `Extract every negative account from these credit reports and return them as a JSON array.
 
-EQUIFAX REPORT TEXT:
+=== EQUIFAX ===
+Extract only accounts explicitly listed in THIS Equifax report.
 ${texts.equifax || '[not provided]'}
 
-EXPERIAN REPORT TEXT:
+=== EXPERIAN ===
+Extract only accounts explicitly listed in THIS Experian report.
 ${texts.experian || '[not provided]'}
 
-TRANSUNION REPORT TEXT:
+=== TRANSUNION ===
+Extract only accounts explicitly listed in THIS TransUnion report.
 ${texts.transunion || '[not provided]'}
 
 Return ONLY a JSON array. Each item shape:
