@@ -357,8 +357,9 @@ ${texts.transunion || '[NOT PROVIDED — do not assign any accounts to TransUnio
     let allInquiries: unknown[] = [];
     let parsedPositiveAccounts: unknown[] = [];
 
+    let r1: Anthropic.Message;
     try {
-      const r1 = await anthropic.messages.create({
+      r1 = await anthropic.messages.create({
         model: 'claude-sonnet-4-6',
         max_tokens: 4000,
         system: CALL1_SYSTEM_PROMPT,
@@ -367,18 +368,26 @@ ${texts.transunion || '[NOT PROVIDED — do not assign any accounts to TransUnio
           content: `Analyze these three credit reports and extract all account, inquiry, and personal information data:\n\n${reportText}\n\nReturn ONLY the JSON object.`,
         }],
       });
+    } catch (err) {
+      console.error('[analyze-reports] Call 1 API error:', err);
+      return res.status(500).json({ error: 'Call 1 API request failed', detail: err instanceof Error ? err.message : String(err) });
+    }
 
-      console.log('[analyze-reports] Call 1 complete, parsing...');
+    console.log('[analyze-reports] Call 1 API complete, parsing response...');
+    const call1TextBlock = r1.content.find((b) => b.type === 'text');
+    const call1Raw = call1TextBlock && call1TextBlock.type === 'text' ? call1TextBlock.text : '';
+    try {
       const parsed1 = parseClaudeJson(r1);
-      if (!Array.isArray(parsed1?.accounts)) throw new Error('Call 1: Missing accounts array');
+      if (!Array.isArray(parsed1?.accounts)) throw new Error('Missing accounts array in Call 1 response');
       extractedAccounts = parsed1.accounts as RawAccount[];
       parsedPersonalInfoErrors = (parsed1.personal_info_errors && typeof parsed1.personal_info_errors === 'object')
         ? parsed1.personal_info_errors as Record<string, unknown> : {};
       allInquiries = Array.isArray(parsed1.inquiries) ? parsed1.inquiries : [];
       parsedPositiveAccounts = Array.isArray(parsed1.positive_accounts) ? parsed1.positive_accounts : [];
+      console.log(`[analyze-reports] Call 1 parsed: ${extractedAccounts.length} accounts, ${allInquiries.length} inquiries (pre-filter), personal_info_errors: ${JSON.stringify(parsedPersonalInfoErrors)}`);
     } catch (err) {
-      console.error('[analyze-reports] Call 1 error:', err);
-      return res.status(500).json({ error: 'Failed to extract accounts from credit reports' });
+      console.error('[analyze-reports] Call 1 parse error:', err, 'raw:', call1Raw.slice(0, 500));
+      return res.status(500).json({ error: 'Call 1 JSON parse failed', detail: err instanceof Error ? err.message : String(err), raw: call1Raw.slice(0, 500) });
     }
 
     // Filter to hard inquiries only (Call 1 should only return hard inquiries, this is a safety filter)
@@ -434,8 +443,16 @@ ${texts.transunion || '[NOT PROVIDED — do not assign any accounts to TransUnio
         }],
       });
 
-      console.log('[analyze-reports] Call 2 complete, parsing...');
-      const parsed2 = parseClaudeJson(r2);
+      console.log('[analyze-reports] Call 2 API complete, parsing response...');
+      const call2TextBlock = r2.content.find((b) => b.type === 'text');
+      const call2Raw = call2TextBlock && call2TextBlock.type === 'text' ? call2TextBlock.text : '';
+      let parsed2: Record<string, unknown>;
+      try {
+        parsed2 = parseClaudeJson(r2);
+      } catch (parseErr) {
+        console.error('[analyze-reports] Call 2 parse error (non-fatal):', parseErr, 'raw:', call2Raw.slice(0, 500));
+        throw parseErr;
+      }
       overallCaseType = String(parsed2?.overall_case_type ?? 'identity_theft');
       overallStrategy = String(parsed2?.overall_strategy ?? '');
       const strategies = Array.isArray(parsed2?.account_strategies) ? parsed2.account_strategies as AccountStrategy[] : [];
@@ -443,11 +460,12 @@ ${texts.transunion || '[NOT PROVIDED — do not assign any accounts to TransUnio
         const key = String(s.creditor_name ?? '').toLowerCase().trim();
         if (key) strategyMap[key] = s;
       }
+      console.log(`[analyze-reports] Call 2 parsed: case_type=${overallCaseType}, ${strategies.length} strategies`);
     } catch (err) {
       console.error('[analyze-reports] Call 2 error (non-fatal, using defaults):', err);
     }
 
-    console.log(`[analyze-reports] Call 2: case_type=${overallCaseType}, strategies=${Object.keys(strategyMap).length}`);
+    console.log(`[analyze-reports] Call 2 result: case_type=${overallCaseType}, strategies in map=${Object.keys(strategyMap).length}`);
 
     // Build and insert dispute_accounts rows, merging Call 2 strategies
     await supabase.from('dispute_accounts').delete().eq('client_id', clientId);
@@ -511,6 +529,8 @@ ${texts.transunion || '[NOT PROVIDED — do not assign any accounts to TransUnio
     }
 
     const autoDisputeSelections = buildAutoDisputeSelections(inserted, parsedPersonalInfoErrors, parsedInquiries);
+
+    console.log('[analyze] positive_accounts to save:', JSON.stringify(parsedPositiveAccounts?.slice(0, 2)));
 
     const clientUpdate: Record<string, unknown> = {
       status: 'analyzing',

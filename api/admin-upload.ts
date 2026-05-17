@@ -60,7 +60,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .maybeSingle();
       const arr = (((existing as Record<string, unknown> | null)?.[arrayColumn]) ?? []) as Array<Record<string, unknown>>;
       console.log(`[admin-upload] ${arrayColumn} before append (${arr.length} items):`, JSON.stringify(arr));
-      arr.push({ path, filename: filename || (path as string).split('/').pop(), uploaded_at: new Date().toISOString() });
+      const newFilename = filename || (path as string).split('/').pop();
+      const alreadyExists = arr.some((item) => item.filename === newFilename);
+      if (!alreadyExists) {
+        arr.push({ path, filename: newFilename, uploaded_at: new Date().toISOString() });
+      }
       console.log(`[admin-upload] ${arrayColumn} after append (${arr.length} items):`, JSON.stringify(arr));
       const { error } = await supabase
         .from('credit_repair_clients')

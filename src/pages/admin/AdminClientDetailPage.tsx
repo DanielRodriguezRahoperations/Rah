@@ -969,7 +969,7 @@ const DocumentsTab = ({
                     rel="noopener noreferrer"
                     className="text-luxury-red hover:text-luxury-accent text-xs uppercase tracking-widest font-semibold whitespace-nowrap"
                   >
-                    Download →
+                    View document →
                   </a>
                 ) : (
                   <span className="text-neutral-500 text-xs">Link expired</span>
@@ -998,7 +998,7 @@ const DocumentsTab = ({
                 {f.signedUrl ? (
                   <a href={f.signedUrl} target="_blank" rel="noopener noreferrer"
                     className="text-luxury-red hover:text-luxury-accent text-xs uppercase tracking-widest font-semibold whitespace-nowrap">
-                    Download →
+                    View document →
                   </a>
                 ) : <span className="text-neutral-500 text-xs">Link expired</span>}
               </div>
@@ -1025,7 +1025,7 @@ const DocumentsTab = ({
                 {f.signedUrl ? (
                   <a href={f.signedUrl} target="_blank" rel="noopener noreferrer"
                     className="text-luxury-red hover:text-luxury-accent text-xs uppercase tracking-widest font-semibold whitespace-nowrap">
-                    Download →
+                    View document →
                   </a>
                 ) : <span className="text-neutral-500 text-xs">Link expired</span>}
               </div>
@@ -1214,6 +1214,7 @@ const AnalyzeTab = ({
 
   React.useEffect(() => {
     setPersonalInfo(getPersonalInfo(client));
+    console.log('[AnalyzeTab] positive_accounts:', client?.positive_accounts?.length);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client]);
 

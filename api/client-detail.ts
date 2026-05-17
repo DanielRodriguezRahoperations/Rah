@@ -43,7 +43,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const supabase = createClient(supabaseUrl, serviceKey);
 
-  // 1. Client record
+  // 1. Client record — must run first to validate existence
   const { data: client, error: clientErr } = await supabase
     .from('credit_repair_clients')
     .select('*')
@@ -55,84 +55,86 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(404).json({ error: 'Client not found' });
   }
 
-  // 2. Letters with tracking
-  const { data: letters } = await supabase
-    .from('dispute_letters')
-    .select('*, tracking_log(*)')
-    .eq('client_id', clientId)
-    .order('created_at', { ascending: false });
+  const clientRecord = client as Record<string, unknown>;
 
-  // 3. Accounts
-  const { data: accounts } = await supabase
-    .from('dispute_accounts')
-    .select('*')
-    .eq('client_id', clientId)
-    .order('created_at', { ascending: true });
+  type FileEntry = { path: string; filename: string; uploaded_at: string };
+  const toFileArr = (raw: unknown): FileEntry[] =>
+    Array.isArray(raw) ? (raw as FileEntry[]) : [];
 
-  // 4. Bureau responses
-  const { data: responses } = await supabase
-    .from('bureau_responses')
-    .select('*')
-    .eq('client_id', clientId)
-    .order('created_at', { ascending: false });
-
-  // 5. Doc signed URLs
-  const docUrls: Record<string, string | null> = {};
-  await Promise.all(
-    DOC_FIELDS.map(async (field) => {
-      const path = (client as Record<string, unknown>)[field];
-      if (typeof path === 'string' && path.length > 0) {
+  // 2–8. Parallelize all remaining queries and signed URL generation
+  const [
+    lettersResult,
+    accountsResult,
+    responsesResult,
+    docUrlEntries,
+    miscFiles,
+    ftcReportFiles,
+    additionalFiles,
+  ] = await Promise.all([
+    // 2. Letters with tracking
+    supabase
+      .from('dispute_letters')
+      .select('*, tracking_log(*)')
+      .eq('client_id', clientId)
+      .order('created_at', { ascending: false }),
+    // 3. Accounts
+    supabase
+      .from('dispute_accounts')
+      .select('*')
+      .eq('client_id', clientId)
+      .order('created_at', { ascending: true }),
+    // 4. Bureau responses
+    supabase
+      .from('bureau_responses')
+      .select('*')
+      .eq('client_id', clientId)
+      .order('created_at', { ascending: false }),
+    // 5. Doc signed URLs
+    Promise.all(
+      DOC_FIELDS.map(async (field) => {
+        const path = clientRecord[field];
+        if (typeof path === 'string' && path.length > 0) {
+          const { data: signed } = await supabase.storage
+            .from('intake-documents')
+            .createSignedUrl(path, SIGNED_URL_TTL);
+          return [field, signed?.signedUrl ?? null] as [string, string | null];
+        }
+        return [field, null] as [string, string | null];
+      })
+    ),
+    // 6. Misc files
+    Promise.all(
+      toFileArr(clientRecord.doc_misc_files).map(async (m) => {
         const { data: signed } = await supabase.storage
           .from('intake-documents')
-          .createSignedUrl(path, SIGNED_URL_TTL);
-        docUrls[field] = signed?.signedUrl ?? null;
-      } else {
-        docUrls[field] = null;
-      }
-    })
-  );
+          .createSignedUrl(m.path, SIGNED_URL_TTL);
+        return { ...m, signedUrl: signed?.signedUrl ?? null };
+      })
+    ),
+    // 7. FTC report files
+    Promise.all(
+      toFileArr(clientRecord.doc_ftc_reports).map(async (m) => {
+        const { data: signed } = await supabase.storage
+          .from('intake-documents')
+          .createSignedUrl(m.path, SIGNED_URL_TTL);
+        return { ...m, signedUrl: signed?.signedUrl ?? null };
+      })
+    ),
+    // 8. Additional files
+    Promise.all(
+      toFileArr(clientRecord.doc_additional_files).map(async (m) => {
+        const { data: signed } = await supabase.storage
+          .from('intake-documents')
+          .createSignedUrl(m.path, SIGNED_URL_TTL);
+        return { ...m, signedUrl: signed?.signedUrl ?? null };
+      })
+    ),
+  ]);
 
-  // 6. Misc document signed URLs
-  const miscRaw = (client as Record<string, unknown>).doc_misc_files;
-  const miscArr = Array.isArray(miscRaw)
-    ? (miscRaw as Array<{ path: string; filename: string; uploaded_at: string }>)
-    : [];
-  const miscFiles = await Promise.all(
-    miscArr.map(async (m) => {
-      const { data: signed } = await supabase.storage
-        .from('intake-documents')
-        .createSignedUrl(m.path, SIGNED_URL_TTL);
-      return { ...m, signedUrl: signed?.signedUrl ?? null };
-    })
-  );
-
-  // FTC reports array with signed URLs
-  const ftcReportsRaw = (client as Record<string, unknown>).doc_ftc_reports;
-  const ftcReportsArr = Array.isArray(ftcReportsRaw)
-    ? (ftcReportsRaw as Array<{ path: string; filename: string; uploaded_at: string }>)
-    : [];
-  const ftcReportFiles = await Promise.all(
-    ftcReportsArr.map(async (m) => {
-      const { data: signed } = await supabase.storage
-        .from('intake-documents')
-        .createSignedUrl(m.path, SIGNED_URL_TTL);
-      return { ...m, signedUrl: signed?.signedUrl ?? null };
-    })
-  );
-
-  // Additional files array with signed URLs
-  const additionalFilesRaw = (client as Record<string, unknown>).doc_additional_files;
-  const additionalFilesArr = Array.isArray(additionalFilesRaw)
-    ? (additionalFilesRaw as Array<{ path: string; filename: string; uploaded_at: string }>)
-    : [];
-  const additionalFiles = await Promise.all(
-    additionalFilesArr.map(async (m) => {
-      const { data: signed } = await supabase.storage
-        .from('intake-documents')
-        .createSignedUrl(m.path, SIGNED_URL_TTL);
-      return { ...m, signedUrl: signed?.signedUrl ?? null };
-    })
-  );
+  const letters = lettersResult.data;
+  const accounts = accountsResult.data;
+  const responses = responsesResult.data;
+  const docUrls: Record<string, string | null> = Object.fromEntries(docUrlEntries);
 
   return res.status(200).json({
     client,

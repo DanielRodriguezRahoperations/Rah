@@ -21,6 +21,10 @@ function getImageMediaType(path: string): SupportedMediaType | null {
   return null;
 }
 
+type DocContent =
+  | { kind: 'image'; mediaType: SupportedMediaType; data: string }
+  | { kind: 'text'; content: string };
+
 export type AddressVerifyResult = {
   intake_address: string;
   id_address: string | null;
@@ -67,31 +71,53 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 
-  const downloadAsBase64 = async (
-    path: string,
-  ): Promise<{ data: string; mediaType: SupportedMediaType } | null> => {
+  // Download a document and return its content as image (base64) or text (PDF extraction)
+  const downloadDoc = async (path: string): Promise<DocContent | null> => {
+    const ext = (path.split('.').pop() ?? '').toLowerCase();
+
+    // PDF: extract text via unpdf
+    if (ext === 'pdf') {
+      const { data, error } = await supabase.storage.from('intake-documents').download(path);
+      if (error || !data) {
+        console.error('[verify-address] PDF download error:', error);
+        return null;
+      }
+      try {
+        const buf = Buffer.from(await data.arrayBuffer());
+        const { extractText } = await import('unpdf');
+        const { text } = await extractText(new Uint8Array(buf), { mergePages: true });
+        if (!text || text.length < 20) return null;
+        return { kind: 'text', content: text.slice(0, 3000) };
+      } catch (err) {
+        console.error('[verify-address] PDF text extraction error:', err);
+        return null;
+      }
+    }
+
+    // Image formats supported by Claude Vision
     const mediaType = getImageMediaType(path);
     if (!mediaType) {
-      console.warn(`[verify-address] Unsupported file format for path: ${path}`);
+      // HEIC and other formats: skip gracefully
       return null;
     }
+
     const { data, error } = await supabase.storage.from('intake-documents').download(path);
     if (error || !data) {
-      console.error('[verify-address] download error:', error);
+      console.error('[verify-address] image download error:', error);
       return null;
     }
     const buf = Buffer.from(await data.arrayBuffer());
-    return { data: buf.toString('base64'), mediaType };
+    return { kind: 'image', mediaType, data: buf.toString('base64') };
   };
 
-  const [govIdDoc, utilityDoc] = await Promise.all([
-    c.doc_dl_front ? downloadAsBase64(String(c.doc_dl_front)) : Promise.resolve(null),
-    c.doc_utility_bill ? downloadAsBase64(String(c.doc_utility_bill)) : Promise.resolve(null),
+  const [govIdResult, utilityResult] = await Promise.all([
+    c.doc_dl_front ? downloadDoc(String(c.doc_dl_front)) : Promise.resolve(null),
+    c.doc_utility_bill ? downloadDoc(String(c.doc_utility_bill)) : Promise.resolve(null),
   ]);
 
-  if (!govIdDoc && !utilityDoc) {
+  if (!govIdResult && !utilityResult) {
     return res.status(400).json({
-      error: 'Documents could not be read — unsupported file format (PDF, HEIC). Upload JPEG or PNG files for automated verification.',
+      error: 'Documents could not be read. Please ensure files are uploaded as PDF, JPEG, or PNG.',
     });
   }
 
@@ -103,18 +129,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     { type: 'text', text: `INTAKE FORM ADDRESS: "${intakeAddress}"` },
   ];
 
-  if (govIdDoc) {
-    contentBlocks.push({ type: 'text', text: 'GOVERNMENT ID (Driver\'s License front):' });
-    contentBlocks.push({ type: 'image', source: { type: 'base64', media_type: govIdDoc.mediaType, data: govIdDoc.data } });
+  if (govIdResult) {
+    contentBlocks.push({ type: 'text', text: "GOVERNMENT ID (Driver's License front):" });
+    if (govIdResult.kind === 'image') {
+      contentBlocks.push({ type: 'image', source: { type: 'base64', media_type: govIdResult.mediaType, data: govIdResult.data } });
+    } else {
+      contentBlocks.push({ type: 'text', text: `[PDF text content]\n${govIdResult.content}` });
+    }
   } else if (c.doc_dl_front) {
-    contentBlocks.push({ type: 'text', text: 'GOVERNMENT ID: not available (unsupported format)' });
+    contentBlocks.push({ type: 'text', text: 'GOVERNMENT ID: not available (could not be read)' });
   }
 
-  if (utilityDoc) {
+  if (utilityResult) {
     contentBlocks.push({ type: 'text', text: 'UTILITY BILL / PROOF OF ADDRESS:' });
-    contentBlocks.push({ type: 'image', source: { type: 'base64', media_type: utilityDoc.mediaType, data: utilityDoc.data } });
+    if (utilityResult.kind === 'image') {
+      contentBlocks.push({ type: 'image', source: { type: 'base64', media_type: utilityResult.mediaType, data: utilityResult.data } });
+    } else {
+      contentBlocks.push({ type: 'text', text: `[PDF text content]\n${utilityResult.content}` });
+    }
   } else if (c.doc_utility_bill) {
-    contentBlocks.push({ type: 'text', text: 'UTILITY BILL: not available (unsupported format)' });
+    contentBlocks.push({ type: 'text', text: 'UTILITY BILL: not available (could not be read)' });
   }
 
   contentBlocks.push({
