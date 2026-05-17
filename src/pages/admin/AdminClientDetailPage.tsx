@@ -28,6 +28,7 @@ interface ClientDetail {
     personal_info_errors?: { name_variations: string[]; unknown_addresses: string[]; unknown_phone_numbers: string[] } | null;
     inquiries?: Array<{ creditor: string; date: string; bureau: string; potentially_unauthorized: boolean }> | null;
     ftc_report_numbers?: string[] | null;
+    dispute_selections?: Record<string, unknown> | null;
   };
   letters: Array<Record<string, unknown> & { id: string; recipient_name: string; letter_type: string; created_at: string; pdf_unsigned_path?: string | null; lob_tracking_number?: string | null; mailed_at?: string | null; mail_status?: string | null; }>;
   accounts: Array<Record<string, unknown> & { id: string; creditor_name: string; account_number: string; account_number_equifax?: string; account_number_experian?: string; account_number_transunion?: string; balance: string; date_opened: string; account_type: string; account_status: string; bureaus: string[]; selected: boolean; dispute_types: string[]; original_creditor?: string; phone_numbers?: string[]; name_variations?: string[]; addresses?: string[]; equifax_data?: Record<string, unknown> | null; experian_data?: Record<string, unknown> | null; transunion_data?: Record<string, unknown> | null; duplicate_flag?: boolean; duplicate_note?: string; balance_inconsistency?: boolean; balance_inconsistency_note?: string; dispute_priority?: string; recommended_fcra_sections?: string[]; letter_targets?: Record<string, unknown> }>;
@@ -932,6 +933,56 @@ const buildTopFields = (accts: ClientDetail['accounts']): Record<string, TopFiel
     account_type: a.account_type,
   }]));
 
+// === Dispute Selections ===
+type BureauToggles = { equifax: boolean; experian: boolean; transunion: boolean };
+type ItemSelection = { bureaus: BureauToggles; fcra_sections: string[] };
+type DisputeSelections = {
+  accounts:   Record<string, ItemSelection>;
+  names:      Record<string, ItemSelection>;
+  addresses:  Record<string, ItemSelection>;
+  phones:     Record<string, ItemSelection>;
+  inquiries:  Record<string, ItemSelection>;
+};
+
+const emptyBureauToggles = (): BureauToggles => ({ equifax: false, experian: false, transunion: false });
+const emptyItemSelection = (): ItemSelection => ({ bureaus: emptyBureauToggles(), fcra_sections: [] });
+
+const initDisputeSelections = (raw: unknown): DisputeSelections => {
+  const r = (raw && typeof raw === 'object' ? raw : {}) as Partial<DisputeSelections>;
+  return {
+    accounts:  r.accounts  ?? {},
+    names:     r.names     ?? {},
+    addresses: r.addresses ?? {},
+    phones:    r.phones    ?? {},
+    inquiries: r.inquiries ?? {},
+  };
+};
+
+const getBureausForPersonalItem = (
+  accts: ClientDetail['accounts'],
+  bureauField: 'name_variations' | 'addresses' | 'phone_numbers',
+  item: string,
+): string[] =>
+  (['equifax', 'experian', 'transunion'] as const).filter((b) =>
+    accts.some((a) => {
+      const bd = (a[`${b}_data` as keyof typeof a]) as Record<string, unknown> | null | undefined;
+      return (Array.isArray(bd?.[bureauField]) ? bd![bureauField] as string[] : [])
+        .some((v) => String(v).toLowerCase() === item.toLowerCase());
+    })
+  );
+
+const PIE_CONFIG: Record<
+  'name_variations' | 'unknown_addresses' | 'unknown_phone_numbers',
+  { bureauField: 'name_variations' | 'addresses' | 'phone_numbers'; cat: 'names' | 'addresses' | 'phones' }
+> = {
+  name_variations:       { bureauField: 'name_variations', cat: 'names' },
+  unknown_addresses:     { bureauField: 'addresses',       cat: 'addresses' },
+  unknown_phone_numbers: { bureauField: 'phone_numbers',   cat: 'phones' },
+};
+
+const BUREAU_SHORT: Record<string, string> = { equifax: 'EQ', experian: 'EX', transunion: 'TU' };
+const BUREAU_KEYS = ['equifax', 'experian', 'transunion'] as const;
+
 // === Analyze Tab ===
 type PersonalInfoErrors = {
   name_variations: string[];
@@ -990,6 +1041,15 @@ const AnalyzeTab = ({
 
   React.useEffect(() => {
     setPersonalInfo(getPersonalInfo(client));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [client]);
+
+  const [disputeSelections, setDisputeSelections] = React.useState<DisputeSelections>(() =>
+    initDisputeSelections(client.dispute_selections));
+  const [selectionFlash, setSelectionFlash] = React.useState(false);
+
+  React.useEffect(() => {
+    setDisputeSelections(initDisputeSelections(client.dispute_selections));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client]);
 
@@ -1078,6 +1138,52 @@ const AnalyzeTab = ({
     });
   };
 
+  const saveDisputeSelections = async (next: DisputeSelections) => {
+    setDisputeSelections(next);
+    await fetch('/api/update-dispute-selections', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+      body: JSON.stringify({ clientId, disputeSelections: next }),
+    });
+    setSelectionFlash(true);
+    setTimeout(() => setSelectionFlash(false), 1500);
+  };
+
+  const toggleItemBureau = (
+    cat: 'names' | 'addresses' | 'phones' | 'inquiries',
+    key: string,
+    bureau: 'equifax' | 'experian' | 'transunion',
+  ) => {
+    const prev = disputeSelections[cat][key] ?? emptyItemSelection();
+    saveDisputeSelections({
+      ...disputeSelections,
+      [cat]: { ...disputeSelections[cat], [key]: { ...prev, bureaus: { ...prev.bureaus, [bureau]: !prev.bureaus[bureau] } } },
+    });
+  };
+
+  const toggleItemFcra = (
+    cat: 'names' | 'addresses' | 'phones' | 'inquiries',
+    key: string,
+    section: string,
+  ) => {
+    const prev = disputeSelections[cat][key] ?? emptyItemSelection();
+    const secs = prev.fcra_sections.includes(section)
+      ? prev.fcra_sections.filter((s) => s !== section)
+      : [...prev.fcra_sections, section];
+    saveDisputeSelections({
+      ...disputeSelections,
+      [cat]: { ...disputeSelections[cat], [key]: { ...prev, fcra_sections: secs } },
+    });
+  };
+
+  const toggleAccountBureau = (accountId: string, bureau: 'equifax' | 'experian' | 'transunion') => {
+    const prev = disputeSelections.accounts[accountId] ?? emptyItemSelection();
+    saveDisputeSelections({
+      ...disputeSelections,
+      accounts: { ...disputeSelections.accounts, [accountId]: { ...prev, bureaus: { ...prev.bureaus, [bureau]: !prev.bureaus[bureau] } } },
+    });
+  };
+
   const sendReportSummary = async () => {
     try {
       const r = await fetch('/api/send-report-summary', {
@@ -1108,6 +1214,11 @@ const AnalyzeTab = ({
       {summaryToast && (
         <div className={`text-sm px-4 py-3 rounded-sm mb-4 ${summaryToast.ok ? 'bg-emerald-950/50 border border-emerald-800 text-emerald-200' : 'bg-red-950/50 border border-red-800 text-red-300'}`}>
           {summaryToast.msg}
+        </div>
+      )}
+      {selectionFlash && (
+        <div className="text-xs text-emerald-400 bg-emerald-950/30 border border-emerald-800/50 rounded-sm px-3 py-1.5 mb-4 inline-block">
+          ✓ Selections saved
         </div>
       )}
 
@@ -1149,17 +1260,74 @@ const AnalyzeTab = ({
                 <div key={field}>
                   <p className="text-[10px] uppercase tracking-widest text-neutral-500 mb-2">{label}</p>
                   <div className="flex flex-col gap-1">
-                    {personalInfo[field].map((item, i) => (
-                      <div key={i} className="flex items-center gap-2 bg-[#0f0f0f] border border-neutral-800 rounded-sm px-2 py-1">
-                        <span className="text-xs text-neutral-300 flex-1">{item}</span>
-                        <button
-                          onClick={() => removePersonalInfoItem(field, i)}
-                          className="text-neutral-600 hover:text-red-400 transition-colors text-sm leading-none flex-shrink-0"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ))}
+                    {personalInfo[field].map((item, i) => {
+                      const cfg = PIE_CONFIG[field];
+                      const reportedBy = getBureausForPersonalItem(accounts, cfg.bureauField, item);
+                      const sel = disputeSelections[cfg.cat][item] ?? emptyItemSelection();
+                      return (
+                        <div key={i} className="bg-[#0f0f0f] border border-neutral-800 rounded-sm px-2 py-1.5 space-y-1.5">
+                          {/* Existing: item text + delete */}
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-neutral-300 flex-1">{item}</span>
+                            <button
+                              onClick={() => removePersonalInfoItem(field, i)}
+                              className="text-neutral-600 hover:text-red-400 transition-colors text-sm leading-none flex-shrink-0"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                          {/* Row 1: Reported by */}
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[9px] uppercase tracking-widest text-neutral-600">Reported by:</span>
+                            {reportedBy.length > 0
+                              ? reportedBy.map((b) => (
+                                  <span key={b} className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm border border-luxury-red/50 bg-luxury-red/10 text-luxury-red">
+                                    {BUREAU_SHORT[b]}
+                                  </span>
+                                ))
+                              : <span className="text-[9px] text-neutral-700">Unknown</span>
+                            }
+                          </div>
+                          {/* Row 2: Add to letter */}
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                            <span className="text-[9px] uppercase tracking-widest text-neutral-600">Add to letter:</span>
+                            {BUREAU_KEYS.map((b) => {
+                              const active = sel.bureaus[b];
+                              return (
+                                <label key={b} className="flex items-center gap-1 cursor-pointer group">
+                                  <input
+                                    type="checkbox"
+                                    checked={active}
+                                    onChange={() => toggleItemBureau(cfg.cat, item, b)}
+                                    className="accent-luxury-red w-3 h-3 flex-shrink-0"
+                                  />
+                                  <span className={`text-[9px] uppercase tracking-wider ${active ? 'text-luxury-red' : 'text-neutral-500 group-hover:text-neutral-300'}`}>
+                                    {BUREAU_SHORT[b]}
+                                  </span>
+                                </label>
+                              );
+                            })}
+                            <span className="text-neutral-700 text-[9px] mx-0.5">|</span>
+                            {FCRA_SECTIONS.map(({ key: fkey, label: flabel }) => {
+                              const active = sel.fcra_sections.includes(fkey);
+                              return (
+                                <label key={fkey} className="flex items-center gap-1 cursor-pointer group">
+                                  <input
+                                    type="checkbox"
+                                    checked={active}
+                                    onChange={() => toggleItemFcra(cfg.cat, item, fkey)}
+                                    className="accent-luxury-red w-3 h-3 flex-shrink-0"
+                                  />
+                                  <span className={`text-[9px] uppercase tracking-wider ${active ? 'text-luxury-red' : 'text-neutral-500 group-hover:text-neutral-300'}`} title={flabel}>
+                                    {fkey}
+                                  </span>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               ) : null
@@ -1182,6 +1350,7 @@ const AnalyzeTab = ({
                   <th className="px-3 py-3 min-w-[220px]">Creditor / Type</th>
                   <th className="px-3 py-3 min-w-[120px]">Bureaus</th>
                   <th className="px-3 py-3 min-w-[155px]">FCRA Sections</th>
+                  <th className="px-3 py-3 min-w-[100px]">Dispute To</th>
                   <th className="px-3 py-3 w-24"></th>
                 </tr>
               </thead>
@@ -1300,6 +1469,28 @@ const AnalyzeTab = ({
                           </div>
                         </td>
 
+                        {/* Dispute To — which bureau letter(s) this account goes into */}
+                        <td className="px-3 py-2">
+                          <div className="flex flex-col gap-1">
+                            {BUREAU_KEYS.map((b) => {
+                              const active = (disputeSelections.accounts[a.id] ?? emptyItemSelection()).bureaus[b];
+                              return (
+                                <label key={b} className="flex items-center gap-1.5 cursor-pointer group">
+                                  <input
+                                    type="checkbox"
+                                    checked={active}
+                                    onChange={() => toggleAccountBureau(a.id, b)}
+                                    className="accent-luxury-red w-3 h-3 flex-shrink-0"
+                                  />
+                                  <span className={`text-[10px] uppercase tracking-wider ${active ? 'text-luxury-red' : 'text-neutral-500 group-hover:text-neutral-300'}`}>
+                                    {BUREAU_SHORT[b]}
+                                  </span>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </td>
+
                         {/* Delete */}
                         <td className="px-3 py-2 text-right align-middle">
                           {deleteConfirm === a.id ? (
@@ -1332,7 +1523,7 @@ const AnalyzeTab = ({
                       {/* Expanded comparison row */}
                       {isExpanded && (
                         <tr className="border-b border-neutral-700 bg-[#111]">
-                          <td colSpan={5} className="px-6 py-5">
+                          <td colSpan={6} className="px-6 py-5">
                             {(a.duplicate_note || a.balance_inconsistency_note) && (
                               <div className="flex flex-wrap gap-2 mb-4">
                                 {a.duplicate_note && (
@@ -1420,21 +1611,67 @@ const AnalyzeTab = ({
                 <th className="px-4 py-3">Bureau</th>
                 <th className="px-4 py-3">Date</th>
                 <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3 min-w-[200px]">Add to Letter</th>
               </tr>
             </thead>
             <tbody>
-              {unauthorizedInquiries.map((q, i) => (
-                <tr key={i} className="border-b border-neutral-800/60">
-                  <td className="px-4 py-3 text-white">{q.creditor}</td>
-                  <td className="px-4 py-3 text-neutral-300 capitalize">{q.bureau}</td>
-                  <td className="px-4 py-3 text-neutral-400 text-xs">{q.date}</td>
-                  <td className="px-4 py-3">
-                    <span className="text-[10px] uppercase tracking-wider text-amber-400 bg-amber-950/30 border border-amber-800/50 rounded-sm px-2 py-0.5">
-                      ⚠ Unauthorized
-                    </span>
-                  </td>
-                </tr>
-              ))}
+              {unauthorizedInquiries.map((q, i) => {
+                const iqKey = `${q.creditor}:${q.bureau}:${q.date}`;
+                const iqSel = disputeSelections.inquiries[iqKey] ?? emptyItemSelection();
+                return (
+                  <tr key={i} className="border-b border-neutral-800/60 align-top">
+                    <td className="px-4 py-3 text-white">{q.creditor}</td>
+                    <td className="px-4 py-3 text-neutral-300 capitalize">{q.bureau}</td>
+                    <td className="px-4 py-3 text-neutral-400 text-xs">{q.date}</td>
+                    <td className="px-4 py-3">
+                      <span className="text-[10px] uppercase tracking-wider text-amber-400 bg-amber-950/30 border border-amber-800/50 rounded-sm px-2 py-0.5">
+                        ⚠ Unauthorized
+                      </span>
+                    </td>
+                    <td className="px-4 py-2">
+                      <div className="space-y-1.5">
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                          {BUREAU_KEYS.map((b) => {
+                            const active = iqSel.bureaus[b];
+                            const isHinted = q.bureau?.toLowerCase() === b;
+                            return (
+                              <label key={b} className="flex items-center gap-1 cursor-pointer group">
+                                <input
+                                  type="checkbox"
+                                  checked={active}
+                                  onChange={() => toggleItemBureau('inquiries', iqKey, b)}
+                                  className="accent-luxury-red w-3 h-3 flex-shrink-0"
+                                />
+                                <span className={`text-[9px] uppercase tracking-wider ${active ? 'text-luxury-red' : isHinted ? 'text-amber-500/60 group-hover:text-amber-400' : 'text-neutral-500 group-hover:text-neutral-300'}`}>
+                                  {BUREAU_SHORT[b]}
+                                </span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                          {FCRA_SECTIONS.map(({ key: fkey, label: flabel }) => {
+                            const active = iqSel.fcra_sections.includes(fkey);
+                            return (
+                              <label key={fkey} className="flex items-center gap-1 cursor-pointer group">
+                                <input
+                                  type="checkbox"
+                                  checked={active}
+                                  onChange={() => toggleItemFcra('inquiries', iqKey, fkey)}
+                                  className="accent-luxury-red w-3 h-3 flex-shrink-0"
+                                />
+                                <span className={`text-[9px] uppercase tracking-wider ${active ? 'text-luxury-red' : 'text-neutral-500 group-hover:text-neutral-300'}`} title={flabel}>
+                                  {fkey}
+                                </span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
