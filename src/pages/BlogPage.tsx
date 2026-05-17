@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Free Website Grader Tool: What Your Score Actually Means",
+      displayTitle: "Free Website Grader Tool: What Your Score Actually Means (And What To Do About It)",
+      date: "May 17, 2026",
+      pubDate: "Sun, 17 May 2026 03:11:00 GMT",
+      issue: 'No. 061',
+      category: "SEO",
+      excerpt: "Free website grader tools give you a number, but most business owners have no idea what that number actually means or what to do next. This guide breaks down every major metric these tools measure, explains what a good score looks like, and shows you exactly how to turn a low grade into real business growth.",
+      slug: 'free-website-grader-tool-what-your-score-actually-means'
+    },
+    {
       title: "How to Improve Your Website SEO Score Without an Agency",
       displayTitle: "How to Improve Your Website SEO Score Without an Agency (And When to Call One)",
       date: "May 17, 2026",
