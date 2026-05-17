@@ -357,7 +357,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       try {
         r = await anthropic.messages.create({
           model: 'claude-sonnet-4-6',
-          max_tokens: 2000,
+          max_tokens: 4000,
           system: BUREAU_EXTRACTION_SYSTEM_PROMPT,
           messages: [{ role: 'user', content: `Analyze this ${bureau} credit report:\n\n${text}\n\nReturn ONLY the JSON object.` }],
         });
