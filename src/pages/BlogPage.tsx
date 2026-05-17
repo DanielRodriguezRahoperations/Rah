@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Local SEO Complete Guide for Small Business Owners 2026",
+      displayTitle: "The Local SEO Complete Guide for Small Business Owners in 2026",
+      date: "May 17, 2026",
+      pubDate: "Sun, 17 May 2026 16:01:49 GMT",
+      issue: 'No. 065',
+      category: "SEO",
+      excerpt: "Local SEO is the single most powerful tool a small business owner can use to attract nearby customers who are ready to buy. This complete guide breaks down every strategy you need to dominate local search results in 2026. From Google Business Profile optimization to citation building, RAH Operations covers it all.",
+      slug: 'local-seo-complete-guide-for-small-business-owners-2026'
+    },
+    {
       title: "How Long Does SEO Take to Work? The Honest Answer",
       displayTitle: "How Long Does SEO Take to Work? The Honest Answer Every Business Owner Needs to Hear",
       date: "May 17, 2026",
