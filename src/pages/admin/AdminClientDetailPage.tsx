@@ -25,7 +25,7 @@ interface ClientDetail {
     address_verified?: boolean | null;
     address_flag_notes?: string | null;
     created_at: string;
-    personal_info_errors?: { name_variations: string[]; unknown_addresses: string[]; unknown_phone_numbers: string[] } | null;
+    personal_info_errors?: { name_variations: Record<string, string[]>; unknown_addresses: Record<string, string[]>; unknown_phone_numbers: Record<string, string[]> } | null;
     inquiries?: Array<{ creditor: string; date: string; bureau: string; potentially_unauthorized: boolean }> | null;
     ftc_report_numbers?: string[] | null;
     dispute_selections?: Record<string, unknown> | null;
@@ -958,26 +958,13 @@ const initDisputeSelections = (raw: unknown): DisputeSelections => {
   };
 };
 
-const getBureausForPersonalItem = (
-  accts: ClientDetail['accounts'],
-  bureauField: 'name_variations' | 'addresses' | 'phone_numbers',
-  item: string,
-): string[] =>
-  (['equifax', 'experian', 'transunion'] as const).filter((b) =>
-    accts.some((a) => {
-      const bd = (a[`${b}_data` as keyof typeof a]) as Record<string, unknown> | null | undefined;
-      return (Array.isArray(bd?.[bureauField]) ? bd![bureauField] as string[] : [])
-        .some((v) => String(v).toLowerCase() === item.toLowerCase());
-    })
-  );
-
 const PIE_CONFIG: Record<
   'name_variations' | 'unknown_addresses' | 'unknown_phone_numbers',
-  { bureauField: 'name_variations' | 'addresses' | 'phone_numbers'; cat: 'names' | 'addresses' | 'phones' }
+  { cat: 'names' | 'addresses' | 'phones' }
 > = {
-  name_variations:       { bureauField: 'name_variations', cat: 'names' },
-  unknown_addresses:     { bureauField: 'addresses',       cat: 'addresses' },
-  unknown_phone_numbers: { bureauField: 'phone_numbers',   cat: 'phones' },
+  name_variations:       { cat: 'names' },
+  unknown_addresses:     { cat: 'addresses' },
+  unknown_phone_numbers: { cat: 'phones' },
 };
 
 const BUREAU_SHORT: Record<string, string> = { equifax: 'EQ', experian: 'EX', transunion: 'TU' };
@@ -985,9 +972,9 @@ const BUREAU_KEYS = ['equifax', 'experian', 'transunion'] as const;
 
 // === Analyze Tab ===
 type PersonalInfoErrors = {
-  name_variations: string[];
-  unknown_addresses: string[];
-  unknown_phone_numbers: string[];
+  name_variations:       Record<string, string[]>;
+  unknown_addresses:     Record<string, string[]>;
+  unknown_phone_numbers: Record<string, string[]>;
 };
 
 const PRIORITY_STYLES: Record<string, string> = {
@@ -1016,10 +1003,15 @@ const AnalyzeTab = ({
 }) => {
   const getPersonalInfo = (c: ClientDetail['client']): PersonalInfoErrors => {
     const pie = c.personal_info_errors;
+    const toMap = (v: unknown): Record<string, string[]> => {
+      if (!v || Array.isArray(v)) return {};
+      if (typeof v === 'object') return v as Record<string, string[]>;
+      return {};
+    };
     return {
-      name_variations: pie?.name_variations ?? [],
-      unknown_addresses: pie?.unknown_addresses ?? [],
-      unknown_phone_numbers: pie?.unknown_phone_numbers ?? [],
+      name_variations:       toMap(pie?.name_variations),
+      unknown_addresses:     toMap(pie?.unknown_addresses),
+      unknown_phone_numbers: toMap(pie?.unknown_phone_numbers),
     };
   };
 
@@ -1125,11 +1117,10 @@ const AnalyzeTab = ({
     onChange();
   };
 
-  const removePersonalInfoItem = async (field: keyof PersonalInfoErrors, index: number) => {
-    const updated: PersonalInfoErrors = {
-      ...personalInfo,
-      [field]: personalInfo[field].filter((_, i) => i !== index),
-    };
+  const removePersonalInfoItem = async (field: keyof PersonalInfoErrors, key: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { [key]: _removed, ...rest } = personalInfo[field];
+    const updated: PersonalInfoErrors = { ...personalInfo, [field]: rest };
     setPersonalInfo(updated);
     await fetch('/api/update-status', {
       method: 'PATCH',
@@ -1203,9 +1194,9 @@ const AnalyzeTab = ({
   const BUREAU_LABELS: Record<string, string> = { equifax: 'Equifax', experian: 'Experian', transunion: 'TransUnion' };
 
   const hasPersonalInfo =
-    personalInfo.name_variations.length > 0 ||
-    personalInfo.unknown_addresses.length > 0 ||
-    personalInfo.unknown_phone_numbers.length > 0;
+    Object.keys(personalInfo.name_variations).length > 0 ||
+    Object.keys(personalInfo.unknown_addresses).length > 0 ||
+    Object.keys(personalInfo.unknown_phone_numbers).length > 0;
 
   const unauthorizedInquiries = (client.inquiries ?? []).filter((q) => q.potentially_unauthorized);
 
@@ -1256,33 +1247,32 @@ const AnalyzeTab = ({
               { field: 'unknown_addresses' as const, label: 'Unknown Addresses' },
               { field: 'unknown_phone_numbers' as const, label: 'Unknown Phone Numbers' },
             ]).map(({ field, label }) =>
-              personalInfo[field].length > 0 ? (
+              Object.keys(personalInfo[field]).length > 0 ? (
                 <div key={field}>
                   <p className="text-[10px] uppercase tracking-widest text-neutral-500 mb-2">{label}</p>
                   <div className="flex flex-col gap-1">
-                    {personalInfo[field].map((item, i) => {
+                    {Object.entries(personalInfo[field]).map(([item, bureaus]) => {
                       const cfg = PIE_CONFIG[field];
-                      const reportedBy = getBureausForPersonalItem(accounts, cfg.bureauField, item);
                       const sel = disputeSelections[cfg.cat][item] ?? emptyItemSelection();
                       return (
-                        <div key={i} className="bg-[#0f0f0f] border border-neutral-800 rounded-sm px-2 py-1.5 space-y-1.5">
+                        <div key={item} className="bg-[#0f0f0f] border border-neutral-800 rounded-sm px-2 py-1.5 space-y-1.5">
                           {/* Existing: item text + delete */}
                           <div className="flex items-center gap-2">
                             <span className="text-xs text-neutral-300 flex-1">{item}</span>
                             <button
-                              onClick={() => removePersonalInfoItem(field, i)}
+                              onClick={() => removePersonalInfoItem(field, item)}
                               className="text-neutral-600 hover:text-red-400 transition-colors text-sm leading-none flex-shrink-0"
                             >
                               ✕
                             </button>
                           </div>
-                          {/* Row 1: Reported by */}
-                          <div className="flex items-center gap-1.5">
+                          {/* Row 1: Reported by — bureaus come directly from stored attribution */}
+                          <div className="flex flex-wrap items-center gap-1.5">
                             <span className="text-[9px] uppercase tracking-widest text-neutral-600">Reported by:</span>
-                            {reportedBy.length > 0
-                              ? reportedBy.map((b) => (
-                                  <span key={b} className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm border border-luxury-red/50 bg-luxury-red/10 text-luxury-red">
-                                    {BUREAU_SHORT[b]}
+                            {Array.isArray(bureaus) && bureaus.length > 0
+                              ? bureaus.map((b) => (
+                                  <span key={b} className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-sm border border-luxury-red bg-luxury-red/10 text-luxury-red">
+                                    {BUREAU_LABELS[b] ?? b}
                                   </span>
                                 ))
                               : <span className="text-[9px] text-neutral-700">Unknown</span>

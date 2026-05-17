@@ -73,6 +73,8 @@ const CREDIT_ANALYSIS_SYSTEM_PROMPT = `You are an expert credit repair analyst a
 
 7. PERSONAL INFORMATION ERRORS
    Extract any variations of the client's name, unknown addresses, and unknown phone numbers found anywhere across all three reports.
+   For each item, record which bureau(s) reported it as an array of bureau names.
+   Use exactly these bureau identifiers: "equifax", "experian", "transunion".
 
 Return ONLY a valid JSON object — no markdown, no explanation:
 
@@ -95,9 +97,9 @@ Return ONLY a valid JSON object — no markdown, no explanation:
     }
   ],
   "personal_info_errors": {
-    "name_variations": [],
-    "unknown_addresses": [],
-    "unknown_phone_numbers": []
+    "name_variations":       { "John R Smith": ["equifax", "experian"], "J. Smith": ["transunion"] },
+    "unknown_addresses":     { "123 Unknown St, City, ST 12345": ["equifax"] },
+    "unknown_phone_numbers": { "555-123-4567": ["experian", "transunion"] }
   },
   "inquiries": [
     { "creditor": "string", "date": "string", "bureau": "string", "potentially_unauthorized": false }
