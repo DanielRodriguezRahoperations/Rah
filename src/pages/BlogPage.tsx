@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "How Long Does SEO Take to Work? The Honest Answer",
+      displayTitle: "How Long Does SEO Take to Work? The Honest Answer Every Business Owner Needs to Hear",
+      date: "May 17, 2026",
+      pubDate: "Sun, 17 May 2026 12:02:07 GMT",
+      issue: 'No. 064',
+      category: "SEO",
+      excerpt: "If you have been asking how long does SEO take to work, you deserve a straight answer - not vague promises. SEO results depend on your competition, your website, and the strategy behind your campaign. Here is what Arizona business owners actually need to know before investing in search engine optimization.",
+      slug: 'how-long-does-seo-take-to-work-honest-answer'
+    },
+    {
       title: "What Is SEO and How Does It Work for Small Businesses",
       displayTitle: "What Is SEO and How Does It Work for Small Businesses in Arizona",
       date: "May 17, 2026",
