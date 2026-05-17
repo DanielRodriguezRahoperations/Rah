@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "How to Rank on Google Without Paying for Ads",
+      displayTitle: "How to Rank on Google Without Paying for Ads: A Complete Organic SEO Guide",
+      date: "May 17, 2026",
+      pubDate: "Sun, 17 May 2026 20:02:01 GMT",
+      issue: 'No. 066',
+      category: "SEO",
+      excerpt: "Ranking on Google without paying for ads is not only possible, it is the most sustainable way to grow your business online. Organic SEO builds long-term visibility that paid ads simply cannot replicate. In this guide, RAH Operations breaks down exactly how to do it.",
+      slug: 'how-to-rank-on-google-without-paying-for-ads'
+    },
+    {
       title: "Local SEO Complete Guide for Small Business Owners 2026",
       displayTitle: "The Local SEO Complete Guide for Small Business Owners in 2026",
       date: "May 17, 2026",
