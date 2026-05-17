@@ -759,7 +759,7 @@ const DocumentsTab = ({
           disabled={uploading || !file}
           className="bg-luxury-red hover:bg-luxury-light disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
         >
-          {uploading ? 'Uploading…' : 'Upload Document'}
+          {uploading ? 'Uploading…' : docType === 'ftc-report' ? 'Add FTC Report' : 'Upload Document'}
         </button>
       </div>
 

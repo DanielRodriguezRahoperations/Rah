@@ -32,7 +32,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Invalid parameters' });
     }
 
-    const safeName = docType === 'misc' ? `misc-${Date.now()}` : docType;
+    const safeName =
+      docType === 'misc' ? `misc-${Date.now()}` :
+      docType === 'ftc-report' ? `ftc-report-${Date.now()}` :
+      docType;
     const path = `${clientId}/${safeName}.${ext.toLowerCase()}`;
 
     const { data, error } = await supabase.storage
@@ -48,17 +51,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { clientId, docType, path, filename } = req.body ?? {};
     if (!clientId || !docType || !path) return res.status(400).json({ error: 'Missing required fields' });
 
-    if (docType === 'misc') {
+    if (docType === 'misc' || docType === 'ftc-report') {
+      const arrayColumn = docType === 'ftc-report' ? 'doc_ftc_reports' : 'doc_misc_files';
       const { data: existing } = await supabase
         .from('credit_repair_clients')
-        .select('doc_misc_files')
+        .select(arrayColumn)
         .eq('id', clientId)
         .maybeSingle();
-      const arr = (((existing as Record<string, unknown> | null)?.doc_misc_files) ?? []) as Array<Record<string, unknown>>;
+      const arr = (((existing as Record<string, unknown> | null)?.[arrayColumn]) ?? []) as Array<Record<string, unknown>>;
+      console.log(`[admin-upload] ${arrayColumn} before append (${arr.length} items):`, JSON.stringify(arr));
       arr.push({ path, filename: filename || (path as string).split('/').pop(), uploaded_at: new Date().toISOString() });
+      console.log(`[admin-upload] ${arrayColumn} after append (${arr.length} items):`, JSON.stringify(arr));
       const { error } = await supabase
         .from('credit_repair_clients')
-        .update({ doc_misc_files: arr })
+        .update({ [arrayColumn]: arr })
         .eq('id', clientId);
       if (error) return res.status(500).json({ error: error.message });
     } else {
