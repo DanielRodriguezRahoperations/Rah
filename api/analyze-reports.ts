@@ -357,7 +357,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       try {
         r = await anthropic.messages.create({
           model: 'claude-sonnet-4-6',
-          max_tokens: 4000,
+          max_tokens: 6000,
           system: BUREAU_EXTRACTION_SYSTEM_PROMPT,
           messages: [{ role: 'user', content: `Analyze this ${bureau} credit report:\n\n${text}\n\nReturn ONLY the JSON object.` }],
         });
@@ -397,18 +397,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     console.log(`[analyze] bureau results: EQ=${equifaxResult?.accounts?.length ?? 'null'} EX=${experianResult?.accounts?.length ?? 'null'} TU=${transunionResult?.accounts?.length ?? 'null'}`);
 
-    // Abort if any bureau whose text was provided failed to extract — do not wipe existing accounts
+    // Log which bureaus failed but continue as long as at least one succeeded
     const failedBureaus = [
       texts.equifax && !equifaxResult ? 'equifax' : null,
       texts.experian && !experianResult ? 'experian' : null,
       texts.transunion && !transunionResult ? 'transunion' : null,
     ].filter(Boolean);
     if (failedBureaus.length > 0) {
-      console.error('[analyze] extraction failed for bureaus:', failedBureaus, '— keeping existing accounts');
-      return res.status(500).json({ error: `Bureau extraction failed for: ${failedBureaus.join(', ')}. Existing accounts preserved.` });
+      console.error('[analyze] extraction failed for bureaus:', failedBureaus, '— continuing with available data');
     }
     if (!equifaxResult && !experianResult && !transunionResult) {
-      return res.status(500).json({ error: 'No bureau texts were provided' });
+      return res.status(500).json({ error: 'All bureau extractions failed — check server logs for details' });
     }
 
     // --- SERVER-SIDE MERGE ---
