@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "What Is SEO and How Does It Work for Small Businesses",
+      displayTitle: "What Is SEO and How Does It Work for Small Businesses in Arizona",
+      date: "May 17, 2026",
+      pubDate: "Sun, 17 May 2026 08:01:48 GMT",
+      issue: 'No. 063',
+      category: "SEO",
+      excerpt: "If you have ever wondered what SEO is and how it works for small businesses, you are not alone. Search engine optimization is one of the most powerful tools available to local Arizona companies looking to grow online. This guide breaks down exactly how SEO works and why it matters for your bottom line.",
+      slug: 'what-is-seo-and-how-does-it-work-for-small-businesses'
+    },
+    {
       title: "Website SEO Checker Free Tool for Small Business Owners",
       displayTitle: "The Best Free Website SEO Checker Tools for Small Business Owners in 2026",
       date: "May 17, 2026",
