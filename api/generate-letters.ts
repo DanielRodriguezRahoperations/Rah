@@ -79,6 +79,51 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .select('id')
     .eq('client_id', clientId);
 
+  // Furnisher address lookup for §623 / §809 letters — used to determine if address is verified
+  let resolvedRecipientAddress = recipientAddress;
+  let needsAddress = false;
+
+  if (['623', '809'].includes(letterType)) {
+    // 1. Check furnisher_addresses table
+    const { data: faRows } = await supabase
+      .from('furnisher_addresses')
+      .select('address, fcra_dept')
+      .or(`creditor_name.ilike.${recipientName},aka.cs.{${recipientName}}`)
+      .limit(1);
+
+    if (faRows && faRows.length > 0) {
+      const fa = faRows[0] as Record<string, string>;
+      resolvedRecipientAddress = `${recipientName}\nATTN: ${fa.fcra_dept || 'FCRA Compliance Department'}\n${fa.address}`;
+    } else {
+      // 2. Check furnisher_address in account bureau data
+      const acctWithAddr = accounts.find((a) => {
+        const bureauKeys = ['equifax_data', 'experian_data', 'transunion_data'];
+        return bureauKeys.some((k) => {
+          const bd = a[k] as Record<string, unknown> | null | undefined;
+          return bd?.furnisher_address && String(bd.furnisher_address).trim().length > 5;
+        });
+      });
+      if (acctWithAddr) {
+        const bureauKeys = ['equifax_data', 'experian_data', 'transunion_data'];
+        for (const k of bureauKeys) {
+          const bd = acctWithAddr[k] as Record<string, unknown> | null | undefined;
+          if (bd?.furnisher_address && String(bd.furnisher_address).trim().length > 5) {
+            resolvedRecipientAddress = `${recipientName}\nATTN: FCRA Compliance Department\n${bd.furnisher_address}`;
+            break;
+          }
+        }
+      } else if (
+        !recipientAddress ||
+        recipientAddress.includes('Verify Before Mailing') ||
+        recipientAddress.includes('Address on File')
+      ) {
+        // 3. Fallback — address not found
+        resolvedRecipientAddress = `${recipientName}\nATTN: FCRA Compliance Department\n*** VERIFY ADDRESS BEFORE MAILING ***`;
+        needsAddress = true;
+      }
+    }
+  }
+
   const disputeRound = Number(cr?.dispute_round ?? 1);
   const roundContext = disputeRound > 1
     ? `\nDISPUTE ROUND: ${disputeRound}\nROUND NOTES: ${cr?.round_notes || 'No notes provided'}\nThis is not a first-time dispute. Escalate language appropriately per round escalation strategy.`
@@ -95,22 +140,61 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // §605B-specific context: personal info errors and unauthorized inquiries
   let bureau605bContext = '';
   if (letterType === '605B' && typeof bureau === 'string' && bureau) {
-    const pie = cr?.personal_info_errors as { unknown_addresses?: string[]; unknown_phone_numbers?: string[] } | null | undefined;
-    const unknownAddresses: string[] = Array.isArray(pie?.unknown_addresses) ? pie!.unknown_addresses : [];
-    const unknownPhones: string[] = Array.isArray(pie?.unknown_phone_numbers) ? pie!.unknown_phone_numbers : [];
-    const allInquiries = Array.isArray(cr?.inquiries) ? cr!.inquiries as Array<{ creditor: string; date: string; bureau: string; potentially_unauthorized: boolean }> : [];
+    const pie = cr?.personal_info_errors as {
+      name_variations?: Record<string, string[]>;
+      unknown_addresses?: Record<string, string[]>;
+      unknown_phone_numbers?: Record<string, string[]>;
+    } | null | undefined;
+
+    // Dispute selections filter for this bureau
+    const disputeSel = cr?.dispute_selections as Record<string, Record<string, { bureaus: Record<string, boolean>; fcra_sections: string[] }>> | null | undefined;
+
+    // Name variations for this bureau (from dispute_selections.names)
+    const nameVarMap = pie?.name_variations ?? {};
+    const namesForBureau: string[] = [];
+    for (const [name, bureaus] of Object.entries(nameVarMap)) {
+      const sel = disputeSel?.names?.[name];
+      const inSel = sel ? sel.bureaus[bureau] : Array.isArray(bureaus) && bureaus.includes(bureau);
+      if (inSel) namesForBureau.push(name);
+    }
+
+    // Unknown addresses for this bureau
+    const addrMap = pie?.unknown_addresses ?? {};
+    const addrsForBureau: string[] = [];
+    for (const [addr, bureaus] of Object.entries(addrMap)) {
+      const sel = disputeSel?.addresses?.[addr];
+      const inSel = sel ? sel.bureaus[bureau] : Array.isArray(bureaus) && bureaus.includes(bureau);
+      if (inSel) addrsForBureau.push(addr);
+    }
+
+    // Unknown phone numbers for this bureau
+    const phoneMap = pie?.unknown_phone_numbers ?? {};
+    const phonesForBureau: string[] = [];
+    for (const [phone, bureaus] of Object.entries(phoneMap)) {
+      const sel = disputeSel?.phones?.[phone];
+      const inSel = sel ? sel.bureaus[bureau] : Array.isArray(bureaus) && bureaus.includes(bureau);
+      if (inSel) phonesForBureau.push(phone);
+    }
+
+    // Hard unauthorized inquiries for this bureau (confirmed or potentially unauthorized)
+    const allInquiries = Array.isArray(cr?.inquiries)
+      ? cr!.inquiries as Array<{ creditor: string; date: string; bureau: string; potentially_unauthorized: boolean; inquiry_type?: string; confirmed_unauthorized?: boolean }>
+      : [];
     const unauthorizedForBureau = allInquiries.filter(
-      (q) => q.potentially_unauthorized && q.bureau?.toLowerCase() === bureau.toLowerCase()
+      (q) => q.potentially_unauthorized && q.inquiry_type === 'hard' && q.bureau?.toLowerCase() === bureau.toLowerCase()
     );
 
-    if (unknownAddresses.length > 0) {
-      bureau605bContext += `\n\nFRAUDULENT ADDRESSES (include as Section II):\n${unknownAddresses.map((a, i) => `  ${i + 1}. ${a}`).join('\n')}`;
+    if (namesForBureau.length > 0) {
+      bureau605bContext += `\n\nFRAUDULENT NAME VARIATIONS (include under Section I or as separate item):\n${namesForBureau.map((n, i) => `  ${i + 1}. ${n}`).join('\n')}`;
     }
-    if (unknownPhones.length > 0) {
-      bureau605bContext += `\n\nFRAUDULENT PHONE NUMBERS (include as Section III):\n${unknownPhones.map((p, i) => `  ${i + 1}. ${p}`).join('\n')}`;
+    if (addrsForBureau.length > 0) {
+      bureau605bContext += `\n\nFRAUDULENT ADDRESSES (include as Section II):\n${addrsForBureau.map((a, i) => `  ${i + 1}. ${a}`).join('\n')}`;
+    }
+    if (phonesForBureau.length > 0) {
+      bureau605bContext += `\n\nFRAUDULENT PHONE NUMBERS (include as Section III):\n${phonesForBureau.map((p, i) => `  ${i + 1}. ${p}`).join('\n')}`;
     }
     if (unauthorizedForBureau.length > 0) {
-      bureau605bContext += `\n\nUNAUTHORIZED INQUIRIES FOR ${bureau.toUpperCase()} (include as Section IV):\n${unauthorizedForBureau.map((q, i) => `  ${i + 1}. ${q.creditor} — ${q.date}`).join('\n')}`;
+      bureau605bContext += `\n\nUNAUTHORIZED HARD INQUIRIES FOR ${bureau.toUpperCase()} (include as Section IV):\n${unauthorizedForBureau.map((q, i) => `  ${i + 1}. ${q.creditor} — ${q.date}`).join('\n')}`;
     }
   }
 
@@ -176,7 +260,7 @@ CLIENT DATA:
 
 RECIPIENT:
 - Name: ${recipientName}
-- Address: ${recipientAddress}
+- Address: ${resolvedRecipientAddress}
 
 ACCOUNTS RELEVANT TO THIS RECIPIENT:
 ${accountsList}
@@ -213,11 +297,12 @@ Return ONLY a JSON object in the exact shape specified. No explanation. No markd
     .insert({
       client_id: clientId,
       recipient_name: recipientName,
-      recipient_address: recipientAddress,
+      recipient_address: resolvedRecipientAddress,
       letter_type: letterType,
       content: parsed.letter,
       attachment_a: parsed.attachmentA,
       packet_top_slip: parsed.packetTopSlip,
+      needs_address: needsAddress,
     })
     .select('*')
     .single();

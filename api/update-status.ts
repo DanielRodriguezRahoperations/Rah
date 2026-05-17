@@ -15,7 +15,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  const { clientId, status, dispute_round, round_notes, personal_info_errors, ftc_report_numbers, case_type, address_verified } = req.body ?? {};
+  const { clientId, status, dispute_round, round_notes, personal_info_errors, ftc_report_numbers, case_type, address_verified, letterId, response_received_at } = req.body ?? {};
+
+  const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+
+  // Handle letter-level updates (response received, etc.)
+  if (letterId && response_received_at !== undefined) {
+    const { error: letterErr } = await supabase
+      .from('dispute_letters')
+      .update({ response_received_at })
+      .eq('id', letterId);
+    if (letterErr) {
+      console.error('[update-status] letter update error:', letterErr);
+      return res.status(500).json({ error: 'Failed to update letter' });
+    }
+    return res.status(200).json({ success: true });
+  }
 
   if (!clientId) {
     return res.status(400).json({ error: 'Missing clientId' });
@@ -33,8 +48,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (Object.keys(update).length === 0) {
     return res.status(400).json({ error: 'No fields to update' });
   }
-
-  const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 
   const { error } = await supabase
     .from('credit_repair_clients')

@@ -1,9 +1,12 @@
 export const BUREAU_ADDRESSES = {
-  experianFraud:   { name: 'Experian',   dept: 'Fraud / Identity Theft Unit',  address: 'P.O. Box 9554, Allen, TX 75013' },
-  experianDispute: { name: 'Experian',   dept: 'Dispute Department',            address: 'P.O. Box 4500, Allen, TX 75013' },
-  equifaxFraud:    { name: 'Equifax',    dept: 'Fraud / Identity Theft Unit',   address: 'P.O. Box 105788, Atlanta, GA 30348' },
-  equifaxDispute:  { name: 'Equifax',    dept: 'Dispute Department',            address: 'P.O. Box 740256, Atlanta, GA 30374' },
-  transunion:      { name: 'TransUnion', dept: 'Fraud / Identity Theft Unit',   address: 'P.O. Box 2000, Chester, PA 19016' },
+  experianFraud:    { name: 'Experian',   dept: 'Fraud / Identity Theft Unit',    address: 'P.O. Box 9554, Allen, TX 75013' },
+  experianDispute:  { name: 'Experian',   dept: 'Consumer Dispute Center',         address: 'P.O. Box 4500, Allen, TX 75013' },
+  equifaxFraud:     { name: 'Equifax',    dept: 'Fraud / Identity Theft Unit',     address: 'P.O. Box 105788, Atlanta, GA 30348' },
+  equifaxDispute:   { name: 'Equifax',    dept: 'Consumer Dispute Department',     address: 'P.O. Box 740256, Atlanta, GA 30374' },
+  transunionFraud:  { name: 'TransUnion', dept: 'Fraud Victim Assistance',         address: 'P.O. Box 2000, Chester, PA 19016' },
+  transunionDispute:{ name: 'TransUnion', dept: 'Consumer Dispute Center',         address: 'P.O. Box 2000, Chester, PA 19016' },
+  // keep legacy key for backward compat
+  transunion:       { name: 'TransUnion', dept: 'Fraud Victim Assistance',         address: 'P.O. Box 2000, Chester, PA 19016' },
 } as const;
 
 export const RESPONSE_WINDOWS = {

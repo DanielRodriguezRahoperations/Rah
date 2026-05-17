@@ -16,16 +16,29 @@
 // ALTER TABLE dispute_accounts ADD COLUMN IF NOT EXISTS dispute_priority text DEFAULT 'medium';
 // ALTER TABLE dispute_accounts ADD COLUMN IF NOT EXISTS recommended_fcra_sections text[] DEFAULT '{}';
 // ALTER TABLE dispute_accounts ADD COLUMN IF NOT EXISTS letter_targets jsonb DEFAULT '{}';
+// ALTER TABLE dispute_accounts ADD COLUMN IF NOT EXISTS strategy_notes text;
 // ALTER TABLE credit_repair_clients ADD COLUMN IF NOT EXISTS personal_info_errors jsonb;
 // ALTER TABLE credit_repair_clients ADD COLUMN IF NOT EXISTS inquiries jsonb;
 // ALTER TABLE credit_repair_clients ADD COLUMN IF NOT EXISTS ftc_report_numbers text[] DEFAULT '{}';
 // ALTER TABLE credit_repair_clients ADD COLUMN IF NOT EXISTS dispute_selections jsonb DEFAULT '{}';
 // ALTER TABLE credit_repair_clients ADD COLUMN IF NOT EXISTS case_type text DEFAULT 'identity_theft';
 // ALTER TABLE credit_repair_clients ADD COLUMN IF NOT EXISTS positive_accounts jsonb DEFAULT '[]';
+// ALTER TABLE credit_repair_clients ADD COLUMN IF NOT EXISTS strategy_notes text;
+// CREATE TABLE IF NOT EXISTS furnisher_addresses (
+//   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+//   creditor_name text NOT NULL,
+//   aka text[] DEFAULT '{}',
+//   address text NOT NULL,
+//   fcra_dept text DEFAULT 'FCRA Compliance Department',
+//   notes text,
+//   created_at timestamptz DEFAULT now()
+// );
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import Anthropic from '@anthropic-ai/sdk';
+
+export const config = { maxDuration: 60 };
 
 function validateAdmin(req: VercelRequest): boolean {
   const expected = `Bearer ${Buffer.from(process.env.ADMIN_PASSWORD ?? '').toString('base64')}`;
@@ -38,80 +51,124 @@ const BUREAU_FIELD: Record<string, string> = {
   transunion: 'doc_cr_transunion',
 };
 
-const CREDIT_ANALYSIS_SYSTEM_PROMPT = `You are an expert credit repair analyst and FCRA attorney with 20 years of experience. When analyzing credit reports you do the following:
+const CALL1_SYSTEM_PROMPT = `You are a credit report data extraction specialist. Your ONLY job is to extract raw data from three bureau credit reports. Do not determine legal strategy here — only extract facts.
 
-1. CROSS-BUREAU MATCHING
-   Match accounts across all three bureaus by creditor name similarity and account number overlap. One creditor = one account record with per-bureau data. Never create duplicate records for the same debt.
+EXTRACTION RULES:
 
-2. DUPLICATE/DOUBLE REPORTING DETECTION
-   Flag any account where the same underlying debt appears to be reporting more than once. Common patterns:
-   - Original installment account + a new collection account for the same debt (e.g. Aidvantage student loans transferred to DOE collections — same loan appearing twice)
-   - Two accounts with identical account numbers at the same creditor
-   - A charge-off AND a collection for the same original creditor
-   Set duplicate_flag: true and explain in duplicate_note.
+NEGATIVE ACCOUNTS (charge-offs, collections, late payments, bankruptcies, judgments):
+- ONE record per unique underlying debt, matched across bureaus by creditor name similarity AND account number overlap
+- Never create duplicate records for the same debt
+- Only include a bureau data object if that bureau's text EXPLICITLY lists that account — never infer cross-bureau presence
+- For each bureau reporting the account, extract: account_number, balance, date_opened, account_status, estimated_removal, addresses[], phone_numbers[], name_variations[], and furnisher_address (the FCRA compliance/dispute mailing address for that creditor found in that bureau's text — use "" if not found)
 
-3. BALANCE INCONSISTENCY DETECTION
-   If the same account shows different balances across bureaus, flag it. Set balance_inconsistency: true. This is a dispute angle under §611.
+HARD INQUIRIES ONLY:
+- INCLUDE: Hard inquiries made for lending decisions, credit applications, account openings
+- EXCLUDE ALL soft inquiries: promotional, pre-approval, account review, employer checks, insurance, monitoring services, credit score pulls
+- For each hard inquiry: creditor, date, bureau, inquiry_type: "hard", reason (stated purpose if available, else ""), potentially_unauthorized: boolean
 
-4. DISPUTE PRIORITY SCORING
-   Rate each negative account: "critical", "high", "medium", or "low"
-   - critical: charge-off or collection $5,000+, or duplicate reporting
-   - high: collection or charge-off any amount on 2+ bureaus
-   - medium: single bureau negative, or minor inconsistency
-   - low: single late payment, inquiry dispute
+PERSONAL INFORMATION ERRORS:
+- Extract ONLY items that appear incorrect, unknown, or fraudulent — not the client's verified current info
+- For each item, record which bureau(s) reported it
 
-5. RECOMMENDED FCRA SECTIONS per account (use these exact keys: "611", "623", "605B", "609", "809"):
-   - Collection account → ["611","623"]
-   - Charge-off → ["611","623"]
-   - Identity theft account → ["605B","611"]
-   - Duplicate reporting → ["611"]
-   - Balance inconsistency → ["611"]
-   - Unauthorized inquiry → ["611"]
-   - Furnisher dispute needed → ["623"]
-   - Debt validation needed → ["809"]
+POSITIVE ACCOUNTS (all accounts in good standing — current, on-time, paid as agreed):
+- Extract all of them for reference
 
-6. LETTER TARGETING
-   For each account, list which bureaus and furnishers/creditors need letters. Only target bureaus that actually report that account.
-
-7. PERSONAL INFORMATION ERRORS
-   Extract any variations of the client's name, unknown addresses, and unknown phone numbers found anywhere across all three reports.
-   For each item, record which bureau(s) reported it as an array of bureau names.
-   Use exactly these bureau identifiers: "equifax", "experian", "transunion".
-
-Return ONLY a valid JSON object — no markdown, no explanation:
-
+Return ONLY valid JSON (no markdown, no explanation):
 {
   "accounts": [
     {
       "creditor_name": "string",
       "original_creditor": "string",
       "account_type": "string",
-      "dispute_priority": "critical|high|medium|low",
-      "recommended_fcra_sections": ["611","623"],
-      "duplicate_flag": false,
-      "duplicate_note": "string",
-      "balance_inconsistency": false,
-      "balance_inconsistency_note": "string",
-      "letter_targets": { "bureaus": ["equifax"], "furnishers": ["creditor name"] },
-      "equifax": { "account_number": "string", "balance": "string", "date_opened": "string", "account_status": "string", "estimated_removal": "string", "addresses": [], "phone_numbers": [], "name_variations": [] },
-      "experian": { "same shape as equifax" } or null,
-      "transunion": { "same shape as equifax" } or null
+      "equifax": {
+        "account_number": "string", "balance": "string", "date_opened": "string",
+        "account_status": "string", "estimated_removal": "string",
+        "addresses": [], "phone_numbers": [], "name_variations": [],
+        "furnisher_address": ""
+      },
+      "experian": null,
+      "transunion": null
     }
   ],
   "personal_info_errors": {
-    "name_variations":       { "John R Smith": ["equifax", "experian"], "J. Smith": ["transunion"] },
-    "unknown_addresses":     { "123 Unknown St, City, ST 12345": ["equifax"] },
-    "unknown_phone_numbers": { "555-123-4567": ["experian", "transunion"] }
+    "name_variations": { "John R Smith": ["equifax", "experian"] },
+    "unknown_addresses": { "123 Fake St, City ST 12345": ["equifax"] },
+    "unknown_phone_numbers": { "555-000-0000": ["transunion"] }
   },
   "inquiries": [
-    { "creditor": "string", "date": "string", "bureau": "string", "potentially_unauthorized": false }
+    {
+      "creditor": "string", "date": "string", "bureau": "string",
+      "inquiry_type": "hard", "reason": "string", "potentially_unauthorized": true
+    }
   ],
   "positive_accounts": [
     { "creditor_name": "string", "account_number": "string", "balance": "string", "date_opened": "string", "status": "string", "bureaus": [] }
   ]
-}
+}`;
 
-Never guess bureau assignment — only include a bureau data object if that bureau's report text explicitly contains that account. Set that bureau to null otherwise.`;
+const CALL2_SYSTEM_PROMPT = `You are an FCRA/FDCPA attorney reviewing extracted credit report accounts and determining optimal legal dispute strategy for each account and for the case overall.
+
+FCRA SECTION RULES — FOLLOW EXACTLY:
+- Fraudulent account (identity theft, opened without consent): §605B (PRIMARY) + §623
+- Collection account on fraudulent debt: §605B + §623 + §809
+- Duplicate reporting (same debt appears twice — e.g. original + collection): §611 CRITICAL priority
+- Balance inconsistency across bureaus: §611
+- Standard inaccuracy, outdated info (no fraud): §611 + §623
+- Unauthorized hard inquiry: §611
+- CRITICAL: §809 applies ONLY to third-party debt collectors — NEVER to original creditors, credit unions, banks, or credit bureaus
+
+DISPUTE PRIORITY:
+- critical: confirmed identity theft, duplicate reporting, or charge-off/collection $5,000+
+- high: collection or charge-off on 2+ bureaus, any amount
+- medium: single bureau negative, balance inconsistency
+- low: single late payment, minor error, inquiry
+
+Return ONLY valid JSON (no markdown, no explanation):
+{
+  "overall_case_type": "identity_theft | standard_dispute",
+  "overall_strategy": "Detailed paragraph explaining the overall legal strategy — what makes this case strong, which laws apply, what outcome is achievable, and recommended approach",
+  "account_strategies": [
+    {
+      "creditor_name": "must exactly match creditor_name from input accounts",
+      "dispute_priority": "critical|high|medium|low",
+      "recommended_fcra_sections": ["605B", "623"],
+      "duplicate_flag": false,
+      "duplicate_note": "",
+      "balance_inconsistency": false,
+      "balance_inconsistency_note": "",
+      "letter_targets": { "bureaus": ["equifax"], "furnishers": ["creditor name"] },
+      "strategy_notes": "One sentence: specific legal angle and why it applies to this account"
+    }
+  ]
+}`;
+
+type BureauData = {
+  account_number: string;
+  balance: string;
+  date_opened: string;
+  account_status: string;
+  estimated_removal: string;
+  addresses: string[];
+  phone_numbers: string[];
+  name_variations: string[];
+  furnisher_address: string;
+};
+
+const safeBureau = (d: unknown): BureauData | null => {
+  if (!d || typeof d !== 'object') return null;
+  const o = d as Record<string, unknown>;
+  return {
+    account_number: String(o.account_number ?? ''),
+    balance: String(o.balance ?? ''),
+    date_opened: String(o.date_opened ?? ''),
+    account_status: String(o.account_status ?? ''),
+    estimated_removal: String(o.estimated_removal ?? ''),
+    addresses: Array.isArray(o.addresses) ? o.addresses.map(String) : [],
+    phone_numbers: Array.isArray(o.phone_numbers) ? o.phone_numbers.map(String) : [],
+    name_variations: Array.isArray(o.name_variations) ? o.name_variations.map(String) : [],
+    furnisher_address: String(o.furnisher_address ?? ''),
+  };
+};
 
 type AutoItemSelection = {
   bureaus: { equifax: boolean; experian: boolean; transunion: boolean };
@@ -163,10 +220,11 @@ function buildAutoDisputeSelections(
     return result;
   };
 
-  type InqRow = { creditor: string; date: string; bureau: string; potentially_unauthorized: boolean };
+  type InqRow = { creditor: string; date: string; bureau: string; potentially_unauthorized: boolean; inquiry_type?: string };
   const inquiriesMap: Record<string, AutoItemSelection> = {};
   for (const inq of (inquiries as InqRow[])) {
-    if (inq.potentially_unauthorized) {
+    // Only include hard inquiries that are potentially unauthorized
+    if (inq.potentially_unauthorized && inq.inquiry_type === 'hard') {
       const key = `${inq.creditor}:${inq.bureau}:${inq.date}`;
       const b = (inq.bureau ?? '').toLowerCase();
       inquiriesMap[key] = {
@@ -184,6 +242,16 @@ function buildAutoDisputeSelections(
     inquiries: inquiriesMap,
   };
 }
+
+const parseClaudeJson = (response: Anthropic.Message): Record<string, unknown> => {
+  const textBlock = response.content.find((b) => b.type === 'text');
+  const raw = textBlock && textBlock.type === 'text' ? textBlock.text : '';
+  const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
+  const startIdx = cleaned.indexOf('{');
+  const endIdx = cleaned.lastIndexOf('}');
+  const jsonStr = startIdx >= 0 && endIdx > startIdx ? cleaned.slice(startIdx, endIdx + 1) : cleaned;
+  return JSON.parse(jsonStr);
+};
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!validateAdmin(req)) {
@@ -253,7 +321,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   }
 
-  // === POST: analyze extracted texts with Claude (per-bureau structure) ===
+  // === POST: analyze extracted texts with Claude (3 sequential calls) ===
   if (req.method === 'POST') {
     const { clientId, texts } = req.body ?? {};
     if (!clientId || !texts || typeof texts !== 'object') {
@@ -267,91 +335,121 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const anthropic = new Anthropic({ apiKey: claudeKey });
 
-    console.log('[analyze-reports] equifax text (first 500):', (texts.equifax || '').slice(0, 500));
-    console.log('[analyze-reports] experian text (first 500):', (texts.experian || '').slice(0, 500));
-    console.log('[analyze-reports] transunion text (first 500):', (texts.transunion || '').slice(0, 500));
-
-    const userMsg = `You are analyzing THREE SEPARATE credit report source documents. Treat each bureau's text as an independent source. Match accounts across them by creditor name and account number similarity.
-
-=== SOURCE 1: EQUIFAX REPORT ===
+    const reportText = `=== SOURCE 1: EQUIFAX REPORT ===
 ${texts.equifax || '[NOT PROVIDED — do not assign any accounts to Equifax]'}
 
 === SOURCE 2: EXPERIAN REPORT ===
 ${texts.experian || '[NOT PROVIDED — do not assign any accounts to Experian]'}
 
 === SOURCE 3: TRANSUNION REPORT ===
-${texts.transunion || '[NOT PROVIDED — do not assign any accounts to TransUnion]'}
+${texts.transunion || '[NOT PROVIDED — do not assign any accounts to TransUnion]'}`;
 
-=== END OF SOURCE DOCUMENTS ===
+    console.log('[analyze-reports] Starting Call 1: Account Extraction');
 
-Now apply your full analysis: cross-bureau matching, duplicate detection, balance inconsistency detection, priority scoring, FCRA section recommendations, letter targeting, and personal info error extraction.
-
-Return ONLY the JSON object described in the system prompt. No markdown. No explanation.`;
-
-    type BureauData = {
-      account_number: string;
-      balance: string;
-      date_opened: string;
-      account_status: string;
-      estimated_removal: string;
-      addresses: string[];
-      phone_numbers: string[];
-      name_variations: string[];
-    };
-
-    const safeBureau = (d: unknown): BureauData | null => {
-      if (!d || typeof d !== 'object') return null;
-      const o = d as Record<string, unknown>;
-      return {
-        account_number: String(o.account_number ?? ''),
-        balance: String(o.balance ?? ''),
-        date_opened: String(o.date_opened ?? ''),
-        account_status: String(o.account_status ?? ''),
-        estimated_removal: String(o.estimated_removal ?? ''),
-        addresses: Array.isArray(o.addresses) ? o.addresses.map(String) : [],
-        phone_numbers: Array.isArray(o.phone_numbers) ? o.phone_numbers.map(String) : [],
-        name_variations: Array.isArray(o.name_variations) ? o.name_variations.map(String) : [],
-      };
-    };
-
-    let extractedAccounts: Array<{
+    // --- CALL 1: Account Extraction ---
+    type RawAccount = {
       creditor_name: unknown; original_creditor: unknown; account_type: unknown;
-      dispute_priority: unknown; recommended_fcra_sections: unknown;
-      duplicate_flag: unknown; duplicate_note: unknown;
-      balance_inconsistency: unknown; balance_inconsistency_note: unknown;
-      letter_targets: unknown;
       equifax: unknown; experian: unknown; transunion: unknown;
-    }> = [];
+    };
+
+    let extractedAccounts: RawAccount[] = [];
     let parsedPersonalInfoErrors: Record<string, unknown> = {};
-    let parsedInquiries: unknown[] = [];
+    let allInquiries: unknown[] = [];
     let parsedPositiveAccounts: unknown[] = [];
 
     try {
-      const response = await anthropic.messages.create({
+      const r1 = await anthropic.messages.create({
         model: 'claude-sonnet-4-6',
-        max_tokens: 6000,
-        system: CREDIT_ANALYSIS_SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: userMsg }],
+        max_tokens: 4000,
+        system: CALL1_SYSTEM_PROMPT,
+        messages: [{
+          role: 'user',
+          content: `Analyze these three credit reports and extract all account, inquiry, and personal information data:\n\n${reportText}\n\nReturn ONLY the JSON object.`,
+        }],
       });
 
-      const textBlock = response.content.find((b) => b.type === 'text');
-      const raw = textBlock && textBlock.type === 'text' ? textBlock.text : '';
-      console.log('[analyze-reports] Claude raw response (first 1000):', raw.slice(0, 1000));
-      const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
-      const startIdx = cleaned.indexOf('{');
-      const endIdx = cleaned.lastIndexOf('}');
-      const jsonStr = startIdx >= 0 && endIdx > startIdx ? cleaned.slice(startIdx, endIdx + 1) : cleaned;
-      const parsed = JSON.parse(jsonStr);
-      if (!Array.isArray(parsed?.accounts)) throw new Error('Missing accounts array');
-      extractedAccounts = parsed.accounts;
-      parsedPersonalInfoErrors = (parsed.personal_info_errors && typeof parsed.personal_info_errors === 'object') ? parsed.personal_info_errors as Record<string, unknown> : {};
-      parsedInquiries = Array.isArray(parsed.inquiries) ? parsed.inquiries : [];
-      parsedPositiveAccounts = Array.isArray(parsed.positive_accounts) ? parsed.positive_accounts : [];
+      console.log('[analyze-reports] Call 1 complete, parsing...');
+      const parsed1 = parseClaudeJson(r1);
+      if (!Array.isArray(parsed1?.accounts)) throw new Error('Call 1: Missing accounts array');
+      extractedAccounts = parsed1.accounts as RawAccount[];
+      parsedPersonalInfoErrors = (parsed1.personal_info_errors && typeof parsed1.personal_info_errors === 'object')
+        ? parsed1.personal_info_errors as Record<string, unknown> : {};
+      allInquiries = Array.isArray(parsed1.inquiries) ? parsed1.inquiries : [];
+      parsedPositiveAccounts = Array.isArray(parsed1.positive_accounts) ? parsed1.positive_accounts : [];
     } catch (err) {
-      console.error('[analyze-reports] Claude error:', err);
-      return res.status(500).json({ error: 'Failed to analyze reports' });
+      console.error('[analyze-reports] Call 1 error:', err);
+      return res.status(500).json({ error: 'Failed to extract accounts from credit reports' });
     }
 
+    // Filter to hard inquiries only (Call 1 should only return hard inquiries, this is a safety filter)
+    const parsedInquiries = allInquiries.filter((q: unknown) => {
+      const inq = q as Record<string, unknown>;
+      return inq.inquiry_type === 'hard';
+    });
+
+    console.log(`[analyze-reports] Call 1: ${extractedAccounts.length} accounts, ${parsedInquiries.length} hard inquiries`);
+
+    // --- CALL 2: Legal Strategy ---
+    type AccountStrategy = {
+      creditor_name: string;
+      dispute_priority: string;
+      recommended_fcra_sections: string[];
+      duplicate_flag: boolean;
+      duplicate_note: string;
+      balance_inconsistency: boolean;
+      balance_inconsistency_note: string;
+      letter_targets: Record<string, unknown>;
+      strategy_notes: string;
+    };
+
+    let overallCaseType = 'identity_theft';
+    let overallStrategy = '';
+    const strategyMap: Record<string, AccountStrategy> = {};
+
+    try {
+      const accountSummary = extractedAccounts.map((a) => ({
+        creditor_name: a.creditor_name,
+        original_creditor: a.original_creditor,
+        account_type: a.account_type,
+        bureaus_reporting: [
+          a.equifax ? 'equifax' : null,
+          a.experian ? 'experian' : null,
+          a.transunion ? 'transunion' : null,
+        ].filter(Boolean),
+        balance_equifax: (a.equifax as Record<string, unknown> | null)?.balance,
+        balance_experian: (a.experian as Record<string, unknown> | null)?.balance,
+        balance_transunion: (a.transunion as Record<string, unknown> | null)?.balance,
+        status_equifax: (a.equifax as Record<string, unknown> | null)?.account_status,
+        status_experian: (a.experian as Record<string, unknown> | null)?.account_status,
+        status_transunion: (a.transunion as Record<string, unknown> | null)?.account_status,
+      }));
+
+      const r2 = await anthropic.messages.create({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 2000,
+        system: CALL2_SYSTEM_PROMPT,
+        messages: [{
+          role: 'user',
+          content: `Determine legal dispute strategy for these ${accountSummary.length} extracted accounts:\n\n${JSON.stringify(accountSummary, null, 2)}\n\nReturn ONLY the strategy JSON.`,
+        }],
+      });
+
+      console.log('[analyze-reports] Call 2 complete, parsing...');
+      const parsed2 = parseClaudeJson(r2);
+      overallCaseType = String(parsed2?.overall_case_type ?? 'identity_theft');
+      overallStrategy = String(parsed2?.overall_strategy ?? '');
+      const strategies = Array.isArray(parsed2?.account_strategies) ? parsed2.account_strategies as AccountStrategy[] : [];
+      for (const s of strategies) {
+        const key = String(s.creditor_name ?? '').toLowerCase().trim();
+        if (key) strategyMap[key] = s;
+      }
+    } catch (err) {
+      console.error('[analyze-reports] Call 2 error (non-fatal, using defaults):', err);
+    }
+
+    console.log(`[analyze-reports] Call 2: case_type=${overallCaseType}, strategies=${Object.keys(strategyMap).length}`);
+
+    // Build and insert dispute_accounts rows, merging Call 2 strategies
     await supabase.from('dispute_accounts').delete().eq('client_id', clientId);
 
     const rows = extractedAccounts.map((a) => {
@@ -360,9 +458,12 @@ Return ONLY the JSON object described in the system prompt. No markdown. No expl
       const tu = safeBureau(a.transunion);
       const bureaus = [eq ? 'equifax' : null, ex ? 'experian' : null, tu ? 'transunion' : null].filter(Boolean) as string[];
       const primary = eq ?? ex ?? tu;
-      const recommendedSections = Array.isArray(a.recommended_fcra_sections)
-        ? (a.recommended_fcra_sections as unknown[]).map(String)
-        : [];
+
+      const creditorKey = String(a.creditor_name ?? '').toLowerCase().trim();
+      const strategy = strategyMap[creditorKey] ?? null;
+
+      const recommendedSections = strategy?.recommended_fcra_sections?.map(String) ?? [];
+
       return {
         client_id: clientId,
         creditor_name: String(a.creditor_name ?? ''),
@@ -382,13 +483,14 @@ Return ONLY the JSON object described in the system prompt. No markdown. No expl
         phone_numbers: primary?.phone_numbers ?? [],
         name_variations: primary?.name_variations ?? [],
         addresses: primary?.addresses ?? [],
-        duplicate_flag: Boolean(a.duplicate_flag),
-        duplicate_note: String(a.duplicate_note ?? ''),
-        balance_inconsistency: Boolean(a.balance_inconsistency),
-        balance_inconsistency_note: String(a.balance_inconsistency_note ?? ''),
-        dispute_priority: String(a.dispute_priority ?? 'medium'),
+        duplicate_flag: Boolean(strategy?.duplicate_flag ?? false),
+        duplicate_note: String(strategy?.duplicate_note ?? ''),
+        balance_inconsistency: Boolean(strategy?.balance_inconsistency ?? false),
+        balance_inconsistency_note: String(strategy?.balance_inconsistency_note ?? ''),
+        dispute_priority: String(strategy?.dispute_priority ?? 'medium'),
         recommended_fcra_sections: recommendedSections,
-        letter_targets: (a.letter_targets && typeof a.letter_targets === 'object') ? a.letter_targets : {},
+        letter_targets: (strategy?.letter_targets && typeof strategy.letter_targets === 'object') ? strategy.letter_targets : {},
+        strategy_notes: String(strategy?.strategy_notes ?? ''),
         selected: true,
         dispute_types: recommendedSections,
         notes: '',
@@ -410,15 +512,19 @@ Return ONLY the JSON object described in the system prompt. No markdown. No expl
 
     const autoDisputeSelections = buildAutoDisputeSelections(inserted, parsedPersonalInfoErrors, parsedInquiries);
 
+    const clientUpdate: Record<string, unknown> = {
+      status: 'analyzing',
+      personal_info_errors: parsedPersonalInfoErrors,
+      inquiries: parsedInquiries,
+      positive_accounts: parsedPositiveAccounts,
+      dispute_selections: autoDisputeSelections,
+      case_type: overallCaseType,
+    };
+    if (overallStrategy) clientUpdate.strategy_notes = overallStrategy;
+
     await supabase
       .from('credit_repair_clients')
-      .update({
-        status: 'analyzing',
-        personal_info_errors: parsedPersonalInfoErrors,
-        inquiries: parsedInquiries,
-        positive_accounts: parsedPositiveAccounts,
-        dispute_selections: autoDisputeSelections,
-      })
+      .update(clientUpdate)
       .eq('id', clientId);
 
     return res.status(200).json({ accounts: inserted, count: inserted.length });
@@ -441,6 +547,7 @@ Return ONLY the JSON object described in the system prompt. No markdown. No expl
       'duplicate_flag', 'duplicate_note',
       'balance_inconsistency', 'balance_inconsistency_note',
       'dispute_priority', 'recommended_fcra_sections', 'letter_targets',
+      'strategy_notes',
     ]);
 
     const updateData: Record<string, unknown> = {};

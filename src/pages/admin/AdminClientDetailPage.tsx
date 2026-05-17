@@ -26,10 +26,11 @@ interface ClientDetail {
     address_flag_notes?: string | null;
     created_at: string;
     personal_info_errors?: { name_variations: Record<string, string[]>; unknown_addresses: Record<string, string[]>; unknown_phone_numbers: Record<string, string[]> } | null;
-    inquiries?: Array<{ creditor: string; date: string; bureau: string; potentially_unauthorized: boolean }> | null;
+    inquiries?: Array<{ creditor: string; date: string; bureau: string; potentially_unauthorized: boolean; inquiry_type?: string; reason?: string }> | null;
     ftc_report_numbers?: string[] | null;
     dispute_selections?: Record<string, unknown> | null;
     case_type?: string | null;
+    strategy_notes?: string | null;
     positive_accounts?: Array<Record<string, unknown>> | null;
     address_verification_result?: {
       intake_address: string;
@@ -40,8 +41,8 @@ interface ClientDetail {
       verified: boolean;
     } | null;
   };
-  letters: Array<Record<string, unknown> & { id: string; recipient_name: string; letter_type: string; created_at: string; pdf_unsigned_path?: string | null; lob_tracking_number?: string | null; mailed_at?: string | null; mail_status?: string | null; }>;
-  accounts: Array<Record<string, unknown> & { id: string; creditor_name: string; account_number: string; account_number_equifax?: string; account_number_experian?: string; account_number_transunion?: string; balance: string; date_opened: string; account_type: string; account_status: string; bureaus: string[]; selected: boolean; dispute_types: string[]; original_creditor?: string; phone_numbers?: string[]; name_variations?: string[]; addresses?: string[]; equifax_data?: Record<string, unknown> | null; experian_data?: Record<string, unknown> | null; transunion_data?: Record<string, unknown> | null; duplicate_flag?: boolean; duplicate_note?: string; balance_inconsistency?: boolean; balance_inconsistency_note?: string; dispute_priority?: string; recommended_fcra_sections?: string[]; letter_targets?: Record<string, unknown> }>;
+  letters: Array<Record<string, unknown> & { id: string; recipient_name: string; letter_type: string; created_at: string; pdf_unsigned_path?: string | null; lob_tracking_number?: string | null; mailed_at?: string | null; mail_status?: string | null; needs_address?: boolean | null; response_received_at?: string | null; }>;
+  accounts: Array<Record<string, unknown> & { id: string; creditor_name: string; account_number: string; account_number_equifax?: string; account_number_experian?: string; account_number_transunion?: string; balance: string; date_opened: string; account_type: string; account_status: string; bureaus: string[]; selected: boolean; dispute_types: string[]; original_creditor?: string; phone_numbers?: string[]; name_variations?: string[]; addresses?: string[]; equifax_data?: Record<string, unknown> | null; experian_data?: Record<string, unknown> | null; transunion_data?: Record<string, unknown> | null; duplicate_flag?: boolean; duplicate_note?: string; balance_inconsistency?: boolean; balance_inconsistency_note?: string; dispute_priority?: string; recommended_fcra_sections?: string[]; letter_targets?: Record<string, unknown>; strategy_notes?: string }>;
   responses: Array<Record<string, unknown> & { id: string; created_at: string }>;
   docUrls: Record<string, string | null>;
   miscFiles: Array<{ path: string; filename: string; uploaded_at: string; signedUrl: string | null }>;
@@ -451,9 +452,11 @@ const AdminClientDetailPage = () => {
                 busy={busy}
                 disputeRound={Number(client.dispute_round ?? 1)}
                 responseCount={data.responses?.length ?? 0}
+                docUrls={docUrls}
+                ftcReportFileCount={data.ftcReportFiles?.length ?? 0}
               />
             )}
-            {tab === 'tracking' && <TrackingTab letters={letters} />}
+            {tab === 'tracking' && <TrackingTab letters={letters} clientId={client.id} onChange={loadDetail} />}
           </motion.div>
         </div>
       </section>
@@ -724,6 +727,15 @@ const OverviewTab = ({
           </button>
         </div>
       </div>
+      <div className="bg-[#1a1a1a] border border-amber-900/40 rounded-sm p-6 lg:col-span-2">
+        <h3 className="text-xs uppercase tracking-widest text-amber-400 font-bold mb-2">AI Dispute Strategy</h3>
+        {client.strategy_notes ? (
+          <p className="text-sm text-neutral-300 leading-relaxed">{client.strategy_notes}</p>
+        ) : (
+          <p className="text-xs text-neutral-600">Run analysis to generate strategy.</p>
+        )}
+      </div>
+
       <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-6 lg:col-span-2">
         <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold mb-4">Dispute Round</h3>
         <div className="grid sm:grid-cols-2 gap-4 mb-4">
@@ -1367,7 +1379,7 @@ const AnalyzeTab = ({
     Object.keys(personalInfo.unknown_addresses).length > 0 ||
     Object.keys(personalInfo.unknown_phone_numbers).length > 0;
 
-  const unauthorizedInquiries = (client.inquiries ?? []).filter((q) => q.potentially_unauthorized);
+  const unauthorizedInquiries = (client.inquiries ?? []).filter((q) => q.inquiry_type === 'hard' && q.potentially_unauthorized);
 
   return (
     <div>
@@ -1552,6 +1564,14 @@ const AnalyzeTab = ({
                             <span className={`flex-shrink-0 text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm border font-bold ${priorityStyle}`}>
                               {priority}
                             </span>
+                            {a.strategy_notes && (
+                              <span
+                                title={a.strategy_notes}
+                                className="flex-shrink-0 text-[11px] text-neutral-500 hover:text-amber-400 cursor-help transition-colors leading-none mt-0.5"
+                              >
+                                ⓘ
+                              </span>
+                            )}
                           </div>
                           <div className="mt-0.5 flex items-center gap-0.5">
                             <input
@@ -1804,22 +1824,22 @@ const AnalyzeTab = ({
         </div>
       )}
 
-      {/* Potentially Unauthorized Inquiries */}
+      {/* Hard Unauthorized Inquiries */}
       {unauthorizedInquiries.length > 0 && (
         <div className="mt-6 bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-neutral-800">
             <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold">
-              Potentially Unauthorized Inquiries ({unauthorizedInquiries.length})
+              Hard Inquiries — Potentially Unauthorized ({unauthorizedInquiries.length})
             </h3>
-            <p className="text-xs text-neutral-500 mt-1">May be disputable under FCRA §611.</p>
+            <p className="text-xs text-neutral-500 mt-1">Only hard inquiries shown. Confirm each as unauthorized before adding to letters.</p>
           </div>
           <table className="w-full text-sm">
             <thead className="bg-[#0f0f0f] border-b border-neutral-800">
               <tr className="text-left text-[10px] uppercase tracking-widest text-neutral-500">
-                <th className="px-4 py-3">Creditor</th>
+                <th className="px-4 py-3">Creditor / Reason</th>
                 <th className="px-4 py-3">Bureau</th>
                 <th className="px-4 py-3">Date</th>
-                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Confirm</th>
                 <th className="px-4 py-3 min-w-[200px]">Add to Letter</th>
               </tr>
             </thead>
@@ -1827,15 +1847,38 @@ const AnalyzeTab = ({
               {unauthorizedInquiries.map((q, i) => {
                 const iqKey = `${q.creditor}:${q.bureau}:${q.date}`;
                 const iqSel = disputeSelections.inquiries[iqKey] ?? emptyItemSelection();
+                const isConfirmed = (iqSel as unknown as Record<string, boolean>).confirmed_unauthorized === true;
                 return (
                   <tr key={i} className="border-b border-neutral-800/60 align-top">
-                    <td className="px-4 py-3 text-white">{q.creditor}</td>
-                    <td className="px-4 py-3 text-neutral-300 capitalize">{q.bureau}</td>
+                    <td className="px-4 py-3">
+                      <div className="text-white font-medium">{q.creditor}</div>
+                      {q.reason && <div className="text-[10px] text-neutral-500 mt-0.5">{q.reason}</div>}
+                    </td>
+                    <td className="px-4 py-3 text-neutral-300 capitalize text-xs">{q.bureau}</td>
                     <td className="px-4 py-3 text-neutral-400 text-xs">{q.date}</td>
                     <td className="px-4 py-3">
-                      <span className="text-[10px] uppercase tracking-wider text-amber-400 bg-amber-950/30 border border-amber-800/50 rounded-sm px-2 py-0.5">
-                        ⚠ Unauthorized
-                      </span>
+                      <button
+                        onClick={() => {
+                          const next = {
+                            ...disputeSelections,
+                            inquiries: {
+                              ...disputeSelections.inquiries,
+                              [iqKey]: {
+                                ...iqSel,
+                                confirmed_unauthorized: !isConfirmed,
+                              } as unknown as typeof iqSel,
+                            },
+                          };
+                          saveDisputeSelections(next);
+                        }}
+                        className={`text-[9px] uppercase tracking-widest px-2 py-1 rounded-sm border transition-colors whitespace-nowrap ${
+                          isConfirmed
+                            ? 'border-red-800 bg-red-950/30 text-red-400 hover:bg-red-950/50'
+                            : 'border-neutral-700 text-neutral-500 hover:border-amber-700 hover:text-amber-400'
+                        }`}
+                      >
+                        {isConfirmed ? '✓ Unauthorized' : 'Confirm Unauthorized'}
+                      </button>
                     </td>
                     <td className="px-4 py-2">
                       <div className="space-y-1.5">
@@ -1913,8 +1956,8 @@ const RECIPIENT_PRESETS: Array<{
   {
     key: 'transunion-fraud',
     letterType: '605B',
-    recipientName: BUREAU_ADDRESSES.transunion.name,
-    recipientAddress: `${BUREAU_ADDRESSES.transunion.dept}\n${BUREAU_ADDRESSES.transunion.address}`,
+    recipientName: BUREAU_ADDRESSES.transunionFraud.name,
+    recipientAddress: `ATTN: ${BUREAU_ADDRESSES.transunionFraud.dept}\n${BUREAU_ADDRESSES.transunionFraud.address}`,
   },
   {
     key: 'experian-611',
@@ -1931,8 +1974,8 @@ const RECIPIENT_PRESETS: Array<{
   {
     key: 'transunion-611',
     letterType: '611',
-    recipientName: BUREAU_ADDRESSES.transunion.name,
-    recipientAddress: `Dispute Department\n${BUREAU_ADDRESSES.transunion.address}`,
+    recipientName: BUREAU_ADDRESSES.transunionDispute.name,
+    recipientAddress: `ATTN: ${BUREAU_ADDRESSES.transunionDispute.dept}\n${BUREAU_ADDRESSES.transunionDispute.address}`,
   },
 ];
 
@@ -1947,6 +1990,8 @@ const LettersTab = ({
   busy,
   disputeRound,
   responseCount,
+  docUrls,
+  ftcReportFileCount,
 }: {
   clientId: string;
   client: ClientDetail['client'];
@@ -1958,6 +2003,8 @@ const LettersTab = ({
   busy: boolean;
   disputeRound: number;
   responseCount: number;
+  docUrls: Record<string, string | null>;
+  ftcReportFileCount: number;
 }) => {
   const [recipientName, setRecipientName] = useState('');
   const [recipientAddress, setRecipientAddress] = useState('');
@@ -2104,10 +2151,9 @@ const LettersTab = ({
           ? { name: BUREAU_ADDRESSES.experianFraud.name, address: `${BUREAU_ADDRESSES.experianFraud.dept}\n${BUREAU_ADDRESSES.experianFraud.address}` }
           : { name: BUREAU_ADDRESSES.experianDispute.name, address: `${BUREAU_ADDRESSES.experianDispute.dept}\n${BUREAU_ADDRESSES.experianDispute.address}` };
       default: // transunion
-        return {
-          name: BUREAU_ADDRESSES.transunion.name,
-          address: `${isFraud ? BUREAU_ADDRESSES.transunion.dept : 'Dispute Department'}\n${BUREAU_ADDRESSES.transunion.address}`,
-        };
+        return isFraud
+          ? { name: BUREAU_ADDRESSES.transunionFraud.name, address: `ATTN: ${BUREAU_ADDRESSES.transunionFraud.dept}\n${BUREAU_ADDRESSES.transunionFraud.address}` }
+          : { name: BUREAU_ADDRESSES.transunionDispute.name, address: `ATTN: ${BUREAU_ADDRESSES.transunionDispute.dept}\n${BUREAU_ADDRESSES.transunionDispute.address}` };
     }
   };
 
@@ -2314,8 +2360,34 @@ const LettersTab = ({
     }
   };
 
+  const preflightChecks = [
+    { label: 'Case type set', ok: !!client.case_type },
+    { label: 'FTC report numbers entered', ok: ftcNums.length > 0 },
+    { label: 'FTC report PDFs uploaded', ok: ftcReportFileCount > 0 },
+    { label: 'Analysis complete', ok: accounts.length > 0 },
+    { label: 'Gov ID uploaded', ok: !!docUrls.doc_dl_front },
+    { label: 'Proof of address uploaded', ok: !!docUrls.doc_utility_bill },
+  ];
+  const allChecksPass = preflightChecks.every((c) => c.ok);
+
   return (
     <div className="space-y-8">
+
+      {/* === Pre-flight Checklist === */}
+      <div className="bg-[#111] border border-neutral-800 rounded-sm p-5">
+        <h3 className="text-xs uppercase tracking-widest text-neutral-400 font-bold mb-3">Pre-flight Checklist</h3>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+          {preflightChecks.map((c) => (
+            <div key={c.label} className="flex items-center gap-2 text-xs">
+              <span className={c.ok ? 'text-emerald-400' : 'text-red-500'}>{c.ok ? '✓' : '✕'}</span>
+              <span className={c.ok ? 'text-neutral-300' : 'text-neutral-500'}>{c.label}</span>
+            </div>
+          ))}
+        </div>
+        {!allChecksPass && (
+          <p className="text-[10px] text-amber-400 mt-3">Complete all items above before generating letters.</p>
+        )}
+      </div>
 
       {/* === Phase 1 Packet === */}
       <div className="bg-[#111] border border-luxury-red/25 rounded-sm p-6">
@@ -2361,8 +2433,9 @@ const LettersTab = ({
         <div className="flex flex-wrap gap-3">
           <button
             onClick={handleGeneratePhase1Packet}
-            disabled={busy || phase1Running || accounts.length === 0}
-            className="bg-luxury-red hover:bg-luxury-light disabled:opacity-50 text-white px-6 py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
+            disabled={busy || phase1Running || accounts.length === 0 || !allChecksPass}
+            title={!allChecksPass ? 'Complete all pre-flight checks first' : undefined}
+            className="bg-luxury-red hover:bg-luxury-light disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
           >
             {phase1Running ? 'Generating Packet…' : 'Generate Full Phase 1 Packet'}
           </button>
@@ -2701,7 +2774,14 @@ const LettersTab = ({
             <tbody>
               {furnisherLettersList.map((l) => (
                 <tr key={l.id} className="border-b border-neutral-800/60">
-                  <td className="px-4 py-3 text-white">{l.recipient_name}</td>
+                  <td className="px-4 py-3">
+                    <div className="text-white">{l.recipient_name}</div>
+                    {l.needs_address && (
+                      <span className="text-[9px] uppercase tracking-widest text-amber-400 bg-amber-950/30 border border-amber-800/50 rounded-sm px-1.5 py-0.5 mt-0.5 inline-block">
+                        ⚠ Verify Address Before Mailing
+                      </span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-neutral-300 text-xs uppercase tracking-widest">{l.letter_type}</td>
                   <td className="px-4 py-3 text-neutral-400 text-xs">{new Date(l.created_at).toLocaleDateString()}</td>
                   <td className="px-4 py-3 text-right flex items-center justify-end gap-3">
@@ -2711,7 +2791,7 @@ const LettersTab = ({
                     {l.lob_tracking_number ? (
                       <span className="text-green-400 text-xs font-mono">Mailed ✓ {l.lob_tracking_number}</span>
                     ) : (
-                      <button onClick={() => sendMail(l.id)} disabled={busy || !l.pdf_unsigned_path} className="text-amber-400 hover:text-amber-300 text-xs uppercase tracking-widest font-semibold disabled:opacity-40" title={!l.pdf_unsigned_path ? 'Generate PDF first' : 'Send via USPS Certified Mail'}>
+                      <button onClick={() => sendMail(l.id)} disabled={busy || !l.pdf_unsigned_path || !!l.needs_address} className="text-amber-400 hover:text-amber-300 text-xs uppercase tracking-widest font-semibold disabled:opacity-40" title={l.needs_address ? 'Verify address first' : !l.pdf_unsigned_path ? 'Generate PDF first' : 'Send via USPS Certified Mail'}>
                         Send Mail
                       </button>
                     )}
@@ -2727,7 +2807,7 @@ const LettersTab = ({
 };
 
 // === Tracking Tab ===
-const TrackingTab = ({ letters }: { letters: ClientDetail['letters'] }) => {
+const TrackingTab = ({ letters, clientId, onChange }: { letters: ClientDetail['letters']; clientId: string; onChange: () => void }) => {
   const addBizDays = (d: Date, n: number): Date => {
     const r = new Date(d);
     let c = 0;
@@ -2744,6 +2824,22 @@ const TrackingTab = ({ letters }: { letters: ClientDetail['letters'] }) => {
   };
   const today = new Date();
   const daysDiff = (d: Date) => Math.floor((d.getTime() - today.getTime()) / 86400000);
+
+  const [loggingResponse, setLoggingResponse] = React.useState<string | null>(null);
+
+  const logResponseReceived = async (letterId: string) => {
+    setLoggingResponse(letterId);
+    try {
+      await fetch('/api/update-status', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+        body: JSON.stringify({ clientId, letterId, response_received_at: new Date().toISOString() }),
+      });
+      onChange();
+    } finally {
+      setLoggingResponse(null);
+    }
+  };
 
   const mailedLetters = letters.filter((l) => l.mailed_at);
   const totalDaysSinceFirst = mailedLetters.length > 0
@@ -2794,6 +2890,7 @@ const TrackingTab = ({ letters }: { letters: ClientDetail['letters'] }) => {
                 <th className="px-4 py-3">Response Due</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Tracking #</th>
+                <th className="px-4 py-3"></th>
               </tr>
             </thead>
             <tbody>
@@ -2834,6 +2931,19 @@ const TrackingTab = ({ letters }: { letters: ClientDetail['letters'] }) => {
                       {l.lob_tracking_number
                         ? <span className="text-green-400">{String(l.lob_tracking_number)}</span>
                         : <span className="text-neutral-600">—</span>}
+                    </td>
+                    <td className="px-4 py-3">
+                      {mailedAt && !l.response_received_at ? (
+                        <button
+                          onClick={() => logResponseReceived(l.id)}
+                          disabled={loggingResponse === l.id}
+                          className="text-[9px] uppercase tracking-widest text-neutral-500 hover:text-emerald-400 border border-neutral-800 hover:border-emerald-800 px-2 py-1 rounded-sm transition-colors disabled:opacity-40 whitespace-nowrap"
+                        >
+                          {loggingResponse === l.id ? '…' : 'Log Response'}
+                        </button>
+                      ) : l.response_received_at ? (
+                        <span className="text-[9px] text-emerald-400 uppercase tracking-widest">Response ✓</span>
+                      ) : null}
                     </td>
                   </tr>
                 );
