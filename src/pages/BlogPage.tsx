@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "How to Improve Your Website SEO Score Without an Agency",
+      displayTitle: "How to Improve Your Website SEO Score Without an Agency (And When to Call One)",
+      date: "May 17, 2026",
+      pubDate: "Sun, 17 May 2026 00:01:16 GMT",
+      issue: 'No. 060',
+      category: "SEO",
+      excerpt: "Improving your website SEO score does not require a big budget or an agency contract. With the right strategy and consistent effort, Arizona business owners can make meaningful gains on their own. This guide breaks down exactly what to do and when it makes sense to bring in professional support.",
+      slug: 'how-to-improve-your-website-seo-score-without-an-agency'
+    },
+    {
       title: "Technical SEO Audit: What It Is and Why It Matters",
       displayTitle: "Technical SEO Audit: What It Is, Why It Matters, and How to Get One Done Right",
       date: "May 16, 2026",
