@@ -104,7 +104,9 @@ Return ONLY valid JSON (no markdown, no explanation):
   "positive_accounts": [
     { "creditor_name": "string", "account_number": "string", "balance": "string", "date_opened": "string", "status": "string", "bureaus": [] }
   ]
-}`;
+}
+
+CRITICAL: Your response must be valid JSON only. No markdown. No backticks. No explanation. Start with { and end with }. Keep bureau data objects concise if needed.`;
 
 const CALL2_SYSTEM_PROMPT = `You are an FCRA/FDCPA attorney reviewing extracted credit report accounts and determining optimal legal dispute strategy for each account and for the case overall.
 
@@ -361,7 +363,7 @@ ${texts.transunion || '[NOT PROVIDED — do not assign any accounts to TransUnio
     try {
       r1 = await anthropic.messages.create({
         model: 'claude-sonnet-4-6',
-        max_tokens: 4000,
+        max_tokens: 8000,
         system: CALL1_SYSTEM_PROMPT,
         messages: [{
           role: 'user',
@@ -375,19 +377,33 @@ ${texts.transunion || '[NOT PROVIDED — do not assign any accounts to TransUnio
 
     console.log('[analyze-reports] Call 1 API complete, parsing response...');
     const call1TextBlock = r1.content.find((b) => b.type === 'text');
-    const call1Raw = call1TextBlock && call1TextBlock.type === 'text' ? call1TextBlock.text : '';
+    const raw1 = call1TextBlock?.type === 'text' ? call1TextBlock.text : '';
+    console.log('[analyze] Call 1 raw length:', raw1.length);
+    console.log('[analyze] Call 1 raw start:', raw1.slice(0, 200));
+    console.log('[analyze] Call 1 raw end:', raw1.slice(-200));
+    let cleaned1 = raw1.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
+    const s1 = cleaned1.indexOf('{');
+    const e1 = cleaned1.lastIndexOf('}');
+    if (s1 >= 0 && e1 > s1) cleaned1 = cleaned1.slice(s1, e1 + 1);
+    console.log('[analyze] Call 1 cleaned length:', cleaned1.length);
     try {
-      const parsed1 = parseClaudeJson(r1);
-      if (!Array.isArray(parsed1?.accounts)) throw new Error('Missing accounts array in Call 1 response');
-      extractedAccounts = parsed1.accounts as RawAccount[];
-      parsedPersonalInfoErrors = (parsed1.personal_info_errors && typeof parsed1.personal_info_errors === 'object')
-        ? parsed1.personal_info_errors as Record<string, unknown> : {};
-      allInquiries = Array.isArray(parsed1.inquiries) ? parsed1.inquiries : [];
-      parsedPositiveAccounts = Array.isArray(parsed1.positive_accounts) ? parsed1.positive_accounts : [];
+      const extractedData = JSON.parse(cleaned1);
+      if (!Array.isArray(extractedData?.accounts)) throw new Error('Missing accounts array in Call 1 response');
+      extractedAccounts = extractedData.accounts as RawAccount[];
+      parsedPersonalInfoErrors = (extractedData.personal_info_errors && typeof extractedData.personal_info_errors === 'object')
+        ? extractedData.personal_info_errors as Record<string, unknown> : {};
+      allInquiries = Array.isArray(extractedData.inquiries) ? extractedData.inquiries : [];
+      parsedPositiveAccounts = Array.isArray(extractedData.positive_accounts) ? extractedData.positive_accounts : [];
       console.log(`[analyze-reports] Call 1 parsed: ${extractedAccounts.length} accounts, ${allInquiries.length} inquiries (pre-filter), personal_info_errors: ${JSON.stringify(parsedPersonalInfoErrors)}`);
     } catch (err) {
-      console.error('[analyze-reports] Call 1 parse error:', err, 'raw:', call1Raw.slice(0, 500));
-      return res.status(500).json({ error: 'Call 1 JSON parse failed', detail: err instanceof Error ? err.message : String(err), raw: call1Raw.slice(0, 500) });
+      console.error('[analyze] Call 1 full raw:', raw1);
+      return res.status(500).json({
+        error: 'Call 1 JSON parse failed',
+        detail: err instanceof Error ? err.message : String(err),
+        rawLength: raw1.length,
+        rawStart: raw1.slice(0, 500),
+        rawEnd: raw1.slice(-500),
+      });
     }
 
     // Filter to hard inquiries only (Call 1 should only return hard inquiries, this is a safety filter)

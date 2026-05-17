@@ -580,6 +580,8 @@ const OverviewTab = ({
     setTimeout(() => setCaseTypeFlash(false), 2000);
   };
 
+  console.log('[Overview] strategy_notes:', client?.strategy_notes?.slice(0, 100));
+
   return (
     <div className="grid lg:grid-cols-2 gap-6">
       {/* Case Type Toggle */}
@@ -1214,7 +1216,9 @@ const AnalyzeTab = ({
 
   React.useEffect(() => {
     setPersonalInfo(getPersonalInfo(client));
-    console.log('[AnalyzeTab] positive_accounts:', client?.positive_accounts?.length);
+    console.log('[AnalyzeTab] positive_accounts:', client?.positive_accounts);
+    console.log('[AnalyzeTab] first account dispute_types:', accounts[0]?.dispute_types);
+    console.log('[AnalyzeTab] dispute_selections:', JSON.stringify(client?.dispute_selections)?.slice(0, 200));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client]);
 
@@ -1375,6 +1379,7 @@ const AnalyzeTab = ({
   const inp = 'bg-transparent border-b border-transparent hover:border-neutral-700 focus:border-luxury-red/50 focus:bg-[#111] text-white px-1 py-0.5 text-xs w-full focus:outline-none transition-colors rounded-sm';
   const BUREAU_LABELS: Record<string, string> = { equifax: 'Equifax', experian: 'Experian', transunion: 'TransUnion' };
 
+  console.log('[AnalyzeTab] personalInfo state:', JSON.stringify(personalInfo));
   const hasPersonalInfo =
     Object.keys(personalInfo.name_variations).length > 0 ||
     Object.keys(personalInfo.unknown_addresses).length > 0 ||
