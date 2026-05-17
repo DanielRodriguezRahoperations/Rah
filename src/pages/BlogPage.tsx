@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "Website SEO Checker Free Tool for Small Business Owners",
+      displayTitle: "The Best Free Website SEO Checker Tools for Small Business Owners in 2026",
+      date: "May 17, 2026",
+      pubDate: "Sun, 17 May 2026 04:01:49 GMT",
+      issue: 'No. 062',
+      category: "SEO",
+      excerpt: "Every small business owner deserves to know exactly how their website performs in search engines. Free website SEO checker tools give you instant insight into what is holding your site back from ranking on Google. Learn which tools actually work and how RAH Operations can help you take action on what you find.",
+      slug: 'website-seo-checker-free-tool-for-small-business-owners'
+    },
+    {
       title: "Free Website Grader Tool: What Your Score Actually Means",
       displayTitle: "Free Website Grader Tool: What Your Score Actually Means (And What To Do About It)",
       date: "May 17, 2026",
