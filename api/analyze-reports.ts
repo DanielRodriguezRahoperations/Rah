@@ -305,7 +305,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   }
 
-  // === POST: analyze extracted texts with Claude (3 parallel bureau calls + 1 strategy call) ===
+  // === POST: analyze extracted texts with a single Claude call ===
   if (req.method === 'POST') {
     const { clientId, texts } = req.body ?? {};
     if (!clientId || !texts || typeof texts !== 'object') {
@@ -320,295 +320,186 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const anthropic = new Anthropic({ apiKey: claudeKey });
 
-    // --- TYPES ---
-    type BureauExtractedAccount = {
-      creditor_name: string;
-      original_creditor: string;
-      account_type: string;
-      account_number: string;
-      balance: string;
-      date_opened: string;
-      account_status: string;
-      estimated_removal: string;
-      furnisher_address: string;
-      is_negative: boolean;
-      addresses: string[];
-      phone_numbers: string[];
-      name_variations: string[];
-    };
-    type BureauExtractionResult = {
-      accounts: BureauExtractedAccount[];
-      inquiries: Array<{ creditor: string; date: string; inquiry_type: string; potentially_unauthorized: boolean; reason: string }>;
-      personal_info_errors: { name_variations: string[]; unknown_addresses: string[]; unknown_phone_numbers: string[] };
-    };
-    type MergedAccount = {
-      creditor_name: string;
-      original_creditor: string;
-      account_type: string;
-      is_negative: boolean;
-      equifax: BureauExtractedAccount | null;
-      experian: BureauExtractedAccount | null;
-      transunion: BureauExtractedAccount | null;
-    };
-
-    // Helper: call Claude for a single bureau's text
-    const extractBureau = async (bureau: string, text: string): Promise<BureauExtractionResult | null> => {
-      let r: Anthropic.Message;
-      try {
-        r = await anthropic.messages.create({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 6000,
-          system: BUREAU_EXTRACTION_SYSTEM_PROMPT,
-          messages: [{ role: 'user', content: `Analyze this ${bureau} credit report:\n\n${text}\n\nReturn ONLY the JSON object.` }],
-        });
-      } catch (err) {
-        const e = err as Record<string, unknown>;
-        console.error(`[analyze] ${bureau} extraction error:`, {
-          name: e?.name,
-          message: e?.message,
-          status: e?.status,
-          stack: typeof e?.stack === 'string' ? e.stack.slice(0, 300) : undefined,
-        });
-        return null;
-      }
-      const tb = r.content.find((b) => b.type === 'text');
-      const raw = tb?.type === 'text' ? tb.text : '';
-      console.log(`[analyze] ${bureau} raw length: ${raw.length}, start: ${raw.slice(0, 100)}`);
-      let cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
-      const si = cleaned.indexOf('{');
-      const ei = cleaned.lastIndexOf('}');
-      if (si >= 0 && ei > si) cleaned = cleaned.slice(si, ei + 1);
-      try {
-        return JSON.parse(cleaned) as BureauExtractionResult;
-      } catch (err) {
-        console.error(`[analyze] ${bureau} parse error:`, err instanceof Error ? err.message : err, 'raw:', raw.slice(0, 300));
-        return null;
-      }
-    };
-
-    console.log('[analyze-reports] Starting parallel bureau extraction...');
-
-    // Run all three bureau extractions in parallel
-    const [equifaxResult, experianResult, transunionResult] = await Promise.all([
-      texts.equifax ? extractBureau('equifax', String(texts.equifax)) : Promise.resolve(null),
-      texts.experian ? extractBureau('experian', String(texts.experian)) : Promise.resolve(null),
-      texts.transunion ? extractBureau('transunion', String(texts.transunion)) : Promise.resolve(null),
-    ]);
-
-    console.log(`[analyze] bureau results: EQ=${equifaxResult?.accounts?.length ?? 'null'} EX=${experianResult?.accounts?.length ?? 'null'} TU=${transunionResult?.accounts?.length ?? 'null'}`);
-
-    // Log which bureaus failed but continue as long as at least one succeeded
-    const failedBureaus = [
-      texts.equifax && !equifaxResult ? 'equifax' : null,
-      texts.experian && !experianResult ? 'experian' : null,
-      texts.transunion && !transunionResult ? 'transunion' : null,
-    ].filter(Boolean);
-    if (failedBureaus.length > 0) {
-      console.error('[analyze] extraction failed for bureaus:', failedBureaus, '— continuing with available data');
-    }
-    if (!equifaxResult && !experianResult && !transunionResult) {
-      return res.status(500).json({ error: 'All bureau extractions failed — check server logs for details' });
-    }
-
-    // --- SERVER-SIDE MERGE ---
-    const normName = (s: string) =>
-      s.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
-
-    const findMatch = (merged: MergedAccount[], name: string): MergedAccount | undefined => {
-      const norm = normName(name);
-      return merged.find((a) => {
-        const an = normName(a.creditor_name);
-        if (an === norm) return true;
-        const shorter = an.length <= norm.length ? an : norm;
-        const longer = an.length <= norm.length ? norm : an;
-        return shorter.length >= 5 && longer.startsWith(shorter);
-      });
-    };
-
-    const bureauPairs = [
-      ['equifax', equifaxResult],
-      ['experian', experianResult],
-      ['transunion', transunionResult],
-    ] as [string, BureauExtractionResult | null][];
-
-    // Merge accounts across bureaus
-    const allMerged: MergedAccount[] = [];
-    for (const [bureau, result] of bureauPairs) {
-      if (!result?.accounts) continue;
-      for (const acct of result.accounts) {
-        const existing = findMatch(allMerged, acct.creditor_name);
-        if (existing) {
-          (existing as Record<string, unknown>)[bureau] = acct;
-        } else {
-          allMerged.push({
-            creditor_name: acct.creditor_name,
-            original_creditor: acct.original_creditor,
-            account_type: acct.account_type,
-            is_negative: acct.is_negative,
-            equifax: bureau === 'equifax' ? acct : null,
-            experian: bureau === 'experian' ? acct : null,
-            transunion: bureau === 'transunion' ? acct : null,
-          });
-        }
-      }
-    }
-
-    // Separate negative (dispute) accounts from positive accounts
-    const extractedAccounts = allMerged.filter((a) => a.is_negative);
-    const parsedPositiveAccounts = allMerged
-      .filter((a) => !a.is_negative)
-      .map((a) => {
-        const primary = a.equifax ?? a.experian ?? a.transunion;
-        return {
-          creditor_name: a.creditor_name,
-          account_number: primary?.account_number ?? '',
-          balance: primary?.balance ?? '',
-          date_opened: primary?.date_opened ?? '',
-          status: primary?.account_status ?? '',
-          bureaus: [a.equifax ? 'equifax' : null, a.experian ? 'experian' : null, a.transunion ? 'transunion' : null].filter(Boolean),
-        };
-      });
-
-    // Merge personal_info_errors (track bureau per item)
-    const pieMap: { name_variations: Record<string, string[]>; unknown_addresses: Record<string, string[]>; unknown_phone_numbers: Record<string, string[]> } = {
-      name_variations: {},
-      unknown_addresses: {},
-      unknown_phone_numbers: {},
-    };
-    for (const [bureau, result] of bureauPairs) {
-      if (!result?.personal_info_errors) continue;
-      const pie = result.personal_info_errors;
-      for (const item of pie.name_variations ?? []) { (pieMap.name_variations[item] ??= []).push(bureau); }
-      for (const item of pie.unknown_addresses ?? []) { (pieMap.unknown_addresses[item] ??= []).push(bureau); }
-      for (const item of pie.unknown_phone_numbers ?? []) { (pieMap.unknown_phone_numbers[item] ??= []).push(bureau); }
-    }
-    const parsedPersonalInfoErrors: Record<string, unknown> = pieMap;
-
-    // Merge inquiries (add bureau, deduplicate by creditor+date+bureau)
-    const seenInq = new Set<string>();
-    const allInquiriesRaw: unknown[] = [];
-    for (const [bureau, result] of bureauPairs) {
-      if (!result?.inquiries) continue;
-      for (const inq of result.inquiries) {
-        const key = `${inq.creditor}:${inq.date}:${bureau}`;
-        if (!seenInq.has(key)) {
-          seenInq.add(key);
-          allInquiriesRaw.push({ ...inq, bureau });
-        }
-      }
-    }
-
-    // Filter to hard inquiries only
-    const parsedInquiries = allInquiriesRaw.filter((q: unknown) => {
-      const inq = q as Record<string, unknown>;
-      return inq.inquiry_type === 'hard';
-    });
-
-    console.log(`[analyze-reports] Merge complete: ${extractedAccounts.length} negative, ${parsedPositiveAccounts.length} positive, ${parsedInquiries.length} hard inquiries`);
-
-    // --- CALL 2: Legal Strategy ---
-    type AccountStrategy = {
-      creditor_name: string;
-      dispute_priority: string;
-      recommended_fcra_sections: string[];
-      duplicate_flag: boolean;
-      duplicate_note: string;
-      balance_inconsistency: boolean;
-      balance_inconsistency_note: string;
-      letter_targets: Record<string, unknown>;
-      strategy_notes: string;
-    };
-
-    let overallCaseType = 'identity_theft';
-    let overallStrategy = '';
-    const strategyMap: Record<string, AccountStrategy> = {};
-
+    // Step 2 — Single Claude call across all three bureau texts
+    let response: Anthropic.Message;
     try {
-      const accountSummary = extractedAccounts.map((a) => ({
-        creditor_name: a.creditor_name,
-        original_creditor: a.original_creditor,
-        account_type: a.account_type,
-        bureaus_reporting: [
-          a.equifax ? 'equifax' : null,
-          a.experian ? 'experian' : null,
-          a.transunion ? 'transunion' : null,
-        ].filter(Boolean),
-        balance_equifax: (a.equifax as Record<string, unknown> | null)?.balance,
-        balance_experian: (a.experian as Record<string, unknown> | null)?.balance,
-        balance_transunion: (a.transunion as Record<string, unknown> | null)?.balance,
-        status_equifax: (a.equifax as Record<string, unknown> | null)?.account_status,
-        status_experian: (a.experian as Record<string, unknown> | null)?.account_status,
-        status_transunion: (a.transunion as Record<string, unknown> | null)?.account_status,
-      }));
-
-      const r2 = await anthropic.messages.create({
+      response = await anthropic.messages.create({
         model: 'claude-sonnet-4-6',
-        max_tokens: 2000,
-        system: CALL2_SYSTEM_PROMPT,
+        max_tokens: 4000,
+        system: `You are an expert credit repair analyst and FCRA attorney. Analyze these credit reports and extract ALL negative items and personal information errors.
+
+Return ONLY a valid JSON object. No markdown. No explanation. Start with { and end with }.
+
+JSON shape:
+{
+  "accounts": [
+    {
+      "creditor_name": "string",
+      "original_creditor": "string",
+      "account_number": "string",
+      "balance": "string",
+      "date_opened": "string",
+      "account_type": "string",
+      "account_status": "string",
+      "bureaus": ["equifax","experian","transunion"],
+      "is_negative": true,
+      "duplicate_flag": false,
+      "duplicate_note": "string",
+      "balance_inconsistency": false,
+      "balance_inconsistency_note": "string",
+      "dispute_priority": "critical",
+      "equifax_account_number": "string",
+      "experian_account_number": "string",
+      "transunion_account_number": "string",
+      "furnisher_address": "string"
+    }
+  ],
+  "positive_accounts": [
+    {
+      "creditor_name": "string",
+      "account_number": "string",
+      "balance": "string",
+      "date_opened": "string",
+      "status": "string",
+      "bureaus": []
+    }
+  ],
+  "personal_info_errors": {
+    "name_variations": { "NAME": ["equifax","experian"] },
+    "unknown_addresses": { "123 Main St": ["equifax"] },
+    "unknown_phone_numbers": { "555-1234": ["transunion"] }
+  },
+  "inquiries": [
+    {
+      "creditor": "string",
+      "date": "string",
+      "bureau": "string",
+      "inquiry_type": "hard",
+      "potentially_unauthorized": true,
+      "reason": "string"
+    }
+  ],
+  "overall_case_type": "identity_theft",
+  "overall_strategy": "string"
+}
+
+RULES:
+- Match accounts across bureaus — one record per unique debt
+- Only assign a bureau if that bureau explicitly reports it
+- bureaus array = which bureaus report this account
+- equifax_account_number = account number as shown on Equifax (empty string if not reported)
+- experian_account_number = account number as shown on Experian (empty string if not reported)
+- transunion_account_number = account number as shown on TransUnion (empty string if not reported)
+- Soft inquiries: inquiry_type "soft", potentially_unauthorized false
+- Hard inquiries: inquiry_type "hard", flag if potentially unauthorized
+- Personal info errors: track which bureau reported each item
+- Student loans appearing as both installment AND collection = duplicate_flag true
+- Balance differs across bureaus = balance_inconsistency true
+- dispute_priority critical = $5k+ or all-bureau or duplicate; high = 2+ bureau collection/charge-off; medium = single bureau; low = minor/inquiry
+- overall_strategy = 2-3 sentence plain English dispute plan`,
         messages: [{
           role: 'user',
-          content: `Determine legal dispute strategy for these ${accountSummary.length} extracted accounts:\n\n${JSON.stringify(accountSummary, null, 2)}\n\nReturn ONLY the strategy JSON.`,
+          content: `Analyze these three credit reports:
+
+=== EQUIFAX ===
+${texts.equifax || '[not provided]'}
+
+=== EXPERIAN ===
+${texts.experian || '[not provided]'}
+
+=== TRANSUNION ===
+${texts.transunion || '[not provided]'}
+
+Return the JSON object.`,
         }],
       });
-
-      console.log('[analyze-reports] Call 2 API complete, parsing response...');
-      const call2TextBlock = r2.content.find((b) => b.type === 'text');
-      const call2Raw = call2TextBlock && call2TextBlock.type === 'text' ? call2TextBlock.text : '';
-      let parsed2: Record<string, unknown>;
-      try {
-        parsed2 = parseClaudeJson(r2);
-      } catch (parseErr) {
-        console.error('[analyze-reports] Call 2 parse error (non-fatal):', parseErr, 'raw:', call2Raw.slice(0, 500));
-        throw parseErr;
-      }
-      overallCaseType = String(parsed2?.overall_case_type ?? 'identity_theft');
-      overallStrategy = String(parsed2?.overall_strategy ?? '');
-      const strategies = Array.isArray(parsed2?.account_strategies) ? parsed2.account_strategies as AccountStrategy[] : [];
-      for (const s of strategies) {
-        const key = String(s.creditor_name ?? '').toLowerCase().trim();
-        if (key) strategyMap[key] = s;
-      }
-      console.log(`[analyze-reports] Call 2 parsed: case_type=${overallCaseType}, ${strategies.length} strategies`);
     } catch (err) {
-      console.error('[analyze-reports] Call 2 error (non-fatal, using defaults):', err);
+      console.error('[analyze] Claude API error:', err);
+      return res.status(500).json({ error: 'Claude API request failed', detail: err instanceof Error ? err.message : String(err) });
     }
 
-    console.log(`[analyze-reports] Call 2 result: case_type=${overallCaseType}, strategies in map=${Object.keys(strategyMap).length}`);
+    // Step 3 — Parse response with markdown fence stripping
+    const textBlock = response.content.find((b) => b.type === 'text');
+    const raw = textBlock?.type === 'text' ? textBlock.text : '';
+    console.log('[analyze] raw length:', raw.length);
+    let cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
+    const si = cleaned.indexOf('{');
+    const ei = cleaned.lastIndexOf('}');
+    if (si >= 0 && ei > si) cleaned = cleaned.slice(si, ei + 1);
 
-    // Delete existing rows only now — after all extractions succeeded — to avoid wiping data on failure
-    await supabase.from('dispute_accounts').delete().eq('client_id', clientId);
+    let parsed: Record<string, unknown>;
+    try {
+      parsed = JSON.parse(cleaned);
+    } catch (err) {
+      console.error('[analyze] JSON parse error:', err instanceof Error ? err.message : err, 'raw:', raw.slice(0, 500));
+      return res.status(500).json({
+        error: 'JSON parse failed',
+        detail: err instanceof Error ? err.message : String(err),
+        rawLength: raw.length,
+        rawStart: raw.slice(0, 500),
+        rawEnd: raw.slice(-500),
+      });
+    }
 
-    const rows = extractedAccounts.map((a) => {
-      const eq = safeBureau(a.equifax);
-      const ex = safeBureau(a.experian);
-      const tu = safeBureau(a.transunion);
-      const bureaus = [eq ? 'equifax' : null, ex ? 'experian' : null, tu ? 'transunion' : null].filter(Boolean) as string[];
-      const primary = eq ?? ex ?? tu;
+    // Step 4 — Determine FCRA sections server-side
+    const getFCRASections = (account: Record<string, unknown>, caseType: string): string[] => {
+      const sections: string[] = [];
+      const isCollection = String(account.account_type ?? '').toLowerCase().includes('collect');
+      if (caseType === 'identity_theft') {
+        sections.push('605B', '623');
+        if (isCollection) sections.push('809');
+      } else {
+        sections.push('611', '623');
+        if (isCollection) sections.push('809');
+      }
+      return sections;
+    };
 
-      return {
+    // Step 5 — Build rows for dispute_accounts insert
+    const caseType = String(parsed.overall_case_type ?? 'identity_theft');
+    const parsedAccounts = Array.isArray(parsed.accounts) ? parsed.accounts as Record<string, unknown>[] : [];
+    const rows = parsedAccounts
+      .filter((a) => Boolean(a.is_negative))
+      .map((a) => ({
         client_id: clientId,
         creditor_name: String(a.creditor_name ?? ''),
         original_creditor: String(a.original_creditor ?? ''),
+        account_number: String(a.account_number ?? ''),
+        account_number_equifax: String(a.equifax_account_number ?? ''),
+        account_number_experian: String(a.experian_account_number ?? ''),
+        account_number_transunion: String(a.transunion_account_number ?? ''),
+        balance: String(a.balance ?? ''),
+        date_opened: String(a.date_opened ?? ''),
         account_type: String(a.account_type ?? ''),
-        account_number: primary?.account_number ?? '',
-        account_number_equifax: eq?.account_number ?? '',
-        account_number_experian: ex?.account_number ?? '',
-        account_number_transunion: tu?.account_number ?? '',
-        balance: primary?.balance ?? '',
-        date_opened: primary?.date_opened ?? '',
-        account_status: primary?.account_status ?? '',
-        equifax_data: eq,
-        experian_data: ex,
-        transunion_data: tu,
-        bureaus,
-        phone_numbers: primary?.phone_numbers ?? [],
-        name_variations: primary?.name_variations ?? [],
-        addresses: primary?.addresses ?? [],
+        account_status: String(a.account_status ?? ''),
+        bureaus: Array.isArray(a.bureaus) ? a.bureaus : [],
+        duplicate_flag: Boolean(a.duplicate_flag),
+        duplicate_note: String(a.duplicate_note ?? ''),
+        balance_inconsistency: Boolean(a.balance_inconsistency),
+        balance_inconsistency_note: String(a.balance_inconsistency_note ?? ''),
+        dispute_priority: String(a.dispute_priority ?? 'medium'),
+        furnisher_address: String(a.furnisher_address ?? ''),
         selected: true,
-        dispute_types: [],
+        dispute_types: getFCRASections(a, caseType),
+        recommended_fcra_sections: getFCRASections(a, caseType),
+        phone_numbers: [],
+        name_variations: [],
+        addresses: [],
         notes: '',
-      };
-    });
+      }));
+
+    const parsedInquiries = (Array.isArray(parsed.inquiries) ? parsed.inquiries as Record<string, unknown>[] : [])
+      .filter((i) => i.inquiry_type === 'hard');
+    const parsedPersonalInfoErrors: Record<string, unknown> =
+      (parsed.personal_info_errors && typeof parsed.personal_info_errors === 'object')
+        ? parsed.personal_info_errors as Record<string, unknown> : {};
+    const parsedPositiveAccounts = Array.isArray(parsed.positive_accounts) ? parsed.positive_accounts : [];
+    const overallStrategy = String(parsed.overall_strategy ?? '');
+
+    console.log(`[analyze] parsed: ${rows.length} negative accounts, ${parsedPositiveAccounts.length} positive, ${parsedInquiries.length} hard inquiries`);
+
+    // Step 6 — Save to Supabase (delete then insert)
+    await supabase.from('dispute_accounts').delete().eq('client_id', clientId);
 
     let inserted: Array<Record<string, unknown>> = [];
     if (rows.length > 0) {
@@ -623,23 +514,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       inserted = data ?? [];
     }
 
+    // Step 7 — Build dispute_selections from saved rows and save everything
     const autoDisputeSelections = buildAutoDisputeSelections(inserted, parsedPersonalInfoErrors, parsedInquiries);
 
     console.log('[analyze] positive_accounts to save:', JSON.stringify(parsedPositiveAccounts?.slice(0, 2)));
 
-    const clientUpdate: Record<string, unknown> = {
-      status: 'analyzing',
-      personal_info_errors: parsedPersonalInfoErrors,
-      inquiries: parsedInquiries,
-      positive_accounts: parsedPositiveAccounts,
-      dispute_selections: autoDisputeSelections,
-      case_type: overallCaseType,
-    };
-    if (overallStrategy) clientUpdate.strategy_notes = overallStrategy;
-
     await supabase
       .from('credit_repair_clients')
-      .update(clientUpdate)
+      .update({
+        status: 'analyzing',
+        case_type: caseType,
+        strategy_notes: overallStrategy,
+        positive_accounts: parsedPositiveAccounts,
+        personal_info_errors: parsedPersonalInfoErrors,
+        inquiries: parsedInquiries,
+        dispute_selections: autoDisputeSelections,
+      })
       .eq('id', clientId);
 
     return res.status(200).json({ accounts: inserted, count: inserted.length });
