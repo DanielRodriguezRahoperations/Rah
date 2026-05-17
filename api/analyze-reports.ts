@@ -312,9 +312,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Missing clientId or texts' });
     }
 
-    const claudeKey = process.env.CLAUDE_API_KEY;
+    const claudeKey = process.env.CLAUDE_API_KEY ?? process.env.ANTHROPIC_API_KEY;
+    console.log('[analyze] API key present:', !!claudeKey, '| CLAUDE_API_KEY:', !!process.env.CLAUDE_API_KEY, '| ANTHROPIC_API_KEY:', !!process.env.ANTHROPIC_API_KEY);
     if (!claudeKey) {
-      return res.status(500).json({ error: 'Claude API not configured' });
+      return res.status(500).json({ error: 'Claude API not configured — set CLAUDE_API_KEY or ANTHROPIC_API_KEY' });
     }
 
     const anthropic = new Anthropic({ apiKey: claudeKey });
@@ -361,7 +362,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           messages: [{ role: 'user', content: `Analyze this ${bureau} credit report:\n\n${text}\n\nReturn ONLY the JSON object.` }],
         });
       } catch (err) {
-        console.error(`[analyze] ${bureau} API error:`, err);
+        const e = err as Record<string, unknown>;
+        console.error(`[analyze] ${bureau} extraction error:`, {
+          name: e?.name,
+          message: e?.message,
+          status: e?.status,
+          stack: typeof e?.stack === 'string' ? e.stack.slice(0, 300) : undefined,
+        });
         return null;
       }
       const tb = r.content.find((b) => b.type === 'text');
@@ -390,8 +397,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     console.log(`[analyze] bureau results: EQ=${equifaxResult?.accounts?.length ?? 'null'} EX=${experianResult?.accounts?.length ?? 'null'} TU=${transunionResult?.accounts?.length ?? 'null'}`);
 
+    // Abort if any bureau whose text was provided failed to extract — do not wipe existing accounts
+    const failedBureaus = [
+      texts.equifax && !equifaxResult ? 'equifax' : null,
+      texts.experian && !experianResult ? 'experian' : null,
+      texts.transunion && !transunionResult ? 'transunion' : null,
+    ].filter(Boolean);
+    if (failedBureaus.length > 0) {
+      console.error('[analyze] extraction failed for bureaus:', failedBureaus, '— keeping existing accounts');
+      return res.status(500).json({ error: `Bureau extraction failed for: ${failedBureaus.join(', ')}. Existing accounts preserved.` });
+    }
     if (!equifaxResult && !experianResult && !transunionResult) {
-      return res.status(500).json({ error: 'All bureau extractions failed — check server logs for raw output' });
+      return res.status(500).json({ error: 'No bureau texts were provided' });
     }
 
     // --- SERVER-SIDE MERGE ---
@@ -559,7 +576,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     console.log(`[analyze-reports] Call 2 result: case_type=${overallCaseType}, strategies in map=${Object.keys(strategyMap).length}`);
 
-    // Build and insert dispute_accounts rows, merging Call 2 strategies
+    // Delete existing rows only now — after all extractions succeeded — to avoid wiping data on failure
     await supabase.from('dispute_accounts').delete().eq('client_id', clientId);
 
     const rows = extractedAccounts.map((a) => {
