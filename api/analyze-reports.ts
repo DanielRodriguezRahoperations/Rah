@@ -569,11 +569,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const bureaus = [eq ? 'equifax' : null, ex ? 'experian' : null, tu ? 'transunion' : null].filter(Boolean) as string[];
       const primary = eq ?? ex ?? tu;
 
-      const creditorKey = String(a.creditor_name ?? '').toLowerCase().trim();
-      const strategy = strategyMap[creditorKey] ?? null;
-
-      const recommendedSections = strategy?.recommended_fcra_sections?.map(String) ?? [];
-
       return {
         client_id: clientId,
         creditor_name: String(a.creditor_name ?? ''),
@@ -593,16 +588,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         phone_numbers: primary?.phone_numbers ?? [],
         name_variations: primary?.name_variations ?? [],
         addresses: primary?.addresses ?? [],
-        duplicate_flag: Boolean(strategy?.duplicate_flag ?? false),
-        duplicate_note: String(strategy?.duplicate_note ?? ''),
-        balance_inconsistency: Boolean(strategy?.balance_inconsistency ?? false),
-        balance_inconsistency_note: String(strategy?.balance_inconsistency_note ?? ''),
-        dispute_priority: String(strategy?.dispute_priority ?? 'medium'),
-        recommended_fcra_sections: recommendedSections,
-        letter_targets: (strategy?.letter_targets && typeof strategy.letter_targets === 'object') ? strategy.letter_targets : {},
-        strategy_notes: String(strategy?.strategy_notes ?? ''),
         selected: true,
-        dispute_types: recommendedSections,
+        dispute_types: [],
         notes: '',
       };
     });
@@ -614,8 +601,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .insert(rows)
         .select('*');
       if (insErr) {
-        console.error('[analyze-reports] insert error:', insErr);
-        return res.status(500).json({ error: 'Failed to save accounts' });
+        console.error('[analyze] insert error:', insErr);
+        return res.status(500).json({ error: 'Failed to save accounts', detail: insErr.message });
       }
       inserted = data ?? [];
     }
