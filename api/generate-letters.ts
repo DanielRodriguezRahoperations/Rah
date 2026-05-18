@@ -594,7 +594,7 @@ Return ONLY the JSON object. No markdown. No preamble.${extrasContext}`;
   try {
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 8000,
+      max_tokens: 16000,
       system: LITIGATION_LETTER_SYSTEM_PROMPT,
       messages: [{ role: 'user', content: userMsg }],
     });
