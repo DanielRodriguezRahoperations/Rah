@@ -86,12 +86,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     case_type: client.case_type,
     dispute_round: client.dispute_round ?? 1,
     accounts: negativeAccts.map(buildAccountSummary),
-    personal_info_errors: {
-      names: getSelections('names'),
-      addresses: getSelections('addresses'),
-      phones: getSelections('phones'),
+    personal_info_summary: {
+      name_variations_count: getSelections('names').length,
+      name_variations: getSelections('names').slice(0, 5).map((s) => s.key),
+      unknown_addresses_count: getSelections('addresses').length,
+      unknown_addresses: getSelections('addresses').slice(0, 5).map((s) => s.key),
+      unknown_phones_count: getSelections('phones').length,
+      unknown_phones: getSelections('phones').slice(0, 5).map((s) => s.key),
     },
-    inquiries: getSelections('inquiries'),
+    inquiries: getSelections('inquiries').slice(0, 10),
   };
 
   const systemPrompt = `You are an advanced FCRA / FDCPA dispute generation and compliance engine operating as a credit reporting enforcement system, identity theft enforcement system, furnisher compliance system, and consumer documentation and escalation system.
