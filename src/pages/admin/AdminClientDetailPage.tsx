@@ -2238,6 +2238,11 @@ const LettersTab = ({
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [addressModalLetterId, setAddressModalLetterId] = useState<string | null>(null);
+  const [addressModalView, setAddressModalView] = useState<'choice' | 'replace'>('choice');
+  const [replaceName, setReplaceName] = useState('');
+  const [replaceAddress, setReplaceAddress] = useState('');
+  const [addressBusy, setAddressBusy] = useState(false);
 
   const toggle = (id: string) => setSelected((s) => ({ ...s, [id]: !s[id] }));
   const selectedIds = Object.keys(selected).filter((k) => selected[k]);
@@ -2440,6 +2445,107 @@ const LettersTab = ({
       setDeleting(false);
       setBusy(false);
       setBusyMsg('');
+    }
+  };
+
+  const openAddressModal = (letterId: string) => {
+    const letter = letters.find((l) => l.id === letterId);
+    setAddressModalLetterId(letterId);
+    setAddressModalView('choice');
+    setReplaceName(letter ? String(letter.recipient_name ?? '') : '');
+    setReplaceAddress('');
+  };
+
+  const handleConfirmAddress = async () => {
+    if (!addressModalLetterId) return;
+    setAddressBusy(true);
+    try {
+      const res = await fetch('/api/verify-letter-address', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+        body: JSON.stringify({ letterId: addressModalLetterId }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        alert(`Address confirmation failed: ${(json as { error?: string }).error ?? 'Unknown error'}`);
+        return;
+      }
+      setAddressModalLetterId(null);
+      onChange();
+    } catch (err) {
+      alert('Error: ' + (err as Error).message);
+    } finally {
+      setAddressBusy(false);
+    }
+  };
+
+  const handleReplaceAndRegenerate = async () => {
+    if (!addressModalLetterId) return;
+    const trimmedName = replaceName.trim();
+    const trimmedAddress = replaceAddress.trim();
+    if (!trimmedName || !trimmedAddress) {
+      alert('Recipient name and address are both required.');
+      return;
+    }
+    const oldLetter = letters.find((l) => l.id === addressModalLetterId);
+    if (!oldLetter) {
+      alert('Letter not found.');
+      return;
+    }
+    const oldRecipientName = String(oldLetter.recipient_name ?? '');
+    const matchingAccounts = furnisherMap[oldRecipientName] ?? [];
+    if (matchingAccounts.length === 0) {
+      alert('Cannot regenerate: no matching accounts found for this recipient. Account selections may have changed since the original letter was generated.');
+      return;
+    }
+    const oldLetterType = String(oldLetter.letter_type) as LetterTypeKey;
+
+    setAddressBusy(true);
+    try {
+      const delRes = await fetch('/api/delete-letter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+        body: JSON.stringify({ letterId: addressModalLetterId }),
+      });
+      const delJson = await delRes.json().catch(() => ({}));
+      if (!delRes.ok) {
+        alert(`Delete failed: ${(delJson as { error?: string }).error ?? 'Unknown error'}`);
+        return;
+      }
+
+      const genRes = await fetch('/api/generate-letters', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+        body: JSON.stringify({
+          clientId,
+          letterType: oldLetterType,
+          recipientName: trimmedName,
+          recipientAddress: trimmedAddress,
+          accountIds: matchingAccounts.map((a) => a.id),
+          addressOverride: true,
+          clientData: {
+            fullName: client.full_name,
+            address: client.address,
+            city: client.city,
+            state: client.state,
+            zip: client.zip,
+            email: client.email,
+            phone: client.phone,
+          },
+        }),
+      });
+      const genJson = await genRes.json().catch(() => ({}));
+      if (!genRes.ok) {
+        alert(`Regenerate failed: ${(genJson as { error?: string }).error ?? 'Unknown error'}`);
+        return;
+      }
+
+      setAddressModalLetterId(null);
+      onChange();
+    } catch (err) {
+      alert('Error: ' + (err as Error).message);
+    } finally {
+      setAddressBusy(false);
     }
   };
 
@@ -2839,6 +2945,102 @@ const LettersTab = ({
         </div>
       )}
 
+      {/* Address Verification Modal */}
+      {addressModalLetterId && (() => {
+        const letter = letters.find((l) => l.id === addressModalLetterId);
+        if (!letter) return null;
+        const currentName = String(letter.recipient_name ?? '');
+        const currentAddress = String(letter.recipient_address ?? '');
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
+            <div className="bg-[#1a1a1a] border border-neutral-700 rounded-sm p-6 w-full max-w-lg">
+              <h3 className="text-sm uppercase tracking-widest text-luxury-red font-bold mb-3">Verify Recipient Address</h3>
+              <p className="text-xs text-neutral-400 mb-2">Current address on file for this letter:</p>
+              <div className="bg-[#0f0f0f] border border-neutral-800 rounded-sm p-3 mb-5 text-xs font-mono text-neutral-300 whitespace-pre-wrap">
+                <div className="text-white font-semibold mb-1">{currentName}</div>
+                {currentAddress}
+              </div>
+
+              {addressModalView === 'choice' ? (
+                <>
+                  <p className="text-xs text-neutral-400 mb-4">
+                    Confirm the address above is correct, or replace it with a verified address and regenerate the letter.
+                  </p>
+                  <div className="flex flex-col gap-2 mb-4">
+                    <button
+                      onClick={handleConfirmAddress}
+                      disabled={addressBusy}
+                      className="text-xs uppercase tracking-widest bg-luxury-red hover:bg-luxury-light disabled:opacity-50 text-white px-5 py-3 rounded-sm transition-colors"
+                    >
+                      {addressBusy ? 'Confirming…' : 'Confirm Address is Correct'}
+                    </button>
+                    <button
+                      onClick={() => setAddressModalView('replace')}
+                      disabled={addressBusy}
+                      className="text-xs uppercase tracking-widest border border-luxury-red/40 hover:bg-luxury-red/10 disabled:opacity-50 text-luxury-red px-5 py-3 rounded-sm transition-colors"
+                    >
+                      Replace Address & Regenerate Letter
+                    </button>
+                  </div>
+                  <div className="flex justify-end">
+                    <button
+                      onClick={() => setAddressModalLetterId(null)}
+                      disabled={addressBusy}
+                      className="text-xs uppercase tracking-widest text-neutral-400 hover:text-white px-4 py-2 border border-neutral-700 rounded-sm transition-colors disabled:opacity-40"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs text-neutral-400 mb-4">
+                    Enter the corrected recipient name and address. The new letter will replace the current one. Accounts and letter type are preserved.
+                  </p>
+                  <div className="mb-4">
+                    <label className="block text-xs uppercase tracking-widest text-neutral-400 mb-2">Recipient Name</label>
+                    <input
+                      type="text"
+                      value={replaceName}
+                      onChange={(e) => setReplaceName(e.target.value)}
+                      disabled={addressBusy}
+                      className="w-full bg-[#0f0f0f] border border-neutral-800 text-white px-3 py-2 rounded-sm text-sm focus:outline-none focus:border-luxury-red disabled:opacity-50"
+                    />
+                  </div>
+                  <div className="mb-5">
+                    <label className="block text-xs uppercase tracking-widest text-neutral-400 mb-2">Recipient Address (multi-line ok)</label>
+                    <textarea
+                      value={replaceAddress}
+                      onChange={(e) => setReplaceAddress(e.target.value)}
+                      rows={4}
+                      disabled={addressBusy}
+                      placeholder={'ATTN: FCRA Compliance Department\n1234 Real Street\nCity, ST 12345'}
+                      className="w-full bg-[#0f0f0f] border border-neutral-800 text-white px-3 py-2 rounded-sm text-sm focus:outline-none focus:border-luxury-red font-mono disabled:opacity-50"
+                    />
+                  </div>
+                  <div className="flex gap-3 justify-end">
+                    <button
+                      onClick={() => setAddressModalView('choice')}
+                      disabled={addressBusy}
+                      className="text-xs uppercase tracking-widest text-neutral-400 hover:text-white px-4 py-2 border border-neutral-700 rounded-sm transition-colors disabled:opacity-40"
+                    >
+                      Back
+                    </button>
+                    <button
+                      onClick={handleReplaceAndRegenerate}
+                      disabled={addressBusy || !replaceName.trim() || !replaceAddress.trim()}
+                      className="text-xs uppercase tracking-widest bg-luxury-red hover:bg-luxury-light disabled:opacity-50 text-white px-5 py-2 rounded-sm transition-colors"
+                    >
+                      {addressBusy ? 'Regenerating…' : 'Regenerate Letter'}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Advanced — Individual Generators (collapsible) */}
       <div>
         <button
@@ -3133,9 +3335,14 @@ const LettersTab = ({
                   <td className="px-4 py-3">
                     <div className="text-white">{l.recipient_name}</div>
                     {l.needs_address && (
-                      <span className="text-[9px] uppercase tracking-widest text-amber-400 bg-amber-950/30 border border-amber-800/50 rounded-sm px-1.5 py-0.5 mt-0.5 inline-block">
+                      <button
+                        type="button"
+                        onClick={() => openAddressModal(l.id)}
+                        className="text-[9px] uppercase tracking-widest text-amber-400 bg-amber-950/30 hover:bg-amber-950/50 border border-amber-800/50 rounded-sm px-1.5 py-0.5 mt-0.5 inline-block cursor-pointer transition-colors"
+                        title="Verify or replace recipient address before mailing"
+                      >
                         ⚠ Verify Address Before Mailing
-                      </span>
+                      </button>
                     )}
                   </td>
                   <td className="px-4 py-3 text-neutral-300 text-xs uppercase tracking-widest">{l.letter_type}</td>
