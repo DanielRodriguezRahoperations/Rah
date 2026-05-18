@@ -2235,6 +2235,9 @@ const LettersTab = ({
   const [phase1Running, setPhase1Running] = useState(false);
   const [mailAllModal, setMailAllModal] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const toggle = (id: string) => setSelected((s) => ({ ...s, [id]: !s[id] }));
   const selectedIds = Object.keys(selected).filter((k) => selected[k]);
@@ -2384,6 +2387,40 @@ const LettersTab = ({
     setBusy(false);
     setBusyMsg('');
     onChange();
+  };
+
+  const handleDeleteLetter = async (letterId: string) => {
+    setDeleting(true);
+    const res = await fetch('/api/delete-letter', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${btoa(adminPassword)}` },
+      body: JSON.stringify({ letterId }),
+    });
+    setDeleting(false);
+    setDeleteConfirm(null);
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      alert(`Delete failed: ${(j as { error?: string }).error ?? 'Unknown error'}`);
+    } else {
+      onChange();
+    }
+  };
+
+  const handleDeleteAllUnmailed = async () => {
+    setDeleting(true);
+    const res = await fetch('/api/delete-letter', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${btoa(adminPassword)}` },
+      body: JSON.stringify({ scope: 'all-unmailed', clientId: client.id }),
+    });
+    setDeleting(false);
+    setBulkDeleteConfirm(false);
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      alert(`Bulk delete failed: ${(j as { error?: string }).error ?? 'Unknown error'}`);
+    } else {
+      onChange();
+    }
   };
 
   const bureauLettersList = letters.filter((l) =>
@@ -2701,6 +2738,15 @@ const LettersTab = ({
               Approve &amp; Mail All ({unmairedLetters.length})
             </button>
           )}
+          {unmairedLetters.length > 0 && !phase1Running && (
+            <button
+              onClick={() => setBulkDeleteConfirm(true)}
+              disabled={busy || deleting}
+              className="border border-red-900/50 hover:bg-red-950/30 disabled:opacity-40 text-red-400 px-6 py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
+            >
+              Delete All Unmailed
+            </button>
+          )}
         </div>
       </div>
 
@@ -2743,6 +2789,30 @@ const LettersTab = ({
                 className="text-xs uppercase tracking-widest bg-luxury-red hover:bg-luxury-light disabled:opacity-50 text-white px-5 py-2 rounded-sm transition-colors"
               >
                 Confirm Mail All
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Delete Confirmation Modal */}
+      {bulkDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
+          <div className="bg-[#1a1a1a] border border-neutral-700 rounded-sm p-6 w-full max-w-md">
+            <h3 className="text-sm uppercase tracking-widest text-red-400 font-bold mb-2">Delete All Unmailed Letters</h3>
+            <p className="text-xs text-neutral-400 mb-5">
+              This will permanently delete all {unmairedLetters.length} unmailed letter{unmairedLetters.length !== 1 ? 's' : ''} and their PDFs for this client. Mailed letters are not affected. This cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button onClick={() => setBulkDeleteConfirm(false)} className="text-xs uppercase tracking-widest text-neutral-400 hover:text-white px-4 py-2 border border-neutral-700 rounded-sm transition-colors">
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAllUnmailed}
+                disabled={deleting}
+                className="text-xs uppercase tracking-widest bg-red-900 hover:bg-red-800 disabled:opacity-50 text-white px-5 py-2 rounded-sm transition-colors"
+              >
+                {deleting ? 'Deleting…' : 'Delete All'}
               </button>
             </div>
           </div>
@@ -2996,6 +3066,20 @@ const LettersTab = ({
                         Send Mail
                       </button>
                     )}
+                    {!l.lob_tracking_number && (
+                      deleteConfirm === l.id ? (
+                        <span className="flex items-center gap-1">
+                          <button onClick={() => handleDeleteLetter(l.id)} disabled={deleting} className="text-red-400 hover:text-red-300 text-xs uppercase tracking-widest font-semibold disabled:opacity-40">
+                            {deleting ? '…' : 'Confirm'}
+                          </button>
+                          <button onClick={() => setDeleteConfirm(null)} className="text-neutral-500 hover:text-neutral-300 text-xs">✕</button>
+                        </span>
+                      ) : (
+                        <button onClick={() => setDeleteConfirm(l.id)} disabled={busy || deleting} className="text-neutral-600 hover:text-red-400 text-xs disabled:opacity-40 transition-colors" title="Delete letter">
+                          ✕
+                        </button>
+                      )
+                    )}
                   </td>
                 </tr>
               ))}
@@ -3046,6 +3130,20 @@ const LettersTab = ({
                       <button onClick={() => sendMail(l.id)} disabled={busy || !l.pdf_unsigned_path || !!l.needs_address} className="text-amber-400 hover:text-amber-300 text-xs uppercase tracking-widest font-semibold disabled:opacity-40" title={l.needs_address ? 'Verify address first' : !l.pdf_unsigned_path ? 'Generate PDF first' : 'Send via USPS Certified Mail'}>
                         Send Mail
                       </button>
+                    )}
+                    {!l.lob_tracking_number && (
+                      deleteConfirm === l.id ? (
+                        <span className="flex items-center gap-1">
+                          <button onClick={() => handleDeleteLetter(l.id)} disabled={deleting} className="text-red-400 hover:text-red-300 text-xs uppercase tracking-widest font-semibold disabled:opacity-40">
+                            {deleting ? '…' : 'Confirm'}
+                          </button>
+                          <button onClick={() => setDeleteConfirm(null)} className="text-neutral-500 hover:text-neutral-300 text-xs">✕</button>
+                        </span>
+                      ) : (
+                        <button onClick={() => setDeleteConfirm(l.id)} disabled={busy || deleting} className="text-neutral-600 hover:text-red-400 text-xs disabled:opacity-40 transition-colors" title="Delete letter">
+                          ✕
+                        </button>
+                      )
                     )}
                   </td>
                 </tr>
