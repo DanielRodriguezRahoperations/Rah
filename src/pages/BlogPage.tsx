@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "How to Get Your Business on the First Page of Google",
+      displayTitle: "How to Get Your Business on the First Page of Google in 2026",
+      date: "May 18, 2026",
+      pubDate: "Mon, 18 May 2026 16:01:57 GMT",
+      issue: 'No. 071',
+      category: "SEO",
+      excerpt: "Getting your business on the first page of Google is no longer optional - it is the difference between growing and getting left behind. In this guide, we break down the exact strategies local Arizona businesses use to dominate search results. From technical SEO to content and local optimization, RAH Operations has you covered.",
+      slug: 'how-to-get-your-business-on-the-first-page-of-google'
+    },
+    {
       title: "What Is a Backlink and Why Does Your Website Need Them",
       displayTitle: "What Is a Backlink and Why Your Website Desperately Needs Them",
       date: "May 18, 2026",
