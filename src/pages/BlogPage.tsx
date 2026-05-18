@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "What Is a Backlink and Why Does Your Website Need Them",
+      displayTitle: "What Is a Backlink and Why Your Website Desperately Needs Them",
+      date: "May 18, 2026",
+      pubDate: "Mon, 18 May 2026 12:01:22 GMT",
+      issue: 'No. 070',
+      category: "SEO",
+      excerpt: "Backlinks are one of the most powerful ranking factors in SEO, yet most small business owners in Arizona have no idea how they work or why they matter. Understanding backlinks is the first step toward building a website that actually gets found on Google. RAH Operations breaks it all down in plain language so you can take action today.",
+      slug: 'what-is-a-backlink-and-why-does-your-website-need-them'
+    },
+    {
       title: "How to Write SEO Blog Posts That Actually Rank on Google",
       displayTitle: "How to Write SEO Blog Posts That Actually Rank on Google (Step-by-Step Guide)",
       date: "May 18, 2026",
