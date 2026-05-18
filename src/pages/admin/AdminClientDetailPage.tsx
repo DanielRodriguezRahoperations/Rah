@@ -31,6 +31,7 @@ interface ClientDetail {
     dispute_selections?: Record<string, unknown> | null;
     case_type?: string | null;
     strategy_notes?: string | null;
+    dispute_strategy?: Record<string, unknown> | null;
     positive_accounts?: Array<Record<string, unknown>> | null;
     address_verification_result?: {
       intake_address: string;
@@ -73,7 +74,7 @@ const STATUS_OPTIONS = [
   'closed',
 ];
 
-type Tab = 'overview' | 'documents' | 'analyze' | 'letters' | 'tracking';
+type Tab = 'overview' | 'documents' | 'analyze' | 'strategy' | 'letters' | 'tracking';
 
 const AdminClientDetailPage = () => {
   const { clientId } = useParams<{ clientId: string }>();
@@ -372,6 +373,7 @@ const AdminClientDetailPage = () => {
                 ['overview', 'Overview'],
                 ['documents', 'Documents'],
                 ['analyze', `Analyzed Accounts (${accounts.length})`],
+                ['strategy', 'Dispute Strategy'],
                 ['letters', `Letters (${letters.length})`],
                 ['tracking', 'Tracking'],
               ] as Array<[Tab, string]>
@@ -438,6 +440,38 @@ const AdminClientDetailPage = () => {
                 clientEmail={client.email}
                 onChange={loadDetail}
                 client={client}
+                onRunStrategy={async () => {
+                  setBusy(true);
+                  setBusyMsg('Claude is generating dispute strategy…');
+                  try {
+                    const r = await fetch('/api/run-strategy', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+                      body: JSON.stringify({ clientId: client.id }),
+                    });
+                    const j = await r.json();
+                    if (!r.ok) {
+                      alert(j.error || 'Strategy generation failed');
+                    } else {
+                      await loadDetail();
+                      setTab('strategy');
+                    }
+                  } catch (err) {
+                    alert('Error: ' + (err as Error).message);
+                  } finally {
+                    setBusy(false);
+                    setBusyMsg('');
+                  }
+                }}
+              />
+            )}
+            {tab === 'strategy' && (
+              <StrategyTab
+                clientId={client.id}
+                client={client}
+                accounts={accounts}
+                onChange={loadDetail}
+                onNavigateToLetters={() => setTab('letters')}
               />
             )}
             {tab === 'letters' && (
@@ -1175,6 +1209,7 @@ const AnalyzeTab = ({
   clientEmail,
   onChange,
   client,
+  onRunStrategy,
 }: {
   accounts: ClientDetail['accounts'];
   runAnalyze: () => void;
@@ -1183,6 +1218,7 @@ const AnalyzeTab = ({
   clientEmail: string;
   onChange: () => void;
   client: ClientDetail['client'];
+  onRunStrategy: () => Promise<void>;
 }) => {
   const getPersonalInfo = (c: ClientDetail['client']): PersonalInfoErrors => {
     const pie = c.personal_info_errors;
@@ -1812,7 +1848,7 @@ const AnalyzeTab = ({
           <p className="text-xs text-neutral-500">Review all items above to unlock Run Strategy</p>
         )}
         <button
-          onClick={() => alert('Run Strategy coming in next update — all selections saved.')}
+          onClick={onRunStrategy}
           disabled={!allReviewed}
           className="bg-amber-600 hover:bg-amber-500 disabled:opacity-30 disabled:cursor-not-allowed text-white px-8 py-4 rounded-sm text-xs uppercase tracking-widest font-bold transition-colors"
         >
@@ -1823,6 +1859,285 @@ const AnalyzeTab = ({
   );
 };
 
+
+const StrategyTab = ({
+  clientId,
+  client,
+  accounts,
+  onChange,
+  onNavigateToLetters,
+}: {
+  clientId: string;
+  client: ClientDetail['client'];
+  accounts: ClientDetail['accounts'];
+  onChange: () => void;
+  onNavigateToLetters: () => void;
+}) => {
+  const strategy = client.dispute_strategy as Record<string, unknown> | null | undefined;
+  const [overrides, setOverrides] = React.useState<Record<string, string>>({});
+  const [summaryToast, setSummaryToast] = React.useState<{ msg: string; ok: boolean } | null>(null);
+  const [approving, setApproving] = React.useState(false);
+
+  const sectionA = (strategy?.section_a ?? {}) as Record<string, Array<{ creditor_name: string; account_number: string; balance: string; account_reason?: string }>>;
+  const sectionB = (strategy?.section_b ?? []) as Array<{ creditor_name: string; account_status: string; recommended_path: string; reasoning: string; bureaus: string[]; account_number_equifax?: string; account_number_experian?: string; account_number_transunion?: string; balance?: string }>;
+  const personalInfoStrategy = (strategy?.personal_info_strategy ?? []) as Array<{ item: string; type: string; bureaus: string[]; recommended_path: string; reasoning: string }>;
+  const inquiryStrategy = (strategy?.inquiry_strategy ?? []) as Array<{ creditor: string; bureau: string; date: string; recommended_path: string; reasoning: string }>;
+  const overallSummary = String(strategy?.overall_summary ?? '');
+
+  const BUREAU_LABELS: Record<string, string> = { equifax: 'Equifax', experian: 'Experian', transunion: 'TransUnion' };
+  const bureauKeys = ['equifax', 'experian', 'transunion'] as const;
+
+  const sendReportSummary = async () => {
+    try {
+      const r = await fetch('/api/send-report-summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+        body: JSON.stringify({ clientId }),
+      });
+      const j = await r.json();
+      setSummaryToast({ msg: r.ok ? `Report summary sent to ${client.email}` : (j.error || 'Failed'), ok: r.ok });
+    } catch {
+      setSummaryToast({ msg: 'Network error', ok: false });
+    }
+    setTimeout(() => setSummaryToast(null), 4000);
+  };
+
+  const handleApproveAndGenerate = async () => {
+    setApproving(true);
+    try {
+      // Save any overrides back to dispute_strategy
+      if (Object.keys(overrides).length > 0) {
+        const updatedB = sectionB.map((item, i) => ({
+          ...item,
+          recommended_path: overrides[`b_${i}`] ?? item.recommended_path,
+        }));
+        await fetch('/api/update-status', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+          body: JSON.stringify({
+            clientId,
+            dispute_strategy: { ...strategy, section_b: updatedB },
+          }),
+        });
+      }
+      await onChange();
+      onNavigateToLetters();
+    } finally {
+      setApproving(false);
+    }
+  };
+
+  if (!strategy) {
+    return (
+      <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-10 text-center">
+        <p className="text-neutral-400 text-sm mb-2">No strategy generated yet.</p>
+        <p className="text-neutral-600 text-xs">Go to Analyzed Accounts, review all items, then click Run Strategy →</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      {summaryToast && (
+        <div className={`text-sm px-4 py-3 rounded-sm ${summaryToast.ok ? 'bg-emerald-950/50 border border-emerald-800 text-emerald-200' : 'bg-red-950/50 border border-red-800 text-red-300'}`}>
+          {summaryToast.msg}
+        </div>
+      )}
+
+      {/* Overall Summary */}
+      {overallSummary && (
+        <div className="bg-[#1a1a1a] border border-amber-900/40 rounded-sm p-5">
+          <h3 className="text-xs uppercase tracking-widest text-amber-400 font-bold mb-2">Strategy Summary</h3>
+          <p className="text-sm text-neutral-300 leading-relaxed">{overallSummary}</p>
+        </div>
+      )}
+
+      {/* Section A — Identity Theft */}
+      {Object.values(sectionA).some((v) => v.length > 0) && (
+        <div>
+          <div className="mb-4">
+            <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold">Section A — Identity Theft §605B Letters</h3>
+            <p className="text-xs text-neutral-500 mt-1">These accounts go into §605B block letters, grouped by bureau.</p>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-4">
+            {bureauKeys.map((b) => {
+              const items = sectionA[b] ?? [];
+              if (items.length === 0) return null;
+              return (
+                <div key={b} className="bg-[#1a1a1a] border border-luxury-red/30 rounded-sm overflow-hidden">
+                  <div className="px-4 py-3 border-b border-luxury-red/20 bg-luxury-red/5">
+                    <h4 className="text-xs uppercase tracking-widest text-luxury-red font-bold">{BUREAU_LABELS[b]} §605B Letter</h4>
+                    <p className="text-[10px] text-neutral-500 mt-0.5">{items.length} item{items.length !== 1 ? 's' : ''}</p>
+                  </div>
+                  <div className="divide-y divide-neutral-800/50">
+                    {items.map((item, i) => (
+                      <div key={i} className="px-4 py-3">
+                        <p className="text-sm text-white font-medium">{item.creditor_name}</p>
+                        {item.account_number && <p className="text-[10px] text-neutral-500 mt-0.5">Acct: {item.account_number}</p>}
+                        {item.balance && <p className="text-[10px] text-neutral-400 mt-0.5">Balance: {item.balance}</p>}
+                        {item.account_reason && <p className="text-[10px] text-neutral-600 italic mt-0.5">{item.account_reason}</p>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Section B — Standard Disputes */}
+      {sectionB.length > 0 && (
+        <div>
+          <div className="mb-4">
+            <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold">Section B — Standard Dispute Items</h3>
+            <p className="text-xs text-neutral-500 mt-1">Claude's recommended legal path per item. Edit any path before approving.</p>
+          </div>
+          <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-[#0f0f0f] border-b border-neutral-800">
+                <tr className="text-left text-[10px] uppercase tracking-widest text-neutral-500">
+                  <th className="px-4 py-3 min-w-[200px]">Account</th>
+                  <th className="px-4 py-3 min-w-[80px]">Bureaus</th>
+                  <th className="px-4 py-3 min-w-[180px]">Legal Path</th>
+                  <th className="px-4 py-3">Reasoning</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sectionB.map((item, i) => {
+                  const currentPath = overrides[`b_${i}`] ?? item.recommended_path;
+                  return (
+                    <tr key={i} className="border-b border-neutral-800/60 align-top">
+                      <td className="px-4 py-3">
+                        <div className="text-white font-medium">{item.creditor_name}</div>
+                        <div className="text-[10px] text-neutral-500 mt-0.5">{item.account_status}</div>
+                        {item.balance && <div className="text-[10px] text-neutral-600 mt-0.5">Balance: {item.balance}</div>}
+                        {(item.account_number_equifax || item.account_number_experian || item.account_number_transunion) && (
+                          <div className="text-[10px] text-neutral-700 mt-0.5">
+                            {item.account_number_equifax && `EQ: ${item.account_number_equifax} `}
+                            {item.account_number_experian && `EX: ${item.account_number_experian} `}
+                            {item.account_number_transunion && `TU: ${item.account_number_transunion}`}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-col gap-1">
+                          {(Array.isArray(item.bureaus) ? item.bureaus : []).map((b) => (
+                            <span key={String(b)} className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-sm border border-luxury-red bg-luxury-red/10 text-luxury-red w-fit">
+                              {BUREAU_LABELS[String(b)] ?? String(b)}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <input
+                          value={currentPath}
+                          onChange={(e) => setOverrides((prev) => ({ ...prev, [`b_${i}`]: e.target.value }))}
+                          className="bg-[#0f0f0f] border border-neutral-700 focus:border-luxury-red text-white text-xs px-2 py-1.5 rounded-sm w-full focus:outline-none"
+                        />
+                        {overrides[`b_${i}`] && overrides[`b_${i}`] !== item.recommended_path && (
+                          <p className="text-[9px] text-amber-400 mt-0.5">✎ Edited</p>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-[11px] text-neutral-400 leading-relaxed">{item.reasoning}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Personal Info Strategy */}
+      {personalInfoStrategy.length > 0 && (
+        <div>
+          <h3 className="text-xs uppercase tracking-widest text-amber-400 font-bold mb-3">Personal Information Dispute Plan</h3>
+          <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-[#0f0f0f] border-b border-neutral-800">
+                <tr className="text-left text-[10px] uppercase tracking-widest text-neutral-500">
+                  <th className="px-4 py-3">Item</th>
+                  <th className="px-4 py-3">Type</th>
+                  <th className="px-4 py-3">Bureaus</th>
+                  <th className="px-4 py-3">Path</th>
+                  <th className="px-4 py-3">Reasoning</th>
+                </tr>
+              </thead>
+              <tbody>
+                {personalInfoStrategy.map((item, i) => (
+                  <tr key={i} className="border-b border-neutral-800/60 align-top">
+                    <td className="px-4 py-3 text-white text-xs">{item.item}</td>
+                    <td className="px-4 py-3 text-neutral-400 text-xs capitalize">{item.type}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col gap-1">
+                        {(Array.isArray(item.bureaus) ? item.bureaus : []).map((b) => (
+                          <span key={String(b)} className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-sm border border-luxury-red bg-luxury-red/10 text-luxury-red w-fit">
+                            {BUREAU_LABELS[String(b)] ?? String(b)}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-luxury-red text-xs font-medium">{item.recommended_path}</td>
+                    <td className="px-4 py-3 text-[11px] text-neutral-400">{item.reasoning}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Inquiry Strategy */}
+      {inquiryStrategy.length > 0 && (
+        <div>
+          <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold mb-3">Inquiry Dispute Plan</h3>
+          <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-[#0f0f0f] border-b border-neutral-800">
+                <tr className="text-left text-[10px] uppercase tracking-widest text-neutral-500">
+                  <th className="px-4 py-3">Creditor</th>
+                  <th className="px-4 py-3">Bureau</th>
+                  <th className="px-4 py-3">Date</th>
+                  <th className="px-4 py-3">Path</th>
+                  <th className="px-4 py-3">Reasoning</th>
+                </tr>
+              </thead>
+              <tbody>
+                {inquiryStrategy.map((item, i) => (
+                  <tr key={i} className="border-b border-neutral-800/60 align-top">
+                    <td className="px-4 py-3 text-white text-xs font-medium">{item.creditor}</td>
+                    <td className="px-4 py-3 text-neutral-400 text-xs capitalize">{item.bureau}</td>
+                    <td className="px-4 py-3 text-neutral-400 text-xs">{item.date}</td>
+                    <td className="px-4 py-3 text-luxury-red text-xs font-medium">{item.recommended_path}</td>
+                    <td className="px-4 py-3 text-[11px] text-neutral-400">{item.reasoning}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-neutral-800">
+        <button
+          onClick={sendReportSummary}
+          className="border border-luxury-red/40 hover:bg-luxury-red/10 text-luxury-red px-5 py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
+        >
+          Send Report Summary to Client
+        </button>
+        <button
+          onClick={handleApproveAndGenerate}
+          disabled={approving}
+          className="bg-luxury-red hover:bg-luxury-light disabled:opacity-50 text-white px-8 py-3 rounded-sm text-xs uppercase tracking-widest font-bold transition-colors"
+        >
+          {approving ? 'Saving…' : 'Approve & Generate Letters →'}
+        </button>
+      </div>
+    </div>
+  );
+};
 
 // === Letters Tab ===
 type LetterTypeKey = '605B' | '611' | '623' | '609' | '809';
