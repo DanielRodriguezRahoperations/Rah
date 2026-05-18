@@ -1435,6 +1435,8 @@ const AnalyzeTab = ({
 
   const allReviewed = React.useMemo(() => {
     const allAccts = accounts.every((a) => {
+      // Positive accounts are automatically considered reviewed
+      if (String((a as Record<string, unknown>).account_standing ?? 'negative') === 'positive') return true;
       const tag = disputeTags[a.id] ?? '';
       if (tag === 'ignore' || tag === 'duplicate' || tag === 'claude_decide') return true;
       return (disputeTypes[a.id] ?? []).length > 0;
@@ -1451,10 +1453,6 @@ const AnalyzeTab = ({
     const allAddrs = Object.keys(personalInfo.unknown_addresses).every((k) => checkSel('addresses', k));
     const allPhones = Object.keys(personalInfo.unknown_phone_numbers).every((k) => checkSel('phones', k));
     const allInqs = unauthorizedInquiries.every((q) => checkSel('inquiries', `${q.creditor}:${q.bureau}:${q.date}`));
-    console.log('[allReviewed] allAccts:', allAccts, 'allNames:', allNames, 'allAddrs:', allAddrs, 'allPhones:', allPhones, 'allInqs:', allInqs);
-    console.log('[allReviewed] disputeTags:', JSON.stringify(disputeTags));
-    console.log('[allReviewed] disputeTypes:', JSON.stringify(disputeTypes));
-    console.log('[allReviewed] accounts count:', accounts.length);
     return allAccts && allNames && allAddrs && allPhones && allInqs;
   }, [disputeTags, disputeTypes, disputeSelections, accounts, personalInfo, unauthorizedInquiries]);
 
