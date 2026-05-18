@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "How to Do Keyword Research for Your Small Business Free",
+      displayTitle: "How to Do Keyword Research for Your Small Business for Free (And Actually Rank)",
+      date: "May 18, 2026",
+      pubDate: "Mon, 18 May 2026 04:01:31 GMT",
+      issue: 'No. 068',
+      category: "SEO",
+      excerpt: "Keyword research does not have to cost you a dime to be effective. In this guide, RAH Operations walks Arizona small business owners through the exact free tools and strategies used to find keywords that drive real traffic and real customers. If you want to rank on Google without guessing, this is where you start.",
+      slug: 'how-to-do-keyword-research-for-your-small-business-free'
+    },
+    {
       title: "On Page SEO Checklist for Small Business Websites 2026",
       displayTitle: "The Complete On Page SEO Checklist for Small Business Websites in 2026",
       date: "May 18, 2026",
