@@ -1451,6 +1451,10 @@ const AnalyzeTab = ({
     const allAddrs = Object.keys(personalInfo.unknown_addresses).every((k) => checkSel('addresses', k));
     const allPhones = Object.keys(personalInfo.unknown_phone_numbers).every((k) => checkSel('phones', k));
     const allInqs = unauthorizedInquiries.every((q) => checkSel('inquiries', `${q.creditor}:${q.bureau}:${q.date}`));
+    console.log('[allReviewed] allAccts:', allAccts, 'allNames:', allNames, 'allAddrs:', allAddrs, 'allPhones:', allPhones, 'allInqs:', allInqs);
+    console.log('[allReviewed] disputeTags:', JSON.stringify(disputeTags));
+    console.log('[allReviewed] disputeTypes:', JSON.stringify(disputeTypes));
+    console.log('[allReviewed] accounts count:', accounts.length);
     return allAccts && allNames && allAddrs && allPhones && allInqs;
   }, [disputeTags, disputeTypes, disputeSelections, accounts, personalInfo, unauthorizedInquiries]);
 
