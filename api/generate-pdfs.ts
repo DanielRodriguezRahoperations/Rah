@@ -57,6 +57,33 @@ function sanitizeForWinAnsi(text: string): string {
     '✓': '[x]', '✔': '[x]', '✗': '[ ]', '✘': '[ ]',
     // Trademark
     '™': '(TM)',
+    // Double-line box drawing (U+2550–U+256C)
+    '═': '=', '║': '|',
+    '╒': '+', '╓': '+', '╔': '+', '╕': '+',
+    '╖': '+', '╗': '+', '╘': '+', '╙': '+',
+    '╚': '+', '╛': '+', '╜': '+', '╝': '+',
+    '╞': '+', '╟': '+', '╠': '+', '╡': '+',
+    '╢': '+', '╣': '+', '╤': '+', '╥': '+',
+    '╦': '+', '╧': '+', '╨': '+', '╩': '+',
+    '╪': '+', '╫': '+', '╬': '+',
+    // Heavier dashes / shapes
+    '▬': '-', '■': '#', '□': '#',
+    // Warning / alert symbols
+    '⚠': '!',   // ⚠
+    '❗': '!',   // ❗
+    '❕': '!',   // ❕
+    '⁉': '!?',  // ⁉
+    '‼': '!!',  // ‼
+    // Checkboxes
+    '☐': '[ ]', // ☐
+    '☑': '[x]', // ☑
+    '☒': '[x]', // ☒
+    // Variation selectors (strip — these modify preceding emoji)
+    '︀': '', '︁': '', '︂': '', '︃': '',
+    '︄': '', '︅': '', '︆': '', '︇': '',
+    '︈': '', '︉': '', '︊': '', '︋': '',
+    '︌': '', '︍': '', '︎': '', '️': '',
+    // Section / paragraph marks already-handled WinAnsi chars left alone (§ ¶ © ® already encode)
   };
 
   let result = text;
@@ -67,7 +94,7 @@ function sanitizeForWinAnsi(text: string): string {
   }
 
   // Final pass: replace anything still outside tab/newline/printable ASCII/Latin-1 supplement with '?'
-  result = result.replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF]/g, '?');
+  result = result.replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF]/gu, '?');
 
   return result;
 }
@@ -101,41 +128,165 @@ function wrapText(text: string, maxCharsPerLine: number): string[] {
   return lines;
 }
 
+type LineSpec = {
+  text: string;
+  bold: boolean;
+  size: number;
+  spacingBefore: number;
+  spacingAfter: number;
+};
+
+function isAllCapsHeader(line: string): boolean {
+  const trimmed = line.trim();
+  if (trimmed.length < 4) return false;
+  const alphaChars = trimmed.match(/[a-zA-Z]/g) || [];
+  if (alphaChars.length < 3) return false;
+  const upperCount = (trimmed.match(/[A-Z]/g) || []).length;
+  const lowerCount = (trimmed.match(/[a-z]/g) || []).length;
+  // Strict: entirely uppercase letters
+  if (lowerCount === 0 && upperCount >= 3) return true;
+  // Loose: predominantly uppercase AND has a header marker (ends with ':' or contains ' -- ')
+  if (upperCount / alphaChars.length >= 0.7) {
+    if (trimmed.endsWith(':')) return true;
+    if (trimmed.includes(' -- ')) return true;
+  }
+  return false;
+}
+
+function classifyAndBuildLines(
+  text: string,
+  bodySize: number,
+  charsPerLineBody: number,
+  charsPerLineBold: number
+): LineSpec[] {
+  const out: LineSpec[] = [];
+  const rawLines = text.split('\n');
+  const headerSize = bodySize + 2;
+
+  for (const raw of rawLines) {
+    const line = raw.replace(/\s+$/, ''); // preserve leading indent
+    const trimmed = line.trim();
+
+    // Blank line
+    if (trimmed === '') {
+      out.push({ text: '', bold: false, size: bodySize, spacingBefore: 0, spacingAfter: 0 });
+      continue;
+    }
+
+    // Divider row (replace with vertical space only)
+    if (/^[-=_]{8,}$/.test(trimmed)) {
+      out.push({ text: '', bold: false, size: bodySize, spacingBefore: 2, spacingAfter: 2 });
+      continue;
+    }
+
+    // Roman numeral H1: "I. INTRODUCTION..."
+    if (/^(?:I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV|XVI|XVII|XVIII|XIX|XX)\.\s+[A-Z]/.test(trimmed)) {
+      const wrapped = wrapText(trimmed, charsPerLineBold);
+      for (let i = 0; i < wrapped.length; i++) {
+        out.push({
+          text: wrapped[i],
+          bold: true,
+          size: headerSize,
+          spacingBefore: i === 0 ? 12 : 0,
+          spacingAfter: i === wrapped.length - 1 ? 4 : 0,
+        });
+      }
+      continue;
+    }
+
+    // RE: subject line
+    if (/^RE:/i.test(trimmed)) {
+      const wrapped = wrapText(trimmed, charsPerLineBold);
+      for (let i = 0; i < wrapped.length; i++) {
+        out.push({
+          text: wrapped[i],
+          bold: true,
+          size: bodySize,
+          spacingBefore: i === 0 ? 4 : 0,
+          spacingAfter: i === wrapped.length - 1 ? 4 : 0,
+        });
+      }
+      continue;
+    }
+
+    // All-caps subsection label
+    if (isAllCapsHeader(trimmed)) {
+      const wrapped = wrapText(line, charsPerLineBold);
+      for (let i = 0; i < wrapped.length; i++) {
+        out.push({
+          text: wrapped[i],
+          bold: true,
+          size: bodySize,
+          spacingBefore: i === 0 ? 6 : 0,
+          spacingAfter: i === wrapped.length - 1 ? 2 : 0,
+        });
+      }
+      continue;
+    }
+
+    // Body line
+    const wrapped = wrapText(line, charsPerLineBody);
+    for (const w of wrapped) {
+      out.push({
+        text: w,
+        bold: false,
+        size: bodySize,
+        spacingBefore: 0,
+        spacingAfter: 0,
+      });
+    }
+  }
+
+  return out;
+}
+
 async function drawTextPages(
   pdf: PDFDocument,
   text: string,
   fontSize = 11
 ): Promise<void> {
-  const font = await pdf.embedFont(StandardFonts.TimesRoman);
+  const fontRegular = await pdf.embedFont(StandardFonts.TimesRoman);
+  const fontBold = await pdf.embedFont(StandardFonts.TimesRomanBold);
+
   const margin = 72;
   const pageWidth = PageSizes.Letter[0];
   const pageHeight = PageSizes.Letter[1];
   const usableWidth = pageWidth - margin * 2;
-  const usableHeight = pageHeight - margin * 2;
-  const lineHeight = fontSize * 1.4;
-  // approximate chars per line
-  const charsPerLine = Math.floor(usableWidth / (fontSize * 0.5));
-  const wrapped = wrapText(sanitizeForWinAnsi(text), charsPerLine);
-  const linesPerPage = Math.floor(usableHeight / lineHeight);
 
-  for (let i = 0; i < wrapped.length; i += linesPerPage) {
-    const slice = wrapped.slice(i, i + linesPerPage);
-    const page = pdf.addPage(PageSizes.Letter);
-    let y = pageHeight - margin;
-    for (const line of slice) {
+  const charsPerLineBody = Math.floor(usableWidth / (fontSize * 0.5));
+  const charsPerLineBold = Math.floor(usableWidth / (fontSize * 0.55));
+
+  const sanitized = sanitizeForWinAnsi(text);
+  const lines = classifyAndBuildLines(sanitized, fontSize, charsPerLineBody, charsPerLineBold);
+
+  let page = pdf.addPage(PageSizes.Letter);
+  let y = pageHeight - margin;
+
+  for (const ls of lines) {
+    const lineHeight = ls.size * 1.4;
+    y -= ls.spacingBefore;
+
+    if (y - lineHeight < margin) {
+      page = pdf.addPage(PageSizes.Letter);
+      y = pageHeight - margin;
+    }
+
+    if (ls.text !== '') {
       try {
-        page.drawText(line, {
+        page.drawText(ls.text, {
           x: margin,
           y,
-          size: fontSize,
-          font,
+          size: ls.size,
+          font: ls.bold ? fontBold : fontRegular,
           color: rgb(0, 0, 0),
         });
       } catch (err) {
         console.warn('[generate-pdfs] drawText failed for line, skipping:', err);
       }
-      y -= lineHeight;
     }
+
+    y -= lineHeight;
+    y -= ls.spacingAfter;
   }
 }
 
@@ -179,12 +330,32 @@ async function appendImageAsPage(pdf: PDFDocument, bytes: Uint8Array, mime: stri
 async function appendPdfBytes(pdf: PDFDocument, bytes: Uint8Array): Promise<boolean> {
   try {
     const src = await PDFDocument.load(bytes);
-    const indices = src.getPageIndices();
-    const copied = await pdf.copyPages(src, indices);
-    for (const p of copied) pdf.addPage(p);
+    const pageCount = src.getPageCount();
+    if (pageCount === 0) return false;
+    const indices = Array.from({ length: pageCount }, (_, i) => i);
+    const embeddedPages = await pdf.embedPdf(src, indices);
+
+    const pageWidth = PageSizes.Letter[0];
+    const pageHeight = PageSizes.Letter[1];
+    const margin = 36;
+    const maxW = pageWidth - margin * 2;
+    const maxH = pageHeight - margin * 2;
+
+    for (const embedded of embeddedPages) {
+      const ratio = Math.min(maxW / embedded.width, maxH / embedded.height);
+      const w = embedded.width * ratio;
+      const h = embedded.height * ratio;
+      const newPage = pdf.addPage(PageSizes.Letter);
+      newPage.drawPage(embedded, {
+        x: (pageWidth - w) / 2,
+        y: (pageHeight - h) / 2,
+        width: w,
+        height: h,
+      });
+    }
     return true;
   } catch (err) {
-    console.warn('[generate-pdfs] pdf load failed:', err);
+    console.warn('[generate-pdfs] pdf load/embed failed:', err);
     return false;
   }
 }
@@ -250,9 +421,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     { field: 'doc_ftc_report', label: 'FTC Identity Theft Report' },
   ];
 
+  const attachedPaths = new Set<string>();
+
   for (const ex of exhibitFields) {
     const path = (client as Record<string, unknown>)[ex.field];
     if (typeof path !== 'string' || !path) continue;
+    if (attachedPaths.has(path)) continue;
+    attachedPaths.add(path);
     try {
       const { data: blob, error: dErr } = await supabase.storage
         .from('intake-documents')
@@ -274,6 +449,49 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     } catch (err) {
       console.warn(`[generate-pdfs] failed to append ${ex.label}:`, err);
+    }
+  }
+
+  type FileEntry = { path: string; filename: string; uploaded_at: string };
+  const toFileArr = (raw: unknown): FileEntry[] =>
+    Array.isArray(raw) ? (raw as FileEntry[]) : [];
+
+  const arrayFieldSpecs: Array<{ field: string; label: string }> = [
+    { field: 'doc_ftc_reports', label: 'FTC Report (additional)' },
+    { field: 'doc_additional_files', label: 'Additional File' },
+    { field: 'doc_misc_files', label: 'Misc File' },
+  ];
+
+  for (const spec of arrayFieldSpecs) {
+    const entries = toFileArr((client as Record<string, unknown>)[spec.field]);
+    for (const entry of entries) {
+      if (!entry || typeof entry.path !== 'string' || !entry.path) continue;
+      if (attachedPaths.has(entry.path)) continue;
+      attachedPaths.add(entry.path);
+      try {
+        const { data: blob, error: dErr } = await supabase.storage
+          .from('intake-documents')
+          .download(entry.path);
+        if (dErr || !blob) {
+          console.warn(`[generate-pdfs] download failed for ${spec.label} ${entry.filename}:`, dErr);
+          continue;
+        }
+        const bytes = new Uint8Array(await blob.arrayBuffer());
+        const lower = entry.path.toLowerCase();
+        if (lower.endsWith('.pdf')) {
+          await appendPdfBytes(pdf, bytes);
+        } else if (
+          lower.endsWith('.jpg') ||
+          lower.endsWith('.jpeg') ||
+          lower.endsWith('.png')
+        ) {
+          await appendImageAsPage(pdf, bytes, lower.endsWith('.png') ? 'png' : 'jpg');
+        } else {
+          await appendImageAsPage(pdf, bytes, 'jpg');
+        }
+      } catch (err) {
+        console.warn(`[generate-pdfs] failed to append ${spec.label} ${entry.filename}:`, err);
+      }
     }
   }
 
