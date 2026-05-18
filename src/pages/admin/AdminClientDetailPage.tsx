@@ -2391,35 +2391,55 @@ const LettersTab = ({
 
   const handleDeleteLetter = async (letterId: string) => {
     setDeleting(true);
-    const res = await fetch('/api/delete-letter', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${btoa(adminPassword)}` },
-      body: JSON.stringify({ letterId }),
-    });
-    setDeleting(false);
-    setDeleteConfirm(null);
-    if (!res.ok) {
-      const j = await res.json().catch(() => ({}));
-      alert(`Delete failed: ${(j as { error?: string }).error ?? 'Unknown error'}`);
-    } else {
-      onChange();
+    setBusy(true);
+    setBusyMsg('Deleting letter…');
+    try {
+      const res = await fetch('/api/delete-letter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+        body: JSON.stringify({ letterId }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        alert(`Delete failed: ${(json as { error?: string }).error ?? 'Unknown error'}`);
+      } else {
+        setDeleteConfirm(null);
+        onChange();
+      }
+    } catch (err) {
+      alert('Error: ' + (err as Error).message);
+    } finally {
+      setDeleting(false);
+      setBusy(false);
+      setBusyMsg('');
     }
   };
 
   const handleDeleteAllUnmailed = async () => {
     setDeleting(true);
-    const res = await fetch('/api/delete-letter', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${btoa(adminPassword)}` },
-      body: JSON.stringify({ scope: 'all-unmailed', clientId: client.id }),
-    });
-    setDeleting(false);
-    setBulkDeleteConfirm(false);
-    if (!res.ok) {
-      const j = await res.json().catch(() => ({}));
-      alert(`Bulk delete failed: ${(j as { error?: string }).error ?? 'Unknown error'}`);
-    } else {
-      onChange();
+    setBusy(true);
+    setBusyMsg('Deleting all unmailed letters…');
+    try {
+      const res = await fetch('/api/delete-letter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+        body: JSON.stringify({ clientId, scope: 'all-unmailed' }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        alert(`Bulk delete failed: ${(json as { error?: string }).error ?? 'Unknown error'}`);
+      } else {
+        const count = (json as { deleted?: number }).deleted ?? 0;
+        setBulkDeleteConfirm(false);
+        alert(`Deleted ${count} unmailed letter${count !== 1 ? 's' : ''}.`);
+        onChange();
+      }
+    } catch (err) {
+      alert('Error: ' + (err as Error).message);
+    } finally {
+      setDeleting(false);
+      setBusy(false);
+      setBusyMsg('');
     }
   };
 
