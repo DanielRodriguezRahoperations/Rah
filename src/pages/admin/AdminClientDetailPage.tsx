@@ -42,7 +42,7 @@ interface ClientDetail {
     } | null;
   };
   letters: Array<Record<string, unknown> & { id: string; recipient_name: string; letter_type: string; created_at: string; pdf_unsigned_path?: string | null; lob_tracking_number?: string | null; mailed_at?: string | null; mail_status?: string | null; needs_address?: boolean | null; response_received_at?: string | null; }>;
-  accounts: Array<Record<string, unknown> & { id: string; creditor_name: string; account_number: string; account_number_equifax?: string; account_number_experian?: string; account_number_transunion?: string; balance: string; date_opened: string; account_type: string; account_status: string; bureaus: string[]; selected: boolean; dispute_types: string[]; original_creditor?: string; phone_numbers?: string[]; name_variations?: string[]; addresses?: string[]; equifax_data?: Record<string, unknown> | null; experian_data?: Record<string, unknown> | null; transunion_data?: Record<string, unknown> | null; duplicate_flag?: boolean; duplicate_note?: string; balance_inconsistency?: boolean; balance_inconsistency_note?: string; dispute_priority?: string; recommended_fcra_sections?: string[]; letter_targets?: Record<string, unknown>; strategy_notes?: string }>;
+  accounts: Array<Record<string, unknown> & { id: string; creditor_name: string; account_number: string; account_number_equifax?: string; account_number_experian?: string; account_number_transunion?: string; balance: string; date_opened: string; account_type: string; account_status: string; bureaus: string[]; selected: boolean; dispute_types: string[]; original_creditor?: string; phone_numbers?: string[]; name_variations?: string[]; addresses?: string[]; equifax_data?: Record<string, unknown> | null; experian_data?: Record<string, unknown> | null; transunion_data?: Record<string, unknown> | null; duplicate_flag?: boolean; duplicate_note?: string; balance_inconsistency?: boolean; balance_inconsistency_note?: string; dispute_priority?: string; recommended_fcra_sections?: string[]; letter_targets?: Record<string, unknown>; strategy_notes?: string; account_standing?: string; account_reason?: string; dispute_tag?: string; equifax_balance?: string; experian_balance?: string; transunion_balance?: string }>;
   responses: Array<Record<string, unknown> & { id: string; created_at: string }>;
   docUrls: Record<string, string | null>;
   miscFiles: Array<{ path: string; filename: string; uploaded_at: string; signedUrl: string | null }>;
@@ -1198,6 +1198,9 @@ const AnalyzeTab = ({
     };
   };
 
+  const negativeAccounts = accounts.filter((a) => String((a as Record<string, unknown>).account_standing ?? 'negative') !== 'positive');
+  const positiveAccounts = accounts.filter((a) => String((a as Record<string, unknown>).account_standing ?? '') === 'positive');
+
   const [disputeTypes, setDisputeTypes] = React.useState<Record<string, string[]>>(() =>
     Object.fromEntries(accounts.map((a) => [a.id, a.dispute_types ?? []])));
   const [disputeTags, setDisputeTags] = React.useState<Record<string, string>>(() =>
@@ -1223,9 +1226,6 @@ const AnalyzeTab = ({
 
   React.useEffect(() => {
     setPersonalInfo(getPersonalInfo(client));
-    console.log('[AnalyzeTab] positive_accounts:', client?.positive_accounts);
-    console.log('[AnalyzeTab] first account dispute_types:', accounts[0]?.dispute_types);
-    console.log('[AnalyzeTab] dispute_selections:', JSON.stringify(client?.dispute_selections)?.slice(0, 200));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client]);
 
@@ -1279,9 +1279,7 @@ const AnalyzeTab = ({
   const getActiveBureaus = (accountId: string): string[] => {
     const account = accounts.find((a) => a.id === accountId);
     if (!account) return [];
-    if (Array.isArray(account.bureaus) && account.bureaus.length > 0) {
-      return account.bureaus as string[];
-    }
+    if (Array.isArray(account.bureaus) && account.bureaus.length > 0) return account.bureaus as string[];
     const edits = bureauEdits[accountId];
     if (!edits) return [];
     return (['equifax', 'experian', 'transunion'] as const).filter((b) => edits[b] != null);
@@ -1346,86 +1344,251 @@ const AnalyzeTab = ({
     setTimeout(() => setSelectionFlash(false), 1500);
   };
 
-  const toggleItemBureau = (
-    cat: 'names' | 'addresses' | 'phones' | 'inquiries',
-    key: string,
-    bureau: 'equifax' | 'experian' | 'transunion',
-  ) => {
+  const toggleItemBureau = (cat: 'names' | 'addresses' | 'phones' | 'inquiries', key: string, bureau: 'equifax' | 'experian' | 'transunion') => {
     const prev = disputeSelections[cat][key] ?? emptyItemSelection();
-    saveDisputeSelections({
-      ...disputeSelections,
-      [cat]: { ...disputeSelections[cat], [key]: { ...prev, bureaus: { ...prev.bureaus, [bureau]: !prev.bureaus[bureau] } } },
-    });
+    saveDisputeSelections({ ...disputeSelections, [cat]: { ...disputeSelections[cat], [key]: { ...prev, bureaus: { ...prev.bureaus, [bureau]: !prev.bureaus[bureau] } } } });
   };
 
-  const toggleItemFcra = (
-    cat: 'names' | 'addresses' | 'phones' | 'inquiries',
-    key: string,
-    section: string,
-  ) => {
+  const toggleItemFcra = (cat: 'names' | 'addresses' | 'phones' | 'inquiries', key: string, section: string) => {
     const prev = disputeSelections[cat][key] ?? emptyItemSelection();
-    const secs = prev.fcra_sections.includes(section)
-      ? prev.fcra_sections.filter((s) => s !== section)
-      : [...prev.fcra_sections, section];
-    saveDisputeSelections({
-      ...disputeSelections,
-      [cat]: { ...disputeSelections[cat], [key]: { ...prev, fcra_sections: secs } },
-    });
+    const secs = prev.fcra_sections.includes(section) ? prev.fcra_sections.filter((s) => s !== section) : [...prev.fcra_sections, section];
+    saveDisputeSelections({ ...disputeSelections, [cat]: { ...disputeSelections[cat], [key]: { ...prev, fcra_sections: secs } } });
+  };
+
+  const toggleItemFlag = (cat: 'names' | 'addresses' | 'phones' | 'inquiries', key: string, flag: 'claude_decide' | 'ignore') => {
+    const prev = disputeSelections[cat][key] ?? emptyItemSelection();
+    const cur = (prev as unknown as Record<string, unknown>)[flag] === true;
+    saveDisputeSelections({ ...disputeSelections, [cat]: { ...disputeSelections[cat], [key]: { ...prev, [flag]: !cur } as unknown as ItemSelection } });
   };
 
   const toggleAccountBureau = (accountId: string, bureau: 'equifax' | 'experian' | 'transunion') => {
     const prev = disputeSelections.accounts[accountId] ?? emptyItemSelection();
-    saveDisputeSelections({
-      ...disputeSelections,
-      accounts: { ...disputeSelections.accounts, [accountId]: { ...prev, bureaus: { ...prev.bureaus, [bureau]: !prev.bureaus[bureau] } } },
-    });
+    saveDisputeSelections({ ...disputeSelections, accounts: { ...disputeSelections.accounts, [accountId]: { ...prev, bureaus: { ...prev.bureaus, [bureau]: !prev.bureaus[bureau] } } } });
   };
 
   const sendReportSummary = async () => {
     try {
-      const r = await fetch('/api/send-report-summary', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
-        body: JSON.stringify({ clientId }),
-      });
+      const r = await fetch('/api/send-report-summary', { method: 'POST', headers: { 'Content-Type': 'application/json', ...adminHeaders() }, body: JSON.stringify({ clientId }) });
       const j = await r.json();
       setSummaryToast({ msg: r.ok ? `Report summary sent to ${clientEmail}` : (j.error || 'Failed'), ok: r.ok });
-    } catch {
-      setSummaryToast({ msg: 'Network error sending report summary', ok: false });
-    }
+    } catch { setSummaryToast({ msg: 'Network error sending report summary', ok: false }); }
     setTimeout(() => setSummaryToast(null), 4000);
   };
 
   const inp = 'bg-transparent border-b border-transparent hover:border-neutral-700 focus:border-luxury-red/50 focus:bg-[#111] text-white px-1 py-0.5 text-xs w-full focus:outline-none transition-colors rounded-sm';
   const BUREAU_LABELS: Record<string, string> = { equifax: 'Equifax', experian: 'Experian', transunion: 'TransUnion' };
 
-  console.log('[AnalyzeTab] personalInfo state:', JSON.stringify(personalInfo));
-  const hasPersonalInfo =
-    Object.keys(personalInfo.name_variations).length > 0 ||
-    Object.keys(personalInfo.unknown_addresses).length > 0 ||
-    Object.keys(personalInfo.unknown_phone_numbers).length > 0;
-
+  const hasPersonalInfo = Object.keys(personalInfo.name_variations).length > 0 || Object.keys(personalInfo.unknown_addresses).length > 0 || Object.keys(personalInfo.unknown_phone_numbers).length > 0;
   const unauthorizedInquiries = (client.inquiries ?? []).filter((q) => q.inquiry_type === 'hard' && q.potentially_unauthorized);
 
-  const hasAnySelection = React.useMemo(() => {
-    const hasAccountTag = Object.values(disputeTags).some((t) => t && t.length > 0);
-    const hasAccountFcra = Object.values(disputeTypes).some((t) => t && t.length > 0);
-    const hasPersonalSel = Object.values({
-      ...disputeSelections.names,
-      ...disputeSelections.addresses,
-      ...disputeSelections.phones,
-    }).some((s) =>
-      Object.values(s.bureaus).some(Boolean) ||
-      s.fcra_sections.length > 0 ||
-      (s as unknown as Record<string, unknown>).claude_decide === true
+  const isAccountReviewed = (accountId: string): boolean => {
+    const tag = disputeTags[accountId] ?? '';
+    if (tag === 'ignore' || tag === 'duplicate' || tag === 'claude_decide') return true;
+    const fcra = disputeTypes[accountId] ?? [];
+    return fcra.length > 0;
+  };
+
+  const isItemReviewed = (cat: 'names' | 'addresses' | 'phones' | 'inquiries', key: string): boolean => {
+    const sel = disputeSelections[cat][key] ?? emptyItemSelection();
+    const s = sel as unknown as Record<string, unknown>;
+    if (s.ignore === true || s.claude_decide === true) return true;
+    if (Object.values(sel.bureaus).some(Boolean)) return true;
+    if (sel.fcra_sections.length > 0) return true;
+    return false;
+  };
+
+  const allReviewed = React.useMemo(() => {
+    const allAccts = accounts.every((a) => isAccountReviewed(a.id));
+    const allNames = Object.keys(personalInfo.name_variations).every((k) => isItemReviewed('names', k));
+    const allAddrs = Object.keys(personalInfo.unknown_addresses).every((k) => isItemReviewed('addresses', k));
+    const allPhones = Object.keys(personalInfo.unknown_phone_numbers).every((k) => isItemReviewed('phones', k));
+    const allInqs = unauthorizedInquiries.every((q) => isItemReviewed('inquiries', `${q.creditor}:${q.bureau}:${q.date}`));
+    return allAccts && allNames && allAddrs && allPhones && allInqs;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disputeTags, disputeTypes, disputeSelections, accounts, personalInfo, unauthorizedInquiries]);
+
+  const AccountTagControls = ({ a }: { a: ClientDetail['accounts'][number] }) => {
+    const fcra = disputeTypes[a.id] ?? [];
+    const tag = disputeTags[a.id] ?? '';
+    const reviewed = isAccountReviewed(a.id);
+    return (
+      <div className="flex flex-col gap-1">
+        {FCRA_SECTIONS.map(({ key, label }) => {
+          const active = fcra.includes(key);
+          return (
+            <label key={key} className="flex items-center gap-1.5 cursor-pointer group">
+              <input type="checkbox" checked={active} onChange={() => handleFCRASection(a.id, key)} className="accent-luxury-red w-3 h-3 flex-shrink-0" />
+              <span className={`text-[10px] uppercase tracking-wider ${active ? 'text-luxury-red' : 'text-neutral-500 group-hover:text-neutral-300'}`}>{label}</span>
+            </label>
+          );
+        })}
+        <div className="mt-1.5 pt-1.5 border-t border-neutral-800/50 flex flex-col gap-1">
+          {(['claude_decide', 'duplicate', 'ignore'] as const).map((t) => {
+            const labels: Record<string, string> = { claude_decide: 'Let Claude Decide', duplicate: 'Duplicate — Skip', ignore: 'Ignore' };
+            const colors: Record<string, string> = { claude_decide: 'accent-amber-500', duplicate: 'accent-sky-500', ignore: 'accent-neutral-500' };
+            const active = tag === t;
+            return (
+              <label key={t} className="flex items-center gap-1.5 cursor-pointer group">
+                <input type="checkbox" checked={active} onChange={() => handleDisputeTag(a.id, t)} className={`${colors[t]} w-3 h-3 flex-shrink-0`} />
+                <span className={`text-[10px] uppercase tracking-wider ${active ? (t === 'claude_decide' ? 'text-amber-400' : t === 'duplicate' ? 'text-sky-400' : 'text-neutral-400') : 'text-neutral-600 group-hover:text-neutral-400'}`}>{labels[t]}</span>
+              </label>
+            );
+          })}
+        </div>
+        {reviewed && <span className="text-[9px] text-emerald-500 mt-0.5">✓ Reviewed</span>}
+        {flash(`${a.id}:tag`)}
+      </div>
     );
-    const hasInquirySel = Object.values(disputeSelections.inquiries).some(
-      (s) =>
-        Object.values(s.bureaus).some(Boolean) ||
-        (s as unknown as Record<string, unknown>).claude_decide === true
-    );
-    return hasAccountTag || hasAccountFcra || hasPersonalSel || hasInquirySel;
-  }, [disputeTags, disputeTypes, disputeSelections]);
+  };
+
+  const AccountTable = ({ accts, standing }: { accts: ClientDetail['accounts']; standing: 'negative' | 'positive' }) => (
+    <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="bg-[#0f0f0f] border-b border-neutral-800">
+            <tr className="text-left text-[10px] uppercase tracking-widest text-neutral-500">
+              <th className="px-3 py-3 w-8"></th>
+              <th className="px-3 py-3 min-w-[220px]">Creditor / Type</th>
+              <th className="px-3 py-3 min-w-[80px]">Bureaus</th>
+              <th className="px-3 py-3 min-w-[160px]">Review</th>
+              <th className="px-3 py-3 min-w-[90px]">Dispute To</th>
+              <th className="px-3 py-3 w-20"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {accts.map((a) => {
+              const isExpanded = expandedRows.has(a.id);
+              const activeBureaus = getActiveBureaus(a.id);
+              const tf = topFields[a.id];
+              if (!tf) return null;
+              const priority = (a.dispute_priority ?? 'medium') as string;
+              const priorityStyle = standing === 'negative' ? (PRIORITY_STYLES[priority] ?? PRIORITY_STYLES.low) : 'bg-emerald-950/30 border-emerald-800 text-emerald-400';
+              const reason = String((a as Record<string, unknown>).account_reason ?? '');
+
+              return (
+                <React.Fragment key={a.id}>
+                  <tr className={`border-b border-neutral-800/50 align-top ${isExpanded ? 'bg-[#151515]' : ''}`}>
+                    <td className="px-3 py-3 text-center align-middle">
+                      <button onClick={() => toggleExpanded(a.id)} className="text-neutral-500 hover:text-white transition-colors text-base leading-none select-none">
+                        {isExpanded ? '▾' : '▸'}
+                      </button>
+                    </td>
+                    <td className="px-3 py-2">
+                      <div className="flex items-start gap-1.5 mb-0.5">
+                        <input value={tf.creditor_name} onChange={(e) => setTopFields((p) => ({ ...p, [a.id]: { ...p[a.id], creditor_name: e.target.value } }))} onBlur={(e) => handleTopFieldBlur(a.id, 'creditor_name', e.target.value)} className={`${inp} font-semibold`} placeholder="Creditor" />
+                        {flash(`${a.id}:creditor_name`)}
+                        <span className={`flex-shrink-0 text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm border font-bold ${priorityStyle}`}>
+                          {standing === 'positive' ? 'positive' : priority}
+                        </span>
+                      </div>
+                      <div className="mt-0.5 flex items-center gap-0.5">
+                        <input value={tf.original_creditor} onChange={(e) => setTopFields((p) => ({ ...p, [a.id]: { ...p[a.id], original_creditor: e.target.value } }))} onBlur={(e) => handleTopFieldBlur(a.id, 'original_creditor', e.target.value)} className={`${inp} text-neutral-400`} placeholder="Original creditor" />
+                        {flash(`${a.id}:original_creditor`)}
+                      </div>
+                      <div className="mt-0.5 flex items-center gap-0.5">
+                        <input value={tf.account_type} onChange={(e) => setTopFields((p) => ({ ...p, [a.id]: { ...p[a.id], account_type: e.target.value } }))} onBlur={(e) => handleTopFieldBlur(a.id, 'account_type', e.target.value)} className={`${inp} text-neutral-500 text-[10px]`} placeholder="Account type" />
+                        {flash(`${a.id}:account_type`)}
+                      </div>
+                      {reason && <p className="mt-1 text-[10px] text-neutral-500 italic leading-tight">{reason}</p>}
+                      {a.duplicate_flag && <p className="mt-1 text-[10px] text-amber-400 bg-amber-950/30 border border-amber-800/50 rounded-sm px-1.5 py-0.5">⚠ Possible duplicate reporting</p>}
+                      {a.balance_inconsistency && <p className="mt-1 text-[10px] text-sky-400 bg-sky-950/30 border border-sky-800/50 rounded-sm px-1.5 py-0.5">≠ Balance inconsistency across bureaus</p>}
+                    </td>
+                    <td className="px-3 py-2">
+                      <div className="flex flex-col gap-1">
+                        {(['equifax', 'experian', 'transunion'] as const).map((b) => {
+                          const active = activeBureaus.includes(b);
+                          return (
+                            <span key={b} className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-sm border w-fit ${active ? 'border-luxury-red bg-luxury-red/10 text-luxury-red' : 'border-neutral-800 text-neutral-700'}`}>
+                              {BUREAU_LABELS[b]}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    </td>
+                    <td className="px-3 py-2">
+                      <AccountTagControls a={a} />
+                    </td>
+                    <td className="px-3 py-2">
+                      <div className="flex flex-col gap-1">
+                        {BUREAU_KEYS.map((b) => {
+                          const active = (disputeSelections.accounts[a.id] ?? emptyItemSelection()).bureaus[b];
+                          return (
+                            <label key={b} className="flex items-center gap-1.5 cursor-pointer group">
+                              <input type="checkbox" checked={active} onChange={() => toggleAccountBureau(a.id, b)} className="accent-luxury-red w-3 h-3 flex-shrink-0" />
+                              <span className={`text-[10px] uppercase tracking-wider ${active ? 'text-luxury-red' : 'text-neutral-500 group-hover:text-neutral-300'}`}>{BUREAU_SHORT[b]}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </td>
+                    <td className="px-3 py-2 text-right align-middle">
+                      {deleteConfirm === a.id ? (
+                        <div className="flex items-center gap-1 justify-end">
+                          <span className="text-[9px] text-red-400">Delete?</span>
+                          <button onClick={() => handleDeleteAccount(a.id)} className="text-[9px] uppercase tracking-wider text-red-400 border border-red-800 px-1.5 py-0.5 rounded-sm hover:bg-red-950">Yes</button>
+                          <button onClick={() => setDeleteConfirm(null)} className="text-[9px] uppercase tracking-wider text-neutral-400 border border-neutral-700 px-1.5 py-0.5 rounded-sm hover:bg-neutral-800">No</button>
+                        </div>
+                      ) : (
+                        <button onClick={() => setDeleteConfirm(a.id)} className="text-neutral-600 hover:text-red-400 transition-colors text-sm px-1">✕</button>
+                      )}
+                    </td>
+                  </tr>
+                  {isExpanded && (
+                    <tr className="border-b border-neutral-700 bg-[#111]">
+                      <td colSpan={6} className="px-6 py-5">
+                        {(a.duplicate_note || a.balance_inconsistency_note) && (
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {a.duplicate_note && <p className="text-[11px] text-amber-300 bg-amber-950/30 border border-amber-800/50 rounded-sm px-3 py-1.5 flex-1 min-w-0"><span className="font-semibold">Duplicate note:</span> {a.duplicate_note}</p>}
+                            {a.balance_inconsistency_note && <p className="text-[11px] text-sky-300 bg-sky-950/30 border border-sky-800/50 rounded-sm px-3 py-1.5 flex-1 min-w-0"><span className="font-semibold">Balance note:</span> {a.balance_inconsistency_note}</p>}
+                          </div>
+                        )}
+                        <table className="w-full text-xs border-collapse">
+                          <thead>
+                            <tr className="text-[10px] uppercase tracking-widest">
+                              <th className="text-left py-2 pr-4 text-neutral-500 font-normal w-28">Field</th>
+                              {(['equifax', 'experian', 'transunion'] as const).map((b) => {
+                                const active = activeBureaus.includes(b);
+                                return (
+                                  <th key={b} className={`text-left py-2 px-3 font-semibold ${active ? 'text-luxury-red' : 'text-neutral-700'}`}>
+                                    {BUREAU_LABELS[b]}{!active && <span className="ml-1 font-normal text-neutral-700 normal-case tracking-normal">(not reported)</span>}
+                                  </th>
+                                );
+                              })}
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-neutral-800/50">
+                            {COMPARISON_FIELDS.map(({ key, label }) => (
+                              <tr key={key}>
+                                <td className="py-1.5 pr-4 text-neutral-500">{label}</td>
+                                {(['equifax', 'experian', 'transunion'] as const).map((b) => {
+                                  const bEdit = bureauEdits[a.id]?.[b] ?? null;
+                                  const flashKey = `${a.id}:${b}:${key}`;
+                                  return (
+                                    <td key={b} className="py-1.5 px-3">
+                                      {bEdit !== null ? (
+                                        <div className="flex items-center gap-0.5">
+                                          <input value={bEdit[key]} onChange={(e) => handleBureauCellChange(a.id, b, key, e.target.value)} onBlur={() => handleBureauCellBlur(a.id, b, key)} className="bg-transparent border-b border-transparent hover:border-neutral-700 focus:border-luxury-red/50 focus:bg-[#0f0f0f] text-neutral-300 px-1 py-0.5 w-full focus:outline-none transition-colors" placeholder="—" />
+                                          {flash(flashKey)}
+                                        </div>
+                                      ) : <span className="text-neutral-700">—</span>}
+                                    </td>
+                                  );
+                                })}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 
   return (
     <div>
@@ -1435,29 +1598,19 @@ const AnalyzeTab = ({
         </div>
       )}
       {selectionFlash && (
-        <div className="text-xs text-emerald-400 bg-emerald-950/30 border border-emerald-800/50 rounded-sm px-3 py-1.5 mb-4 inline-block">
-          ✓ Selections saved
-        </div>
+        <div className="text-xs text-emerald-400 bg-emerald-950/30 border border-emerald-800/50 rounded-sm px-3 py-1.5 mb-4 inline-block">✓ Selections saved</div>
       )}
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
-          <h2 className="font-serif-display text-2xl text-white">Negative Accounts</h2>
-          <p className="text-sm text-neutral-400">Click any field to edit inline. Expand rows to compare bureau data.</p>
+          <h2 className="font-serif-display text-2xl text-white">Analyzed Accounts</h2>
+          <p className="text-sm text-neutral-400">Review every item. Run Strategy unlocks when all items are reviewed.</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <button
-            onClick={sendReportSummary}
-            disabled={busy || accounts.length === 0}
-            className="border border-luxury-red/40 hover:bg-luxury-red/10 disabled:opacity-40 text-luxury-red px-5 py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
-          >
+          <button onClick={sendReportSummary} disabled={busy || accounts.length === 0} className="border border-luxury-red/40 hover:bg-luxury-red/10 disabled:opacity-40 text-luxury-red px-5 py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors">
             Send Report Summary
           </button>
-          <button
-            onClick={runAnalyze}
-            disabled={busy}
-            className="bg-luxury-red hover:bg-luxury-light disabled:opacity-50 text-white px-5 py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors"
-          >
+          <button onClick={runAnalyze} disabled={busy} className="bg-luxury-red hover:bg-luxury-light disabled:opacity-50 text-white px-5 py-3 rounded-sm text-xs uppercase tracking-widest font-semibold transition-colors">
             {accounts.length === 0 ? 'Run Analysis' : 'Re-run Analysis'}
           </button>
         </div>
@@ -1467,7 +1620,7 @@ const AnalyzeTab = ({
       {hasPersonalInfo && (
         <div className="bg-[#1a1a1a] border border-amber-900/50 rounded-sm p-5 mb-6">
           <h3 className="text-xs uppercase tracking-widest text-amber-400 font-bold mb-1">Personal Information Errors Detected</h3>
-          <p className="text-xs text-neutral-500 mb-3">Remove any item that has been corrected or is not a dispute target.</p>
+          <p className="text-xs text-neutral-500 mb-3">Review every item — select bureaus, dispute type, Let Claude Decide, or Ignore.</p>
           <div className="grid sm:grid-cols-3 gap-4">
             {([
               { field: 'name_variations' as const, label: 'Name Variations' },
@@ -1481,46 +1634,29 @@ const AnalyzeTab = ({
                     {Object.entries(personalInfo[field]).map(([item, bureaus]) => {
                       const cfg = PIE_CONFIG[field];
                       const sel = disputeSelections[cfg.cat][item] ?? emptyItemSelection();
+                      const s = sel as unknown as Record<string, unknown>;
+                      const reviewed = isItemReviewed(cfg.cat, item);
                       return (
-                        <div key={item} className="bg-[#0f0f0f] border border-neutral-800 rounded-sm px-2 py-1.5 space-y-1.5">
-                          {/* Existing: item text + delete */}
+                        <div key={item} className={`bg-[#0f0f0f] border rounded-sm px-2 py-1.5 space-y-1.5 ${reviewed ? 'border-emerald-900/50' : 'border-neutral-800'}`}>
                           <div className="flex items-center gap-2">
                             <span className="text-xs text-neutral-300 flex-1">{item}</span>
-                            <button
-                              onClick={() => removePersonalInfoItem(field, item)}
-                              className="text-neutral-600 hover:text-red-400 transition-colors text-sm leading-none flex-shrink-0"
-                            >
-                              ✕
-                            </button>
+                            {reviewed && <span className="text-[9px] text-emerald-500">✓</span>}
+                            <button onClick={() => removePersonalInfoItem(field, item)} className="text-neutral-600 hover:text-red-400 transition-colors text-sm leading-none flex-shrink-0">✕</button>
                           </div>
-                          {/* Row 1: Reported by — bureaus come directly from stored attribution */}
                           <div className="flex flex-wrap items-center gap-1.5">
                             <span className="text-[9px] uppercase tracking-widest text-neutral-600">Reported by:</span>
                             {Array.isArray(bureaus) && bureaus.length > 0
-                              ? bureaus.map((b) => (
-                                  <span key={b} className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-sm border border-luxury-red bg-luxury-red/10 text-luxury-red">
-                                    {BUREAU_LABELS[b] ?? b}
-                                  </span>
-                                ))
-                              : <span className="text-[9px] text-neutral-700">Unknown</span>
-                            }
+                              ? bureaus.map((b) => <span key={b} className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-sm border border-luxury-red bg-luxury-red/10 text-luxury-red">{BUREAU_LABELS[b] ?? b}</span>)
+                              : <span className="text-[9px] text-neutral-700">Unknown</span>}
                           </div>
-                          {/* Row 2: Add to letter */}
                           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                             <span className="text-[9px] uppercase tracking-widest text-neutral-600">Add to letter:</span>
                             {BUREAU_KEYS.map((b) => {
                               const active = sel.bureaus[b];
                               return (
                                 <label key={b} className="flex items-center gap-1 cursor-pointer group">
-                                  <input
-                                    type="checkbox"
-                                    checked={active}
-                                    onChange={() => toggleItemBureau(cfg.cat, item, b)}
-                                    className="accent-luxury-red w-3 h-3 flex-shrink-0"
-                                  />
-                                  <span className={`text-[9px] uppercase tracking-wider ${active ? 'text-luxury-red' : 'text-neutral-500 group-hover:text-neutral-300'}`}>
-                                    {BUREAU_SHORT[b]}
-                                  </span>
+                                  <input type="checkbox" checked={active} onChange={() => toggleItemBureau(cfg.cat, item, b)} className="accent-luxury-red w-3 h-3 flex-shrink-0" />
+                                  <span className={`text-[9px] uppercase tracking-wider ${active ? 'text-luxury-red' : 'text-neutral-500 group-hover:text-neutral-300'}`}>{BUREAU_SHORT[b]}</span>
                                 </label>
                               );
                             })}
@@ -1529,43 +1665,23 @@ const AnalyzeTab = ({
                               const active = sel.fcra_sections.includes(fkey);
                               return (
                                 <label key={fkey} className="flex items-center gap-1 cursor-pointer group">
-                                  <input
-                                    type="checkbox"
-                                    checked={active}
-                                    onChange={() => toggleItemFcra(cfg.cat, item, fkey)}
-                                    className="accent-luxury-red w-3 h-3 flex-shrink-0"
-                                  />
-                                  <span className={`text-[9px] uppercase tracking-wider ${active ? 'text-luxury-red' : 'text-neutral-500 group-hover:text-neutral-300'}`} title={flabel}>
-                                    {fkey}
-                                  </span>
+                                  <input type="checkbox" checked={active} onChange={() => toggleItemFcra(cfg.cat, item, fkey)} className="accent-luxury-red w-3 h-3 flex-shrink-0" />
+                                  <span className={`text-[9px] uppercase tracking-wider ${active ? 'text-luxury-red' : 'text-neutral-500 group-hover:text-neutral-300'}`} title={flabel}>{fkey}</span>
                                 </label>
                               );
                             })}
                           </div>
-                          <div className="pt-1">
-                            <button
-                              onClick={() => {
-                                const cfg = PIE_CONFIG[field];
-                                const prev = disputeSelections[cfg.cat][item] ?? emptyItemSelection();
-                                const isSet = (prev as unknown as Record<string, unknown>).claude_decide === true;
-                                saveDisputeSelections({
-                                  ...disputeSelections,
-                                  [cfg.cat]: {
-                                    ...disputeSelections[cfg.cat],
-                                    [item]: { ...prev, claude_decide: !isSet } as unknown as ItemSelection,
-                                  },
-                                });
-                              }}
-                              className={`text-[9px] uppercase tracking-widest px-2 py-0.5 rounded-sm border transition-colors ${
-                                ((disputeSelections[PIE_CONFIG[field].cat][item] ?? {}) as Record<string, unknown>).claude_decide === true
-                                  ? 'border-amber-700 bg-amber-950/30 text-amber-400'
-                                  : 'border-neutral-700 text-neutral-500 hover:border-amber-700 hover:text-amber-400'
-                              }`}
-                            >
-                              {((disputeSelections[PIE_CONFIG[field].cat][item] ?? {}) as Record<string, unknown>).claude_decide === true
-                                ? '✓ Let Claude Decide'
-                                : 'Let Claude Decide'}
-                            </button>
+                          <div className="flex flex-wrap gap-x-3 gap-y-1 pt-0.5">
+                            {(['claude_decide', 'ignore'] as const).map((flag) => {
+                              const active = s[flag] === true;
+                              const flagLabels = { claude_decide: 'Let Claude Decide', ignore: 'Ignore' };
+                              return (
+                                <label key={flag} className="flex items-center gap-1 cursor-pointer group">
+                                  <input type="checkbox" checked={active} onChange={() => toggleItemFlag(cfg.cat, item, flag)} className={`${flag === 'claude_decide' ? 'accent-amber-500' : 'accent-neutral-500'} w-3 h-3 flex-shrink-0`} />
+                                  <span className={`text-[9px] uppercase tracking-wider ${active ? (flag === 'claude_decide' ? 'text-amber-400' : 'text-neutral-400') : 'text-neutral-600 group-hover:text-neutral-400'}`}>{flagLabels[flag]}</span>
+                                </label>
+                              );
+                            })}
                           </div>
                         </div>
                       );
@@ -1578,351 +1694,36 @@ const AnalyzeTab = ({
         </div>
       )}
 
+      {/* Negative Accounts */}
       {accounts.length === 0 ? (
         <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm p-10 text-center text-neutral-400">
-          No accounts analyzed yet. Click "Run Analysis" to extract negative items from uploaded credit reports.
+          No accounts analyzed yet. Click "Run Analysis" to extract items from uploaded credit reports.
         </div>
       ) : (
         <>
-          <div className="flex items-center justify-between mb-3 mt-6">
-            <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold">
-              Negative Accounts
-            </h3>
+          <div className="flex items-center justify-between mb-3 mt-2">
+            <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold">Negative Accounts ({negativeAccounts.length})</h3>
           </div>
-        <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-[#0f0f0f] border-b border-neutral-800">
-                <tr className="text-left text-[10px] uppercase tracking-widest text-neutral-500">
-                  <th className="px-3 py-3 w-8"></th>
-                  <th className="px-3 py-3 min-w-[220px]">Creditor / Type</th>
-                  <th className="px-3 py-3 min-w-[120px]">Bureaus</th>
-                  <th className="px-3 py-3 min-w-[155px]">FCRA Sections</th>
-                  <th className="px-3 py-3 min-w-[100px]">Dispute To</th>
-                  <th className="px-3 py-3 w-24"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {accounts.map((a) => {
-                  const isExpanded = expandedRows.has(a.id);
-                  const fcra = disputeTypes[a.id] ?? [];
-                  const activeBureaus = getActiveBureaus(a.id);
-                  const tf = topFields[a.id];
-                  if (!tf) return null;
-                  const priority = (a.dispute_priority ?? 'medium') as string;
-                  const priorityStyle = PRIORITY_STYLES[priority] ?? PRIORITY_STYLES.low;
+          <AccountTable accts={negativeAccounts} standing="negative" />
 
-                  return (
-                    <React.Fragment key={a.id}>
-                      {/* Collapsed row */}
-                      <tr className={`border-b border-neutral-800/50 align-top ${isExpanded ? 'bg-[#151515]' : ''}`}>
-
-                        {/* Expand toggle */}
-                        <td className="px-3 py-3 text-center align-middle">
-                          <button
-                            onClick={() => toggleExpanded(a.id)}
-                            className="text-neutral-500 hover:text-white transition-colors text-base leading-none select-none"
-                          >
-                            {isExpanded ? '▾' : '▸'}
-                          </button>
-                        </td>
-
-                        {/* Creditor / Original / Type + priority badge + flags */}
-                        <td className="px-3 py-2">
-                          <div className="flex items-start gap-1.5 mb-0.5">
-                            <input
-                              value={tf.creditor_name}
-                              onChange={(e) => setTopFields((p) => ({ ...p, [a.id]: { ...p[a.id], creditor_name: e.target.value } }))}
-                              onBlur={(e) => handleTopFieldBlur(a.id, 'creditor_name', e.target.value)}
-                              className={`${inp} font-semibold`}
-                              placeholder="Creditor"
-                            />
-                            {flash(`${a.id}:creditor_name`)}
-                            <span className={`flex-shrink-0 text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm border font-bold ${priorityStyle}`}>
-                              {priority}
-                            </span>
-                            {a.strategy_notes && (
-                              <span
-                                title={a.strategy_notes}
-                                className="flex-shrink-0 text-[11px] text-neutral-500 hover:text-amber-400 cursor-help transition-colors leading-none mt-0.5"
-                              >
-                                ⓘ
-                              </span>
-                            )}
-                          </div>
-                          <div className="mt-0.5 flex items-center gap-0.5">
-                            <input
-                              value={tf.original_creditor}
-                              onChange={(e) => setTopFields((p) => ({ ...p, [a.id]: { ...p[a.id], original_creditor: e.target.value } }))}
-                              onBlur={(e) => handleTopFieldBlur(a.id, 'original_creditor', e.target.value)}
-                              className={`${inp} text-neutral-400`}
-                              placeholder="Original creditor"
-                            />
-                            {flash(`${a.id}:original_creditor`)}
-                          </div>
-                          <div className="mt-0.5 flex items-center gap-0.5">
-                            <input
-                              value={tf.account_type}
-                              onChange={(e) => setTopFields((p) => ({ ...p, [a.id]: { ...p[a.id], account_type: e.target.value } }))}
-                              onBlur={(e) => handleTopFieldBlur(a.id, 'account_type', e.target.value)}
-                              className={`${inp} text-neutral-500 text-[10px]`}
-                              placeholder="Account type"
-                            />
-                            {flash(`${a.id}:account_type`)}
-                          </div>
-                          {a.duplicate_flag && (
-                            <p className="mt-1 text-[10px] text-amber-400 bg-amber-950/30 border border-amber-800/50 rounded-sm px-1.5 py-0.5">
-                              ⚠ Possible duplicate reporting — verify before disputing
-                            </p>
-                          )}
-                          {a.balance_inconsistency && (
-                            <p className="mt-1 text-[10px] text-sky-400 bg-sky-950/30 border border-sky-800/50 rounded-sm px-1.5 py-0.5">
-                              ≠ Balance inconsistency across bureaus — dispute angle
-                            </p>
-                          )}
-                        </td>
-
-                        {/* Bureau badges — read-only, derived from non-null jsonb */}
-                        <td className="px-3 py-2">
-                          <div className="flex flex-col gap-1">
-                            {(['equifax', 'experian', 'transunion'] as const).map((b) => {
-                              const active = activeBureaus.includes(b);
-                              return (
-                                <span
-                                  key={b}
-                                  className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-sm border w-fit ${
-                                    active
-                                      ? 'border-luxury-red bg-luxury-red/10 text-luxury-red'
-                                      : 'border-neutral-800 text-neutral-700'
-                                  }`}
-                                >
-                                  {BUREAU_LABELS[b]}
-                                </span>
-                              );
-                            })}
-                          </div>
-                        </td>
-
-                        {/* FCRA Sections — pre-selected from recommended_fcra_sections via dispute_types */}
-                        <td className="px-3 py-2">
-                          <div className="flex flex-col gap-1">
-                            {FCRA_SECTIONS.map(({ key, label }) => {
-                              const active = fcra.includes(key);
-                              return (
-                                <label key={key} className="flex items-center gap-1.5 cursor-pointer group">
-                                  <input
-                                    type="checkbox"
-                                    checked={active}
-                                    onChange={() => handleFCRASection(a.id, key)}
-                                    className="accent-luxury-red w-3 h-3 flex-shrink-0"
-                                  />
-                                  <span className={`text-[10px] uppercase tracking-wider ${active ? 'text-luxury-red' : 'text-neutral-500 group-hover:text-neutral-300'}`}>
-                                    {label}
-                                  </span>
-                                </label>
-                              );
-                            })}
-                          </div>
-                          <div className="mt-2 pt-2 border-t border-neutral-800/50">
-                            <button
-                              onClick={() => handleDisputeTag(a.id, 'claude_decide')}
-                              className={`text-[9px] uppercase tracking-widest px-2 py-1 rounded-sm border transition-colors w-full text-left ${
-                                disputeTags[a.id] === 'claude_decide'
-                                  ? 'border-amber-700 bg-amber-950/30 text-amber-400'
-                                  : 'border-neutral-700 text-neutral-500 hover:border-amber-700 hover:text-amber-400'
-                              }`}
-                            >
-                              {disputeTags[a.id] === 'claude_decide' ? '✓ Let Claude Decide' : 'Let Claude Decide'}
-                            </button>
-                            {flash(`${a.id}:tag`)}
-                          </div>
-                        </td>
-
-                        {/* Dispute To — which bureau letter(s) this account goes into */}
-                        <td className="px-3 py-2">
-                          <div className="flex flex-col gap-1">
-                            {BUREAU_KEYS.map((b) => {
-                              const active = (disputeSelections.accounts[a.id] ?? emptyItemSelection()).bureaus[b];
-                              return (
-                                <label key={b} className="flex items-center gap-1.5 cursor-pointer group">
-                                  <input
-                                    type="checkbox"
-                                    checked={active}
-                                    onChange={() => toggleAccountBureau(a.id, b)}
-                                    className="accent-luxury-red w-3 h-3 flex-shrink-0"
-                                  />
-                                  <span className={`text-[10px] uppercase tracking-wider ${active ? 'text-luxury-red' : 'text-neutral-500 group-hover:text-neutral-300'}`}>
-                                    {BUREAU_SHORT[b]}
-                                  </span>
-                                </label>
-                              );
-                            })}
-                          </div>
-                        </td>
-
-                        {/* Delete */}
-                        <td className="px-3 py-2 text-right align-middle">
-                          {deleteConfirm === a.id ? (
-                            <div className="flex items-center gap-1 justify-end">
-                              <span className="text-[9px] text-red-400">Delete?</span>
-                              <button
-                                onClick={() => handleDeleteAccount(a.id)}
-                                className="text-[9px] uppercase tracking-wider text-red-400 border border-red-800 px-1.5 py-0.5 rounded-sm hover:bg-red-950"
-                              >
-                                Yes
-                              </button>
-                              <button
-                                onClick={() => setDeleteConfirm(null)}
-                                className="text-[9px] uppercase tracking-wider text-neutral-400 border border-neutral-700 px-1.5 py-0.5 rounded-sm hover:bg-neutral-800"
-                              >
-                                No
-                              </button>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => setDeleteConfirm(a.id)}
-                              className="text-neutral-600 hover:text-red-400 transition-colors text-sm px-1"
-                            >
-                              ✕
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-
-                      {/* Expanded comparison row */}
-                      {isExpanded && (
-                        <tr className="border-b border-neutral-700 bg-[#111]">
-                          <td colSpan={6} className="px-6 py-5">
-                            {(a.duplicate_note || a.balance_inconsistency_note) && (
-                              <div className="flex flex-wrap gap-2 mb-4">
-                                {a.duplicate_note && (
-                                  <p className="text-[11px] text-amber-300 bg-amber-950/30 border border-amber-800/50 rounded-sm px-3 py-1.5 flex-1 min-w-0">
-                                    <span className="font-semibold">Duplicate note:</span> {a.duplicate_note}
-                                  </p>
-                                )}
-                                {a.balance_inconsistency_note && (
-                                  <p className="text-[11px] text-sky-300 bg-sky-950/30 border border-sky-800/50 rounded-sm px-3 py-1.5 flex-1 min-w-0">
-                                    <span className="font-semibold">Balance note:</span> {a.balance_inconsistency_note}
-                                  </p>
-                                )}
-                              </div>
-                            )}
-                            <table className="w-full text-xs border-collapse">
-                              <thead>
-                                <tr className="text-[10px] uppercase tracking-widest">
-                                  <th className="text-left py-2 pr-4 text-neutral-500 font-normal w-28">Field</th>
-                                  {(['equifax', 'experian', 'transunion'] as const).map((b) => {
-                                    const active = activeBureaus.includes(b);
-                                    return (
-                                      <th key={b} className={`text-left py-2 px-3 font-semibold ${active ? 'text-luxury-red' : 'text-neutral-700'}`}>
-                                        {BUREAU_LABELS[b]}
-                                        {!active && <span className="ml-1 font-normal text-neutral-700 normal-case tracking-normal">(not reported)</span>}
-                                      </th>
-                                    );
-                                  })}
-                                </tr>
-                              </thead>
-                              <tbody className="divide-y divide-neutral-800/50">
-                                {COMPARISON_FIELDS.map(({ key, label }) => (
-                                  <tr key={key}>
-                                    <td className="py-1.5 pr-4 text-neutral-500">{label}</td>
-                                    {(['equifax', 'experian', 'transunion'] as const).map((b) => {
-                                      const bEdit = bureauEdits[a.id]?.[b] ?? null;
-                                      const flashKey = `${a.id}:${b}:${key}`;
-                                      return (
-                                        <td key={b} className="py-1.5 px-3">
-                                          {bEdit !== null ? (
-                                            <div className="flex items-center gap-0.5">
-                                              <input
-                                                value={bEdit[key]}
-                                                onChange={(e) => handleBureauCellChange(a.id, b, key, e.target.value)}
-                                                onBlur={() => handleBureauCellBlur(a.id, b, key)}
-                                                className="bg-transparent border-b border-transparent hover:border-neutral-700 focus:border-luxury-red/50 focus:bg-[#0f0f0f] text-neutral-300 px-1 py-0.5 w-full focus:outline-none transition-colors"
-                                                placeholder="—"
-                                              />
-                                              {flash(flashKey)}
-                                            </div>
-                                          ) : (
-                                            <span className="text-neutral-700">—</span>
-                                          )}
-                                        </td>
-                                      );
-                                    })}
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </td>
-                        </tr>
-                      )}
-                    </React.Fragment>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
+          {positiveAccounts.length > 0 && (
+            <>
+              <div className="flex items-center justify-between mb-3 mt-8">
+                <h3 className="text-xs uppercase tracking-widest text-emerald-400 font-bold">Positive Accounts ({positiveAccounts.length})</h3>
+                <p className="text-xs text-neutral-500">Accounts in good standing — verify classification is correct</p>
+              </div>
+              <AccountTable accts={positiveAccounts} standing="positive" />
+            </>
+          )}
         </>
-      )}
-
-      {/* Positive Accounts */}
-      {Array.isArray(client.positive_accounts) && client.positive_accounts.length > 0 && (
-        <div className="mt-6 bg-[#1a1a1a] border border-emerald-900/40 rounded-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-emerald-900/40">
-            <h3 className="text-xs uppercase tracking-widest text-emerald-400 font-bold">
-              Positive Accounts ({client.positive_accounts.length})
-            </h3>
-            <p className="text-xs text-neutral-500 mt-1">Accounts in good standing — use to demonstrate creditworthiness in letters.</p>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-[#0f0f0f] border-b border-emerald-900/30">
-                <tr className="text-left text-[10px] uppercase tracking-widest text-neutral-500">
-                  <th className="px-4 py-3">Creditor</th>
-                  <th className="px-4 py-3">Type</th>
-                  <th className="px-4 py-3">Balance</th>
-                  <th className="px-4 py-3">Opened</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Bureaus</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(client.positive_accounts as Array<Record<string, unknown>>).map((pa, i) => (
-                  <tr key={i} className="border-b border-neutral-800/50">
-                    <td className="px-4 py-3 text-white font-medium">{String(pa.creditor_name ?? '—')}</td>
-                    <td className="px-4 py-3 text-neutral-400 text-xs">{String(pa.account_type ?? '—')}</td>
-                    <td className="px-4 py-3 text-neutral-300">{String(pa.balance ?? '—')}</td>
-                    <td className="px-4 py-3 text-neutral-400 text-xs">{String(pa.date_opened ?? '—')}</td>
-                    <td className="px-4 py-3">
-                      <span className="text-[10px] uppercase tracking-wider text-emerald-400 bg-emerald-950/30 border border-emerald-800/50 rounded-sm px-2 py-0.5">
-                        {String(pa.status ?? '—')}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-1">
-                        {(Array.isArray(pa.bureaus) ? pa.bureaus : []).map((b) => (
-                          <span key={String(b)} className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm border border-emerald-900/50 text-emerald-500">
-                            {String(b)}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
       )}
 
       {/* Hard Unauthorized Inquiries */}
       {unauthorizedInquiries.length > 0 && (
         <div className="mt-6 bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-neutral-800">
-            <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold">
-              Hard Inquiries — Potentially Unauthorized ({unauthorizedInquiries.length})
-            </h3>
-            <p className="text-xs text-neutral-500 mt-1">Only hard inquiries shown. Confirm each as unauthorized before adding to letters.</p>
+            <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold">Hard Inquiries — Potentially Unauthorized ({unauthorizedInquiries.length})</h3>
+            <p className="text-xs text-neutral-500 mt-1">Review each — confirm unauthorized, select dispute options, or ignore.</p>
           </div>
           <table className="w-full text-sm">
             <thead className="bg-[#0f0f0f] border-b border-neutral-800">
@@ -1931,45 +1732,32 @@ const AnalyzeTab = ({
                 <th className="px-4 py-3">Bureau</th>
                 <th className="px-4 py-3">Date</th>
                 <th className="px-4 py-3">Confirm</th>
-                <th className="px-4 py-3 min-w-[200px]">Add to Letter</th>
+                <th className="px-4 py-3 min-w-[220px]">Review</th>
               </tr>
             </thead>
             <tbody>
               {unauthorizedInquiries.map((q, i) => {
                 const iqKey = `${q.creditor}:${q.bureau}:${q.date}`;
                 const iqSel = disputeSelections.inquiries[iqKey] ?? emptyItemSelection();
-                const isConfirmed = (iqSel as unknown as Record<string, boolean>).confirmed_unauthorized === true;
+                const iqS = iqSel as unknown as Record<string, unknown>;
+                const isConfirmed = iqS.confirmed_unauthorized === true;
+                const reviewed = isItemReviewed('inquiries', iqKey);
                 return (
-                  <tr key={i} className="border-b border-neutral-800/60 align-top">
+                  <tr key={i} className={`border-b border-neutral-800/60 align-top ${reviewed ? 'bg-emerald-950/5' : ''}`}>
                     <td className="px-4 py-3">
                       <div className="text-white font-medium">{q.creditor}</div>
                       {q.reason && <div className="text-[10px] text-neutral-500 mt-0.5">{q.reason}</div>}
+                      {reviewed && <span className="text-[9px] text-emerald-500">✓ Reviewed</span>}
                     </td>
                     <td className="px-4 py-3 text-neutral-300 capitalize text-xs">{q.bureau}</td>
                     <td className="px-4 py-3 text-neutral-400 text-xs">{q.date}</td>
                     <td className="px-4 py-3">
-                      <button
-                        onClick={() => {
-                          const next = {
-                            ...disputeSelections,
-                            inquiries: {
-                              ...disputeSelections.inquiries,
-                              [iqKey]: {
-                                ...iqSel,
-                                confirmed_unauthorized: !isConfirmed,
-                              } as unknown as typeof iqSel,
-                            },
-                          };
-                          saveDisputeSelections(next);
-                        }}
-                        className={`text-[9px] uppercase tracking-widest px-2 py-1 rounded-sm border transition-colors whitespace-nowrap ${
-                          isConfirmed
-                            ? 'border-red-800 bg-red-950/30 text-red-400 hover:bg-red-950/50'
-                            : 'border-neutral-700 text-neutral-500 hover:border-amber-700 hover:text-amber-400'
-                        }`}
-                      >
-                        {isConfirmed ? '✓ Unauthorized' : 'Confirm Unauthorized'}
-                      </button>
+                      <label className="flex items-center gap-1.5 cursor-pointer group">
+                        <input type="checkbox" checked={isConfirmed} onChange={() => {
+                          saveDisputeSelections({ ...disputeSelections, inquiries: { ...disputeSelections.inquiries, [iqKey]: { ...iqSel, confirmed_unauthorized: !isConfirmed } as unknown as typeof iqSel } });
+                        }} className="accent-red-500 w-3 h-3 flex-shrink-0" />
+                        <span className={`text-[9px] uppercase tracking-wider ${isConfirmed ? 'text-red-400' : 'text-neutral-500 group-hover:text-neutral-300'}`}>Unauthorized</span>
+                      </label>
                     </td>
                     <td className="px-4 py-2">
                       <div className="space-y-1.5">
@@ -1979,15 +1767,8 @@ const AnalyzeTab = ({
                             const isHinted = q.bureau?.toLowerCase() === b;
                             return (
                               <label key={b} className="flex items-center gap-1 cursor-pointer group">
-                                <input
-                                  type="checkbox"
-                                  checked={active}
-                                  onChange={() => toggleItemBureau('inquiries', iqKey, b)}
-                                  className="accent-luxury-red w-3 h-3 flex-shrink-0"
-                                />
-                                <span className={`text-[9px] uppercase tracking-wider ${active ? 'text-luxury-red' : isHinted ? 'text-amber-500/60 group-hover:text-amber-400' : 'text-neutral-500 group-hover:text-neutral-300'}`}>
-                                  {BUREAU_SHORT[b]}
-                                </span>
+                                <input type="checkbox" checked={active} onChange={() => toggleItemBureau('inquiries', iqKey, b)} className="accent-luxury-red w-3 h-3 flex-shrink-0" />
+                                <span className={`text-[9px] uppercase tracking-wider ${active ? 'text-luxury-red' : isHinted ? 'text-amber-500/60 group-hover:text-amber-400' : 'text-neutral-500 group-hover:text-neutral-300'}`}>{BUREAU_SHORT[b]}</span>
                               </label>
                             );
                           })}
@@ -1997,41 +1778,23 @@ const AnalyzeTab = ({
                             const active = iqSel.fcra_sections.includes(fkey);
                             return (
                               <label key={fkey} className="flex items-center gap-1 cursor-pointer group">
-                                <input
-                                  type="checkbox"
-                                  checked={active}
-                                  onChange={() => toggleItemFcra('inquiries', iqKey, fkey)}
-                                  className="accent-luxury-red w-3 h-3 flex-shrink-0"
-                                />
-                                <span className={`text-[9px] uppercase tracking-wider ${active ? 'text-luxury-red' : 'text-neutral-500 group-hover:text-neutral-300'}`} title={flabel}>
-                                  {fkey}
-                                </span>
+                                <input type="checkbox" checked={active} onChange={() => toggleItemFcra('inquiries', iqKey, fkey)} className="accent-luxury-red w-3 h-3 flex-shrink-0" />
+                                <span className={`text-[9px] uppercase tracking-wider ${active ? 'text-luxury-red' : 'text-neutral-500 group-hover:text-neutral-300'}`} title={flabel}>{fkey}</span>
                               </label>
                             );
                           })}
                         </div>
-                        <div className="pt-1">
-                          <button
-                            onClick={() => {
-                              const isSet = (iqSel as unknown as Record<string, unknown>).claude_decide === true;
-                              saveDisputeSelections({
-                                ...disputeSelections,
-                                inquiries: {
-                                  ...disputeSelections.inquiries,
-                                  [iqKey]: { ...iqSel, claude_decide: !isSet } as unknown as typeof iqSel,
-                                },
-                              });
-                            }}
-                            className={`text-[9px] uppercase tracking-widest px-2 py-0.5 rounded-sm border transition-colors ${
-                              (iqSel as unknown as Record<string, unknown>).claude_decide === true
-                                ? 'border-amber-700 bg-amber-950/30 text-amber-400'
-                                : 'border-neutral-700 text-neutral-500 hover:border-amber-700 hover:text-amber-400'
-                            }`}
-                          >
-                            {(iqSel as unknown as Record<string, unknown>).claude_decide === true
-                              ? '✓ Let Claude Decide'
-                              : 'Let Claude Decide'}
-                          </button>
+                        <div className="flex flex-wrap gap-x-3 gap-y-1 pt-0.5">
+                          {(['claude_decide', 'ignore'] as const).map((flag) => {
+                            const active = iqS[flag] === true;
+                            const flagLabels = { claude_decide: 'Let Claude Decide', ignore: 'Ignore' };
+                            return (
+                              <label key={flag} className="flex items-center gap-1 cursor-pointer group">
+                                <input type="checkbox" checked={active} onChange={() => toggleItemFlag('inquiries', iqKey, flag)} className={`${flag === 'claude_decide' ? 'accent-amber-500' : 'accent-neutral-500'} w-3 h-3 flex-shrink-0`} />
+                                <span className={`text-[9px] uppercase tracking-wider ${active ? (flag === 'claude_decide' ? 'text-amber-400' : 'text-neutral-400') : 'text-neutral-600 group-hover:text-neutral-400'}`}>{flagLabels[flag]}</span>
+                              </label>
+                            );
+                          })}
                         </div>
                       </div>
                     </td>
@@ -2043,19 +1806,23 @@ const AnalyzeTab = ({
         </div>
       )}
 
-      {hasAnySelection && (
-        <div className="mt-8 flex justify-end">
-          <button
-            onClick={() => alert('Run Strategy coming in next update — all selections saved.')}
-            className="bg-amber-600 hover:bg-amber-500 text-white px-8 py-4 rounded-sm text-xs uppercase tracking-widest font-bold transition-colors"
-          >
-            Run Strategy →
-          </button>
-        </div>
-      )}
+      {/* Run Strategy — only when all items reviewed */}
+      <div className="mt-8 flex items-center justify-end gap-4">
+        {accounts.length > 0 && !allReviewed && (
+          <p className="text-xs text-neutral-500">Review all items above to unlock Run Strategy</p>
+        )}
+        <button
+          onClick={() => alert('Run Strategy coming in next update — all selections saved.')}
+          disabled={!allReviewed}
+          className="bg-amber-600 hover:bg-amber-500 disabled:opacity-30 disabled:cursor-not-allowed text-white px-8 py-4 rounded-sm text-xs uppercase tracking-widest font-bold transition-colors"
+        >
+          Run Strategy →
+        </button>
+      </div>
     </div>
   );
 };
+
 
 // === Letters Tab ===
 type LetterTypeKey = '605B' | '611' | '623' | '609' | '809';
