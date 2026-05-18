@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "On Page SEO Checklist for Small Business Websites 2026",
+      displayTitle: "The Complete On Page SEO Checklist for Small Business Websites in 2026",
+      date: "May 18, 2026",
+      pubDate: "Mon, 18 May 2026 00:01:37 GMT",
+      issue: 'No. 067',
+      category: "SEO",
+      excerpt: "If your small business website is not showing up on Google, your on page SEO is likely the problem. This complete checklist covers every critical element you need to optimize in 2026. Follow these steps or let the experts at RAH Operations handle it for you.",
+      slug: 'on-page-seo-checklist-for-small-business-websites-2026'
+    },
+    {
       title: "How to Rank on Google Without Paying for Ads",
       displayTitle: "How to Rank on Google Without Paying for Ads: A Complete Organic SEO Guide",
       date: "May 17, 2026",
