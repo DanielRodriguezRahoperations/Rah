@@ -1434,13 +1434,24 @@ const AnalyzeTab = ({
   };
 
   const allReviewed = React.useMemo(() => {
-    const allAccts = accounts.every((a) => isAccountReviewed(a.id));
-    const allNames = Object.keys(personalInfo.name_variations).every((k) => isItemReviewed('names', k));
-    const allAddrs = Object.keys(personalInfo.unknown_addresses).every((k) => isItemReviewed('addresses', k));
-    const allPhones = Object.keys(personalInfo.unknown_phone_numbers).every((k) => isItemReviewed('phones', k));
-    const allInqs = unauthorizedInquiries.every((q) => isItemReviewed('inquiries', `${q.creditor}:${q.bureau}:${q.date}`));
+    const allAccts = accounts.every((a) => {
+      const tag = disputeTags[a.id] ?? '';
+      if (tag === 'ignore' || tag === 'duplicate' || tag === 'claude_decide') return true;
+      return (disputeTypes[a.id] ?? []).length > 0;
+    });
+    const checkSel = (cat: 'names' | 'addresses' | 'phones' | 'inquiries', key: string): boolean => {
+      const sel = disputeSelections[cat][key] ?? emptyItemSelection();
+      const s = sel as unknown as Record<string, unknown>;
+      if (s.ignore === true || s.claude_decide === true) return true;
+      if (Object.values(sel.bureaus).some(Boolean)) return true;
+      if (sel.fcra_sections.length > 0) return true;
+      return false;
+    };
+    const allNames = Object.keys(personalInfo.name_variations).every((k) => checkSel('names', k));
+    const allAddrs = Object.keys(personalInfo.unknown_addresses).every((k) => checkSel('addresses', k));
+    const allPhones = Object.keys(personalInfo.unknown_phone_numbers).every((k) => checkSel('phones', k));
+    const allInqs = unauthorizedInquiries.every((q) => checkSel('inquiries', `${q.creditor}:${q.bureau}:${q.date}`));
     return allAccts && allNames && allAddrs && allPhones && allInqs;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disputeTags, disputeTypes, disputeSelections, accounts, personalInfo, unauthorizedInquiries]);
 
   const AccountTagControls = ({ a }: { a: ClientDetail['accounts'][number] }) => {
