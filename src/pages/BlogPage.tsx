@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "How to Write SEO Blog Posts That Actually Rank on Google",
+      displayTitle: "How to Write SEO Blog Posts That Actually Rank on Google (Step-by-Step Guide)",
+      date: "May 18, 2026",
+      pubDate: "Mon, 18 May 2026 08:01:47 GMT",
+      issue: 'No. 069',
+      category: "SEO",
+      excerpt: "Writing blog posts that actually rank on Google requires more than good grammar and a catchy headline. You need a strategic approach that combines keyword research, content structure, and on-page optimization. This guide breaks down exactly how to do it.",
+      slug: 'how-to-write-seo-blog-posts-that-actually-rank-on-google'
+    },
+    {
       title: "How to Do Keyword Research for Your Small Business Free",
       displayTitle: "How to Do Keyword Research for Your Small Business for Free (And Actually Rank)",
       date: "May 18, 2026",
