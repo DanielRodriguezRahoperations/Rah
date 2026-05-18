@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "SEO for Beginners: Complete Guide for Small Business Owners",
+      displayTitle: "SEO for Beginners: The Complete Guide Every Small Business Owner Needs",
+      date: "May 18, 2026",
+      pubDate: "Mon, 18 May 2026 20:01:51 GMT",
+      issue: 'No. 072',
+      category: "SEO",
+      excerpt: "If you own a small business in Arizona and want more customers finding you online, SEO is the single most powerful tool in your arsenal. This complete beginner's guide breaks down exactly how search engine optimization works, what you need to prioritize first, and how to build a strategy that drives real results. No fluff, no jargon - just actionable steps you can start using today.",
+      slug: 'seo-for-beginners-complete-guide-for-small-business-owners'
+    },
+    {
       title: "How to Get Your Business on the First Page of Google",
       displayTitle: "How to Get Your Business on the First Page of Google in 2026",
       date: "May 18, 2026",
