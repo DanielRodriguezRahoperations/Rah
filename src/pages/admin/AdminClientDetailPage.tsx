@@ -1433,28 +1433,6 @@ const AnalyzeTab = ({
     return false;
   };
 
-  const allReviewed = React.useMemo(() => {
-    const allAccts = accounts.every((a) => {
-      // Positive accounts are automatically considered reviewed
-      if (String((a as Record<string, unknown>).account_standing ?? 'negative') === 'positive') return true;
-      const tag = disputeTags[a.id] ?? '';
-      if (tag === 'ignore' || tag === 'duplicate' || tag === 'claude_decide') return true;
-      return (disputeTypes[a.id] ?? []).length > 0;
-    });
-    const checkSel = (cat: 'names' | 'addresses' | 'phones' | 'inquiries', key: string): boolean => {
-      const sel = disputeSelections[cat][key] ?? emptyItemSelection();
-      const s = sel as unknown as Record<string, unknown>;
-      if (s.ignore === true || s.claude_decide === true) return true;
-      if (Object.values(sel.bureaus).some(Boolean)) return true;
-      if (sel.fcra_sections.length > 0) return true;
-      return false;
-    };
-    const allNames = Object.keys(personalInfo.name_variations).every((k) => checkSel('names', k));
-    const allAddrs = Object.keys(personalInfo.unknown_addresses).every((k) => checkSel('addresses', k));
-    const allPhones = Object.keys(personalInfo.unknown_phone_numbers).every((k) => checkSel('phones', k));
-    const allInqs = unauthorizedInquiries.every((q) => checkSel('inquiries', `${q.creditor}:${q.bureau}:${q.date}`));
-    return allAccts && allNames && allAddrs && allPhones && allInqs;
-  }, [disputeTags, disputeTypes, disputeSelections, accounts, personalInfo, unauthorizedInquiries]);
 
   const AccountTagControls = ({ a }: { a: ClientDetail['accounts'][number] }) => {
     const fcra = disputeTypes[a.id] ?? [];
@@ -1855,14 +1833,11 @@ const AnalyzeTab = ({
         </div>
       )}
 
-      {/* Run Strategy — only when all items reviewed */}
+      {/* Run Strategy */}
       <div className="mt-8 flex items-center justify-end gap-4">
-        {accounts.length > 0 && !allReviewed && (
-          <p className="text-xs text-neutral-500">Review all items above to unlock Run Strategy</p>
-        )}
         <button
           onClick={onRunStrategy}
-          disabled={!allReviewed}
+          disabled={accounts.length === 0 || busy}
           className="bg-amber-600 hover:bg-amber-500 disabled:opacity-30 disabled:cursor-not-allowed text-white px-8 py-4 rounded-sm text-xs uppercase tracking-widest font-bold transition-colors"
         >
           Run Strategy →
@@ -1964,6 +1939,30 @@ const StrategyTab = ({
           <p className="text-sm text-neutral-300 leading-relaxed">{overallSummary}</p>
         </div>
       )}
+
+      {/* Unreviewed Items Notice */}
+      {(() => {
+        const unreviewed: string[] = [];
+        (accounts ?? []).forEach((a) => {
+          const standing = String((a as Record<string, unknown>).account_standing ?? 'negative');
+          if (standing === 'positive') return;
+          const tag = String((a as Record<string, unknown>).dispute_tag ?? '');
+          const types = (a.dispute_types ?? []) as string[];
+          if (!tag && types.length === 0) unreviewed.push(a.creditor_name);
+        });
+        if (unreviewed.length === 0) return null;
+        return (
+          <div className="bg-amber-950/30 border border-amber-800 rounded-sm p-4">
+            <h3 className="text-xs uppercase tracking-widest text-amber-400 font-bold mb-2">⚠ Items Without Selections ({unreviewed.length})</h3>
+            <p className="text-xs text-neutral-400 mb-2">These accounts had no dispute type or tag selected. Claude will use its best judgment for them.</p>
+            <div className="flex flex-wrap gap-2">
+              {unreviewed.map((name, i) => (
+                <span key={i} className="text-[10px] text-amber-300 bg-amber-950/50 border border-amber-800/50 rounded-sm px-2 py-0.5">{name}</span>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Section A — Identity Theft */}
       {Object.values(sectionA).some((v) => v.length > 0) && (
