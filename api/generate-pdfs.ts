@@ -4,6 +4,74 @@ import { PDFDocument, StandardFonts, rgb, PageSizes } from 'pdf-lib';
 
 const SIGNED_URL_TTL = 7 * 24 * 60 * 60;
 
+/**
+ * Replaces Unicode characters that pdf-lib's WinAnsi (CP1252) standard fonts
+ * cannot encode with ASCII-safe equivalents. Anything still outside printable
+ * ASCII or Latin-1 supplement after replacement is replaced with '?'.
+ * Latin-1 accented characters (é, ñ, ü, etc.) are preserved because WinAnsi
+ * supports them.
+ */
+function sanitizeForWinAnsi(text: string): string {
+  if (!text) return '';
+
+  const replacements: Record<string, string> = {
+    // Box-drawing horizontals/verticals
+    '─': '-', '━': '-', '│': '|', '┃': '|',
+    '┄': '-', '┅': '-', '┆': '|', '┇': '|',
+    '┈': '-', '┉': '-', '┊': '|', '┋': '|',
+    // Box-drawing corners and junctions
+    '┌': '+', '┍': '+', '┎': '+', '┏': '+',
+    '┐': '+', '┑': '+', '┒': '+', '┓': '+',
+    '└': '+', '┕': '+', '┖': '+', '┗': '+',
+    '┘': '+', '┙': '+', '┚': '+', '┛': '+',
+    '├': '+', '┤': '+', '┬': '+', '┴': '+', '┼': '+',
+    // Block elements
+    '▀': '#', '▄': '#', '█': '#', '▌': '#', '▐': '#',
+    '░': '#', '▒': '#', '▓': '#',
+    // Dashes
+    '‐': '-', '‑': '-', '‒': '-', '–': '-',
+    '—': '--', '―': '--',
+    // Quotes
+    '‘': "'", '’': "'", '‚': ',', '‛': "'",
+    '“': '"', '”': '"', '„': '"', '‟': '"',
+    '′': "'", '″': '"',
+    // Bullets
+    '•': '*', '‣': '>', '⁃': '-',
+    '⁌': '*', '⁍': '*', '∙': '*',
+    '○': 'o', '●': '*', '◦': 'o',
+    // Spaces (collapse to regular space; strip zero-width)
+    ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',
+    ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',
+    ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',
+    '　': ' ',
+    '​': '', '‌': '', '‍': '', '﻿': '',
+    // Ellipsis
+    '…': '...',
+    // Arrows
+    '←': '<-', '→': '->', '↑': '^', '↓': 'v',
+    '↔': '<->', '⇒': '=>', '⇐': '<=',
+    // Math
+    '×': 'x', '÷': '/', '−': '-', '±': '+/-',
+    '≠': '!=', '≤': '<=', '≥': '>=', '∞': 'inf',
+    // Checkmarks
+    '✓': '[x]', '✔': '[x]', '✗': '[ ]', '✘': '[ ]',
+    // Trademark
+    '™': '(TM)',
+  };
+
+  let result = text;
+  for (const [from, to] of Object.entries(replacements)) {
+    if (result.indexOf(from) !== -1) {
+      result = result.split(from).join(to);
+    }
+  }
+
+  // Final pass: replace anything still outside tab/newline/printable ASCII/Latin-1 supplement with '?'
+  result = result.replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF]/g, '?');
+
+  return result;
+}
+
 function validateAdmin(req: VercelRequest): boolean {
   const expected = `Bearer ${Buffer.from(process.env.ADMIN_PASSWORD ?? '').toString('base64')}`;
   return req.headers.authorization === expected;
@@ -47,7 +115,7 @@ async function drawTextPages(
   const lineHeight = fontSize * 1.4;
   // approximate chars per line
   const charsPerLine = Math.floor(usableWidth / (fontSize * 0.5));
-  const wrapped = wrapText(text, charsPerLine);
+  const wrapped = wrapText(sanitizeForWinAnsi(text), charsPerLine);
   const linesPerPage = Math.floor(usableHeight / lineHeight);
 
   for (let i = 0; i < wrapped.length; i += linesPerPage) {
@@ -55,13 +123,17 @@ async function drawTextPages(
     const page = pdf.addPage(PageSizes.Letter);
     let y = pageHeight - margin;
     for (const line of slice) {
-      page.drawText(line, {
-        x: margin,
-        y,
-        size: fontSize,
-        font,
-        color: rgb(0, 0, 0),
-      });
+      try {
+        page.drawText(line, {
+          x: margin,
+          y,
+          size: fontSize,
+          font,
+          color: rgb(0, 0, 0),
+        });
+      } catch (err) {
+        console.warn('[generate-pdfs] drawText failed for line, skipping:', err);
+      }
       y -= lineHeight;
     }
   }
@@ -118,6 +190,7 @@ async function appendPdfBytes(pdf: PDFDocument, bytes: Uint8Array): Promise<bool
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  try {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -229,4 +302,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .createSignedUrl(storagePath, SIGNED_URL_TTL);
 
   return res.status(200).json({ path: storagePath, signedUrl: signed?.signedUrl ?? null });
+  } catch (err) {
+    console.error('[generate-pdfs] unhandled error:', err);
+    const message = err instanceof Error ? err.message : 'Internal server error';
+    return res.status(500).json({ error: message });
+  }
 }
