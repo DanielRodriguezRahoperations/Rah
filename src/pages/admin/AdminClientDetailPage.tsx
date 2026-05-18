@@ -1200,6 +1200,8 @@ const AnalyzeTab = ({
 
   const [disputeTypes, setDisputeTypes] = React.useState<Record<string, string[]>>(() =>
     Object.fromEntries(accounts.map((a) => [a.id, a.dispute_types ?? []])));
+  const [disputeTags, setDisputeTags] = React.useState<Record<string, string>>(() =>
+    Object.fromEntries(accounts.map((a) => [a.id, String((a as Record<string, unknown>).dispute_tag ?? '')])));
   const [expandedRows, setExpandedRows] = React.useState<Set<string>>(new Set());
   const [bureauEdits, setBureauEdits] = React.useState<Record<string, Record<string, BureauDataEdit | null>>>(() => buildBureauEdits(accounts));
   const [topFields, setTopFields] = React.useState<Record<string, TopFields>>(() => buildTopFields(accounts));
@@ -1212,6 +1214,11 @@ const AnalyzeTab = ({
     setDisputeTypes(Object.fromEntries(accounts.map((a) => [a.id, a.dispute_types ?? []])));
     setBureauEdits(buildBureauEdits(accounts));
     setTopFields(buildTopFields(accounts));
+  }, [accounts]);
+
+  React.useEffect(() => {
+    setDisputeTags(Object.fromEntries(accounts.map((a) =>
+      [a.id, String((a as Record<string, unknown>).dispute_tag ?? '')])));
   }, [accounts]);
 
   React.useEffect(() => {
@@ -1261,7 +1268,20 @@ const AnalyzeTab = ({
     await patchAccount(accountId, { dispute_types: next });
   };
 
+  const handleDisputeTag = async (accountId: string, tag: string) => {
+    const current = disputeTags[accountId];
+    const next = current === tag ? '' : tag;
+    setDisputeTags((prev) => ({ ...prev, [accountId]: next }));
+    await patchAccount(accountId, { dispute_tag: next || null });
+    showFlash(`${accountId}:tag`);
+  };
+
   const getActiveBureaus = (accountId: string): string[] => {
+    const account = accounts.find((a) => a.id === accountId);
+    if (!account) return [];
+    if (Array.isArray(account.bureaus) && account.bureaus.length > 0) {
+      return account.bureaus as string[];
+    }
     const edits = bureauEdits[accountId];
     if (!edits) return [];
     return (['equifax', 'experian', 'transunion'] as const).filter((b) => edits[b] != null);
@@ -1387,6 +1407,26 @@ const AnalyzeTab = ({
 
   const unauthorizedInquiries = (client.inquiries ?? []).filter((q) => q.inquiry_type === 'hard' && q.potentially_unauthorized);
 
+  const hasAnySelection = React.useMemo(() => {
+    const hasAccountTag = Object.values(disputeTags).some((t) => t && t.length > 0);
+    const hasAccountFcra = Object.values(disputeTypes).some((t) => t && t.length > 0);
+    const hasPersonalSel = Object.values({
+      ...disputeSelections.names,
+      ...disputeSelections.addresses,
+      ...disputeSelections.phones,
+    }).some((s) =>
+      Object.values(s.bureaus).some(Boolean) ||
+      s.fcra_sections.length > 0 ||
+      (s as unknown as Record<string, unknown>).claude_decide === true
+    );
+    const hasInquirySel = Object.values(disputeSelections.inquiries).some(
+      (s) =>
+        Object.values(s.bureaus).some(Boolean) ||
+        (s as unknown as Record<string, unknown>).claude_decide === true
+    );
+    return hasAccountTag || hasAccountFcra || hasPersonalSel || hasInquirySel;
+  }, [disputeTags, disputeTypes, disputeSelections]);
+
   return (
     <div>
       {summaryToast && (
@@ -1502,6 +1542,31 @@ const AnalyzeTab = ({
                               );
                             })}
                           </div>
+                          <div className="pt-1">
+                            <button
+                              onClick={() => {
+                                const cfg = PIE_CONFIG[field];
+                                const prev = disputeSelections[cfg.cat][item] ?? emptyItemSelection();
+                                const isSet = (prev as unknown as Record<string, unknown>).claude_decide === true;
+                                saveDisputeSelections({
+                                  ...disputeSelections,
+                                  [cfg.cat]: {
+                                    ...disputeSelections[cfg.cat],
+                                    [item]: { ...prev, claude_decide: !isSet } as unknown as ItemSelection,
+                                  },
+                                });
+                              }}
+                              className={`text-[9px] uppercase tracking-widest px-2 py-0.5 rounded-sm border transition-colors ${
+                                ((disputeSelections[PIE_CONFIG[field].cat][item] ?? {}) as Record<string, unknown>).claude_decide === true
+                                  ? 'border-amber-700 bg-amber-950/30 text-amber-400'
+                                  : 'border-neutral-700 text-neutral-500 hover:border-amber-700 hover:text-amber-400'
+                              }`}
+                            >
+                              {((disputeSelections[PIE_CONFIG[field].cat][item] ?? {}) as Record<string, unknown>).claude_decide === true
+                                ? '✓ Let Claude Decide'
+                                : 'Let Claude Decide'}
+                            </button>
+                          </div>
                         </div>
                       );
                     })}
@@ -1518,6 +1583,12 @@ const AnalyzeTab = ({
           No accounts analyzed yet. Click "Run Analysis" to extract negative items from uploaded credit reports.
         </div>
       ) : (
+        <>
+          <div className="flex items-center justify-between mb-3 mt-6">
+            <h3 className="text-xs uppercase tracking-widest text-luxury-red font-bold">
+              Negative Accounts
+            </h3>
+          </div>
         <div className="bg-[#1a1a1a] border border-neutral-800 rounded-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -1652,6 +1723,19 @@ const AnalyzeTab = ({
                               );
                             })}
                           </div>
+                          <div className="mt-2 pt-2 border-t border-neutral-800/50">
+                            <button
+                              onClick={() => handleDisputeTag(a.id, 'claude_decide')}
+                              className={`text-[9px] uppercase tracking-widest px-2 py-1 rounded-sm border transition-colors w-full text-left ${
+                                disputeTags[a.id] === 'claude_decide'
+                                  ? 'border-amber-700 bg-amber-950/30 text-amber-400'
+                                  : 'border-neutral-700 text-neutral-500 hover:border-amber-700 hover:text-amber-400'
+                              }`}
+                            >
+                              {disputeTags[a.id] === 'claude_decide' ? '✓ Let Claude Decide' : 'Let Claude Decide'}
+                            </button>
+                            {flash(`${a.id}:tag`)}
+                          </div>
                         </td>
 
                         {/* Dispute To — which bureau letter(s) this account goes into */}
@@ -1778,6 +1862,7 @@ const AnalyzeTab = ({
             </table>
           </div>
         </div>
+        </>
       )}
 
       {/* Positive Accounts */}
@@ -1925,6 +2010,29 @@ const AnalyzeTab = ({
                             );
                           })}
                         </div>
+                        <div className="pt-1">
+                          <button
+                            onClick={() => {
+                              const isSet = (iqSel as unknown as Record<string, unknown>).claude_decide === true;
+                              saveDisputeSelections({
+                                ...disputeSelections,
+                                inquiries: {
+                                  ...disputeSelections.inquiries,
+                                  [iqKey]: { ...iqSel, claude_decide: !isSet } as unknown as typeof iqSel,
+                                },
+                              });
+                            }}
+                            className={`text-[9px] uppercase tracking-widest px-2 py-0.5 rounded-sm border transition-colors ${
+                              (iqSel as unknown as Record<string, unknown>).claude_decide === true
+                                ? 'border-amber-700 bg-amber-950/30 text-amber-400'
+                                : 'border-neutral-700 text-neutral-500 hover:border-amber-700 hover:text-amber-400'
+                            }`}
+                          >
+                            {(iqSel as unknown as Record<string, unknown>).claude_decide === true
+                              ? '✓ Let Claude Decide'
+                              : 'Let Claude Decide'}
+                          </button>
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -1932,6 +2040,17 @@ const AnalyzeTab = ({
               })}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {hasAnySelection && (
+        <div className="mt-8 flex justify-end">
+          <button
+            onClick={() => alert('Run Strategy coming in next update — all selections saved.')}
+            className="bg-amber-600 hover:bg-amber-500 text-white px-8 py-4 rounded-sm text-xs uppercase tracking-widest font-bold transition-colors"
+          >
+            Run Strategy →
+          </button>
         </div>
       )}
     </div>
