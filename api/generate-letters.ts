@@ -278,6 +278,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const { clientId, letterType, recipientName, recipientAddress, accountIds, clientData, bureau } =
     req.body ?? {};
+  const addressOverride = req.body?.addressOverride === true;
 
   if (
     !clientId ||
@@ -288,6 +289,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     !clientData
   ) {
     return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  if (addressOverride && (typeof recipientAddress !== 'string' || recipientAddress.trim().length === 0)) {
+    return res.status(400).json({ error: 'addressOverride requires a non-empty recipientAddress' });
   }
 
   const supabase = createClient(
@@ -350,9 +355,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   let resolvedRecipientAddress = recipientAddress;
   let needsAddress = false;
-  let addressSource: 'provided' | 'furnisher_table' | 'bureau_data' | 'claude_high' | 'claude_medium' | 'claude_low' | 'fallback' = 'provided';
+  let addressSource: 'provided' | 'admin_override' | 'furnisher_table' | 'bureau_data' | 'claude_high' | 'claude_medium' | 'claude_low' | 'fallback' = 'provided';
 
-  if (['623', '809'].includes(letterType)) {
+  if (addressOverride) {
+    resolvedRecipientAddress = recipientAddress;
+    needsAddress = false;
+    addressSource = 'admin_override';
+  } else if (['623', '809'].includes(letterType)) {
     // Level 1 — furnisher_addresses table
     const { data: faRows } = await supabase
       .from('furnisher_addresses')
