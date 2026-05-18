@@ -14,6 +14,14 @@
 // ALTER TABLE credit_repair_clients ADD COLUMN IF NOT EXISTS personal_info_errors jsonb;
 // ALTER TABLE credit_repair_clients ADD COLUMN IF NOT EXISTS inquiries jsonb;
 // ALTER TABLE credit_repair_clients ADD COLUMN IF NOT EXISTS strategy_notes text;
+// ALTER TABLE dispute_accounts ADD COLUMN IF NOT EXISTS account_standing text DEFAULT 'negative';
+// ALTER TABLE dispute_accounts ADD COLUMN IF NOT EXISTS account_reason text DEFAULT '';
+// ALTER TABLE dispute_accounts ADD COLUMN IF NOT EXISTS equifax_data jsonb;
+// ALTER TABLE dispute_accounts ADD COLUMN IF NOT EXISTS experian_data jsonb;
+// ALTER TABLE dispute_accounts ADD COLUMN IF NOT EXISTS transunion_data jsonb;
+// ALTER TABLE dispute_accounts ADD COLUMN IF NOT EXISTS equifax_balance text DEFAULT '';
+// ALTER TABLE dispute_accounts ADD COLUMN IF NOT EXISTS experian_balance text DEFAULT '';
+// ALTER TABLE dispute_accounts ADD COLUMN IF NOT EXISTS transunion_balance text DEFAULT '';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import Anthropic from '@anthropic-ai/sdk';
@@ -39,8 +47,21 @@ The user message contains three labeled sections. Only assign a bureau to an acc
 - Never assign all three by default. An account on only 1 or 2 bureaus is completely normal.
 - Each bureau formats reports differently — read carefully.
 
+ACCOUNT CLASSIFICATION — CRITICAL:
+An account is NEGATIVE if it has ANY of the following regardless of current balance:
+- Any late payment history (30, 60, 90, 120 days late)
+- Charge-off status (even if balance is now $0)
+- Collection status
+- Settlement
+- Repossession
+- Foreclosure
+- Bankruptcy inclusion
+- Any derogatory remark or negative comment
+A $0 balance does NOT make an account positive if it has negative history. Only classify an account as positive if it has ZERO negative remarks, ZERO late payments, and is in completely good standing.
+
 ACCOUNT NUMBERS:
 Extract the account number exactly as shown on each bureau's report separately. They will often differ.
+For each account also extract the balance as shown on each bureau separately — balances can differ across bureaus.
 
 PERSONAL INFO ERRORS:
 Extract name variations, addresses, and phone numbers that appear INCORRECT or FRAUDULENT on the reports. Do NOT extract the client's own current correct information. For each item record which bureau(s) reported it.
@@ -169,12 +190,16 @@ Return a JSON object in exactly this shape:
       "original_creditor": "string — original creditor if different, empty string if same",
       "account_type": "string",
       "account_status": "string — why it is negative e.g. Collection, Charge-Off, 120 Days Late",
-      "balance": "string",
+      "account_reason": "string — one sentence explaining exactly why this is negative e.g. Charged off in 2022, balance transferred to collections",
+      "balance": "string — highest or most recent balance shown",
       "date_opened": "string MM/YYYY",
       "bureaus": ["equifax", "experian", "transunion"],
       "equifax_account_number": "string — exact number from Equifax, empty if not on Equifax",
       "experian_account_number": "string — exact number from Experian, empty if not on Experian",
       "transunion_account_number": "string — exact number from TransUnion, empty if not on TransUnion",
+      "equifax_balance": "string — balance as shown on Equifax, empty if not on Equifax",
+      "experian_balance": "string — balance as shown on Experian, empty if not on Experian",
+      "transunion_balance": "string — balance as shown on TransUnion, empty if not on TransUnion",
       "estimated_removal": "string — estimated removal date if shown, empty if not",
       "duplicate_flag": false,
       "duplicate_note": "string",
@@ -187,11 +212,19 @@ Return a JSON object in exactly this shape:
   "positive_accounts": [
     {
       "creditor_name": "string",
+      "original_creditor": "string",
       "account_type": "string",
       "account_status": "string",
+      "account_reason": "string — one sentence explaining why this is positive e.g. Current, never late, in good standing",
       "balance": "string",
       "date_opened": "string",
-      "bureaus": ["equifax"]
+      "bureaus": ["equifax"],
+      "equifax_account_number": "string — exact number from Equifax, empty if not on Equifax",
+      "experian_account_number": "string — exact number from Experian, empty if not on Experian",
+      "transunion_account_number": "string — exact number from TransUnion, empty if not on TransUnion",
+      "equifax_balance": "string — balance as shown on Equifax, empty if not on Equifax",
+      "experian_balance": "string — balance as shown on Experian, empty if not on Experian",
+      "transunion_balance": "string — balance as shown on TransUnion, empty if not on TransUnion"
     }
   ],
   "personal_info_errors": {
@@ -257,7 +290,24 @@ Return a JSON object in exactly this shape:
     // Delete existing accounts and insert new ones
     await supabase.from('dispute_accounts').delete().eq('client_id', clientId);
 
-    const rows = (parsed.negative_accounts ?? []).map((a) => ({
+    const buildBureauData = (a: Record<string, unknown>, bureau: string) => {
+      const acctNum = String(a[`${bureau}_account_number`] ?? '');
+      const bal = String(a[`${bureau}_balance`] ?? '');
+      if (!acctNum && !bal && !Array.isArray(a.bureaus)) return null;
+      if (!(Array.isArray(a.bureaus) ? a.bureaus : []).includes(bureau)) return null;
+      return {
+        account_number: acctNum,
+        balance: bal,
+        date_opened: String(a.date_opened ?? ''),
+        account_status: String(a.account_status ?? ''),
+        estimated_removal: String(a.estimated_removal ?? ''),
+        addresses: [],
+        phone_numbers: [],
+        name_variations: [],
+      };
+    };
+
+    const mapAccount = (a: Record<string, unknown>, standing: 'negative' | 'positive') => ({
       client_id: clientId,
       creditor_name: String(a.creditor_name ?? ''),
       original_creditor: String(a.original_creditor ?? ''),
@@ -265,11 +315,19 @@ Return a JSON object in exactly this shape:
       account_number_equifax: String(a.equifax_account_number ?? ''),
       account_number_experian: String(a.experian_account_number ?? ''),
       account_number_transunion: String(a.transunion_account_number ?? ''),
+      equifax_balance: String(a.equifax_balance ?? ''),
+      experian_balance: String(a.experian_balance ?? ''),
+      transunion_balance: String(a.transunion_balance ?? ''),
       balance: String(a.balance ?? ''),
       date_opened: String(a.date_opened ?? ''),
       account_type: String(a.account_type ?? ''),
       account_status: String(a.account_status ?? ''),
+      account_standing: standing,
+      account_reason: String(a.account_reason ?? ''),
       bureaus: Array.isArray(a.bureaus) ? a.bureaus : [],
+      equifax_data: buildBureauData(a, 'equifax'),
+      experian_data: buildBureauData(a, 'experian'),
+      transunion_data: buildBureauData(a, 'transunion'),
       duplicate_flag: Boolean(a.duplicate_flag),
       duplicate_note: String(a.duplicate_note ?? ''),
       balance_inconsistency: Boolean(a.balance_inconsistency),
@@ -281,7 +339,12 @@ Return a JSON object in exactly this shape:
       dispute_types: [],
       dispute_tag: null,
       notes: '',
-    }));
+    });
+
+    const rows = [
+      ...(parsed.negative_accounts ?? []).map((a) => mapAccount(a, 'negative')),
+      ...(parsed.positive_accounts ?? []).map((a) => mapAccount(a, 'positive')),
+    ];
 
     let inserted: Array<Record<string, unknown>> = [];
     if (rows.length > 0) {
@@ -303,7 +366,6 @@ Return a JSON object in exactly this shape:
         status: 'analyzing',
         case_type: String(parsed.overall_case_type ?? 'identity_theft'),
         strategy_notes: String(parsed.overall_strategy ?? ''),
-        positive_accounts: parsed.positive_accounts ?? [],
         personal_info_errors: parsed.personal_info_errors ?? {},
         inquiries: (parsed.inquiries ?? []).filter(
           (q) => String(q.inquiry_type) === 'hard'
@@ -315,26 +377,41 @@ Return a JSON object in exactly this shape:
       console.error('[analyze] client update error:', clientUpdErr);
     }
 
-    return res.status(200).json({ accounts: inserted, count: inserted.length });
+    const negativeCount = (parsed.negative_accounts ?? []).length;
+    const positiveCount = (parsed.positive_accounts ?? []).length;
+    return res.status(200).json({ accounts: inserted, count: negativeCount, positiveCount });
   }
 
-  // === PATCH: Update dispute_types for a single account ===
+  // === PATCH: Update fields for a single account ===
   if (req.method === 'PATCH') {
-    const { accountId, disputeTypes } = req.body ?? {};
-    if (typeof accountId !== 'string' || !accountId || !Array.isArray(disputeTypes)) {
-      return res.status(400).json({ error: 'Missing accountId or disputeTypes' });
+    const body = req.body ?? {};
+    const { accountId, ...fields } = body;
+    if (typeof accountId !== 'string' || !accountId) {
+      return res.status(400).json({ error: 'Missing accountId' });
     }
-
+    const allowed = [
+      'dispute_types', 'dispute_tag', 'selected', 'notes',
+      'creditor_name', 'original_creditor', 'account_type',
+      'equifax_data', 'experian_data', 'transunion_data',
+      'account_number_equifax', 'account_number_experian', 'account_number_transunion',
+      'equifax_balance', 'experian_balance', 'transunion_balance',
+      'account_standing', 'account_reason',
+    ];
+    const update: Record<string, unknown> = {};
+    for (const key of allowed) {
+      if (key in fields) update[key] = fields[key];
+    }
+    if (Object.keys(update).length === 0) {
+      return res.status(400).json({ error: 'No valid fields to update' });
+    }
     const { error: updErr } = await supabase
       .from('dispute_accounts')
-      .update({ dispute_types: disputeTypes })
+      .update(update)
       .eq('id', accountId);
-
     if (updErr) {
-      console.error('[analyze-reports] dispute_types update error:', updErr);
-      return res.status(500).json({ error: 'Failed to update dispute type' });
+      console.error('[analyze-reports] patch error:', updErr);
+      return res.status(500).json({ error: 'Failed to update account', detail: updErr.message });
     }
-
     return res.status(200).json({ success: true });
   }
 
