@@ -2239,11 +2239,47 @@ const LettersTab = ({
   const toggle = (id: string) => setSelected((s) => ({ ...s, [id]: !s[id] }));
   const selectedIds = Object.keys(selected).filter((k) => selected[k]);
 
+  // Strategy-derived furnisher set: captures accounts where Claude assigned §623/§809
+  // in dispute_strategy.section_b during Run Strategy, even if the admin never manually
+  // checked the FCRA boxes in the Analyze tab. Without this, such accounts (e.g., CRM
+  // and PRESTO) are silently excluded from furnisher letter generation.
+  const strategy = client.dispute_strategy as Record<string, unknown> | null | undefined;
+  const sectionB = (strategy?.section_b ?? []) as Array<{
+    creditor_name?: string;
+    recommended_path?: string;
+  }>;
+  const strategyFurnisherCreditors = new Set<string>();
+  for (const item of sectionB) {
+    const path = String(item?.recommended_path ?? '');
+    if (path.includes('623') || path.includes('809')) {
+      const name = String(item?.creditor_name ?? '').trim();
+      if (name) strategyFurnisherCreditors.add(name);
+    }
+  }
+
+  // Pick the correct furnisher letter type for a creditor group.
+  // Prefers dispute_types from accounts (admin-checked); falls back to strategy section_b.
+  const pickFurnisherLetterType = (credAccts: ClientDetail['accounts'], creditorName: string): LetterTypeKey => {
+    const types = credAccts.flatMap((a) => a.dispute_types ?? []);
+    if (types.includes('623')) return '623';
+    if (types.includes('809')) return '809';
+    const strategyItem = sectionB.find((item) => String(item?.creditor_name ?? '').trim() === creditorName);
+    const path = String(strategyItem?.recommended_path ?? '');
+    if (path.includes('623')) return '623';
+    return '809';
+  };
+
   const furnisherMap: Record<string, ClientDetail['accounts']> = {};
   for (const a of accounts) {
-    if ((a.dispute_types ?? []).some((t: string) => ['623', '809'].includes(t))) {
-      const key = (a.original_creditor as string | undefined) || a.creditor_name;
-      furnisherMap[key] = [...(furnisherMap[key] ?? []), a];
+    const hasDisputeType = (a.dispute_types ?? []).some((t: string) => ['623', '809'].includes(t));
+    const hasStrategyPath = strategyFurnisherCreditors.has(a.creditor_name);
+    if (hasDisputeType || hasStrategyPath) {
+      // Prefer creditor_name (the actual reporting furnisher) over original_creditor
+      // (which may be just a program label, not a mailable entity — e.g., "DIRECT LOANS").
+      const key = a.creditor_name || (a.original_creditor as string | undefined) || '';
+      if (key) {
+        furnisherMap[key] = [...(furnisherMap[key] ?? []), a];
+      }
     }
   }
   const furnisherGroups = Object.entries(furnisherMap);
@@ -2307,8 +2343,7 @@ const LettersTab = ({
         const [creditorName, credAccts] = furnisherGroups[i];
         setPhase1Steps((p) => p.map((s, idx) => idx === offset + i ? { ...s, status: 'generating' } : s));
         setBusyMsg(`Generating letter to ${creditorName}…`);
-        const types = credAccts.flatMap((a) => a.dispute_types ?? []);
-        const lType: LetterTypeKey = types.includes('623') ? '623' : '809';
+        const lType: LetterTypeKey = pickFurnisherLetterType(credAccts, creditorName);
         const res = await fetch('/api/generate-letters', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...adminHeaders() },
@@ -2429,8 +2464,7 @@ const LettersTab = ({
     setBusy(true);
     try {
       for (const [creditorName, credAccts] of furnisherGroups) {
-        const types = credAccts.flatMap((a) => a.dispute_types ?? []);
-        const lType: LetterTypeKey = types.includes('623') ? '623' : '809';
+        const lType: LetterTypeKey = pickFurnisherLetterType(credAccts, creditorName);
         setBusyMsg(`Generating letter to ${creditorName}…`);
         const res = await fetch('/api/generate-letters', {
           method: 'POST',
@@ -2793,8 +2827,7 @@ const LettersTab = ({
           </p>
           <div className="bg-[#0f0f0f] border border-neutral-800 rounded-sm p-3 mb-4 space-y-1">
             {furnisherGroups.map(([name, accts]) => {
-              const types = accts.flatMap((a) => a.dispute_types ?? []);
-              const lType = types.includes('623') ? '§623' : '§809';
+              const lType = `§${pickFurnisherLetterType(accts, name)}`;
               return (
                 <div key={name} className="flex items-center justify-between text-xs">
                   <span className="text-white">{name}</span>
