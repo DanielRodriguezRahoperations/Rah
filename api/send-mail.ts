@@ -159,6 +159,38 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     })();
   }
 
+  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
+  if (resendKey && adminEmail) {
+    (async () => {
+      try {
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            from: 'RAH Operations <noreply@rahoperations.com>',
+            to: adminEmail,
+            subject: `Letter Mailed: ${cl.full_name as string} -> ${recipientName}`,
+            html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
+              <h2 style="color:#1a1a1a;">Dispute Letter Mailed via Lob</h2>
+              <p>A dispute letter has been dispatched via USPS Certified Mail.</p>
+              <div style="background:#f5f5f5;padding:16px;border-radius:4px;margin:20px 0;">
+                <p style="margin:0;"><strong>Client:</strong> ${cl.full_name as string}</p>
+                <p style="margin:8px 0 0;"><strong>Recipient:</strong> ${recipientName}</p>
+                <p style="margin:8px 0 0;"><strong>Recipient Address:</strong><br/>${recipientAddress.split('\n').join('<br/>')}</p>
+                <p style="margin:8px 0 0;"><strong>Letter Type:</strong> ${((letter as Record<string, unknown>).letter_type as string) ?? 'N/A'}</p>
+                <p style="margin:8px 0 0;"><strong>Date Mailed:</strong> ${new Date().toLocaleDateString()}</p>
+                <p style="margin:8px 0 0;"><strong>USPS Tracking:</strong> ${lobData.tracking_number}</p>
+                <p style="margin:8px 0 0;"><strong>Lob Letter ID:</strong> ${lobData.id}</p>
+              </div>
+              <p>Track at <a href="https://tools.usps.com/go/TrackConfirmAction?tLabels=${lobData.tracking_number}">USPS.com</a> or view in <a href="https://dashboard.lob.com/letters/${lobData.id}">Lob Dashboard</a>.</p>
+              <p style="color:#666;font-size:13px;margin-top:32px;">RAH Operations Admin Notification</p>
+            </div>`,
+          }),
+        });
+      } catch { /* non-critical */ }
+    })();
+  }
+
   return res.status(200).json({
     success: true,
     lobLetterId: lobData.id,
