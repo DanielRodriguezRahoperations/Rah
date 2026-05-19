@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "How to Get More Google Reviews for Your Business Fast",
+      displayTitle: "How to Get More Google Reviews for Your Business Fast (And Why It Matters in 2026)",
+      date: "May 19, 2026",
+      pubDate: "Tue, 19 May 2026 04:01:14 GMT",
+      issue: 'No. 074',
+      category: "Digital Marketing",
+      excerpt: "Google reviews are one of the most powerful trust signals for local businesses in Arizona. If you are not actively collecting them, you are leaving revenue on the table. This guide breaks down exactly how to get more Google reviews fast and turn them into a competitive advantage.",
+      slug: 'how-to-get-more-google-reviews-for-your-business-fast'
+    },
+    {
       title: "How to Optimize Your Google Business Profile to Rank Higher",
       displayTitle: "How to Optimize Your Google Business Profile to Rank Higher in Local Search",
       date: "May 19, 2026",
