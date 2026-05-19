@@ -6,6 +6,16 @@ import { absoluteUrl } from '../utils/url';
 const BlogPage = () => {
   const posts = [
     {
+      title: "How to Optimize Your Google Business Profile to Rank Higher",
+      displayTitle: "How to Optimize Your Google Business Profile to Rank Higher in Local Search",
+      date: "May 19, 2026",
+      pubDate: "Tue, 19 May 2026 00:02:32 GMT",
+      issue: 'No. 073',
+      category: "SEO",
+      excerpt: "Your Google Business Profile is one of the most powerful free tools available for local businesses in Arizona. When optimized correctly, it can push your business to the top of Google Maps and local search results. Learn the exact steps to outrank your competition and drive more customers through your door.",
+      slug: 'how-to-optimize-your-google-business-profile-to-rank-higher'
+    },
+    {
       title: "SEO for Beginners: Complete Guide for Small Business Owners",
       displayTitle: "SEO for Beginners: The Complete Guide Every Small Business Owner Needs",
       date: "May 18, 2026",
