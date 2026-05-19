@@ -243,7 +243,8 @@ function classifyAndBuildLines(
 async function drawTextPages(
   pdf: PDFDocument,
   text: string,
-  fontSize = 11
+  fontSize = 11,
+  firstPageTopOffset = 0
 ): Promise<void> {
   const fontRegular = await pdf.embedFont(StandardFonts.TimesRoman);
   const fontBold = await pdf.embedFont(StandardFonts.TimesRomanBold);
@@ -260,7 +261,7 @@ async function drawTextPages(
   const lines = classifyAndBuildLines(sanitized, fontSize, charsPerLineBody, charsPerLineBold);
 
   let page = pdf.addPage(PageSizes.Letter);
-  let y = pageHeight - margin;
+  let y = pageHeight - margin - firstPageTopOffset;
 
   for (const ls of lines) {
     const lineHeight = ls.size * 1.4;
@@ -399,13 +400,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const pdf = await PDFDocument.create();
 
-  // Page 1: packet top slip
-  if (letter.packet_top_slip) {
-    await drawTextPages(pdf, letter.packet_top_slip, 12);
-  }
-  // Letter content
+  // Letter content (108pt = 1.5" extra top offset on page 1 for Lob address block)
   if (letter.content) {
-    await drawTextPages(pdf, letter.content, 11);
+    await drawTextPages(pdf, letter.content, 11, 108);
   }
   // Attachment A
   if (letter.attachment_a) {
